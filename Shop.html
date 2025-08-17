@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JCHAT - Emoji Premium Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --pink: #ff2e92;
+      --blue: #00d5ff;
+      --bg: #0d0f13;
+      --card: rgba(255,255,255,0.03);
+      --text: #f5f7fa;
+      --muted: rgba(255,255,255,0.65);
+      --border: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at -10% -20%, rgba(0,213,255,0.12), transparent 60%),
+                  radial-gradient(1200px 800px at 110% 120%, rgba(255,46,146,0.12), transparent 60%),
+                  var(--bg);
+      min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px;
+    }
+    .container { width: 100%; max-width: 980px; }
+    .header {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      margin: 8px 0 16px; padding: 12px 16px; border: 1px solid var(--border);
+      background: var(--card); border-radius: 14px; backdrop-filter: blur(8px);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo { font-family: Poppins, sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+    .logo .grad { background: linear-gradient(90deg, var(--blue), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .back { color: var(--text); text-decoration: none; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; display: inline-flex; align-items: center; gap: 8px; }
+    .grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .card { border: 1px solid var(--border); background: var(--card); border-radius: 14px; padding: 14px; }
+    h1 { font-family: Poppins, sans-serif; font-weight: 800; margin: 0 0 8px; font-size: 1.6rem; }
+    .muted { color: var(--muted); font-size: 0.95rem; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 6px; }
+    .btn {
+      border: 1px solid var(--border); background: linear-gradient(90deg, rgba(0,213,255,0.12), rgba(255,46,146,0.12));
+      color: var(--text); padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn.primary { background: linear-gradient(90deg, var(--blue), var(--pink)); border-color: transparent; }
+    .btn.block { width: 100%; justify-content: center; }
+
+    .packs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
+    .pack { border: 1px solid var(--border); background: rgba(255,255,255,0.02); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 10px; }
+    .pack input { accent-color: #25d366; width: 18px; height: 18px; }
+    .pack .name { font-weight: 700; }
+    .pack .price { margin-left: auto; font-weight: 800; color: #e6f4ff; background: rgba(0,213,255,0.12); border: 1px solid var(--border); border-radius: 999px; padding: 4px 8px; }
+
+    .summary { display: grid; gap: 10px; }
+    .row { display: flex; align-items: center; gap: 10px; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); font-weight: 800; }
+    .copy { border: 1px solid var(--border); background: transparent; color: var(--text); border-radius: 10px; padding: 6px 8px; cursor: pointer; }
+
+    .info { border: 1px dashed var(--border); border-radius: 12px; padding: 10px; }
+    .bank { display: grid; gap: 10px; }
+    .bank .card { padding: 10px; }
+
+    input[type="file"] { display: block; }
+
+    .msg { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); padding: 10px 16px; border-radius: 10px; color: #fff; display: none; }
+    .msg.show { display: block; }
+    .msg.success { background: #16a34a; }
+    .msg.error { background: #dc2626; }
+    .msg.info { background: #2563eb; }
+
+    /* Pulse highlight for preselected items */
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(37,211,102,0.6)} 70%{box-shadow:0 0 0 10px rgba(37,211,102,0)} 100%{box-shadow:0 0 0 0 rgba(37,211,102,0)} }
+    .highlight { animation: pulse 1.6s ease-out 2; border-color: #25d366 !important; }
+
+    /* Receipt upload styles */
+    .file-input-wrapper { display:flex; align-items:center; gap:8px; border:1px dashed var(--border); padding:8px 10px; border-radius:10px; cursor:pointer; }
+    .file-input-wrapper i { color: var(--pink); }
+    .file-input-wrapper .file-name { font-size:.85rem; color:var(--muted); }
+    .receipt-preview { width:100%; max-height:160px; object-fit:contain; margin-top:8px; border:1px solid var(--border); border-radius:10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <div class="logo"><span class="grad">JCHAT</span> Emoji Store</div>
+      </div>
+      <a class="back" href="/chat.html"><i class="fas fa-comments"></i> Back to Chat</a>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h1>Buy Emoji Premium</h1>
+        <div class="muted">Buy all emoji packs at once or pick the categories you need.</div>
+        <div class="actions">
+          <button id="buyAllBtn" class="btn primary"><i class="fas fa-gem"></i> Buy All Emoji Packs</button>
+          <button id="clearBtn" class="btn"><i class="fas fa-rotate-left"></i> Clear Selection</button>
+        </div>
+        <div class="packs" id="packs"></div>
+      </div>
+
+      <div class="card">
+        <h1>Checkout</h1>
+        <div class="summary">
+          <div class="row">
+            <div class="chip"><i class="fas fa-tag"></i> <span id="summaryAmount">₦0</span></div>
+            <div class="chip"><i class="fas fa-boxes-stacked"></i> <span id="summaryCount">0 packs</span></div>
+          </div>
+          <div class="row">
+            <div><strong>Order ID:</strong> <span id="orderId"></span></div>
+            <button id="copyOrderId" class="copy"><i class="fas fa-copy"></i></button>
+          </div>
+          <div class="info">
+            <div class="muted" style="margin-bottom:6px">Step 1: Make a bank transfer using the details below. Use your Order ID as reference.</div>
+            <div class="bank">
+              <div class="card">
+                <div class="row" style="gap:8px"><i class="fas fa-university" style="color:#ffd700"></i><div><strong>Bank:</strong> OPay</div></div>
+                <div><strong>Account Name:</strong> ELECHI JOSHUA</div>
+                <div><strong>Account Number:</strong> <span id="opayAcct">8111609765</span> <button id="copyOpay" class="copy">Copy</button></div>
+              </div>
+              <div class="card">
+                <div class="row" style="gap:8px"><i class="fas fa-university" style="color:#ffd700"></i><div><strong>Bank:</strong> Keystone Bank</div></div>
+                <div><strong>Account Name:</strong> ELECHI OSOUNDU JOSHUA</div>
+                <div><strong>Account Number:</strong> <span id="keystoneAcct">6042862356</span> <button id="copyKeystone" class="copy">Copy</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="info">
+            <label for="receiptUploadInput" style="display:block; font-weight:700; margin-bottom:6px">Step 2: Upload payment receipt (optional)</label>
+            <div class="file-input-wrapper">
+              <input type="file" id="receiptUploadInput" accept="image/*,.pdf" style="display:none;">
+              <i class="fas fa-upload"></i>
+              <span class="file-name" id="receiptFileName">No file chosen</span>
+            </div>
+            <img id="receiptPreview" class="receipt-preview" style="display:none;">
+            <div id="checkoutError" class="muted" style="color:#ffb4b4"></div>
+          </div>
+          <button id="submitBtn" class="btn primary block"><span class="text">Submit Order</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="msg info">Info</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+      apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+      authDomain: "jchat-1.firebaseapp.com",
+      projectId: "jchat-1",
+      storageBucket: "jchat-1.firebasestorage.app",
+      messagingSenderId: "328479683167",
+      appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+      measurementId: "G-S6Z9GG0R9P"
+    };
+    const cloudinaryConfig = { cloudName: "dxld01rcp", uploadPreset: "Storage_preset" };
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? initialAuthToken : null;
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    const PACK_PRICE = 300; // NGN per pack
+    const PACKS = [
+      { id:'smileys', name:'Smileys' },
+      { id:'hands',   name:'Hands' },
+      { id:'hearts',  name:'Hearts' },
+      { id:'party',   name:'Party' },
+      { id:'animals', name:'Animals' },
+      { id:'food',    name:'Food' },
+      { id:'misc',    name:'More' },
+      { id:'travel',  name:'Travel' },
+      { id:'nature',  name:'Nature' },
+      { id:'sports',  name:'Sports' },
+      { id:'music',   name:'Music' },
+      { id:'objects', name:'Objects' },
+      { id:'food2',   name:'Foods 2' },
+      { id:'faces2',  name:'Faces 2' },
+      { id:'activity',name:'Activities' },
+    ];
+
+    const packsEl = document.getElementById('packs');
+    const buyAllBtn = document.getElementById('buyAllBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const summaryAmount = document.getElementById('summaryAmount');
+    const summaryCount = document.getElementById('summaryCount');
+    const orderIdEl = document.getElementById('orderId');
+    const copyOrderIdBtn = document.getElementById('copyOrderId');
+    const copyOpay = document.getElementById('copyOpay');
+    const copyKeystone = document.getElementById('copyKeystone');
+    const submitBtn = document.getElementById('submitBtn');
+    const checkoutError = document.getElementById('checkoutError');
+    const toast = document.getElementById('toast');
+    const receiptUploadInput = document.getElementById('receiptUploadInput');
+    const receiptFileNameSpan = document.getElementById('receiptFileName');
+    const receiptPreviewImg = document.getElementById('receiptPreview');
+    let selectedReceiptFile = null;
+    if (receiptUploadInput) {
+      const fileInputWrapper = document.querySelector('.file-input-wrapper');
+      fileInputWrapper?.addEventListener('click', () => receiptUploadInput.click());
+      receiptUploadInput.addEventListener('change', handleReceiptUpload);
+    }
+
+    let currentUser = null;
+
+    function showToast(message, type = 'info') {
+      toast.textContent = message;
+      toast.className = `msg show ${type}`;
+      setTimeout(() => { toast.className = 'msg'; }, 2500);
+    }
+
+    // Play transaction sound (tries ne.mp3, then WebAudio beep fallback)
+    async function playTransactionSound() {
+      try {
+        const audio = new Audio('ne.mp3');
+        audio.volume = 0.7;
+        await audio.play();
+        return;
+      } catch (_) {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = 880; // A5
+          gain.gain.value = 0.0001;
+          osc.connect(gain).connect(ctx.destination);
+          osc.start();
+          gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+          osc.stop(ctx.currentTime + 0.16);
+        } catch {}
+      }
+    }
+
+    function generateOrderId() {
+      // Generate a compact, unique ID: timestamp base-36 + 4-char random segment
+      const ts = Date.now().toString(36).toUpperCase(); // e.g., LZJ0HW3
+      const rand = Math.random().toString(36).substring(2, 6).toUpperCase(); // e.g., 3F9K
+      return `EMOJI-${ts}-${rand}`;
+    }
+    function getSelectedPackIds() {
+      return Array.from(document.querySelectorAll('.pack input[type="checkbox"]:checked')).map(i => i.value);
+    }
+    function updateSummary() {
+      const count = getSelectedPackIds().length;
+      const total = count * PACK_PRICE;
+      summaryAmount.textContent = `₦${total.toLocaleString('en-NG')}`;
+      summaryCount.textContent = `${count} ${count === 1 ? 'pack' : 'packs'}`;
+      if (!orderIdEl.textContent) orderIdEl.textContent = generateOrderId();
+    }
+
+    function renderPacks() {
+      packsEl.innerHTML = '';
+      for (const p of PACKS) {
+        const div = document.createElement('label');
+        div.className = 'pack';
+        div.innerHTML = `<input type="checkbox" value="${p.id}"><span class="name">${p.name}</span><span class="price">₦${PACK_PRICE}</span>`;
+        div.querySelector('input').addEventListener('change', updateSummary);
+        packsEl.appendChild(div);
+      }
+    }
+
+    buyAllBtn.addEventListener('click', () => {
+      document.querySelectorAll('.pack input[type="checkbox"]').forEach(chk => chk.checked = true);
+      orderIdEl.textContent = generateOrderId();
+      updateSummary();
+    });
+    clearBtn.addEventListener('click', () => {
+      document.querySelectorAll('.pack input[type="checkbox"]').forEach(chk => chk.checked = false);
+      orderIdEl.textContent = '';
+      updateSummary();
+    });
+
+    copyOrderIdBtn.addEventListener('click', () => {
+      const t = orderIdEl.textContent || '';
+      if (!t) return;
+      navigator.clipboard.writeText(t).then(() => showToast('Order ID copied', 'success'));
+    });
+    copyOpay.addEventListener('click', () => {
+      const t = document.getElementById('opayAcct').textContent || '';
+      if (t) navigator.clipboard.writeText(t).then(() => showToast('OPay account copied', 'success'));
+    });
+    copyKeystone.addEventListener('click', () => {
+      const t = document.getElementById('keystoneAcct').textContent || '';
+      if (t) navigator.clipboard.writeText(t).then(() => showToast('Keystone account copied', 'success'));
+    });
+
+    async function handleReceiptUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        selectedReceiptFile = file;
+        if (receiptFileNameSpan) receiptFileNameSpan.textContent = file.name;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (receiptPreviewImg) { receiptPreviewImg.src = e.target.result; receiptPreviewImg.style.display = 'block'; }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        selectedReceiptFile = null;
+        if (receiptFileNameSpan) receiptFileNameSpan.textContent = 'No file chosen';
+        if (receiptPreviewImg) { receiptPreviewImg.style.display = 'none'; receiptPreviewImg.src = ''; }
+      }
+    }
+
+    async function submitOrder() {
+      checkoutError.textContent = '';
+      const selected = getSelectedPackIds();
+      if (selected.length === 0) { checkoutError.textContent = 'Please select at least one emoji category.'; return; }
+      const orderId = orderIdEl.textContent || generateOrderId();
+      const amount = selected.length * PACK_PRICE;
+      let uploadedReceiptUrl = null;
+      if (selectedReceiptFile) {
+        try {
+          const formData = new FormData();
+          formData.append('file', selectedReceiptFile);
+          formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+          const resp = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`, { method:'POST', body: formData });
+          if (!resp.ok) throw new Error('Receipt upload failed');
+          const data = await resp.json();
+          uploadedReceiptUrl = data.secure_url;
+        } catch (e) {
+          console.error('Cloudinary upload failed:', e);
+        }
+      }
+      if (!currentUser) { showToast('Please log in.', 'error'); return; }
+
+      try {
+        submitBtn.disabled = true; submitBtn.querySelector('.text').textContent = 'Submitting...';
+
+        // Cap UI waiting time to 3 seconds max
+        let finalized = false;
+        const finalizeUI = () => {
+          if (finalized) return;
+          finalized = true;
+          submitBtn.disabled = false; submitBtn.querySelector('.text').textContent = 'Submit Order';
+          showToast('Order submitted. Complete transfer and wait for approval.', 'success');
+          playTransactionSound();
+          orderIdEl.textContent = generateOrderId();
+          if (receiptUploadInput) receiptUploadInput.value = '';
+        };
+        const uiTimeout = setTimeout(finalizeUI, 3000);
+
+        // Create order immediately for fast submission
+        const orderRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'orders'));
+        const orderData = {
+          orderId,
+          userId: currentUser.uid,
+          itemType: 'emoji_packs',
+          itemIds: selected.map(id => `stickers:${id}`),
+          amount: `₦${amount}`,
+          currency: 'NGN',
+          status: 'pending',
+          createdAt: serverTimestamp(),
+          ...(uploadedReceiptUrl ? { receiptImageUrl: uploadedReceiptUrl } : {})
+        };
+        await setDoc(orderRef, orderData);
+
+        // Finalize UI now (or by timeout if already elapsed)
+        clearTimeout(uiTimeout);
+        finalizeUI();
+
+        // Cloudinary upload handled above; nothing else to do here.
+      } catch (e) {
+        console.error(e);
+        checkoutError.textContent = e?.message || 'Failed to submit order';
+      } finally {
+        // UI finalized above (either immediately or by timeout)
+      }
+    }
+
+    submitBtn.addEventListener('click', submitOrder);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+      } else {
+        try {
+          if (initialAuthToken) {
+            await signInWithCustomToken(auth, initialAuthToken);
+          } else {
+            await signInAnonymously(auth);
+          }
+        } catch (_) { /* ignore */ }
+      }
+    });
+
+    renderPacks();
+    updateSummary();
+
+    // Preselect from URL params ?select=smileys,hands
+    (function preselectFromUrl(){
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const raw = (params.get('select') || '').split(',').map(s => s.trim()).filter(Boolean);
+        const sel = raw.map(id => id.startsWith('stickers:') ? id.split(':')[1] : id);
+        if (sel.length === 0) return;
+        let firstEl = null;
+        const items = Array.from(packsEl.querySelectorAll('.pack'));
+        items.forEach((div) => {
+          const inp = div.querySelector('input[type="checkbox"]');
+          if (!inp) return;
+          if (sel.includes(inp.value)) {
+            inp.checked = true;
+            div.classList.add('highlight');
+            if (!firstEl) firstEl = div;
+          }
+        });
+        updateSummary();
+        if (firstEl) firstEl.scrollIntoView({behavior:'smooth', block:'center'});
+      } catch (_) {}
+    })();
+  </script>
+</body>
+</html>
