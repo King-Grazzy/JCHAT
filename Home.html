@@ -2651,6 +2651,24 @@
         // Theme switcher functionality
         let currentTheme = 'theme-dark-mode'; // Default theme
         const themeSwitcherThemes = ['theme-dark-mode', 'theme-light-mode'];
+        // Theme purchase/lock state
+        let purchasedThemeProductIds = new Set();
+        let pendingThemeProductIds = new Set();
+        // Map Shop product IDs (themes category) to Home theme classes
+        const productIdToThemeClass = {
+            1: 'theme-glass-mode',     // Neon Cyberpunk -> Glass vibe
+            2: 'theme-sunset-mode',    // Ocean Breeze -> Sunset vibe
+            3: 'theme-dark-mode',      // Dark Galaxy -> Dark (already free)
+            4: 'theme-light-mode'      // Minimalist Pro -> Light (already free)
+        };
+        // Catalog for picker UI
+        const themeCatalog = [
+            { key: 'theme-dark-mode',  name: 'Dark',   free: true,  productId: 3 },
+            { key: 'theme-light-mode', name: 'Light',  free: true,  productId: 4 },
+            { key: 'theme-glass-mode', name: 'Glass',  free: false, productId: 1 },
+            { key: 'theme-sunset-mode',name: 'Sunset', free: false, productId: 2 },
+        ];
+        let themePickerEl = null;
 
         // Initialize theme switcher
         function initializeThemeSwitcher() {
@@ -2661,7 +2679,10 @@
             // Add event listener to theme switcher button
             themeSwitcherBtn = document.getElementById('themeSwitcherBtn');
             if (themeSwitcherBtn) {
-                themeSwitcherBtn.addEventListener('click', cycleTheme);
+                themeSwitcherBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openThemePicker();
+                });
             }
         }
 
@@ -2698,6 +2719,105 @@
             // Show theme change notification
             const themeName = theme.replace('theme-', '').replace('-mode', '');
             if (typeof showMessageBox === 'function') { showMessageBox(`Theme changed to ${themeName} mode`, 'success'); }
+        }
+
+        // Theme Picker UI
+        function ensureThemePicker() {
+            if (themePickerEl) return themePickerEl;
+            themePickerEl = document.createElement('div');
+            themePickerEl.id = 'themePicker';
+            themePickerEl.style.position = 'fixed';
+            themePickerEl.style.top = '60px';
+            themePickerEl.style.right = '20px';
+            themePickerEl.style.zIndex = '2000';
+            themePickerEl.style.background = 'var(--card-background)';
+            themePickerEl.style.border = '1px solid var(--border-light)';
+            themePickerEl.style.borderRadius = '12px';
+            themePickerEl.style.minWidth = '220px';
+            themePickerEl.style.boxShadow = '0 10px 30px rgba(0,0,0,.3)';
+            themePickerEl.style.backdropFilter = 'blur(20px)';
+            themePickerEl.style.display = 'none';
+            document.body.appendChild(themePickerEl);
+            return themePickerEl;
+        }
+
+        function buildThemePickerList() {
+            const el = ensureThemePicker();
+            const rows = themeCatalog.map(t => {
+                const owned = t.free || purchasedThemeProductIds.has(t.productId);
+                const pending = !owned && pendingThemeProductIds.has(t.productId);
+                const active = currentTheme === t.key;
+                const state = owned ? (active ? 'Current' : 'Owned') : (pending ? 'Pending' : 'Locked');
+                const stateStyle = owned ? 'color:#7CFC00' : (pending ? 'color:#FFC107' : 'color:#ff9aa2');
+                const disabledAttr = owned ? '' : 'data-locked="true"';
+                return `<button class="icon-btn" data-theme="${t.key}" data-product-id="${t.productId||''}" ${disabledAttr} style="width:100%;display:flex;justify-content:space-between;align-items:center;margin:0;border:none;background:transparent;border-bottom:1px solid var(--border-light);padding:10px 12px;${active?'background: rgba(255,255,255,0.04);':''}">
+                            <span>${t.name}</span>
+                            <span style="${stateStyle}">${state}</span>
+                        </button>`;
+            }).join('');
+            el.innerHTML = `<div style="padding:8px 8px 0 8px;font-weight:700">Themes</div>${rows}<div style="padding:8px;color:var(--text-light);font-size:.85rem;">Locked themes require purchase from the Shop.</div>`;
+            el.querySelectorAll('button[data-theme]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const themeKey = btn.getAttribute('data-theme');
+                    const locked = btn.hasAttribute('data-locked');
+                    const pid = Number(btn.getAttribute('data-product-id')||'0');
+                    if (locked) {
+                        // Redirect to Shop for this product
+                        window.location.href = 'Shop.html';
+                        if (typeof showMessageBox === 'function') {
+                            showMessageBox('This theme is locked. Purchase it in the Shop to unlock.', 'warning');
+                        }
+                        return;
+                    }
+                    setTheme(themeKey);
+                    closeThemePicker();
+                });
+            });
+        }
+
+        function openThemePicker() {
+            buildThemePickerList();
+            const el = ensureThemePicker();
+            el.style.display = 'block';
+            // Close on outside click
+            const handler = (e) => {
+                if (!el.contains(e.target) && e.target !== themeSwitcherBtn) {
+                    closeThemePicker();
+                    document.removeEventListener('click', handler);
+                }
+            };
+            setTimeout(() => document.addEventListener('click', handler), 0);
+        }
+        function closeThemePicker() { if (themePickerEl) themePickerEl.style.display = 'none'; }
+
+        // Subscribe to purchases and pending requests for themes
+        async function subscribeThemeEntitlements(userId) {
+            try {
+                const purchasesDocRef = doc(db, 'artifacts', appId, 'users', userId, 'shop', 'purchases');
+                onSnapshot(purchasesDocRef, (docSnap) => {
+                    const next = new Set();
+                    if (docSnap.exists()) {
+                        const items = Array.isArray(docSnap.data().items) ? docSnap.data().items : [];
+                        items.forEach(it => { if (it && it.category === 'themes') next.add(Number(it.id)); });
+                    }
+                    purchasedThemeProductIds = next;
+                });
+            } catch (e) { console.warn('Theme purchases subscription failed:', e); }
+
+            try {
+                const reqCol = collection(db, 'artifacts', appId, 'public', 'data', 'shop_payment_requests');
+                const qRef = query(reqCol, where('userId', '==', userId), where('status', '==', 'pending'));
+                onSnapshot(qRef, (snap) => {
+                    const next = new Set();
+                    snap.forEach(d => {
+                        const r = d.data();
+                        if (Array.isArray(r.items)) {
+                            r.items.forEach(it => { if (it && it.category === 'themes') next.add(Number(it.id)); });
+                        }
+                    });
+                    pendingThemeProductIds = next;
+                });
+            } catch (e) { console.warn('Theme pending subscription failed:', e); }
         }
         // Function to initialize all DOM elements safely
         function initializeDOMElements() {
@@ -5941,6 +6061,9 @@
                 await fetchSystemSettings(); // Initial fetch of system settings.
                 await fetchAndDisplayPosts(); // This will setup all real-time listeners for posts and comments.
                 fetchNotificationCount(user.uid);
+
+                // Theme entitlements
+                subscribeThemeEntitlements(user.uid);
 
 
             } else {
