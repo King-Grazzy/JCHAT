@@ -4515,6 +4515,18 @@
                     tx.update(reqRef, { status: 'approved', approvedAt: serverTimestamp(), approvedBy: currentUser?.uid || null });
                 });
 
+                // Create a notification for the user
+                try {
+                    const notifRef = collection(db, 'artifacts', appId, 'users', (await getDoc(doc(db, 'artifacts', appId, 'public', 'data', 'shop_payment_requests', requestId))).data().userId, 'notifications');
+                    await addDoc(notifRef, {
+                        type: 'shop_payment_approved',
+                        title: 'Your purchase was approved',
+                        message: 'Your items have been unlocked. Enjoy your new content!',
+                        timestamp: serverTimestamp(),
+                        read: false
+                    });
+                } catch (_) {}
+
                 showMessageBox('Payment approved and items delivered.', 'success');
             } catch (e) {
                 console.error(e);
