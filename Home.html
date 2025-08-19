@@ -2874,14 +2874,14 @@
         const themeCatalog = [
             { key: 'theme-dark-mode',    name: 'Dark Galaxy Theme',      free: true,  productId: 3 },
             { key: 'theme-light-mode',   name: 'Minimalist Pro Theme',   free: true,  productId: 4 },
-            { key: 'theme-glass-mode',   name: 'Neon Cyberpunk Theme',   free: false, productId: 1 },
-            { key: 'theme-sunset-mode',  name: 'Ocean Breeze Theme',     free: false, productId: 2 },
-            { key: 'theme-ocean-mode',   name: 'Ocean Depths Theme',     free: false, productId: 5 },
-            { key: 'theme-forest-mode',  name: 'Forest Wilderness',     free: false, productId: 6 },
-            { key: 'theme-cosmic-mode',  name: 'Cosmic Void Theme',     free: false, productId: 7 },
-            { key: 'theme-retro-mode',   name: 'Retro Vaporwave',       free: false, productId: 8 },
-            { key: 'theme-neon-mode',    name: 'Neon Matrix Theme',     free: false, productId: 9 },
-            { key: 'theme-elegant-mode', name: 'Elegant Minimalist',    free: false, productId: 10 }
+            { key: 'theme-glass-mode',   name: 'Neon Cyberpunk Theme',   free: true, productId: 1 },
+            { key: 'theme-sunset-mode',  name: 'Ocean Breeze Theme',     free: true, productId: 2 },
+            { key: 'theme-ocean-mode',   name: 'Ocean Depths Theme',     free: true, productId: 5 },
+            { key: 'theme-forest-mode',  name: 'Forest Wilderness',     free: true, productId: 6 },
+            { key: 'theme-cosmic-mode',  name: 'Cosmic Void Theme',     free: true, productId: 7 },
+            { key: 'theme-retro-mode',   name: 'Retro Vaporwave',       free: true, productId: 8 },
+            { key: 'theme-neon-mode',    name: 'Neon Matrix Theme',     free: true, productId: 9 },
+            { key: 'theme-elegant-mode', name: 'Elegant Minimalist',    free: true, productId: 10 }
         ];
         let themePickerEl = null;
 
@@ -2963,12 +2963,16 @@
             themePickerEl.style.right = '20px';
             themePickerEl.style.zIndex = '2000';
             themePickerEl.style.background = 'var(--card-background)';
-            themePickerEl.style.border = '1px solid var(--border-light)';
-            themePickerEl.style.borderRadius = '12px';
-            themePickerEl.style.minWidth = '220px';
-            themePickerEl.style.boxShadow = '0 10px 30px rgba(0,0,0,.3)';
+            themePickerEl.style.border = '2px solid var(--border-light)';
+            themePickerEl.style.borderRadius = '15px';
+            themePickerEl.style.minWidth = '280px';
+            themePickerEl.style.maxWidth = '320px';
+            themePickerEl.style.maxHeight = '500px';
+            themePickerEl.style.overflowY = 'auto';
+            themePickerEl.style.boxShadow = '0 15px 40px rgba(0,0,0,.4)';
             themePickerEl.style.backdropFilter = 'blur(20px)';
             themePickerEl.style.display = 'none';
+            themePickerEl.style.animation = 'fadeIn 0.2s ease';
             document.body.appendChild(themePickerEl);
             return themePickerEl;
         }
@@ -2982,12 +2986,19 @@
                 const state = owned ? (active ? 'Current' : 'Owned') : (pending ? 'Pending' : 'Locked');
                 const stateStyle = owned ? 'color:#7CFC00' : (pending ? 'color:#FFC107' : 'color:#ff9aa2');
                 const disabledAttr = owned ? '' : 'data-locked="true"';
-                return `<button class="icon-btn" data-theme="${t.key}" data-product-id="${t.productId||''}" ${disabledAttr} style="width:100%;display:flex;justify-content:space-between;align-items:center;margin:0;border:none;background:transparent;border-bottom:1px solid var(--border-light);padding:10px 12px;${active?'background: rgba(255,255,255,0.04);':''}">
-                            <span>${t.name}</span>
-                            <span style="${stateStyle}">${state}</span>
+                const themeIcons = {
+                    'theme-dark-mode': '🌙', 'theme-light-mode': '☀️', 'theme-glass-mode': '💎',
+                    'theme-sunset-mode': '🏔️', 'theme-ocean-mode': '🌊', 'theme-forest-mode': '🌲',
+                    'theme-cosmic-mode': '⭐', 'theme-retro-mode': '📺', 'theme-neon-mode': '⚡',
+                    'theme-elegant-mode': '👑'
+                };
+                const icon = themeIcons[t.key] || '🎨';
+                return `<button class="theme-picker-btn" data-theme="${t.key}" data-product-id="${t.productId||''}" ${disabledAttr} style="width:100%;display:flex;justify-content:space-between;align-items:center;margin:0;border:none;background:${active?'rgba(0,213,255,0.1)':'transparent'};border-bottom:1px solid var(--border-light);padding:12px 15px;cursor:pointer;transition:all 0.2s ease;color:var(--white);" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='${active?'rgba(0,213,255,0.1)':'transparent'}'">
+                            <span style="display:flex;align-items:center;gap:10px;"><span style="font-size:1.2em;">${icon}</span><span>${t.name}</span></span>
+                            <span style="${stateStyle};font-weight:600;font-size:0.85em;">${state}</span>
                         </button>`;
             }).join('');
-            el.innerHTML = `<div style=\"padding:8px 8px 0 8px;font-weight:700\">Themes</div>${rows}<div style=\"padding:8px;color:var(--text-light);font-size:.85rem;\">Locked themes require purchase from the Shop.</div>`;
+            el.innerHTML = `<div style=\"padding:12px 12px 8px 12px;font-weight:700;color:var(--white);font-size:1.1rem;\">🎨 Choose Theme (${themeCatalog.length} Available)</div>${rows}<div style=\"padding:8px 12px;color:var(--text-light);font-size:.85rem;border-top:1px solid var(--border-light);margin-top:4px;\">Click any theme to apply it instantly!</div>`;
             el.querySelectorAll('button[data-theme]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const themeKey = btn.getAttribute('data-theme');
@@ -3015,9 +3026,11 @@
         }
 
         function openThemePicker() {
+            console.log('JCHAT_DEBUG: Opening theme picker with', themeCatalog.length, 'themes');
             buildThemePickerList();
             const el = ensureThemePicker();
             el.style.display = 'block';
+            console.log('JCHAT_DEBUG: Theme picker element:', el);
             // Close on outside click
             const handler = (e) => {
                 if (!el.contains(e.target) && e.target !== themeSwitcherBtn) {
