@@ -24,6 +24,9 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     
+    <!-- Tone.js for audio notifications -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
     <style>
         /* Universal box-sizing for consistent layout */
         *, *::before, *::after {
@@ -266,6 +269,11 @@
 
         .product-badge.new {
             background: var(--success-color);
+        }
+
+        .product-badge.purchased {
+            background: var(--gold);
+            color: #000;
         }
 
         .product-icon {
@@ -614,6 +622,24 @@
             animation: pulse 1.5s infinite;
         }
 
+        /* Purchased items styling */
+        .product-card.purchased {
+            opacity: 0.7;
+            position: relative;
+        }
+
+        .product-card.purchased::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: var(--radius);
+            pointer-events: none;
+        }
+
         /* Premium glow effect */
         .premium-glow {
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
@@ -673,7 +699,7 @@
             <div class="nav-actions">
                 <div class="jcoin-balance">
                     <i class="fas fa-coins"></i>
-                    <span id="jcoin-balance">1,250</span>
+                    <span id="jcoin-balance">Loading...</span>
                     <span>JCoins</span>
                 </div>
                 
@@ -698,6 +724,18 @@
         <div class="special-offer">
             <h3 class="offer-title">🎉 Limited Time Offer!</h3>
             <p class="offer-description">Get 25% off on all theme bundles this week only!</p>
+        </div>
+
+        <!-- Search bar -->
+        <div style="max-width: 500px; margin: 0 auto 2rem auto;">
+            <div style="position: relative;">
+                <input type="text" id="search-input" placeholder="Search for themes, emojis, features..." 
+                       style="width: 100%; padding: 1rem 1rem 1rem 3rem; border: 1px solid var(--border-light); 
+                              background: var(--input-background); color: var(--white); border-radius: 25px; 
+                              font-size: 1rem; outline: none; transition: all var(--transition);">
+                <i class="fas fa-search" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); 
+                   color: var(--text-light); pointer-events: none;"></i>
+            </div>
         </div>
 
         <!-- Category filters -->
@@ -766,7 +804,36 @@
         <span id="notification-text"></span>
     </div>
 
-    <script>
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebaseapp.com",
+            messagingSenderId: "328479683167",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+
+        const appId = 'default-app-id';
+
+        // Initialize Firebase services
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global state
+        let currentUser = null;
+        let userProfile = null;
+        let cart = [];
+        let currentCategory = 'all';
+
         // Product data
         const products = [
             // Themes
@@ -818,10 +885,26 @@
                     'Ambient space sounds'
                 ]
             },
+            {
+                id: 4,
+                category: 'themes',
+                title: 'Minimalist Pro Theme',
+                description: 'Clean, professional theme perfect for work environments',
+                price: 300,
+                originalPrice: null,
+                icon: 'fas fa-desktop',
+                badge: null,
+                features: [
+                    'Clean minimalist design',
+                    'Professional color scheme',
+                    'Distraction-free interface',
+                    'Productivity focused'
+                ]
+            },
 
             // Emoji Packs
             {
-                id: 4,
+                id: 5,
                 category: 'emojis',
                 title: 'Anime Emoji Pack',
                 description: 'Exclusive anime-style emojis with kawaii expressions',
@@ -837,7 +920,7 @@
                 ]
             },
             {
-                id: 5,
+                id: 6,
                 category: 'emojis',
                 title: 'Gaming Emoji Pack',
                 description: 'Gaming-themed emojis for all your gaming conversations',
@@ -853,7 +936,7 @@
                 ]
             },
             {
-                id: 6,
+                id: 7,
                 category: 'emojis',
                 title: 'Professional Emoji Pack',
                 description: 'Business and professional emojis for work conversations',
@@ -868,10 +951,26 @@
                     'Office life expressions'
                 ]
             },
+            {
+                id: 8,
+                category: 'emojis',
+                title: 'Holiday Emoji Pack',
+                description: 'Seasonal and holiday-themed emojis for celebrations',
+                price: 120,
+                originalPrice: null,
+                icon: 'fas fa-gift',
+                badge: null,
+                features: [
+                    '35+ holiday emojis',
+                    'All major holidays covered',
+                    'Seasonal celebrations',
+                    'Cultural festivities'
+                ]
+            },
 
             // Premium Features
             {
-                id: 7,
+                id: 9,
                 category: 'features',
                 title: 'Premium Plus Membership',
                 description: 'Unlock all premium features with unlimited access',
@@ -889,7 +988,7 @@
                 ]
             },
             {
-                id: 8,
+                id: 10,
                 category: 'features',
                 title: 'Message Reactions Plus',
                 description: 'Enhanced reaction system with custom animations',
@@ -905,7 +1004,7 @@
                 ]
             },
             {
-                id: 9,
+                id: 11,
                 category: 'features',
                 title: 'Advanced Privacy Shield',
                 description: 'Enhanced privacy features and security controls',
@@ -920,10 +1019,26 @@
                     'Privacy analytics dashboard'
                 ]
             },
+            {
+                id: 12,
+                category: 'features',
+                title: 'Super Admin Tools',
+                description: 'Advanced moderation and management tools',
+                price: 800,
+                originalPrice: null,
+                icon: 'fas fa-tools',
+                badge: null,
+                features: [
+                    'Advanced user management',
+                    'Bulk message operations',
+                    'Custom moderation rules',
+                    'Analytics dashboard access'
+                ]
+            },
 
             // Badges & Titles
             {
-                id: 10,
+                id: 13,
                 category: 'badges',
                 title: 'VIP Gold Badge',
                 description: 'Exclusive gold badge showing your VIP status',
@@ -939,7 +1054,7 @@
                 ]
             },
             {
-                id: 11,
+                id: 14,
                 category: 'badges',
                 title: 'Legend Title Pack',
                 description: 'Collection of legendary titles to show your achievements',
@@ -955,7 +1070,7 @@
                 ]
             },
             {
-                id: 12,
+                id: 15,
                 category: 'badges',
                 title: 'Custom Badge Creator',
                 description: 'Create your own personalized badges and titles',
@@ -970,10 +1085,26 @@
                     'Color palette selection'
                 ]
             },
+            {
+                id: 16,
+                category: 'badges',
+                title: 'Founder Badge',
+                description: 'Exclusive badge for early supporters and founders',
+                price: 1200,
+                originalPrice: null,
+                icon: 'fas fa-star',
+                badge: null,
+                features: [
+                    'Exclusive founder recognition',
+                    'Permanent badge display',
+                    'Special chat privileges',
+                    'Early access to new features'
+                ]
+            },
 
             // Sound Packs
             {
-                id: 13,
+                id: 17,
                 category: 'sounds',
                 title: 'Retro Gaming Sounds',
                 description: 'Classic 8-bit and 16-bit gaming notification sounds',
@@ -989,7 +1120,7 @@
                 ]
             },
             {
-                id: 14,
+                id: 18,
                 category: 'sounds',
                 title: 'Nature Sounds Pack',
                 description: 'Peaceful nature sounds for a calming chat experience',
@@ -1005,7 +1136,7 @@
                 ]
             },
             {
-                id: 15,
+                id: 19,
                 category: 'sounds',
                 title: 'Sci-Fi Sound Effects',
                 description: 'Futuristic sci-fi sounds for the ultimate tech experience',
@@ -1019,19 +1150,196 @@
                     'Robot voice notifications',
                     'Space ambient sounds'
                 ]
+            },
+            {
+                id: 20,
+                category: 'sounds',
+                title: 'Classical Music Pack',
+                description: 'Elegant classical music notifications for sophisticated users',
+                price: 200,
+                originalPrice: null,
+                icon: 'fas fa-music',
+                badge: null,
+                features: [
+                    'Classical music snippets',
+                    'Orchestral notifications',
+                    'Piano and violin sounds',
+                    'Elegant alert tones'
+                ]
             }
         ];
 
-        // Shopping cart
-        let cart = JSON.parse(localStorage.getItem('jchat_cart')) || [];
-        let currentCategory = 'all';
+        // Authentication state management
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadUserProfile();
+                await loadUserCart();
+                await loadUserPurchases();
+                initializeShop();
+            } else {
+                // Redirect to login if not authenticated
+                showNotification('Please log in to access the shop', 'error');
+                setTimeout(() => {
+                    window.location.href = 'Login.html';
+                }, 2000);
+            }
+        });
 
-        // Initialize the shop
-        document.addEventListener('DOMContentLoaded', function() {
+        // Load user profile and balance
+        async function loadUserProfile() {
+            if (!currentUser) return;
+
+            try {
+                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
+                const privateDocSnap = await getDoc(privateProfileDocRef);
+
+                if (privateDocSnap.exists()) {
+                    userProfile = privateDocSnap.data();
+                    
+                    // Initialize missing fields if they don't exist
+                    const updates = {};
+                    if (userProfile.jCoins === undefined) {
+                        updates.jCoins = 0;
+                        userProfile.jCoins = 0;
+                    }
+                    if (userProfile.purchasedItems === undefined) {
+                        updates.purchasedItems = [];
+                        userProfile.purchasedItems = [];
+                    }
+                    if (userProfile.wishlist === undefined) {
+                        updates.wishlist = [];
+                        userProfile.wishlist = [];
+                    }
+                    
+                    // Update document if needed
+                    if (Object.keys(updates).length > 0) {
+                        await updateDoc(privateProfileDocRef, updates);
+                    }
+                } else {
+                    // Create new profile
+                    userProfile = {
+                        username: currentUser.displayName || `User_${currentUser.uid.substring(0, 8)}`,
+                        email: currentUser.email || "",
+                        jCoins: 0,
+                        purchasedItems: [],
+                        wishlist: [],
+                        level: 1,
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    };
+                    await setDoc(privateProfileDocRef, userProfile);
+                }
+
+                // Update UI with real balance
+                updateBalanceDisplay();
+                
+            } catch (error) {
+                console.error("Error loading user profile:", error);
+                showNotification('Error loading profile data', 'error');
+            }
+        }
+
+        // Load user's cart from Firebase
+        async function loadUserCart() {
+            if (!currentUser) return;
+
+            try {
+                const cartDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "shop", "cart");
+                const cartDocSnap = await getDoc(cartDocRef);
+
+                if (cartDocSnap.exists()) {
+                    cart = cartDocSnap.data().items || [];
+                } else {
+                    cart = [];
+                }
+                
+                updateCartUI();
+            } catch (error) {
+                console.error("Error loading cart:", error);
+                cart = [];
+                updateCartUI();
+            }
+        }
+
+        // Save cart to Firebase
+        async function saveCartToFirebase() {
+            if (!currentUser) return;
+
+            try {
+                const cartDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "shop", "cart");
+                await setDoc(cartDocRef, {
+                    items: cart,
+                    updatedAt: serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Error saving cart:", error);
+            }
+        }
+
+        // Load user's purchased items
+        async function loadUserPurchases() {
+            if (!currentUser) return;
+
+            try {
+                const purchasesDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "shop", "purchases");
+                const purchasesDocSnap = await getDoc(purchasesDocRef);
+
+                if (purchasesDocSnap.exists()) {
+                    const purchasedItems = purchasesDocSnap.data().items || [];
+                    // Mark purchased items in products
+                    markPurchasedItems(purchasedItems);
+                }
+            } catch (error) {
+                console.error("Error loading purchases:", error);
+            }
+        }
+
+        // Mark purchased items in the UI
+        function markPurchasedItems(purchasedItems) {
+            const purchasedIds = purchasedItems.map(item => item.id);
+            // This will be used to disable/mark purchased items in the UI
+            window.purchasedItemIds = purchasedIds;
+        }
+
+        // Update balance display
+        function updateBalanceDisplay() {
+            const balanceElement = document.getElementById('jcoin-balance');
+            if (userProfile && balanceElement) {
+                balanceElement.textContent = (userProfile.jCoins || 0).toLocaleString();
+            }
+        }
+
+        // Initialize shop after authentication
+        function initializeShop() {
             renderProducts();
             updateCartUI();
             setupCategoryFilters();
-        });
+            setupSearchFunctionality();
+        }
+
+        // Setup search functionality
+        function setupSearchFunctionality() {
+            const searchInput = document.getElementById('search-input');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const query = e.target.value.trim();
+                    if (query.length === 0) {
+                        currentCategory = 'all';
+                        document.querySelector('.category-btn[data-category="all"]').classList.add('active');
+                        document.querySelectorAll('.category-btn:not([data-category="all"])').forEach(btn => 
+                            btn.classList.remove('active')
+                        );
+                        renderProducts();
+                    } else {
+                        searchProducts(query);
+                    }
+                }, 300);
+            });
+        }
 
         // Render products
         function renderProducts() {
@@ -1040,42 +1348,55 @@
                 ? products 
                 : products.filter(p => p.category === currentCategory);
 
-            grid.innerHTML = filteredProducts.map(product => `
-                <div class="product-card ${product.badge === 'popular' ? 'premium-glow' : ''}" data-category="${product.category}">
-                    ${product.badge ? `<div class="product-badge ${product.badge}">${product.badge}</div>` : ''}
-                    
-                    <div class="product-icon">
-                        <i class="${product.icon}"></i>
-                    </div>
-                    
-                    <h3 class="product-title">${product.title}</h3>
-                    <p class="product-description">${product.description}</p>
-                    
-                    <ul class="product-features">
-                        ${product.features.map(feature => `
-                            <li><i class="fas fa-check"></i> ${feature}</li>
-                        `).join('')}
-                    </ul>
-                    
-                    <div class="product-price">
-                        <div class="price">
-                            <span class="jcoin-price">${product.price} JCoins</span>
-                            ${product.originalPrice ? `<span class="original-price">${product.originalPrice} JCoins</span>` : ''}
+            grid.innerHTML = filteredProducts.map(product => {
+                const isPurchased = window.purchasedItemIds && window.purchasedItemIds.includes(product.id);
+                const isInCart = cart.some(item => item.id === product.id);
+                
+                return `
+                    <div class="product-card ${product.badge === 'popular' ? 'premium-glow' : ''} ${isPurchased ? 'purchased' : ''}" data-category="${product.category}">
+                        ${product.badge ? `<div class="product-badge ${product.badge}">${product.badge}</div>` : ''}
+                        ${isPurchased ? `<div class="product-badge purchased">owned</div>` : ''}
+                        
+                        <div class="product-icon">
+                            <i class="${product.icon}"></i>
                         </div>
-                        ${product.originalPrice ? `<div class="discount">-${Math.round((1 - product.price / product.originalPrice) * 100)}%</div>` : ''}
+                        
+                        <h3 class="product-title">${product.title}</h3>
+                        <p class="product-description">${product.description}</p>
+                        
+                        <ul class="product-features">
+                            ${product.features.map(feature => `
+                                <li><i class="fas fa-check"></i> ${feature}</li>
+                            `).join('')}
+                        </ul>
+                        
+                        <div class="product-price">
+                            <div class="price">
+                                <span class="jcoin-price">${product.price} JCoins</span>
+                                ${product.originalPrice ? `<span class="original-price">${product.originalPrice} JCoins</span>` : ''}
+                            </div>
+                            ${product.originalPrice ? `<div class="discount">-${Math.round((1 - product.price / product.originalPrice) * 100)}%</div>` : ''}
+                        </div>
+                        
+                        <div class="product-actions">
+                            ${isPurchased ? `
+                                <button class="btn-primary" disabled style="opacity: 0.5;">
+                                    <i class="fas fa-check"></i>
+                                    Owned
+                                </button>
+                            ` : `
+                                <button class="btn-primary" onclick="addToCart(${product.id})" ${isInCart ? 'disabled style="opacity: 0.5;"' : ''}>
+                                    <i class="fas fa-cart-plus"></i>
+                                    ${isInCart ? 'In Cart' : 'Add to Cart'}
+                                </button>
+                            `}
+                            <button class="btn-secondary" onclick="toggleWishlist(${product.id})">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div class="product-actions">
-                        <button class="btn-primary" onclick="addToCart(${product.id})">
-                            <i class="fas fa-cart-plus"></i>
-                            Add to Cart
-                        </button>
-                        <button class="btn-secondary" onclick="toggleWishlist(${product.id})">
-                            <i class="fas fa-heart"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Setup category filters
@@ -1092,7 +1413,12 @@
         }
 
         // Add to cart
-        function addToCart(productId) {
+        async function addToCart(productId) {
+            if (!currentUser) {
+                showNotification('Please log in to add items to cart', 'error');
+                return;
+            }
+
             const product = products.find(p => p.id === productId);
             const existingItem = cart.find(item => item.id === productId);
             
@@ -1101,23 +1427,32 @@
                 return;
             }
             
+            // Check if already purchased
+            if (window.purchasedItemIds && window.purchasedItemIds.includes(productId)) {
+                showNotification('You already own this item!', 'error');
+                return;
+            }
+            
             cart.push({
                 id: product.id,
                 title: product.title,
                 price: product.price,
-                icon: product.icon
+                icon: product.icon,
+                category: product.category
             });
             
-            localStorage.setItem('jchat_cart', JSON.stringify(cart));
+            await saveCartToFirebase();
             updateCartUI();
+            renderProducts(); // Re-render to update button states
             showNotification('Added to cart!', 'success');
         }
 
         // Remove from cart
-        function removeFromCart(productId) {
+        async function removeFromCart(productId) {
             cart = cart.filter(item => item.id !== productId);
-            localStorage.setItem('jchat_cart', JSON.stringify(cart));
+            await saveCartToFirebase();
             updateCartUI();
+            renderProducts(); // Re-render to update button states
             showNotification('Removed from cart!', 'success');
         }
 
@@ -1169,36 +1504,134 @@
             cartSidebar.classList.toggle('open');
         }
 
-        // Checkout
-        function checkout() {
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            const currentBalance = parseInt(document.getElementById('jcoin-balance').textContent.replace(',', ''));
-            
-            if (total > currentBalance) {
-                showNotification('Insufficient JCoins!', 'error');
+        // Checkout with real Firebase transaction
+        async function checkout() {
+            if (!currentUser || !userProfile) {
+                showNotification('Authentication error. Please refresh the page.', 'error');
                 return;
             }
+
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
             
-            // Simulate purchase
-            const newBalance = currentBalance - total;
-            document.getElementById('jcoin-balance').textContent = newBalance.toLocaleString();
-            
-            // Clear cart
-            cart = [];
-            localStorage.setItem('jchat_cart', JSON.stringify(cart));
-            updateCartUI();
-            toggleCart();
-            
-            showNotification('Purchase successful! Items have been added to your account.', 'success');
-            
-            // Store purchased items
-            const purchasedItems = JSON.parse(localStorage.getItem('jchat_purchased_items')) || [];
-            cart.forEach(item => {
-                if (!purchasedItems.find(p => p.id === item.id)) {
-                    purchasedItems.push(item);
+            if (total > userProfile.jCoins) {
+                showNotification('Insufficient JCoins! Visit the Wallet to earn more.', 'error');
+                return;
+            }
+
+            try {
+                // Use Firebase transaction to ensure atomic operations
+                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
+                
+                await runTransaction(db, async (transaction) => {
+                    const profileDoc = await transaction.get(privateProfileDocRef);
+                    
+                    if (!profileDoc.exists()) {
+                        throw new Error("User profile not found");
+                    }
+                    
+                    const currentProfile = profileDoc.data();
+                    const currentBalance = currentProfile.jCoins || 0;
+                    
+                    if (currentBalance < total) {
+                        throw new Error("Insufficient JCoins");
+                    }
+                    
+                    // Deduct JCoins
+                    const newBalance = currentBalance - total;
+                    
+                    // Get current purchased items
+                    const currentPurchased = currentProfile.purchasedItems || [];
+                    
+                    // Add new items to purchased list
+                    const newPurchasedItems = [...currentPurchased];
+                    cart.forEach(item => {
+                        if (!newPurchasedItems.find(p => p.id === item.id)) {
+                            newPurchasedItems.push({
+                                ...item,
+                                purchaseDate: new Date(),
+                                purchasePrice: item.price
+                            });
+                        }
+                    });
+                    
+                    // Update profile
+                    transaction.update(privateProfileDocRef, {
+                        jCoins: newBalance,
+                        purchasedItems: newPurchasedItems,
+                        updatedAt: serverTimestamp()
+                    });
+                });
+
+                // Log the purchase transaction
+                await addDoc(collection(db, "artifacts", appId, "users", currentUser.uid, "transactions"), {
+                    type: 'purchase',
+                    amount: -total,
+                    description: `Shop purchase: ${cart.map(item => item.title).join(', ')}`,
+                    items: cart,
+                    timestamp: serverTimestamp(),
+                    balanceAfter: userProfile.jCoins - total
+                });
+
+                // Update local state
+                userProfile.jCoins -= total;
+                userProfile.purchasedItems = userProfile.purchasedItems || [];
+                cart.forEach(item => {
+                    if (!userProfile.purchasedItems.find(p => p.id === item.id)) {
+                        userProfile.purchasedItems.push(item);
+                    }
+                });
+
+                // Clear cart
+                cart = [];
+                await saveCartToFirebase();
+                
+                // Update UI
+                updateBalanceDisplay();
+                updateCartUI();
+                await loadUserPurchases(); // Refresh purchased items
+                renderProducts(); // Re-render to show owned items
+                toggleCart();
+                
+                showNotification('Purchase successful! Items have been added to your account.', 'success');
+                
+            } catch (error) {
+                console.error("Purchase error:", error);
+                showNotification(error.message || 'Purchase failed. Please try again.', 'error');
+            }
+        }
+
+        // Toggle wishlist
+        async function toggleWishlist(productId) {
+            if (!currentUser || !userProfile) {
+                showNotification('Please log in to manage wishlist', 'error');
+                return;
+            }
+
+            try {
+                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
+                const wishlist = userProfile.wishlist || [];
+                const isInWishlist = wishlist.includes(productId);
+                
+                let newWishlist;
+                if (isInWishlist) {
+                    newWishlist = wishlist.filter(id => id !== productId);
+                    showNotification('Removed from wishlist!', 'success');
+                } else {
+                    newWishlist = [...wishlist, productId];
+                    showNotification('Added to wishlist!', 'success');
                 }
-            });
-            localStorage.setItem('jchat_purchased_items', JSON.stringify(purchasedItems));
+                
+                await updateDoc(privateProfileDocRef, {
+                    wishlist: newWishlist,
+                    updatedAt: serverTimestamp()
+                });
+                
+                userProfile.wishlist = newWishlist;
+                
+            } catch (error) {
+                console.error("Error updating wishlist:", error);
+                showNotification('Error updating wishlist', 'error');
+            }
         }
 
         // Show notification
@@ -1212,11 +1645,6 @@
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
-        }
-
-        // Toggle wishlist (placeholder)
-        function toggleWishlist(productId) {
-            showNotification('Added to wishlist!', 'success');
         }
 
         // Close cart when clicking outside
@@ -1241,11 +1669,74 @@
             }
         });
 
-        // Search functionality (placeholder for future implementation)
+        // Search functionality
         function searchProducts(query) {
-            // This could be implemented to filter products by search query
-            console.log('Searching for:', query);
+            const searchResults = products.filter(product => 
+                product.title.toLowerCase().includes(query.toLowerCase()) ||
+                product.description.toLowerCase().includes(query.toLowerCase()) ||
+                product.features.some(feature => feature.toLowerCase().includes(query.toLowerCase()))
+            );
+            
+            // Render search results
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = searchResults.map(product => {
+                const isPurchased = window.purchasedItemIds && window.purchasedItemIds.includes(product.id);
+                const isInCart = cart.some(item => item.id === product.id);
+                
+                return `
+                    <div class="product-card ${product.badge === 'popular' ? 'premium-glow' : ''} ${isPurchased ? 'purchased' : ''}" data-category="${product.category}">
+                        ${product.badge ? `<div class="product-badge ${product.badge}">${product.badge}</div>` : ''}
+                        ${isPurchased ? `<div class="product-badge purchased">owned</div>` : ''}
+                        
+                        <div class="product-icon">
+                            <i class="${product.icon}"></i>
+                        </div>
+                        
+                        <h3 class="product-title">${product.title}</h3>
+                        <p class="product-description">${product.description}</p>
+                        
+                        <ul class="product-features">
+                            ${product.features.map(feature => `
+                                <li><i class="fas fa-check"></i> ${feature}</li>
+                            `).join('')}
+                        </ul>
+                        
+                        <div class="product-price">
+                            <div class="price">
+                                <span class="jcoin-price">${product.price} JCoins</span>
+                                ${product.originalPrice ? `<span class="original-price">${product.originalPrice} JCoins</span>` : ''}
+                            </div>
+                            ${product.originalPrice ? `<div class="discount">-${Math.round((1 - product.price / product.originalPrice) * 100)}%</div>` : ''}
+                        </div>
+                        
+                        <div class="product-actions">
+                            ${isPurchased ? `
+                                <button class="btn-primary" disabled style="opacity: 0.5;">
+                                    <i class="fas fa-check"></i>
+                                    Owned
+                                </button>
+                            ` : `
+                                <button class="btn-primary" onclick="addToCart(${product.id})" ${isInCart ? 'disabled style="opacity: 0.5;"' : ''}>
+                                    <i class="fas fa-cart-plus"></i>
+                                    ${isInCart ? 'In Cart' : 'Add to Cart'}
+                                </button>
+                            `}
+                            <button class="btn-secondary" onclick="toggleWishlist(${product.id})">
+                                <i class="fas fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
+
+        // Make functions globally available
+        window.addToCart = addToCart;
+        window.removeFromCart = removeFromCart;
+        window.toggleCart = toggleCart;
+        window.checkout = checkout;
+        window.toggleWishlist = toggleWishlist;
+        window.searchProducts = searchProducts;
     </script>
 </body>
 </html>
