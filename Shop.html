@@ -291,7 +291,7 @@
       measurementId: "G-S6Z9GG0R9P"
     };
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? initialAuthToken : null;
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
