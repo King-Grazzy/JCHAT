@@ -365,6 +365,7 @@
           currency: 'NGN',
           status: 'pending',
           createdAt: serverTimestamp(),
+          assignedAdminId: 'cc96gdhCRPO72NFZtleRCujHvIq2',
           ...(uploadedReceiptUrl ? { receiptImageUrl: uploadedReceiptUrl } : {})
         };
         await setDoc(orderRef, orderData);

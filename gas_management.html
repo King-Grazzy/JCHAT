@@ -4456,6 +4456,7 @@
             const constraints = [];
             if (status !== 'all') { constraints.push(where('status', '==', status)); }
             if (userQ) { constraints.push(where('userId', '==', userQ)); }
+            constraints.push(where('assignedAdminId', '==', ADMIN_UID));
             if (constraints.length > 0) { qRef = query(qRef, ...constraints); }
             unsubscribeShopPaymentsListener = onSnapshot(qRef, (snap) => {
                 shopPaymentsList.innerHTML = '';
