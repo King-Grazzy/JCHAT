@@ -1810,6 +1810,10 @@
                                     <i class="fas fa-cart-plus"></i>
                                     ${isInCart ? 'In Cart' : 'Add to Cart'}
                                 </button>
+                                <button class="btn-secondary" onclick="openSingleItemPayment(${product.id})">
+                                    <i class="fas fa-file-invoice"></i>
+                                    Pay with Receipt
+                                </button>
                             `}
                             <button class="btn-secondary" onclick="toggleWishlist(${product.id})">
                                 <i class="fas fa-heart"></i>
@@ -1956,6 +1960,34 @@
             // Reset to JCoin payment by default
             switchCurrency('jcoin');
             
+            modal.classList.add('show');
+        }
+
+        // Open modal for a single item (receipt flow)
+        function openSingleItemPayment(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) { showNotification('Item not found', 'error'); return; }
+            // Stash a single-item purchase context
+            window.__singleItemPurchase = { id: product.id, title: product.title, price: product.price, category: product.category };
+            const modal = document.getElementById('payment-modal');
+            document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
+            // Force money/receipt mode; hide jcoin option
+            document.getElementById('jcoin-btn').classList.remove('active');
+            document.getElementById('money-btn').classList.add('active');
+            document.querySelector('[data-payment="jcoin"]').style.display = 'none';
+            document.querySelector('[data-payment="bank"]').style.display = '';
+            document.querySelector('[data-payment="opay"]').style.display = '';
+            document.querySelector('[data-payment="bank"]').classList.add('selected');
+            document.getElementById('payment-instructions').style.display = '';
+            document.getElementById('bank-details').style.display = '';
+            document.getElementById('receipt-upload').style.display = '';
+            const nairaAmount = product.price * 10;
+            document.getElementById('subtotal-price').textContent = `₦${nairaAmount.toLocaleString()}`;
+            document.getElementById('item-count').textContent = '1';
+            document.getElementById('total-price').textContent = `₦${nairaAmount.toLocaleString()}`;
+            document.getElementById('payment-amount').textContent = `₦${nairaAmount.toLocaleString()}`;
+            document.getElementById('payment-btn-text').textContent = 'Submit Payment';
+            document.getElementById('user-reference').textContent = currentUser ? currentUser.uid : 'Login Required';
             modal.classList.add('show');
         }
 
@@ -2203,8 +2235,10 @@
                     throw new Error('Failed to upload receipt');
                 }
 
-                // Create payment request in Firebase
-                const total = cart.reduce((sum, item) => sum + item.price, 0);
+                // Create payment request in Firebase (supports single-item mode)
+                const single = window.__singleItemPurchase || null;
+                const sourceItems = single ? [single] : cart;
+                const total = sourceItems.reduce((sum, item) => sum + item.price, 0);
                 const nairaAmount = total * 10; // ₦10 = 1 JCoin
 
                 const paymentRequestRef = await addDoc(collection(db, "artifacts", appId, "public", "data", "shop_payment_requests"), {
@@ -2214,12 +2248,7 @@
                     paymentMethod: paymentMethod,
                     jcoinAmount: total,
                     nairaAmount: nairaAmount,
-                    items: cart.map(item => ({
-                        id: item.id,
-                        title: item.title,
-                        price: item.price,
-                        category: item.category
-                    })),
+                    items: sourceItems.map(item => ({ id: item.id, title: item.title, price: item.price, category: item.category })),
                     receiptUrl: uploadResult.secure_url,
                     status: 'pending',
                     assignedAdminId: 'cc96gdhCRPO72NFZtleRCujHvIq2',
@@ -2248,16 +2277,19 @@
                     timestamp: serverTimestamp()
                 });
 
-                // Clear cart and close modal
-                cart = [];
-                await saveCartToFirebase();
+                // Clear cart if full-cart flow; in single-item mode, do not alter cart
+                if (!single) {
+                    cart = [];
+                    await saveCartToFirebase();
+                }
                 closePaymentModal();
                 
                 // Update UI
                 updateCartUI();
                 toggleCart();
                 
-                showNotification('Payment request submitted successfully! You will receive your items once payment is verified.', 'success');
+                showNotification('Payment request submitted successfully! You will receive your item(s) after admin approval.', 'success');
+                window.__singleItemPurchase = null;
                 
             } catch (error) {
                 console.error("Payment request error:", error);
