@@ -222,10 +222,13 @@
             --active-item-background: rgba(255, 215, 0, 0.1);
         }
 
-
-        /* Always show scrollbar to prevent layout shifts */
+        /* Enhanced Touch-Friendly Scrolling */
         html {
-            overflow-y: scroll;
+            scroll-behavior: smooth;
+            overflow-x: auto; /* Allow horizontal scroll when needed */
+            overflow-y: auto; /* Allow vertical scroll when needed */
+            -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
+            scroll-snap-type: y proximity; /* Enable scroll snapping for better control */
         }
 
         body {
@@ -236,7 +239,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-x: auto; /* Allow horizontal scroll when needed */
+            overflow-y: auto; /* Allow vertical scroll when needed */
+            -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
             padding-bottom: 0px; /* Adjusted: Removed nav bar and toggle button */
             background-color: var(--background-main);
             background-image: radial-gradient(circle at top left, var(--background-gradient-1), transparent 100px),
@@ -259,6 +264,84 @@
             z-index: 10;
             display: flex;
             justify-content: center;
+        }
+
+        /* Tiny Plus Toggle in Header */
+        .tiny-toggle {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--blue), var(--pink));
+            border: none;
+            color: white;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 213, 255, 0.3);
+            margin-left: 15px;
+        }
+
+        .tiny-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 213, 255, 0.4);
+        }
+
+        .tiny-toggle.active {
+            transform: rotate(45deg);
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+        }
+
+        .tiny-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* Tiny Dropdown */
+        .tiny-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 20px;
+            background: rgba(26, 26, 46, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 8px;
+            min-width: 160px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
+            z-index: 1001;
+        }
+
+        .tiny-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .tiny-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            color: var(--white);
+            text-decoration: none;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .tiny-dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--blue);
+        }
+
+        .tiny-dropdown-item i {
+            width: 14px;
+            font-size: 12px;
         }
 
         header .header-content-wrapper {
@@ -595,7 +678,6 @@
             transform: scale(1.1);
         }
 
-
         /* Logout Button Styling (from Home.html) */
         #logoutButton {
             background: linear-gradient(90deg, var(--pink), var(--blue));
@@ -645,7 +727,42 @@
             flex-direction: column;
             gap: 20px;
             align-items: center;
+            overflow: visible; /* Allow content to overflow for proper display */
+            -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
         }
+        /* Enhanced scrollbar styling for better touch interaction */
+        ::-webkit-scrollbar {
+            width: 12px; /* Wider for better touch interaction */
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--blue), var(--pink));
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            min-height: 40px; /* Minimum height for better touch interaction */
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, var(--pink), var(--blue));
+        }
+
+        /* Touch gesture improvements */
+        .content-wrapper,
+        .profile-section,
+        .unlocked-rewards-section,
+        .recent-activity-section,
+        .customization-section,
+        .wallet-guide-section {
+            touch-action: pan-y; /* Enable vertical panning */
+            overscroll-behavior: contain; /* Prevent overscroll bounce */
+            -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
+        }
+
         /* Enhanced Profile Section (adapted from original Profile.html and settings-section) */
         .profile-section {
             background: var(--card-background);
@@ -664,7 +781,8 @@
             text-align: center;
             position: relative;
             transition: all 0.3s ease;
-            overflow: hidden;
+            overflow: visible; /* Allow content to overflow for proper display */
+            scroll-margin-top: 20px; /* Better scroll snapping */
         }
 
         .profile-section::before {
@@ -683,14 +801,401 @@
             box-shadow: 0 12px 35px rgba(0, 0, 0, .4);
         }
 
-
-
         .profile-header-area { /* New wrapper for top part of profile */
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
             width: 100%;
+        }
+
+        /* NEW: Profile Completion Progress Bar Styles */
+        .profile-completion-section {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 10px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .completion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .completion-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .completion-percentage {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--blue);
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .completion-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .completion-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            border-radius: 4px;
+            transition: width 0.8s ease;
+            width: 0%;
+        }
+
+        .completion-tip {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            text-align: center;
+            margin: 0;
+            opacity: 0.8;
+        }
+
+
+
+        /* NEW: Enhanced Mobile Experience Styles */
+        @media (max-width: 768px) {
+            .profile-completion-section {
+                max-width: 100%;
+                margin: 15px 0;
+                padding: 15px;
+            }
+
+
+
+            .profile-header-area {
+                gap: 12px;
+            }
+
+            .profile-pic-wrapper {
+                width: 100px;
+                height: 100px;
+            }
+
+            .profile-name {
+                font-size: 1.5rem;
+            }
+
+            .profile-bio {
+                font-size: 0.9rem;
+                text-align: center;
+                padding: 0 15px;
+            }
+
+            .profile-stats {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .stat-item {
+                min-width: 80px;
+            }
+
+            .profile-actions {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .profile-action-button {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            /* Touch-friendly form elements */
+            .profile-details-section input,
+            .profile-details-section textarea,
+            .profile-details-section select {
+                padding: 12px 15px;
+                font-size: 16px; /* Prevents zoom on iOS */
+                min-height: 44px; /* Touch-friendly height */
+            }
+
+            .profile-details-section label {
+                font-size: 0.95rem;
+                margin-bottom: 8px;
+            }
+
+            /* Mobile-optimized toggle switches */
+            .toggle-switch {
+                transform: scale(1); /* Full size on mobile */
+                min-height: 44px;
+            }
+
+            .toggle-switch input {
+                min-height: 44px;
+            }
+
+            /* Swipe gestures for mobile */
+            .profile-section {
+                touch-action: pan-y;
+            }
+
+            /* Mobile-friendly modals */
+            .modal-content {
+                margin: 20px;
+                max-height: calc(100vh - 40px);
+                overflow-y: auto;
+            }
+
+            /* Mobile-optimized friends button */
+            .friends-button {
+                min-height: 90px; /* Larger touch target */
+                padding: 18px 12px;
+            }
+
+            .button-icon {
+                top: 12px;
+                right: 12px;
+                font-size: 16px; /* Larger icon for mobile */
+            }
+
+            /* Mobile-optimized friends section */
+            .friends-snippet-section {
+                padding: 15px;
+                margin: 15px 0;
+            }
+
+            .friends-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 12px;
+            }
+
+            .friend-pic-wrapper {
+                width: 50px;
+                height: 50px;
+            }
+
+            /* Mobile navigation improvements */
+            .profileTabs {
+                gap: 5px;
+                margin: 10px 0;
+            }
+
+            .profileTabs button {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                flex: 1;
+                min-width: 0;
+            }
+        }
+
+        /* Touch gesture support */
+        .profile-section {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        .profile-section.swiping {
+            transition: none;
+        }
+
+        /* NEW: Theme Presets Styles */
+        .theme-presets-section {
+            margin: 20px 0;
+        }
+
+        .theme-presets-section label {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .theme-preset-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .theme-preset {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-preset:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--blue);
+            transform: translateY(-2px);
+        }
+
+        .theme-preset.selected {
+            border-color: var(--pink);
+            background: rgba(255, 46, 146, 0.1);
+        }
+
+        .preset-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .professional-preview {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .creative-preview {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .minimal-preview {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .vibrant-preview {
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+        }
+
+        .theme-preset span {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-light);
+            text-align: center;
+        }
+
+        /* NEW: Profile Notifications Styles */
+        .profile-notifications-section {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .notifications-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .notifications-header i {
+            color: var(--blue);
+            font-size: 1.1rem;
+        }
+
+        .notifications-header span {
+            flex: 1;
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        .clear-notifications-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .clear-notifications-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        .notifications-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--blue);
+            transition: all 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .notification-item.info {
+            border-left-color: var(--blue);
+        }
+
+        .notification-item.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .notification-item.success {
+            border-left-color: var(--status-online);
+        }
+
+        .notification-item.error {
+            border-left-color: var(--delete-button-color);
+        }
+
+        .notification-icon {
+            font-size: 1rem;
+            margin-top: 2px;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .notification-message {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            color: var(--text-light);
+            font-size: 0.75rem;
+            opacity: 0.7;
         }
 
         .profile-pic-wrapper {
@@ -752,29 +1257,13 @@
         }
 
         /* NEW: Profile picture loading spinner */
-        .profile-pic-wrapper .profile-pic-loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid var(--blue);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            display: none; /* Hidden by default */
-        }
-        .profile-pic-wrapper.loading .profile-pic-loader {
-            display: block;
-        }
+
         .profile-pic-wrapper.loading .profile-pic,
         .profile-pic-wrapper.loading .profile-pic-placeholder,
         .profile-pic-wrapper.loading .edit-profile-pic-overlay {
             opacity: 0.3; /* Dim content while loading */
             pointer-events: none; /* Disable interaction */
         }
-
 
         .profile-name {
             font-family: 'Poppins', sans-serif;
@@ -950,6 +1439,65 @@
             letter-spacing: 0.05em;
         }
 
+        /* NEW: Friends Button Styles */
+        .friends-button {
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            background: linear-gradient(135deg, rgba(0, 213, 255, 0.1), rgba(255, 46, 146, 0.1));
+            border: 2px solid rgba(0, 213, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .friends-button:hover {
+            background: linear-gradient(135deg, rgba(0, 213, 255, 0.2), rgba(255, 46, 146, 0.2));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 213, 255, 0.3);
+            border-color: rgba(0, 213, 255, 0.6);
+        }
+
+        .friends-button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 213, 255, 0.4);
+        }
+
+        .friends-button.active {
+            background: linear-gradient(135deg, rgba(0, 213, 255, 0.25), rgba(255, 46, 146, 0.25));
+            border-color: var(--accent-color, #00d5ff);
+            box-shadow: 0 0 25px rgba(0, 213, 255, 0.4);
+        }
+
+        .button-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 14px;
+            color: var(--accent-color, #00d5ff);
+            transition: all 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .friends-button:hover .button-icon {
+            opacity: 1;
+            color: var(--accent-color, #00d5ff);
+            transform: scale(1.1);
+        }
+
+        .friends-button.active .button-icon {
+            color: var(--accent-color, #00d5ff);
+            opacity: 1;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
         /* NEW: Level Display and Progress Bar Styles */
         .level-link-wrapper {
             text-decoration: none; /* Remove underline from the link */
@@ -1119,7 +1667,6 @@
             text-align: center;
         }
 
-
         .profile-actions {
             display: flex;
             gap: 1rem;
@@ -1200,7 +1747,6 @@
         .profile-action-button.unfriend { background: #dc3545; }
         .profile-action-button.unfriend:hover { background: #c82333; }
 
-
         /* Icons within action buttons */
         .profile-action-button i {
             /* Apply gradient to icons */
@@ -1214,7 +1760,6 @@
         .profile-action-button.danger i {
             -webkit-text-fill-color: var(--white); /* Ensure icons are white for secondary/danger */
         }
-
 
         /* Inline Profile Details (from original Profile.html snippet) */
         .profile-details-section { /* Renamed from .profile-details to avoid conflict */
@@ -1329,7 +1874,7 @@
         }
 
         /* NEW: Unlocked Rewards Section */
-        .unlocked-rewards-section, .friends-snippet-section, .recent-activity-section, .customization-section, .wallet-guide-section {
+        .unlocked-rewards-section, .recent-activity-section, .customization-section, .wallet-guide-section {
             background: var(--card-background);
             border: 1px solid var(--glass-blue);
             backdrop-filter: blur(10px) saturate(180%);
@@ -1393,6 +1938,344 @@
             max-width: 100%;
             font-weight: 600;
             color: var(--white);
+        }
+
+        /* NEW: Enhanced Friend Item Styles */
+        .friend-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .friend-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .friend-profile-link {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .friend-profile-link:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .friend-actions {
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .chat-with-friend-btn {
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .chat-with-friend-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 213, 255, 0.4);
+        }
+
+        .default-avatar {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            color: white;
+            font-size: 2rem;
+        }
+
+
+
+        /* Modal Overlay (exactly like Chat.html) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--card-background);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .close-friends-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: var(--text-light);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .close-friends-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        /* Select Friend Modal Specific Styles (exactly like Chat.html) */
+        #selectFriendModal .modal-content {
+            background: #000000;
+            border: 2px solid #333333;
+            background-clip: padding-box;
+            backdrop-filter: blur(20px);
+            position: relative;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(50, 50, 50, 0.3);
+        }
+
+        #selectFriendModal .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 2px solid #333333;
+            background: #111111;
+            color: var(--white);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+
+        #selectFriendModal .search-input:focus {
+            border: 2px solid #555555;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5), 0 0 5px rgba(100, 100, 100, 0.2);
+            background: #000000;
+        }
+
+        #selectFriendModal .search-input::placeholder {
+            color: var(--text-light);
+        }
+
+        #selectFriendModal .friend-list-modal {
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: calc(80vh - 200px);
+            padding-right: 5px;
+            margin: 15px 0;
+        }
+
+        #selectFriendModal .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            background-color: #000000 !important;
+            background: #000000 !important;
+            border: 1px solid #333333;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        #selectFriendModal .friend-item:hover {
+            background-color: #111111 !important;
+            background: #111111 !important;
+            transform: translateY(-2px);
+            border-color: #555555;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        #selectFriendModal .friend-item img,
+        #selectFriendModal .friend-item .default-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #333333;
+        }
+
+        #selectFriendModal .friend-item .default-avatar {
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        #selectFriendModal .friend-item span {
+            flex-grow: 1;
+            color: var(--white);
+            font-weight: 500;
+            text-align: left;
+        }
+
+        /* Status Indicator Styles (exactly like Chat.html) */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #888888;
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            border: 2px solid #000000;
+        }
+
+        .status-dot.online {
+            background: #4CAF50;
+            box-shadow: 0 0 6px rgba(76, 175, 80, 0.6);
+            animation: pulse-online 2s infinite;
+        }
+
+        .status-dot.recently {
+            background: #FFC107;
+        }
+
+        .status-dot.offline {
+            background: #888888;
+        }
+
+        @keyframes pulse-online {
+            0% { box-shadow: 0 0 6px rgba(76, 175, 80, 0.6); }
+            50% { box-shadow: 0 0 12px rgba(76, 175, 80, 0.8); }
+            100% { box-shadow: 0 0 6px rgba(76, 175, 80, 0.6); }
+        }
+
+        /* Friend Status Updates */
+        .friend-status {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+
+        .friend-status.online {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .friend-status.typing {
+            background: rgba(0, 213, 255, 0.2);
+            color: #00d5ff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .cancel-btn {
+            background: #333333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background: #555555;
+            transform: translateY(-1px);
+        }
+
+        #selectFriendModal .loading-friends-modal,
+        #selectFriendModal .no-friends-modal {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+        }
+
+        #selectFriendModal .loading-friends-modal i {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        #selectFriendModal .loading-friends-modal p {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .friends-snippet-section.show {
+            display: block !important;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Recent Activity Section */
@@ -1491,7 +2374,6 @@
             border-color: var(--blue);
             box-shadow: 0 0 0 3px rgba(0, 213, 255, 0.2);
         }
-
 
         .sub-section button {
             background: var(--button-background); /* Consistent button style */
@@ -1599,18 +2481,6 @@
         }
         #messageBox.loading-pulse { animation: pulse-bg 1.5s infinite ease-in-out; }
 
-        /* Loader styles for buttons (from Home.html) */
-        .button-loader {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid var(--white);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: none;
-            flex-shrink: 0; /* Prevent loader from shrinking */
-        }
-        .button-loader.active { display: block; }
         .button-text { display: block; }
         .loading .button-text { display: none; }
         @keyframes spin {
@@ -2067,6 +2937,20 @@
                 white-space: nowrap;
             }
 
+            /* Mobile-optimized friend items */
+            .friend-item {
+                padding: 12px;
+            }
+
+            .chat-with-friend-btn {
+                padding: 10px 14px;
+                font-size: 0.8rem;
+            }
+
+            .friends-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 12px;
+            }
 
         }
 
@@ -2127,6 +3011,63 @@
             .user-profile-header span {
                 font-size: 0.8rem;
                 max-width: 100px;
+            }
+        }
+
+        /* Enhanced mobile responsiveness for scrolling */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 15px;
+                -webkit-overflow-scrolling: touch; /* Ensure touch scrolling on mobile */
+                scroll-snap-type: y proximity; /* Enable scroll snapping on mobile */
+            }
+            
+            .profile-section,
+            .unlocked-rewards-section,
+            .recent-activity-section,
+            .customization-section,
+            .wallet-guide-section {
+                width: 95%;
+                padding: 1.5rem;
+                margin: 15px auto;
+                -webkit-overflow-scrolling: touch; /* Ensure touch scrolling on mobile */
+                scroll-snap-type: y proximity; /* Enable scroll snapping on mobile */
+            }
+
+            /* Mobile-specific touch improvements */
+            ::-webkit-scrollbar {
+                width: 14px; /* Even wider on mobile for better touch */
+            }
+
+
+
+            /* Mobile-optimized tiny toggle */
+            .tiny-toggle {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+        }
+
+        /* Additional touch improvements for very small screens */
+        @media (max-width: 480px) {
+            .content-wrapper {
+                scroll-snap-type: y mandatory; /* Force scroll snapping on very small screens */
+            }
+            
+            .profile-section,
+            .unlocked-rewards-section,
+            .recent-activity-section,
+            .customization-section,
+            .wallet-guide-section {
+                scroll-snap-type: y mandatory; /* Force scroll snapping on very small screens */
+            }
+
+            /* Very small screen tiny toggle */
+            .tiny-toggle {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
             }
         }
 
@@ -2195,7 +3136,6 @@
                 font-size: 0.8rem;
             }
 
-
             .profile-details-section label {
                 font-size: 0.85rem;
             }
@@ -2219,6 +3159,22 @@
             .rewards-grid, .friends-grid {
                 grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
                 gap: 10px;
+            }
+
+            /* Mobile-optimized modal */
+            .modal-content {
+                padding: 20px;
+                max-width: 95%;
+                max-height: 90vh;
+            }
+
+            #selectFriendModal .friend-item {
+                padding: 10px 12px;
+            }
+
+            #selectFriendModal .search-input {
+                padding: 10px 12px;
+                font-size: 16px; /* Prevents zoom on iOS */
             }
             .reward-item, .friend-item {
                 font-size: 0.8rem;
@@ -2268,7 +3224,7 @@
 
     <header>
         <div class="header-content-wrapper">
-            <a href="/home.html" class="logo">JCHAT</a>
+            <a href="/Home.html" class="logo">JCHAT</a>
             <nav>
                 <ul>
                     <!-- Removed Home and Profile links from header navigation -->
@@ -2276,13 +3232,9 @@
             </nav>
             <div class="user-profile-header">
                 <!-- NEW: Admin Icon Link (hidden by default) -->
-                <a href="/Admin.html" id="adminIconLink" aria-label="Admin Dashboard">
+                <a href="/gas_management.html" id="adminIconLink" aria-label="Admin Dashboard">
                     <i class="fas fa-user-cog"></i>
                 </a>
-                <!-- Currency Status Indicator -->
-                <div id="currencyStatus" style="font-size: 0.85rem; color: var(--text-light); margin-right: 12px; display: flex; align-items: center; gap: 4px;">
-                    <span id="currencyStatusText">Detecting currency...</span>
-                </div>
                 <!-- Notification Icon with Badge -->
                 <div class="notification-icon-wrapper">
                     <a href="/notifications.html" aria-label="Notifications">
@@ -2291,11 +3243,65 @@
                     </a>
                 </div>
                 <!-- Removed Logout Button -->
-                <a href="/profile.html" id="profileLink">
+                <a href="/Profile.html" id="profileLink">
                     <img id="headerProfilePic" src="" alt="Profile Picture" style="display: none;">
                     <i id="headerAvatarIcon" class="fas fa-user-circle"></i>
                     <span id="headerDisplayName">Loading...</span>
                 </a>
+                <!-- Tiny Plus Toggle -->
+                <button class="tiny-toggle" id="tinyToggle" onclick="toggleTinyMenu()">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <div class="tiny-dropdown" id="tinyDropdown">
+                    <a href="/Home.html" class="tiny-dropdown-item">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a>
+                    <a href="/Chat.html" class="tiny-dropdown-item">
+                        <i class="fas fa-comments"></i>
+                        Chat
+                    </a>
+                    <a href="/Profile.html" class="tiny-dropdown-item">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                    <a href="/Settings.html" class="tiny-dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <a href="/Wallet.html" class="tiny-dropdown-item">
+                        <i class="fas fa-wallet"></i>
+                        Wallet
+                    </a>
+                    <a href="/Find_Friends.html" class="tiny-dropdown-item">
+                        <i class="fas fa-users"></i>
+                        Find Friends
+                    </a>
+                    <a href="/Groups.html" class="tiny-dropdown-item">
+                        <i class="fas fa-layer-group"></i>
+                        Groups
+                    </a>
+                    <a href="/Jcoin.html" class="tiny-dropdown-item">
+                        <i class="fas fa-coins"></i>
+                        JCoins
+                    </a>
+                    <div class="tiny-dropdown-item" data-action="edit-profile">
+                        <i class="fas fa-edit"></i>
+                        Edit Profile
+                    </div>
+                    <div class="tiny-dropdown-item" data-action="share-profile">
+                        <i class="fas fa-share-alt"></i>
+                        Share Profile
+                    </div>
+                    <div class="tiny-dropdown-item" data-action="download-qr">
+                        <i class="fas fa-qrcode"></i>
+                        Download QR
+                    </div>
+                    <div class="tiny-dropdown-item" data-action="profile-settings">
+                        <i class="fas fa-cog"></i>
+                        Profile Settings
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -2308,9 +3314,6 @@
                     <input type="file" id="profileCoverUploadInput" accept="image/*" style="display:none;">
                     <label for="profileCoverUploadInput" id="editCoverOverlay" style="position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,0.5);padding:6px 10px;border-radius:8px;cursor:pointer;display:none;"><i class="fas fa-camera"></i> Edit Cover</label>
                 </div>
-                
-
-                    
 
                 <div class="profile-header-area">
                     <div class="profile-pic-wrapper" id="profilePicWrapper">
@@ -2320,10 +3323,36 @@
                         <label for="profilePicUploadInput" class="edit-profile-pic-overlay" id="editProfilePicOverlay">
                             <i class="fas fa-camera"></i> Edit
                         </label>
-                        <div class="profile-pic-loader"></div> <!-- NEW: Loading spinner for profile pic -->
+                         <!-- NEW: Loading spinner for profile pic -->
                     </div>
                     <h2 id="profileUsername" class="profile-name">Loading...</h2>
                     <p id="profileBio" class="profile-bio">No bio provided yet.</p>
+                    
+                    <!-- NEW: Profile Completion Progress Bar -->
+                    <div class="profile-completion-section">
+                        <div class="completion-header">
+                            <span class="completion-label">Profile Completion</span>
+                            <span id="completionPercentage" class="completion-percentage">0%</span>
+                        </div>
+                        <div class="completion-progress-bar">
+                            <div id="completionProgressFill" class="completion-progress-fill"></div>
+                        </div>
+                        <p class="completion-tip" id="completionTip">Complete your profile to unlock more features!</p>
+                    </div>
+
+                    <!-- NEW: Smart Profile Notifications -->
+                    <div class="profile-notifications-section" id="profileNotificationsSection" style="display: none;">
+                        <div class="notifications-header">
+                            <i class="fas fa-bell"></i>
+                            <span>Profile Notifications</span>
+                            <button class="clear-notifications-btn" id="clearNotificationsBtn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="notifications-list" id="notificationsList">
+                            <!-- Notifications will be populated here -->
+                        </div>
+                    </div>
                     
                     <!-- NEW: User ID Display -->
                     <p id="profileUserId" class="profile-info-item user-id-container" style="display: none;">
@@ -2337,11 +3366,21 @@
                     
                     <p id="profileLocation" class="profile-info-item" style="display: none;"><i class="fas fa-map-marker-alt"></i> <span id="locationText"></span></p>
                     <p id="profileEmail" class="profile-info-item" style="display: none;"><i class="fas fa-envelope"></i> <span id="emailText"></span></p>
+                    
+                    <!-- New Profile Information Fields -->
+                    <p id="profileFullName" class="profile-info-item" style="display: none;"><i class="fas fa-user"></i> <span id="fullNameText"></span></p>
+                    <p id="profileDateOfBirth" class="profile-info-item" style="display: none;"><i class="fas fa-birthday-cake"></i> <span id="dateOfBirthText"></span></p>
+                    <p id="profileGender" class="profile-info-item" style="display: none;"><i class="fas fa-venus-mars"></i> <span id="genderText"></span></p>
+                    <p id="profilePhone" class="profile-info-item" style="display: none;"><i class="fas fa-phone"></i> <span id="phoneText"></span></p>
+                    <p id="profileCountry" class="profile-info-item" style="display: none;"><i class="fas fa-flag"></i> <span id="countryText"></span></p>
+                    <p id="profileCity" class="profile-info-item" style="display: none;"><i class="fas fa-city"></i> <span id="cityText"></span></p>
+                    <p id="profileLanguage" class="profile-info-item" style="display: none;"><i class="fas fa-language"></i> <span id="languageText"></span></p>
+                    <p id="profileTimezone" class="profile-info-item" style="display: none;"><i class="fas fa-clock"></i> <span id="timezoneText"></span></p>
+                    
                     <p id="profileSchool" class="profile-info-item" style="display: none;"><i class="fas fa-graduation-cap"></i> <span id="schoolText"></span></p>
                     <p id="profileWork" class="profile-info-item" style="display: none;"><i class="fas fa-briefcase"></i> <span id="workText"></span></p>
                     <p id="profileWebsite" class="profile-info-item" style="display: none;"><i class="fas fa-globe"></i> <a id="websiteLink" href="#" target="_blank" rel="noopener noreferrer" class="gradient-text"></a></p>
                     <p id="profileSocialLinks" class="profile-info-item" style="display: none;"><i class="fas fa-share-alt"></i> <span id="socialLinksText"></span></p>
-
 
                     <!-- NEW: Level Info Display -->
                     <div class="profile-level-info">
@@ -2361,9 +3400,10 @@
                         <span id="statPosts" class="stat-value">0</span>
                         <span class="stat-label">Posts</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item friends-button" id="friendsStatItem" data-stat="friends">
                         <span id="statFriends" class="stat-value">0</span>
-                        <span class="stat-label">Friends</span>
+                        <span class="stat-label">View Friends</span>
+                        <i class="fas fa-users button-icon" id="friendsButtonIcon"></i>
                     </div>
                     <div class="stat-item">
                         <span id="statFollowers" class="stat-value">0</span>
@@ -2395,20 +3435,21 @@
                         <i class="fas fa-user-shield"></i> Privacy Settings
                     </a>
                     <!-- NEW: Wallet Link -->
-                    <a href="/wallet.html" id="walletLink" class="profile-action-button secondary disabled-link">
+                    <a href="/Wallet.html" id="walletLink" class="profile-action-button secondary disabled-link">
                         <i class="fas fa-lock padlock-icon"></i> My Wallet
                     </a>
                     <p id="walletLockedMessage" class="wallet-locked-message" style="display: none;">
                         Contact admin to unlock wallet access for just #5,000 and you have your wallet Unlocked. Jchatguide@gmail.com
                           Wa +2349013790707 
                           
+                </div>
+
+
                         
                     </p>
                     <!-- NEW: Request JCoins Button -->
                     <button id="requestJCoinsButton" class="profile-action-button">
                         <i class="fas fa-coins"></i> Request JCoins
-                    
-
 
                     <!-- NEW: Report User Button (only visible for other users) -->
                     <button id="reportUserButton" class="profile-action-button danger" style="display: none;">
@@ -2457,12 +3498,18 @@
 
                     <button id="saveProfileChanges" class="profile-action-button">
                         <span class="button-text">Save Profile</span>
-                        <div class="button-loader"></div>
+                        
                     </button>
 
                     <!-- NEW: Privacy Settings Toggles -->
-                    <h3 style="text-align: center; margin-top: 2rem;">Privacy Settings</h3>
-                    <div class="privacy-toggle-group">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2rem;">
+                        <h3 style="text-align:center;margin:0;">Privacy Settings</h3>
+                        <button id="togglePrivacySettingsBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
+                            <i class="fas fa-eye"></i> Show
+                        </button>
+                    </div>
+                    <div id="privacySettingsSection" class="profile-details-section" style="display:none;">
+                        <div class="privacy-toggle-group">
                         <label for="toggleEmailVisibility">Show Email Publicly</label>
                         <label class="toggle-switch">
                             <input type="checkbox" id="toggleEmailVisibility">
@@ -2541,12 +3588,19 @@
                     </div>
                     <button id="savePrivacySettingsButton" class="profile-action-button secondary">
                         <span class="button-text">Save Privacy Settings</span>
-                        <div class="button-loader"></div>
+                        
                     </button>
+                    </div> <!-- End Privacy Settings Section -->
 
                     <!-- NEW: Profile Customization Section -->
-                    <h3 style="text-align: center; margin-top: 2rem;">Profile Customization</h3>
-                    <div class="customization-option">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2rem;">
+                        <h3 style="text-align:center;margin:0;">Profile Customization</h3>
+                        <button id="toggleCustomizationBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
+                            <i class="fas fa-eye"></i> Show
+                        </button>
+                    </div>
+                    <div id="customizationSection" class="profile-details-section" style="display:none;">
+                        <div class="customization-option">
                         <label for="profileFrameSelect">Profile Picture Frame:</label>
                         <select id="profileFrameSelect">
                             <option value="default">Default</option>
@@ -2573,14 +3627,43 @@
                             <!-- Add more options -->
                         </select>
                     </div>
+
+                    <!-- NEW: Theme Presets -->
+                    <div class="theme-presets-section">
+                        <label>Quick Theme Presets:</label>
+                        <div class="theme-preset-grid">
+                            <div class="theme-preset" data-theme="professional">
+                                <div class="preset-preview professional-preview"></div>
+                                <span>Professional</span>
+                            </div>
+                            <div class="theme-preset" data-theme="creative">
+                                <div class="preset-preview creative-preview"></div>
+                                <span>Creative</span>
+                            </div>
+                            <div class="theme-preset" data-theme="minimal">
+                                <div class="preset-preview minimal-preview"></div>
+                                <span>Minimal</span>
+                            </div>
+                            <div class="theme-preset" data-theme="vibrant">
+                                <div class="preset-preview vibrant-preview"></div>
+                                <span>Vibrant</span>
+                            </div>
+                        </div>
+                    </div>
                     <button id="saveCustomizationButton" class="profile-action-button">
                         <span class="button-text">Save Customization</span>
-                        <div class="button-loader"></div>
+                        
                     </button>
+                    </div> <!-- End Customization Section -->
 
                     <!-- Identity & Availability -->
-                    <h3 style="text-align:center;margin-top:1.5rem;">Identity & Availability</h3>
-                    <div class="profile-details-section">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
+                        <h3 style="text-align:center;margin:0;">Identity & Availability</h3>
+                        <button id="toggleIdentityAvailabilityBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
+                            <i class="fas fa-eye"></i> Show
+                        </button>
+                    </div>
+                    <div id="identityAvailabilitySection" class="profile-details-section" style="display:none;">
                         <label for="handleInput">Handle</label>
                         <input type="text" id="handleInput" placeholder="e.g., @yourhandle">
                         <label for="pronounsInput">Pronouns</label>
@@ -2602,8 +3685,13 @@
                     </div>
 
                     <!-- Skills & Endorsements -->
-                    <h3 style="text-align:center;margin-top:1.5rem;">Skills & Endorsements</h3>
-                    <div class="profile-details-section">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
+                        <h3 style="text-align:center;margin:0;">Skills & Endorsements</h3>
+                        <button id="toggleSkillsBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
+                            <i class="fas fa-eye"></i> Show
+                        </button>
+                    </div>
+                    <div id="skillsSection" class="profile-details-section" style="display:none;">
                         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                             <input type="text" id="newSkillInput" placeholder="Add skill (owner only)" style="flex:1;">
                             <button id="addSkillBtn" class="profile-action-button"><i class="fas fa-plus"></i> Add Skill</button>
@@ -2612,39 +3700,66 @@
                     </div>
 
                     <!-- Featured Badges -->
-                    <h3 style="text-align:center;margin-top:1.5rem;">Featured Badges</h3>
-                    <div class="profile-details-section">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
+                        <h3 style="text-align:center;margin:0;">Featured Badges</h3>
+                        <button id="toggleBadgesBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
+                            <i class="fas fa-eye"></i> Show
+                        </button>
+                    </div>
+                    <div id="badgesSection" class="profile-details-section" style="display:none;">
                         <p style="opacity:0.8;margin:0 0 8px;">Choose up to 3 to feature on your profile.</p>
                         <div id="featuredBadgesChooser" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
                         <div id="featuredBadgesDisplay" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
-                    </div>
+                    </div> <!-- End Badges Section -->
 
                     <!-- Profile Insights -->
-                    <h3 style="text-align:center;margin-top:1.5rem;">Profile Insights</h3>
-                    <div class="profile-details-section">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
+                        <h3 style="text-align:center;margin:0;">Profile Insights</h3>
+                        <button id="toggleInsightsBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
+                            <i class="fas fa-eye"></i> Show
+                        </button>
+                    </div>
+                    <div id="insightsSection" class="profile-details-section" style="display:none;">
                         <label style="display:flex;align-items:center;gap:8px;">
                             <input type="checkbox" id="analyticsOptInToggle">
                             Enable profile view analytics (owner only)
                         </label>
                         <p id="profileViewsLine" style="margin-top:8px;">Views: <strong id="profileViewsCount">0</strong></p>
-                    </div>
+                    </div> <!-- End Insights Section -->
 
                     <!-- Verified Links & QR -->
-                    <h3 style="text-align:center;margin-top:1.5rem;">Share Profile</h3>
-                    <div class="profile-details-section" style="align-items:center;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
+                        <h3 style="text-align:center;margin:0;">Share Profile</h3>
+                        <button id="toggleShareBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
+                            <i class="fas fa-eye"></i> Show
+                        </button>
+                    </div>
+                    <div id="shareSection" class="profile-details-section" style="align-items:center;display:none;">
                         <div id="profileShareUrl" style="opacity:0.9;word-break:break-all;margin-bottom:8px;"></div>
                         <img id="profileQrImg" alt="QR" style="width:160px;height:160px;border-radius:8px;border:1px solid var(--border-light);display:none;"/>
-                    </div>
+                    </div> <!-- End Share Section -->
 
                     <!-- Safety Manager -->
-                    <h3 style="text-align:center;margin-top:1.5rem;">Safety</h3>
-                    <div class="profile-details-section">
-                        <button id="openSafetyManagerBtn" class="profile-action-button secondary"><i class="fas fa-shield-alt"></i> Safety Manager</button>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
+                        <h3 style="text-align:center;margin:0;">Safety</h3>
+                        <button id="toggleSafetyBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
+                            <i class="fas fa-eye"></i> Show
+                        </button>
                     </div>
+                    <div id="safetySection" class="profile-details-section" style="display:none;">
+                        <button id="openSafetyManagerBtn" class="profile-action-button secondary"><i class="fas fa-shield-alt"></i> Safety Manager</button>
+                    </div> <!-- End Safety Section -->
 
                     <!-- Pinned Post -->
-                    <h3 style="text-align:center;margin-top:1.5rem;">Pinned Post</h3>
-                    <div id="pinnedPostArea" style="border:1px solid var(--border-light);border-radius:10px;padding:10px;background:rgba(255,255,255,0.03);"></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
+                        <h3 style="text-align:center;margin:0;">Pinned Post</h3>
+                        <button id="togglePinnedPostBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
+                            <i class="fas fa-eye"></i> Show
+                        </button>
+                    </div>
+                    <div id="pinnedPostSection" style="display:none;">
+                        <div id="pinnedPostArea" style="border:1px solid var(--border-light);border-radius:10px;padding:10px;background:rgba(255,255,255,0.03);"></div>
+                    </div>
 
                 </div>
                 </div> <!-- End Tab About -->
@@ -2695,7 +3810,6 @@
                     </div>
                 </div>
 
-
                     <!-- Toggle for Account Settings (Email/Password) -->
                     <button id="toggleAccountSettingsButton" class="profile-action-button secondary" style="margin-top: 2rem;">
                         <i class="fas fa-cog"></i> Manage Account Settings
@@ -2721,7 +3835,7 @@
                                 </div>
                                 <button type="submit" id="updateEmailButton">
                                     <span class="button-text">Update Email</span>
-                                    <div class="button-loader"></div>
+                                    
                                 </button>
                             </form>
 
@@ -2739,7 +3853,7 @@
                             </div>
                             <button id="changePasswordButton">
                                 <span class="button-text">Change Password</span>
-                                <div class="button-loader"></div>
+                                
                             </button>
 
                             <button id="logoutButtonAccount" class="profile-action-button secondary">
@@ -2760,13 +3874,7 @@
                 </div>
             </div>
 
-            <!-- NEW: Friends Snippet Section -->
-            <div class="friends-snippet-section" id="friendsSnippetSection" style="display: none;">
-                <h3>Friends You Might Know</h3>
-                <div class="friends-grid" id="friendsSnippetGrid">
-                    <p class="no-friends-message">Loading friends...</p>
-                </div>
-            </div>
+
 
             <!-- NEW: Recent Activity Section -->
             <div class="recent-activity-section" id="recentActivitySection" style="display: none;">
@@ -2779,79 +3887,49 @@
             <!-- NEW: Wallet User Guide Section -->
             <div class="wallet-guide-section">
                 <h3>Wallet User Guide</h3>
+                
                 <div class="guide-item">
-                    <h4><i class="fas fa-wallet"></i> Understanding Your Balance</h4>
-                    <p>Your JCHAT Wallet holds your digital currency, JCoins, and your experience points, Gas (XP).</p>
+                    <h4><i class="fas fa-university"></i> OPay Details</h4>
+                    <p><strong>Bank:</strong> OPay</p>
+                    <p><strong>Account Name:</strong> ELECHI JOSHUA</p>
+                    <p><strong>Account Number:</strong> 8111609765</p>
+                    <p><strong>Reference:</strong> Your JCHAT User ID</p>
+                </div>
+
+                <div class="guide-item">
+                    <h4><i class="fas fa-university"></i> Bank Transfer (Keystone Bank)</h4>
+                    <p><strong>Bank:</strong> Keystone Bank</p>
+                    <p><strong>Account Name:</strong> ELECHI OSOUNDU JOSHUA</p>
+                    <p><strong>Account Number:</strong> 6042862356</p>
+                    <p><strong>Reference:</strong> Your JCHAT User ID</p>
+                    <p style="font-size:0.9rem;color:var(--text-light);">After payment, upload your receipt below and tap "Send Purchase Request".</p>
+                </div>
+
+                <div class="guide-item">
+                    <h4><i class="fas fa-key"></i> Transaction PIN</h4>
+                    <p>Set a 4-digit PIN to confirm transfers and withdrawals.</p>
+                </div>
+
+                <div class="guide-item">
+                    <h4><i class="fas fa-upload"></i> Submit Receipt</h4>
+                    <p>After making payment:</p>
                     <ul>
-                        <li><i class="fas fa-circle"></i> <strong>JCoins:</strong> Our in-app currency. Use them for various features, purchases, and even withdraw them for real money (subject to withdrawal rates).</li>
-                        <li><i class="fas fa-circle"></i> <strong>Gas (XP):</strong> Your experience points. Earn Gas by engaging with the app, and it contributes to your user level.</li>
-                        <li><i class="fas fa-circle"></i> <strong>USD Value:</strong> See the estimated USD value of your JCoins based on the current exchange rate.</li>
+                        <li><i class="fas fa-check-circle"></i> Enter the amount paid in Naira</li>
+                        <li><i class="fas fa-check-circle"></i> Upload your payment receipt</li>
+                        <li><i class="fas fa-check-circle"></i> Click "Send Purchase Request"</li>
                     </ul>
                 </div>
 
                 <div class="guide-item">
-                    <h4><i class="fas fa-money-bill-wave"></i> Buying JCoins</h4>
-                    <p>To top up your JCoins, follow these steps:</p>
+                    <h4><i class="fas fa-headset"></i> Need Help?</h4>
                     <ul>
-                        <li><i class="fas fa-check-circle"></i> Go to the <a href="/wallet.html" class="gradient-text">My Wallet</a> page.</li>
-                        <li><i class="fas fa-check-circle"></i> In the "Buy JCoins" section, you'll find our bank details.</li>
-                        <li><i class="fas fa-check-circle"></i> Make a transfer to the provided account number.
-                            <br><strong>Important:</strong> Use your JCHAT User ID as the reference for the transfer.</li>
-                        <li><i class="fas fa-check-circle"></i> After transferring, fill out the "Custom Purchase" form with the Naira amount you paid.</li>
-                        <li><i class="fas fa-check-circle"></i> Upload a clear screenshot or photo of your payment receipt.</li>
-                        <li><i class="fas fa-check-circle"></i> Click "Send Purchase Request." An admin will review and credit your account.</li>
-                        <li><i class="fas fa-info-circle"></i> Purchases of <span class="gradient-text">#1000</span> and above receive a <span class="gradient-text">10% JCoin bonus</span>!</li>
-                    </ul>
-                </div>
-
-                <div class="guide-item">
-                    <h4><i class="fas fa-gift"></i> Earning JCoins & Gas</h4>
-                    <p>There are several ways to earn more on JCHAT:</p>
-                    <ul>
-                        <li><i class="fas fa-star"></i> <strong>Daily Login Bonus:</strong> Claim free JCoins and Gas every 24 hours from your profile or wallet page.</li>
-                        <li><i class="fas fa-user-check"></i> <strong>Complete Your Profile:</strong> Fill out all your profile details for a one-time JCoin and Gas bonus.</li>
-                        <li><i class="fas fa-user-plus"></i> <strong>Refer a Friend:</strong> Invite new users to JCHAT and earn JCoins when they join.</li>
-                        <li><i class="fas fa-comments"></i> <strong>Engage in Chat:</strong> Earn Gas (XP) by actively participating in conversations and interacting with other users.</li>
-                        <li><i class="fas fa-level-up-alt"></i> <strong>Level Up:</strong> Gain Gas to increase your user level and unlock exclusive rewards, titles, and features!</li>
-                    </ul>
-                </div>
-
-                <div class="guide-item">
-                    <h4><i class="fas fa-paper-plane"></i> Sending JCoins</h4>
-                    <p>You can send JCoins to other JCHAT users directly from your wallet:</p>
-                    <ul>
-                        <li><i class="fas fa-arrow-right"></i> On the <a href="/wallet.html" class="gradient-text">My Wallet</a> page, click "Send JCoins."</li>
-                        <li><i class="fas fa-arrow-right"></i> Enter the recipient's exact JCHAT User ID.</li>
-                        <li><i class="fas fa-arrow-right"></i> Enter the amount of JCoins you wish to send.</li>
-                        <li><i class="fas fa-arrow-right"></i> Confirm the transaction with your password for security.</li>
-                    </ul>
-                </div>
-
-                <div class="guide-item">
-                    <h4><i class="fas fa-hand-holding-usd"></i> Withdrawing JCoins</h4>
-                    <p>Convert your JCoins into real Naira:</p>
-                    <ul>
-                        <li><i class="fas fa-money-check-alt"></i> First, ensure your bank details (Bank Name, Account Name, Account Number) are saved in the "Withdraw JCoins" section of your <a href="/wallet.html" class="gradient-text">My Wallet</a> page.</li>
-                        <li><i class="fas fa-money-check-alt"></i> The current withdrawal rate is <strong>20000 JCoins = #10,000 NGN</strong>.</li>
-                        <li><i class="fas fa-money-check-alt"></i> Click the "Withdraw JCoins" button. Your JCoins will be deducted, and a request sent to an admin.</li>
-                        <li><i class="fas fa-money-check-alt"></i> Funds will be transferred to your saved bank account upon admin approval.</li>
-                        <li><i class="fas fa-hourglass-half"></i> You can track the status of your withdrawal requests in the "My Withdrawal Requests" history.</li>
-                    </ul>
-                </div>
-
-                <div class="guide-item">
-                    <h4><i class="fas fa-history"></i> Transaction History</h4>
-                    <p>Keep track of all your JCoin movements:</p>
-                    <ul>
-                        <li><i class="fas fa-list-alt"></i> On the <a href="/wallet.html" class="gradient-text">My Wallet</a> page, view your "Transaction History."</li>
-                        <li><i class="fas fa-filter"></i> Use the "All Types" filter to view credits, debits, purchases, or withdrawals specifically.</li>
-                        <li><i class="fas fa-search"></i> Use the search bar to find specific transactions by description.</li>
-                        <li><i class="fas fa-info-circle"></i> Click on any transaction to see more detailed information, including receipt images for purchases.</li>
+                        <li><i class="fas fa-envelope"></i> <a href="mailto:jchatguide@gmail.com" target="_blank">jchatguide@gmail.com</a></li>
+                        <li><i class="fab fa-whatsapp"></i> <a href="https://wa.me/2348111609765" target="_blank">WhatsApp +2348111609765</a></li>
+                        <li><i class="fas fa-phone"></i> <a href="tel:+2349013790707">Phone +2349013790707</a></li>
                     </ul>
                 </div>
             </div>
             <!-- End NEW: Wallet User Guide Section -->
-
 
             <!-- User's posts feed -->
             <div class="posts-feed-section" id="userPostsFeed" style="display: none;">
@@ -2864,6 +3942,24 @@
 
     <!-- Custom Message Box (reused from Home.html) -->
     <div id="messageBox"></div>
+
+    <!-- Select Friend Modal (exactly like Chat.html) -->
+    <div id="selectFriendModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Select a Friend to Chat With</h3>
+            <input type="text" id="friendSearchInput" placeholder="Search friends..." class="search-input">
+            <div id="friendListContainer" class="friend-list-modal">
+                <div class="loading-friends-modal" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading friends...</p>
+                </div>
+                <p class="no-friends-modal" style="display: none;">No friends found.</p>
+            </div>
+            <div class="modal-buttons">
+                <button id="closeFriendModalBtn" class="cancel-btn">Close</button>
+            </div>
+        </div>
+    </div>
 
     <!-- NEW: JCoin Request Modal -->
     <div id="jcoinRequestModal" class="modal-overlay">
@@ -2892,7 +3988,7 @@
                 <button id="cancelJCoinRequest" class="modal-button cancel-button">Cancel</button>
                 <button id="submitJCoinRequestButton" class="modal-button save-button">
                     <span class="button-text">Submit Request</span>
-                    <div class="button-loader"></div>
+                    
                 </button>
             </div>
         </div>
@@ -2926,7 +4022,7 @@
                 <button id="cancelReportButton" class="modal-button cancel-button">Cancel</button>
                 <button id="submitReportButton" class="modal-button save-button">
                     <span class="button-text">Submit Report</span>
-                    <div class="button-loader"></div>
+                    
                 </button>
             </div>
         </div>
@@ -2935,7 +4031,7 @@
         // Import Firebase modules (Updated to v11.8.0 - Latest Stable)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, updateProfile, updateEmail, reauthenticateWithCredential, EmailAuthProvider, updatePassword, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, setDoc, deleteDoc, collection, query, where, getDocs, runTransaction, writeBatch, serverTimestamp, orderBy, addDoc, arrayUnion, documentId } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc, setDoc, deleteDoc, collection, query, where, getDocs, runTransaction, writeBatch, serverTimestamp, orderBy, addDoc, arrayUnion, documentId, onSnapshot } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-storage.js";
         import { Timestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
@@ -2957,26 +4053,6 @@
             uploadPreset: "Storage_preset" // Your Cloudinary Upload Preset
         };
 
-        // Currency configuration for enhanced real-time conversion
-        const CURRENCIES = {
-            'US': { code: 'USD', symbol: '$', name: 'US Dollar' },
-            'GB': { code: 'GBP', symbol: '£', name: 'British Pound' },
-            'EU': { code: 'EUR', symbol: '€', name: 'Euro' },
-            'CA': { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
-            'AU': { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
-            'IN': { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
-            'JP': { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
-            'KR': { code: 'KRW', symbol: '₩', name: 'South Korean Won' },
-            'BR': { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' },
-            'MX': { code: 'MXN', symbol: '$', name: 'Mexican Peso' },
-            'NG': { code: 'NGN', symbol: '₦', name: 'Nigerian Naira' }
-        };
-
-        // Default to Naira if detection fails
-        let userCurrency = CURRENCIES['NG'];
-        let exchangeRates = { NGN: 1 };
-        let isRatesLoading = false;
-
         // Initialize Firebase services
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -2991,6 +4067,10 @@
         const messageBox = document.getElementById('messageBox');
         const headerNavLinkProfile = document.getElementById('profileLink'); // Corrected ID to match HTML
         const adminIconLink = document.getElementById('adminIconLink');
+        
+        // Tiny Toggle Elements
+        const tinyToggle = document.getElementById('tinyToggle');
+        const tinyDropdown = document.getElementById('tinyDropdown');
 
         const profilePicWrapper = document.getElementById('profilePicWrapper'); // New wrapper for owner check
         const profilePagePic = document.getElementById('profilePagePic');
@@ -3011,127 +4091,28 @@
         const profileEmail = document.getElementById('profileEmail'); // P element container
         const emailText = document.getElementById('emailText'); // Span inside profileEmail
 
-        // Currency detection and exchange rate management
-        async function detectUserCurrency() {
-            try {
-                // Try to get user's country from IP
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                
-                if (data.country_code && CURRENCIES[data.country_code]) {
-                    userCurrency = CURRENCIES[data.country_code];
-                    showMessageBox(`Prices shown in ${userCurrency.name}`, 'info');
-                }
-                
-                // Store user's currency preference
-                localStorage.setItem('jchat-user-currency', userCurrency.code);
-                
-                // Fetch exchange rates
-                await fetchExchangeRates();
-                
-            } catch (error) {
-                console.log('Currency detection failed, using Naira:', error);
-                // Fallback to stored preference or Naira
-                const storedCurrency = localStorage.getItem('jchat-user-currency');
-                if (storedCurrency) {
-                    const currencyEntry = Object.values(CURRENCIES).find(c => c.code === storedCurrency);
-                    if (currencyEntry) userCurrency = currencyEntry;
-                }
-                
-                // Still try to fetch exchange rates even if detection failed
-                await fetchExchangeRates();
-            }
-        }
-
-        async function fetchExchangeRates() {
-            if (isRatesLoading) return;
-            isRatesLoading = true;
-            
-            try {
-                // Use a free exchange rate API
-                const response = await fetch(`https://api.exchangerate-api.com/v4/latest/NGN`);
-                const data = await response.json();
-                
-                if (data.rates) {
-                    exchangeRates = data.rates;
-                    updateJCoinDisplay();
-                    showMessageBox('Exchange rates updated', 'success');
-                }
-            } catch (error) {
-                console.error('Failed to fetch exchange rates:', error);
-                // Fallback to approximate rates
-                exchangeRates = {
-                    USD: 0.0012, EUR: 0.0011, GBP: 0.0009, CAD: 0.0016,
-                    AUD: 0.0018, INR: 0.10, JPY: 0.18, KRW: 1.62,
-                    BRL: 0.006, MXN: 0.020, NGN: 1
-                };
-            } finally {
-                isRatesLoading = false;
-            }
-        }
-
-        function convertPrice(priceInNaira, targetCurrency = userCurrency.code) {
-            const rate = exchangeRates[targetCurrency] || 1;
-            const converted = priceInNaira * rate;
-            
-            // Format based on currency
-            if (targetCurrency === 'JPY' || targetCurrency === 'KRW') {
-                return Math.round(converted);
-            } else if (targetCurrency === 'INR') {
-                return Math.round(converted);
-            } else {
-                return converted.toFixed(2);
-            }
-        }
-
-        function formatPrice(price, currency = userCurrency) {
-            const convertedPrice = convertPrice(price, currency.code);
-            return `${currency.symbol}${convertedPrice}`;
-        }
-
-        function updateJCoinDisplay() {
-            // Update JCoin display with current currency
-            if (jCoinsSpan && jcoinExchangeRate && jcoinUSDValue && currentUserProfileData) {
-                const jcoinAmount = currentUserProfileData.jCoins ?? 0;
-                const nairaRate = currentSystemSettings?.jcoinNairaRate || 7.5;
-                const nairaValue = jcoinAmount * nairaRate;
-                const convertedValue = convertPrice(nairaValue, userCurrency.code);
-                
-                jcoinUSDValue.textContent = `${userCurrency.symbol}${convertedValue}`;
-                
-                // Update the exchange rate display text
-                const exchangeRateText = document.getElementById('jcoinExchangeRate');
-                if (exchangeRateText) {
-                    exchangeRateText.innerHTML = `
-                        <span id="jcoinUSDValue">${userCurrency.symbol}${convertedValue}</span> ${userCurrency.code}
-                        ${isRatesLoading ? '<span style="animation: spin 1s linear infinite;">🔄</span>' : ''}
-                    `;
-                }
-            }
-            
-            // Update currency status in header
-            const statusText = document.getElementById('currencyStatusText');
-            if (statusText) {
-                if (isRatesLoading) {
-                    statusText.textContent = '🔄 Loading exchange rates...';
-                } else if (Object.keys(exchangeRates).length > 1) {
-                    statusText.textContent = `Prices in ${userCurrency.symbol}${userCurrency.code}`;
-                } else {
-                    statusText.textContent = 'Using approximate rates';
-                }
-            }
-            
-            // Update page title to show current currency
-            const titleElement = document.querySelector('title');
-            if (titleElement) {
-                titleElement.textContent = `JCHAT - Profile (${userCurrency.symbol}${userCurrency.code})`;
-            }
-        }
+        // New Profile Information Elements
+        const profileFullName = document.getElementById('profileFullName');
+        const fullNameText = document.getElementById('fullNameText');
+        const profileDateOfBirth = document.getElementById('profileDateOfBirth');
+        const dateOfBirthText = document.getElementById('dateOfBirthText');
+        const profileGender = document.getElementById('profileGender');
+        const genderText = document.getElementById('genderText');
+        const profilePhone = document.getElementById('profilePhone');
+        const phoneText = document.getElementById('phoneText');
+        const profileCountry = document.getElementById('profileCountry');
+        const countryText = document.getElementById('countryText');
+        const profileCity = document.getElementById('profileCity');
+        const cityText = document.getElementById('cityText');
+        const profileLanguage = document.getElementById('profileLanguage');
+        const languageText = document.getElementById('languageText');
+        const profileTimezone = document.getElementById('profileTimezone');
+        const timezoneText = document.getElementById('timezoneText');
 
         // --- Notification Badge Management ---
         function updateNotificationBadge(count) {
             const notificationWrapper = document.querySelector('.notification-icon-wrapper');
-            const badge = document.getElementById('notificationCount');
+            const notificationBadge = document.getElementById('notificationCount');
             if (badge && notificationWrapper) {
                 if (count > 0) {
                     badge.textContent = count > 99 ? '99+' : count.toString();
@@ -3156,7 +4137,6 @@
         const profileSocialLinks = document.getElementById('profileSocialLinks');
         const socialLinksText = document.getElementById('socialLinksText');
 
-
         const statPosts = document.getElementById('statPosts');
         const statFriends = document.getElementById('statFriends');
         const statFollowers = document.getElementById('statFollowers');
@@ -3179,7 +4159,6 @@
         const claimDailyBonusButton = document.getElementById('claimDailyBonusButton'); // NEW
         const dailyBonusCountdown = document.getElementById('dailyBonusCountdown'); // NEW
         const reportUserButton = document.getElementById('reportUserButton'); // NEW
-
 
         // Inline Edit Fields
         const displayNameInput = document.getElementById('displayName'); // Input for display name
@@ -3236,7 +4215,6 @@
         const profileThemeSelect = document.getElementById('profileThemeSelect');
         const saveCustomizationButton = document.getElementById('saveCustomizationButton');
 
-
         // Account Settings Fields
         const profileEmailInput = document.getElementById('profileEmailInput'); // Disabled email display
         const newEmailInput = document.getElementById('newEmail');
@@ -3251,7 +4229,6 @@
         // NEW: Toggle for Account Settings Section
         const toggleAccountSettingsButton = document.getElementById('toggleAccountSettingsButton');
         const accountSettingsSection = document.getElementById('accountSettingsSection');
-
 
         const userPostsFeed = document.getElementById('userPostsFeed');
         const postsFeedUsername = document.getElementById('postsFeedUsername');
@@ -3509,7 +4486,6 @@
                 });
             }
 
-
         // --- Global State ---
         let currentUser = null; // The currently authenticated user (Firebase Auth object)
         let currentUserProfileData = null; // The current user's own private profile data (Firestore document)
@@ -3519,11 +4495,14 @@
         const ADMIN_UID = 'cc96gdhCRPO72NFZtleRCujHvIq2'; // Admin's User ID
         let currentSystemSettings = {}; // To store system settings (like exchange rates)
 
+        // NEW: Online Status Tracking (exactly like Chat.html)
+        let userOnlineStatus = new Map(); // Track online status of users
+        let userAuthStatus = new Map(); // Track authentication status of users
+
         const JCOIN_BONUS_THRESHOLD_NAIRA = 1000; // Naira amount from which JCoin bonus applies
         const JCOIN_BONUS_PERCENTAGE = 0.10; // 10% bonus
 
         let dailyBonusInterval = null; // For daily bonus countdown timer
-
 
         // --- Utility Functions ---
 
@@ -3647,18 +4626,18 @@
          */
         function toggleButtonLoading(buttonElement, isLoading) {
             if (!buttonElement) return;
-            const loader = buttonElement.querySelector('.button-loader');
+            
             const text = buttonElement.querySelector('.button-text');
 
             if (isLoading) {
                 buttonElement.disabled = true;
                 buttonElement.classList.add('loading'); // Add loading class for general styling
-                if (loader) loader.classList.add('active');
+                
                 if (text) text.style.display = 'none';
             } else {
                 buttonElement.disabled = false;
                 buttonElement.classList.remove('loading');
-                if (loader) loader.classList.remove('active');
+                
                 if (text) text.style.display = 'block';
             }
         }
@@ -3961,7 +4940,6 @@
             }
         }
 
-
         /**
          * Handles user logout.
          */
@@ -4057,8 +5035,10 @@
                 if (newWebsite) { if (websiteLink) { websiteLink.href = newWebsite; websiteLink.textContent = newWebsite.replace(/^(https?:\/\/)?(www\.)?/, ''); } if (profileWebsite) profileWebsite.style.display = 'block'; } else { if (profileWebsite) profileWebsite.style.display = 'none'; }
                 if (newSocialLinks) { if (socialLinksText) socialLinksText.textContent = newSocialLinks; if (profileSocialLinks) profileSocialLinks.style.display = 'block'; } else { if (profileSocialLinks) profileSocialLinks.style.display = 'none'; }
 
-
                 showMessageBox("Profile saved successfully!", 'success');
+
+                // NEW: Update profile completion progress after saving
+                updateProfileCompletion();
 
                 // Refresh currentUserProfileData
                 const updatedProfileSnap = await getDoc(privateProfileDocRef);
@@ -4217,7 +5197,6 @@
                     return;
                 }
 
-
                 const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
                 await updateDoc(privateProfileDocRef, {
                     profileFrame: newProfileFrame,
@@ -4241,6 +5220,714 @@
                 toggleButtonLoading(saveCustomizationButton, false);
             }
         }
+
+        /**
+         * Toggles the visibility of the Identity & Availability section.
+         */
+        function toggleIdentityAvailability() {
+            const section = document.getElementById('identityAvailabilitySection');
+            const button = document.getElementById('toggleIdentityAvailabilityBtn');
+            const icon = button.querySelector('i');
+            const text = button.textContent.trim();
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                button.classList.remove('secondary');
+                button.classList.add('primary');
+            } else {
+                section.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i> Show';
+                button.classList.remove('primary');
+                button.classList.add('secondary');
+            }
+        }
+
+        /**
+         * Toggles the visibility of the Privacy Settings section.
+         */
+        function togglePrivacySettings() {
+            const section = document.getElementById('privacySettingsSection');
+            const button = document.getElementById('togglePrivacySettingsBtn');
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                button.classList.remove('secondary');
+                button.classList.add('primary');
+            } else {
+                section.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i> Show';
+                button.classList.remove('primary');
+                button.classList.add('secondary');
+            }
+        }
+
+        /**
+         * Toggles the visibility of the Profile Customization section.
+         */
+        function toggleCustomization() {
+            const section = document.getElementById('customizationSection');
+            const button = document.getElementById('toggleCustomizationBtn');
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                button.classList.remove('secondary');
+                button.classList.add('primary');
+            } else {
+                section.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i> Show';
+                button.classList.remove('primary');
+                button.classList.add('secondary');
+            }
+        }
+
+        /**
+         * Toggles the visibility of the Skills & Endorsements section.
+         */
+        function toggleSkills() {
+            const section = document.getElementById('skillsSection');
+            const button = document.getElementById('toggleSkillsBtn');
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                button.classList.remove('secondary');
+                button.classList.add('primary');
+            } else {
+                section.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i> Show';
+                button.classList.remove('primary');
+                button.classList.add('secondary');
+            }
+        }
+
+        /**
+         * Toggles the visibility of the Featured Badges section.
+         */
+        function toggleBadges() {
+            const section = document.getElementById('badgesSection');
+            const button = document.getElementById('toggleBadgesBtn');
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                button.classList.remove('secondary');
+                button.classList.add('primary');
+            } else {
+                section.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i> Show';
+                button.classList.remove('primary');
+                button.classList.add('secondary');
+            }
+        }
+
+        /**
+         * Toggles the visibility of the Profile Insights section.
+         */
+        function toggleInsights() {
+            const section = document.getElementById('insightsSection');
+            const button = document.getElementById('toggleInsightsBtn');
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                button.classList.remove('secondary');
+                button.classList.add('primary');
+            } else {
+                section.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i> Show';
+                button.classList.remove('primary');
+                button.classList.add('secondary');
+            }
+        }
+
+        /**
+         * Toggles the visibility of the Share Profile section.
+         */
+        function toggleShare() {
+            const section = document.getElementById('shareSection');
+            const button = document.getElementById('toggleShareBtn');
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                button.classList.remove('secondary');
+                button.classList.add('primary');
+            } else {
+                section.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i> Show';
+                button.classList.remove('primary');
+                button.classList.add('secondary');
+            }
+        }
+
+        /**
+         * Toggles the visibility of the Safety section.
+         */
+        function toggleSafety() {
+            const section = document.getElementById('safetySection');
+            const button = document.getElementById('toggleSafetyBtn');
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                button.classList.remove('secondary');
+                button.classList.add('primary');
+            } else {
+                section.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i> Show';
+                button.classList.remove('primary');
+                button.classList.add('secondary');
+            }
+        }
+
+        /**
+         * Toggles the visibility of the Pinned Post section.
+         */
+        function togglePinnedPost() {
+            const section = document.getElementById('pinnedPostSection');
+            const button = document.getElementById('togglePinnedPostBtn');
+
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                button.classList.remove('secondary');
+                button.classList.add('primary');
+            } else {
+                section.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i> Show';
+                button.classList.remove('primary');
+                button.classList.add('secondary');
+            }
+        }
+
+        /**
+         * Calculates and updates the profile completion percentage.
+         */
+        function updateProfileCompletion() {
+            const profileFields = [
+                'displayName', 'bio', 'locationInput', 'schoolInput', 'workInput', 
+                'interestsInput', 'websiteInput', 'socialLinksInput', 'handleInput', 
+                'pronounsInput', 'languagesInput', 'timeZoneInput', 'statusTextInput', 
+                'schedulingLinkInput'
+            ];
+
+            let completedFields = 0;
+            let totalFields = profileFields.length;
+
+            profileFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field && field.value && field.value.trim() !== '') {
+                    completedFields++;
+                }
+            });
+
+            const completionPercentage = Math.round((completedFields / totalFields) * 100);
+            
+            // Update UI
+            const percentageElement = document.getElementById('completionPercentage');
+            const progressFill = document.getElementById('completionProgressFill');
+            const tipElement = document.getElementById('completionTip');
+
+            if (percentageElement) percentageElement.textContent = `${completionPercentage}%`;
+            if (progressFill) progressFill.style.width = `${completionPercentage}%`;
+
+            // Update tip based on completion
+            if (tipElement) {
+                if (completionPercentage === 100) {
+                    tipElement.textContent = '🎉 Profile complete! You\'ve unlocked all features!';
+                    tipElement.style.color = '#4CAF50';
+                } else if (completionPercentage >= 80) {
+                    tipElement.textContent = 'Almost there! Just a few more details to complete your profile.';
+                    tipElement.style.color = '#FFC107';
+                } else if (completionPercentage >= 60) {
+                    tipElement.textContent = 'Great progress! Keep going to unlock more features.';
+                    tipElement.style.color = '#FF9800';
+                } else if (completionPercentage >= 40) {
+                    tipElement.textContent = 'Good start! Add more details to improve your profile.';
+                    tipElement.style.color = '#FF9800';
+                } else {
+                    tipElement.textContent = 'Complete your profile to unlock more features!';
+                    tipElement.style.color = '#FF5722';
+                }
+            }
+
+            return completionPercentage;
+        }
+
+
+
+        /**
+         * Handles quick action execution.
+         */
+        function handleQuickAction(action) {
+            switch (action) {
+                case 'edit-profile':
+                    // Show profile edit section
+                    const profileDetailsSection = document.querySelector('.profile-details-section');
+                    if (profileDetailsSection) {
+                        profileDetailsSection.style.display = 'flex';
+                        profileDetailsSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    break;
+                case 'share-profile':
+                    // Generate and copy profile share URL
+                    const shareUrl = `${window.location.origin}/Profile.html?userId=${currentUser?.uid || displayedUserId}`;
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        showMessageBox('Profile URL copied to clipboard!', 'success');
+                    }).catch(() => {
+                        showMessageBox('Failed to copy URL', 'error');
+                    });
+                    break;
+                case 'download-qr':
+                    // Trigger QR code download
+                    const qrImg = document.getElementById('profileQrImg');
+                    if (qrImg && qrImg.src) {
+                        const link = document.createElement('a');
+                        link.download = 'profile-qr.png';
+                        link.href = qrImg.src;
+                        link.click();
+                    } else {
+                        showMessageBox('QR code not available yet', 'warning');
+                    }
+                    break;
+                case 'profile-settings':
+                    // Show profile settings (customization section)
+                    const customizationSection = document.getElementById('customizationSection');
+                    if (customizationSection) {
+                        customizationSection.style.display = 'block';
+                        customizationSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    break;
+                default:
+                    console.log('Unknown action:', action);
+            }
+        }
+
+        /**
+         * Initializes tiny toggle functionality.
+         */
+        function initializeTinyToggle() {
+            console.log('JCHAT_DEBUG: Initializing tiny toggle...');
+            console.log('JCHAT_DEBUG: tinyToggle element found:', !!tinyToggle);
+            console.log('JCHAT_DEBUG: tinyDropdown element found:', !!tinyDropdown);
+            
+            if (tinyToggle && tinyDropdown) {
+                console.log('JCHAT_DEBUG: Tiny toggle initialized successfully');
+                
+                // Add event listeners for quick action items in tiny dropdown
+                const actionItems = tinyDropdown.querySelectorAll('[data-action]');
+                actionItems.forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const action = item.dataset.action;
+                        console.log('JCHAT_DEBUG: Quick action clicked from tiny dropdown:', action);
+                        handleQuickAction(action);
+                        
+                        // Close dropdown after action
+                        const tinyDropdownEl = document.getElementById('tinyDropdown');
+                        const tinyToggleEl = document.getElementById('tinyToggle');
+                        if (tinyDropdownEl && tinyToggleEl) {
+                            tinyDropdownEl.classList.remove('show');
+                            tinyToggleEl.classList.remove('active');
+                        }
+                    });
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    const tinyToggleEl = document.getElementById('tinyToggle');
+                    const tinyDropdownEl = document.getElementById('tinyDropdown');
+                    
+                    if (tinyToggleEl && tinyDropdownEl && 
+                        !tinyToggleEl.contains(e.target) && !tinyDropdownEl.contains(e.target)) {
+                        if (tinyDropdownEl.classList.contains('show')) {
+                            console.log('JCHAT_DEBUG: Closing tiny dropdown - clicked outside');
+                            tinyDropdownEl.classList.remove('show');
+                            tinyToggleEl.classList.remove('active');
+                        }
+                    }
+                });
+
+                // Close dropdown with Escape key
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        const tinyDropdownEl = document.getElementById('tinyDropdown');
+                        const tinyToggleEl = document.getElementById('tinyToggle');
+                        
+                        if (tinyDropdownEl && tinyDropdownEl.classList.contains('show')) {
+                            tinyDropdownEl.classList.remove('show');
+                            if (tinyToggleEl) tinyToggleEl.classList.remove('active');
+                            console.log('JCHAT_DEBUG: Tiny dropdown closed via Escape key');
+                        }
+                    }
+                });
+
+                console.log('JCHAT_DEBUG: Tiny toggle elements:', { tinyToggle, tinyDropdown });
+            } else {
+                console.error('JCHAT_ERROR: Tiny toggle elements not found');
+                console.log('JCHAT_DEBUG: Tiny toggle element:', tinyToggle);
+                console.log('JCHAT_DEBUG: Tiny dropdown element:', tinyDropdown);
+            }
+        }
+
+        /**
+         * Toggles the tiny menu dropdown.
+         */
+        function toggleTinyMenu() {
+            console.log('JCHAT_DEBUG: toggleTinyMenu called');
+            
+            const tinyDropdownEl = document.getElementById('tinyDropdown');
+            const tinyToggleEl = document.getElementById('tinyToggle');
+            
+            console.log('JCHAT_DEBUG: tinyDropdown element:', tinyDropdownEl);
+            console.log('JCHAT_DEBUG: tinyToggle element:', tinyToggleEl);
+            
+            if (tinyDropdownEl && tinyToggleEl) {
+                const isVisible = tinyDropdownEl.classList.contains('show');
+                console.log('JCHAT_DEBUG: Dropdown currently visible:', isVisible);
+                
+                if (isVisible) {
+                    tinyDropdownEl.classList.remove('show');
+                    tinyToggleEl.classList.remove('active');
+                    console.log('JCHAT_DEBUG: Tiny dropdown closed');
+                } else {
+                    tinyDropdownEl.classList.add('show');
+                    tinyToggleEl.classList.add('active');
+                    console.log('JCHAT_DEBUG: Tiny dropdown opened');
+                }
+                
+                // Double-check the classes were applied
+                console.log('JCHAT_DEBUG: Dropdown classes after toggle:', tinyDropdownEl.classList.toString());
+                console.log('JCHAT_DEBUG: Toggle classes after toggle:', tinyToggleEl.classList.toString());
+            } else {
+                console.error('JCHAT_ERROR: tinyDropdown or tinyToggle not found in toggleTinyMenu');
+            }
+        }
+
+        // Make toggleTinyMenu globally accessible
+        window.toggleTinyMenu = toggleTinyMenu;
+
+        /**
+         * Initializes touch gestures for mobile devices.
+         */
+        function initializeTouchGestures() {
+            const profileSection = document.querySelector('.profile-section');
+            if (!profileSection) return;
+
+            let startY = 0;
+            let startX = 0;
+            let isSwiping = false;
+
+            // Touch start
+            profileSection.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+                startX = e.touches[0].clientX;
+                isSwiping = false;
+            }, { passive: true });
+
+            // Touch move
+            profileSection.addEventListener('touchmove', (e) => {
+                if (!isSwiping) {
+                    const deltaY = Math.abs(e.touches[0].clientY - startY);
+                    const deltaX = Math.abs(e.touches[0].clientX - startX);
+                    
+                    if (deltaY > 10 && deltaY > deltaX) {
+                        isSwiping = true;
+                        profileSection.classList.add('swiping');
+                    }
+                }
+            }, { passive: true });
+
+            // Touch end
+            profileSection.addEventListener('touchend', (e) => {
+                if (isSwiping) {
+                    const deltaY = e.changedTouches[0].clientY - startY;
+                    
+                    if (Math.abs(deltaY) > 50) {
+                        // Swipe up/down detected
+                        if (deltaY < 0) {
+                            // Swipe up - could trigger profile completion focus
+                            const completionSection = document.querySelector('.profile-completion-section');
+                            if (completionSection) {
+                                completionSection.scrollIntoView({ behavior: 'smooth' });
+                            }
+                        } else {
+                            // Swipe down - could trigger tiny menu
+                            if (window.toggleTinyMenu) {
+                                window.toggleTinyMenu();
+                            }
+                        }
+                    }
+                    
+                    setTimeout(() => {
+                        profileSection.classList.remove('swiping');
+                    }, 100);
+                }
+            }, { passive: true });
+
+            // Add haptic feedback for mobile
+            if ('vibrate' in navigator) {
+                const actionButtons = document.querySelectorAll('.profile-action-button');
+                actionButtons.forEach(button => {
+                    button.addEventListener('touchstart', () => {
+                        navigator.vibrate(10);
+                    }, { passive: true });
+                });
+            }
+        }
+
+        /**
+         * Initializes theme preset functionality.
+         */
+        function initializeThemePresets() {
+            const themePresets = document.querySelectorAll('.theme-preset');
+            const profileThemeSelect = document.getElementById('profileThemeSelect');
+
+            themePresets.forEach(preset => {
+                preset.addEventListener('click', () => {
+                    const theme = preset.dataset.theme;
+                    
+                    // Remove selected class from all presets
+                    themePresets.forEach(p => p.classList.remove('selected'));
+                    
+                    // Add selected class to clicked preset
+                    preset.classList.add('selected');
+                    
+                    // Update the theme select dropdown
+                    if (profileThemeSelect) {
+                        profileThemeSelect.value = theme;
+                    }
+                    
+                    // Apply theme preview
+                    applyThemePreview(theme);
+                    
+                    // Show success message
+                    showMessageBox(`Theme preset "${theme}" selected!`, 'success');
+                });
+            });
+
+            // Set initial selected theme
+            if (profileThemeSelect) {
+                const currentTheme = profileThemeSelect.value;
+                const currentPreset = document.querySelector(`[data-theme="${currentTheme}"]`);
+                if (currentPreset) {
+                    currentPreset.classList.add('selected');
+                }
+            }
+        }
+
+        /**
+         * Applies theme preview to the profile.
+         */
+        function applyThemePreview(theme) {
+            const profileSection = document.querySelector('.profile-section');
+            if (!profileSection) return;
+
+            // Remove existing theme classes
+            profileSection.classList.remove('theme-professional', 'theme-creative', 'theme-minimal', 'theme-vibrant');
+
+            // Add new theme class
+            profileSection.classList.add(`theme-${theme}`);
+
+            // Apply theme-specific styles
+            switch (theme) {
+                case 'professional':
+                    profileSection.style.setProperty('--accent-color', '#667eea');
+                    profileSection.style.setProperty('--accent-color-dark', '#764ba2');
+                    break;
+                case 'creative':
+                    profileSection.style.setProperty('--accent-color', '#f093fb');
+                    profileSection.style.setProperty('--accent-color-dark', '#f5576c');
+                    break;
+                case 'minimal':
+                    profileSection.style.setProperty('--accent-color', '#4facfe');
+                    profileSection.style.setProperty('--accent-color-dark', '#00f2fe');
+                    break;
+                case 'vibrant':
+                    profileSection.style.setProperty('--accent-color', '#43e97b');
+                    profileSection.style.setProperty('--accent-color-dark', '#38f9d7');
+                    break;
+                default:
+                    // Reset to default theme
+                    profileSection.style.removeProperty('--accent-color');
+                    profileSection.style.removeProperty('--accent-color-dark');
+            }
+        }
+
+        /**
+         * Smart Profile Notifications System
+         */
+        class ProfileNotifications {
+            constructor() {
+                this.notifications = [];
+                this.notificationsSection = document.getElementById('profileNotificationsSection');
+                this.notificationsList = document.getElementById('notificationsList');
+                this.clearBtn = document.getElementById('clearNotificationsBtn');
+                this.initialize();
+            }
+
+            initialize() {
+                if (this.clearBtn) {
+                    this.clearBtn.addEventListener('click', () => this.clearAllNotifications());
+                }
+                
+                // Check for existing notifications in localStorage
+                this.loadNotifications();
+                this.checkProfileStatus();
+            }
+
+            addNotification(type, title, message, persistent = false) {
+                const notification = {
+                    id: Date.now(),
+                    type: type,
+                    title: title,
+                    message: message,
+                    timestamp: new Date(),
+                    persistent: persistent
+                };
+
+                this.notifications.unshift(notification);
+                this.saveNotifications();
+                this.displayNotifications();
+                this.showNotificationSection();
+
+                // Auto-remove non-persistent notifications after 5 seconds
+                if (!persistent) {
+                    setTimeout(() => {
+                        this.removeNotification(notification.id);
+                    }, 5000);
+                }
+
+                return notification.id;
+            }
+
+            removeNotification(id) {
+                this.notifications = this.notifications.filter(n => n.id !== id);
+                this.saveNotifications();
+                this.displayNotifications();
+                
+                if (this.notifications.length === 0) {
+                    this.hideNotificationSection();
+                }
+            }
+
+            clearAllNotifications() {
+                this.notifications = [];
+                this.saveNotifications();
+                this.displayNotifications();
+                this.hideNotificationSection();
+                showMessageBox('All notifications cleared!', 'success');
+            }
+
+            displayNotifications() {
+                if (!this.notificationsList) return;
+
+                this.notificationsList.innerHTML = '';
+                
+                this.notifications.forEach(notification => {
+                    const notificationElement = this.createNotificationElement(notification);
+                    this.notificationsList.appendChild(notificationElement);
+                });
+            }
+
+            createNotificationElement(notification) {
+                const div = document.createElement('div');
+                div.className = `notification-item ${notification.type}`;
+                div.innerHTML = `
+                    <i class="fas ${this.getNotificationIcon(notification.type)} notification-icon"></i>
+                    <div class="notification-content">
+                        <div class="notification-title">${notification.title}</div>
+                        <div class="notification-message">${notification.message}</div>
+                        <div class="notification-time">${this.formatTime(notification.timestamp)}</div>
+                    </div>
+                    <button class="clear-notifications-btn" onclick="profileNotifications.removeNotification(${notification.id})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                return div;
+            }
+
+            getNotificationIcon(type) {
+                const icons = {
+                    'info': 'fa-info-circle',
+                    'warning': 'fa-exclamation-triangle',
+                    'success': 'fa-check-circle',
+                    'error': 'fa-times-circle'
+                };
+                return icons[type] || 'fa-bell';
+            }
+
+            formatTime(timestamp) {
+                const now = new Date();
+                const diff = now - timestamp;
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+
+                if (minutes < 1) return 'Just now';
+                if (minutes < 60) return `${minutes}m ago`;
+                if (hours < 24) return `${hours}h ago`;
+                return `${days}d ago`;
+            }
+
+            showNotificationSection() {
+                if (this.notificationsSection) {
+                    this.notificationsSection.style.display = 'block';
+                }
+            }
+
+            hideNotificationSection() {
+                if (this.notificationsSection) {
+                    this.notificationsSection.style.display = 'none';
+                }
+            }
+
+            saveNotifications() {
+                localStorage.setItem('jchat-profile-notifications', JSON.stringify(this.notifications));
+            }
+
+            loadNotifications() {
+                const saved = localStorage.getItem('jchat-profile-notifications');
+                if (saved) {
+                    try {
+                        this.notifications = JSON.parse(saved);
+                        this.displayNotifications();
+                        if (this.notifications.length > 0) {
+                            this.showNotificationSection();
+                        }
+                    } catch (e) {
+                        console.error('Error loading notifications:', e);
+                    }
+                }
+            }
+
+            checkProfileStatus() {
+                // Check profile completion and add notifications
+                const completion = updateProfileCompletion();
+                
+                if (completion === 100) {
+                    this.addNotification('success', 'Profile Complete! 🎉', 'Your profile is 100% complete! You\'ve unlocked all features.', true);
+                } else if (completion >= 80) {
+                    this.addNotification('info', 'Almost There!', 'Your profile is ' + completion + '% complete. Just a few more details to go!');
+                } else if (completion < 40) {
+                    this.addNotification('warning', 'Profile Incomplete', 'Your profile is only ' + completion + '% complete. Add more details to unlock features!');
+                }
+
+                // Check for profile views (if analytics are enabled)
+                const analyticsEnabled = document.getElementById('analyticsOptInToggle')?.checked;
+                if (analyticsEnabled) {
+                    this.addNotification('info', 'Analytics Enabled', 'Profile view analytics are now active. Track your profile performance!');
+                }
+            }
+        }
+
+        // Global instance
+        let profileNotifications;
+
         /**
          * Handles changing user's email address.
          */
@@ -4717,7 +6404,6 @@
                     if (profileData.chatBubbleStyle === undefined) { await updateDoc(privateProfileDocRef, { chatBubbleStyle: "default" }); profileData.chatBubbleStyle = "default"; } // NEW
                     if (profileData.profileTheme === undefined) { await updateDoc(privateProfileDocRef, { profileTheme: "default" }); profileData.profileTheme = "default"; } // NEW
 
-
                     console.log("JCHAT_DEBUG: Fetched existing profile data for header:", profileData);
                 } else {
                     // If private profile doesn't exist, create a basic one
@@ -4788,7 +6474,7 @@
                 const usernameInitial = (profileData.username || "J").charAt(0).toUpperCase();
                 displayProfilePicture(headerProfilePic, headerAvatarIcon, profileData?.profilePicId, usernameInitial, "w_70,h_70,c_fill,g_face,r_max");
                 headerDisplayName.textContent = profileData.username || "JCHAT User";
-                if (headerNavLinkProfile) headerNavLinkProfile.href = `/profile.html?userId=${user.uid}`; // Ensure header nav link is correct, null check
+                if (headerNavLinkProfile) headerNavLinkProfile.href = `/Profile.html?userId=${user.uid}`; // Ensure header nav link is correct, null check
 
                 // Show Admin Icon if current user is admin
                 if (adminIconLink) { // Null check
@@ -4858,7 +6544,6 @@
                 showMessageBox("Failed to load system settings.", 'error');
             }
         }
-
 
         /**
          * Shows the JCoin request modal.
@@ -5142,7 +6827,6 @@
             }
         }
 
-
         /**
          * Shows the report user modal for the displayed user.
          */
@@ -5216,7 +6900,6 @@
             }
         }
 
-
         /**
          * Fetches and displays unlocked rewards/benefits for the current user.
          */
@@ -5280,7 +6963,6 @@
                         iconClass = 'fas fa-ticket-alt'; // Icon for vouchers
                     }
 
-
                     rewardItem.innerHTML = `
                         <i class="${iconClass} reward-icon"></i>
                         <span>${name}</span>
@@ -5290,69 +6972,298 @@
             }
         }
 
+
+
+
+
+
         /**
-         * Fetches and displays a snippet of friends/followers.
-         * For simplicity, this will show a few *random* public profiles from the 'users' collection
-         * if the user has a decent number of "friends" or "followers" count (mock data).
-         * In a real app, you would query the actual friends list.
+         * Fetches and displays friends in the modal (exactly like Chat.html)
          */
-        async function fetchAndDisplayFriendsSnippet() {
-            if (!friendsSnippetSection || !friendsSnippetGrid || !noFriendsMessage) return;
+        async function fetchAndDisplayFriendsInModal() {
+            const friendListContainer = document.getElementById('friendListContainer');
+            const loadingElement = friendListContainer.querySelector('.loading-friends-modal');
+            const noFriendsElement = friendListContainer.querySelector('.no-friends-modal');
+            
+            if (!friendListContainer || !loadingElement || !noFriendsElement) return;
 
-            // Only show if it's the owner's profile and they have friends, or if another user has public friend count
-            if (displayedUserId !== currentUser.uid && !(displayedUserProfileData.friendsCount > 0)) {
-                 friendsSnippetSection.style.display = 'none';
-                 return;
-            }
-            friendsSnippetSection.style.display = 'block';
-
-            friendsSnippetGrid.innerHTML = '';
-            noFriendsMessage.style.display = 'block'; // Assume no friends initially
+            // Show loading state
+            loadingElement.style.display = 'block';
+            noFriendsElement.style.display = 'none';
 
             try {
-                // Simulate fetching a few friends/followers
-                // In a real app, you'd have a 'friends' subcollection for each user.
-                // For example: collection(db, "artifacts", appId, "users", displayedUserId, "friends")
+                // Fetch ALL friends using the same logic as Find_Friends.html
+                const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
                 const publicUsersRef = collection(db, "artifacts", appId, "public", "data", "users");
-                const q = query(publicUsersRef, where(documentId(), '!=', displayedUserId)); // Exclude current user
-                const querySnapshot = await getDocs(q);
-
-                let availableUsers = [];
-                querySnapshot.forEach(docSnap => {
-                    const userData = docSnap.data();
-                    // Include users with public profiles and at least a username
-                    if (userData.visibility?.profilePic && userData.username && userData.profilePicId) {
-                        availableUsers.push({ id: docSnap.id, ...userData });
+                
+                // Get the current user's friends list
+                const friendsSnapshot = await getDocs(publicFriendsRef);
+                const currentUserFriends = new Set();
+                
+                friendsSnapshot.forEach(docSnap => {
+                    const friendData = docSnap.data();
+                    if (friendData.user1Id === displayedUserId) {
+                        currentUserFriends.add(friendData.user2Id);
+                    } else if (friendData.user2Id === displayedUserId) {
+                        currentUserFriends.add(friendData.user1Id);
                     }
                 });
 
-                if (availableUsers.length > 0) {
-                    noFriendsMessage.style.display = 'none';
-                    // Shuffle and pick a few random ones (max 5)
-                    const shuffled = availableUsers.sort(() => 0.5 - Math.random());
-                    const friendsToShow = shuffled.slice(0, 5);
-
-                    friendsToShow.forEach(friend => {
-                        const friendItem = document.createElement('a'); // Make it a link to their profile
-                        friendItem.href = `/profile.html?userId=${friend.id}`;
-                        friendItem.classList.add('friend-item');
-                        friendItem.innerHTML = `
-                            <div class="friend-pic-wrapper">
-                                <img src="${getCloudinaryImageUrl(friend.profilePicId, 'w_120,h_120,c_fill,g_face,r_max')}" alt="${friend.username} Pic" onerror="this.onerror=null; this.src='https://placehold.co/60x60/CCCCCC/000000?text=${friend.username.charAt(0).toUpperCase()}';">
-                            </div>
-                            <span class="friend-name">${friend.username}</span>
-                        `;
-                        friendsSnippetGrid.appendChild(friendItem);
-                    });
-                } else {
-                    noFriendsMessage.textContent = "No friends to display or no public profiles.";
+                if (currentUserFriends.size === 0) {
+                    loadingElement.style.display = 'none';
+                    noFriendsElement.style.display = 'block';
+                    noFriendsElement.textContent = 'No friends yet. Start connecting with other users!';
+                    return;
                 }
 
+                // Fetch all public users to get friend details
+                const usersSnapshot = await getDocs(publicUsersRef);
+                const friendsData = [];
+
+                usersSnapshot.forEach(docSnap => {
+                    const userData = docSnap.data();
+                    if (currentUserFriends.has(docSnap.id)) {
+                        friendsData.push({
+                            id: docSnap.id,
+                            username: userData.username || `User_${docSnap.id.substring(0, 8)}`,
+                            profilePicId: userData.profilePicId,
+                            bio: userData.bio || "",
+                            location: userData.location || "",
+                            visibility: userData.visibility || {}
+                        });
+                    }
+                });
+
+                // Hide loading and render friends
+                loadingElement.style.display = 'none';
+                renderFriendsInModal(friendsData);
+                
+                // Update the Friends button count
+                updateFriendsButtonCount(friendsData.length);
+
             } catch (error) {
-                console.error("JCHAT_ERROR: Error fetching friends snippet:", error);
-                noFriendsMessage.textContent = "Failed to load friends.";
+                console.error("JCHAT_ERROR: Error fetching friends for modal:", error);
+                loadingElement.style.display = 'none';
+                noFriendsElement.style.display = 'block';
+                noFriendsElement.textContent = 'Failed to load friends. Please try again.';
             }
         }
+
+        /**
+         * Renders friends list in the modal (exactly like Chat.html)
+         */
+        function renderFriendsInModal(friends) {
+            const friendListContainer = document.getElementById('friendListContainer');
+            const noFriendsElement = friendListContainer.querySelector('.no-friends-modal');
+            
+            if (!friendListContainer || !noFriendsElement) return;
+
+            // Clear existing friend items
+            const existingItems = friendListContainer.querySelectorAll('.friend-item');
+            existingItems.forEach(item => item.remove());
+
+            if (friends.length === 0) {
+                noFriendsElement.style.display = 'block';
+                noFriendsElement.textContent = 'No friends found.';
+                return;
+            }
+
+            noFriendsElement.style.display = 'none';
+
+                                        // Create friend items
+            friends.forEach(friend => {
+                const friendItem = document.createElement('div');
+                friendItem.className = 'friend-item';
+                friendItem.setAttribute('data-friend-id', friend.id);
+
+                // Create profile picture with fallback
+                let profilePicHtml = '';
+                if (friend.profilePicId && friend.visibility?.profilePic !== false) {
+                    profilePicHtml = `
+                        <div style="position: relative;">
+                            <img src="${getCloudinaryImageUrl(friend.profilePicId, 'w_80,h_80,c_fill,g_face,r_max')}" 
+                                 alt="${friend.username} Pic" 
+                                 onerror="this.onerror=null; this.src='https://placehold.co/40x40/CCCCCC/000000?text=${friend.username.charAt(0).toUpperCase()}';">
+                            <div class="status-dot offline" id="status-${friend.id}"></div>
+                        </div>`;
+                } else {
+                    profilePicHtml = `
+                        <div style="position: relative;">
+                            <div class="default-avatar"><i class="fas fa-user-circle"></i></div>
+                            <div class="status-dot offline" id="status-${friend.id}"></div>
+                        </div>`;
+                }
+
+                friendItem.innerHTML = `
+                    ${profilePicHtml}
+                    <span>${friend.username}</span>
+                `;
+
+                // Add click handler to start chat
+                friendItem.addEventListener('click', () => {
+                    const friendId = friend.id;
+                    const friendName = friend.username;
+                    
+                    console.log(`JCHAT_DEBUG: Starting chat with friend ${friendId} (${friendName})`);
+                    
+                    // Close modal
+                    selectFriendModal.classList.remove('active');
+                    
+                    // Navigate to chat page
+                    showMessageBox(`💬 Opening chat with ${friendName}...`, 'success');
+                    setTimeout(() => {
+                        window.location.href = `/Chat.html?partner=${friendId}`;
+                    }, 1000);
+                });
+
+                friendListContainer.appendChild(friendItem);
+            });
+
+            // Update modal title to show friend count
+            const modalTitle = selectFriendModal.querySelector('h3');
+            if (modalTitle) {
+                modalTitle.textContent = `Select a Friend to Chat With (${friends.length})`;
+            }
+        }
+
+        /**
+         * Filters friends in the modal based on search query
+         */
+        function filterFriendsInModal(searchQuery) {
+            const friendItems = document.querySelectorAll('#selectFriendModal .friend-item');
+            const query = searchQuery.toLowerCase();
+
+            friendItems.forEach(item => {
+                const friendName = item.querySelector('span').textContent.toLowerCase();
+                if (friendName.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        /**
+         * Updates online status for a specific user (exactly like Chat.html)
+         */
+        function updateUserOnlineStatus(userId, isOnline, lastActivity = null) {
+            if (!userId) return;
+
+            // Update the status map
+            userOnlineStatus.set(userId, isOnline);
+
+            // Update the status dot in the modal if it exists
+            const statusDot = document.getElementById(`status-${userId}`);
+            if (statusDot) {
+                statusDot.className = 'status-dot';
+                
+                if (isOnline) {
+                    statusDot.classList.add('online');
+                } else if (lastActivity) {
+                    const now = new Date();
+                    const lastActivityDate = lastActivity.toDate ? lastActivity.toDate() : new Date(lastActivity);
+                    const timeDiff = now - lastActivityDate;
+                    
+                    if (timeDiff < 30 * 60 * 1000) { // 30 minutes threshold for "recently"
+                        statusDot.classList.add('recently');
+                    } else {
+                        statusDot.classList.add('offline');
+                    }
+                } else {
+                    statusDot.classList.add('offline');
+                }
+            }
+        }
+
+        /**
+         * Sets up real-time online status tracking (exactly like Chat.html)
+         */
+        function setupOnlineStatusTracking() {
+            if (!isAuthReady || !currentUser) return;
+
+            console.log("JCHAT_DEBUG: Setting up online status tracking...");
+
+            // Listen to public users collection for real-time updates
+            const publicUsersRef = collection(db, "artifacts", appId, "public", "data", "users");
+            
+            onSnapshot(publicUsersRef, (snapshot) => {
+                snapshot.forEach(docSnap => {
+                    const userData = docSnap.data();
+                    const userId = docSnap.id;
+                    
+                    // Track authentication status
+                    const isAuthenticated = userData.isOnline || false;
+                    userAuthStatus.set(userId, isAuthenticated);
+                    
+                    // Update online status based on last activity (for authenticated users only)
+                    if (isAuthenticated && userData.lastActivity) {
+                        const lastActivity = userData.lastActivity.toDate ? userData.lastActivity.toDate() : new Date(userData.lastActivity);
+                        const now = new Date();
+                        const timeDiff = now - lastActivity;
+                        const isOnline = timeDiff < 5 * 60 * 1000; // 5 minutes threshold
+                        
+                        updateUserOnlineStatus(userId, isOnline, userData.lastActivity);
+                    } else {
+                        updateUserOnlineStatus(userId, false);
+                    }
+                });
+            }, (error) => {
+                console.error("JCHAT_ERROR: Error setting up online status tracking:", error);
+            });
+        }
+
+        /**
+         * Updates the Friends button label with current friend count
+         */
+        function updateFriendsButtonCount(count) {
+            const friendsStatItem = document.getElementById('friendsStatItem');
+            if (friendsStatItem) {
+                const statValue = friendsStatItem.querySelector('#statFriends');
+                const statLabel = friendsStatItem.querySelector('.stat-label');
+                
+                if (statValue) {
+                    statValue.textContent = count;
+                }
+                
+                if (statLabel) {
+                    statLabel.textContent = `View Friends (${count})`;
+                }
+            }
+        }
+
+        /**
+         * Fetches the real friend count and updates the Friends stat
+         */
+        async function fetchAndUpdateFriendCount() {
+            if (!isAuthReady || !currentUser) return;
+
+            try {
+                // Fetch ALL friends using the same logic as Find_Friends.html
+                const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
+                
+                // Get the current user's friends list
+                const friendsSnapshot = await getDocs(publicFriendsRef);
+                const currentUserFriends = new Set();
+                
+                friendsSnapshot.forEach(docSnap => {
+                    const friendData = docSnap.data();
+                    if (friendData.user1Id === displayedUserId) {
+                        currentUserFriends.add(friendData.user2Id);
+                    } else if (friendData.user2Id === displayedUserId) {
+                        currentUserFriends.add(friendData.user1Id);
+                    }
+                });
+
+                // Update the Friends stat with real count
+                updateFriendsButtonCount(currentUserFriends.size);
+                
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error fetching friend count:", error);
+                // Keep count as 0 if there's an error
+                updateFriendsButtonCount(0);
+            }
+        }
+
         /**
          * Fetches and displays recent activity logs for the current user.
          * For non-owners, it would only show public activity if logged.
@@ -5438,7 +7349,7 @@
          * @param {string} userIdToDisplay - The UID of the user whose profile should be displayed.
          */
         async function fetchAndDisplayUserProfile(userIdToDisplay) {
-            // Clear previous state and show loader
+            
             showMessageBox("Loading profile...", 'loading', true);
             if (profileUsername) profileUsername.textContent = "Loading...";
             if (profileBio) profileBio.textContent = "Loading...";
@@ -5480,9 +7391,9 @@
             if (dailyBonusCountdown) dailyBonusCountdown.style.display = 'none'; // NEW: Hide daily bonus countdown
             if (reportUserButton) reportUserButton.style.display = 'none'; // NEW: Hide report user button
             // Hide inline edit fields and account settings by default
-            const profileDetailsSection = displayNameInput ? displayNameInput.closest('.profile-details-section') : null; // Null check for displayNameInput
-            if (profileDetailsSection) {
-                profileDetailsSection.style.display = 'none';
+            const localProfileDetailsSection = displayNameInput ? displayNameInput.closest('.profile-details-section') : null; // Null check for displayNameInput
+            if (localProfileDetailsSection) {
+                localProfileDetailsSection.style.display = 'none';
             }
             if (accountSettingsSection) accountSettingsSection.style.display = 'none'; // NEW: Hide account settings by default
             if (toggleAccountSettingsButton) toggleAccountSettingsButton.style.display = 'none'; // NEW: Hide toggle button by default
@@ -5507,7 +7418,6 @@
             if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'none';
             if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
             if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
-
 
             let profileDocRef;
             let isCurrentUserProfile = false;
@@ -5567,7 +7477,6 @@
                         }
                     }
 
-
                     // Bio
                     if (profileBio) { // Null check
                         if (displayedUserProfileData.bio && (isCurrentUserProfile || visibility.bio)) {
@@ -5608,6 +7517,92 @@
                     }
 
                     // NEW: Display additional user info based on visibility
+                    
+                    // Full Name
+                    if (profileFullName && fullNameText) {
+                        if (displayedUserProfileData.fullName && (isCurrentUserProfile || visibility.firstName)) {
+                            fullNameText.textContent = displayedUserProfileData.fullName;
+                            profileFullName.style.display = 'block';
+                        } else {
+                            profileFullName.style.display = 'none';
+                        }
+                    }
+
+                    // Date of Birth
+                    if (profileDateOfBirth && dateOfBirthText) {
+                        if (displayedUserProfileData.dateOfBirth && (isCurrentUserProfile || visibility.dateOfBirth)) {
+                            const dob = new Date(displayedUserProfileData.dateOfBirth);
+                            const age = Math.floor((new Date() - dob) / (365.25 * 24 * 60 * 60 * 1000));
+                            dateOfBirthText.textContent = `${dob.toLocaleDateString()} (${age} years old)`;
+                            profileDateOfBirth.style.display = 'block';
+                        } else {
+                            profileDateOfBirth.style.display = 'none';
+                        }
+                    }
+
+                    // Gender
+                    if (profileGender && genderText) {
+                        if (displayedUserProfileData.gender && (isCurrentUserProfile || visibility.gender)) {
+                            const genderDisplay = displayedUserProfileData.gender.charAt(0).toUpperCase() + displayedUserProfileData.gender.slice(1);
+                            genderText.textContent = genderDisplay;
+                            profileGender.style.display = 'block';
+                        } else {
+                            profileGender.style.display = 'none';
+                        }
+                    }
+
+                    // Phone
+                    if (profilePhone && phoneText) {
+                        if (displayedUserProfileData.phone && (isCurrentUserProfile || visibility.phone)) {
+                            phoneText.textContent = displayedUserProfileData.phone;
+                            profilePhone.style.display = 'block';
+                        } else {
+                            profilePhone.style.display = 'none';
+                        }
+                    }
+
+                    // Country
+                    if (profileCountry && countryText) {
+                        if (displayedUserProfileData.country && (isCurrentUserProfile || visibility.country)) {
+                            const countryDisplay = displayedUserProfileData.country.charAt(0).toUpperCase() + displayedUserProfileData.country.slice(1);
+                            countryText.textContent = countryDisplay;
+                            profileCountry.style.display = 'block';
+                        } else {
+                            profileCountry.style.display = 'none';
+                        }
+                    }
+
+                    // City
+                    if (profileCity && cityText) {
+                        if (displayedUserProfileData.city && (isCurrentUserProfile || visibility.city)) {
+                            cityText.textContent = displayedUserProfileData.city;
+                            profileCity.style.display = 'block';
+                        } else {
+                            profileCity.style.display = 'none';
+                        }
+                    }
+
+                    // Language
+                    if (profileLanguage && languageText) {
+                        if (displayedUserProfileData.language && (isCurrentUserProfile || visibility.language)) {
+                            const languageDisplay = displayedUserProfileData.language.charAt(0).toUpperCase() + displayedUserProfileData.language.slice(1);
+                            languageText.textContent = languageDisplay;
+                            profileLanguage.style.display = 'block';
+                        } else {
+                            profileLanguage.style.display = 'none';
+                        }
+                    }
+
+                    // Timezone
+                    if (profileTimezone && timezoneText) {
+                        if (displayedUserProfileData.timezone && (isCurrentUserProfile || visibility.timezone)) {
+                            timezoneText.textContent = displayedUserProfileData.timezone;
+                            profileTimezone.style.display = 'block';
+                        } else {
+                            profileTimezone.style.display = 'none';
+                        }
+                    }
+
                     if (profileSchool && schoolText) {
                         if (displayedUserProfileData.school && (isCurrentUserProfile || visibility.school)) {
                             schoolText.textContent = displayedUserProfileData.school;
@@ -5642,31 +7637,34 @@
                         }
                     }
 
-
                     // Stats (always show for owner, for others based on public profile data)
                     if (statPosts) statPosts.textContent = displayedUserProfileData.totalPosts ?? 0; // Null check
-                    if (statFriends) statFriends.textContent = displayedUserProfileData.friendsCount ?? 0; // Null check
+                    // Friends count will be updated when modal is opened, set to 0 initially
+                if (statFriends) statFriends.textContent = "0";
                     if (statFollowers) statFollowers.textContent = displayedUserProfileData.followersCount ?? 0; // Null check
                     if (statFollowing) statFollowing.textContent = displayedUserProfileData.followingCount ?? 0; // Null check
                     
                     // JCoins (only visible to owner)
+                    const fallbackUserCurrency = (typeof userCurrency === 'object' && userCurrency) ? userCurrency : { code: 'USD', symbol: '$', label: 'USD' };
                     if (jCoinsSpan && jcoinExchangeRate && jcoinUSDValue) { // Null check
                         if (isCurrentUserProfile) {
                             jCoinsSpan.textContent = (displayedUserProfileData.jCoins ?? 0).toLocaleString();
-                            
-                            // Use enhanced currency conversion
-                            const jcoinAmount = displayedUserProfileData.jCoins ?? 0;
-                            const nairaRate = currentSystemSettings?.jcoinNairaRate || 7.5;
-                            const nairaValue = jcoinAmount * nairaRate;
-                            const convertedValue = convertPrice(nairaValue, userCurrency.code);
-                            
-                            jcoinUSDValue.textContent = `${userCurrency.symbol}${convertedValue}`;
-                            
-                            // Update the exchange rate display with loading indicator
-                            jcoinExchangeRate.innerHTML = `
-                                <span id="jcoinUSDValue">${userCurrency.symbol}${convertedValue}</span> ${userCurrency.code}
-                                ${isRatesLoading ? '<span style="animation: spin 1s linear infinite;">🔄</span>' : ''}
-                            `;
+                            if (typeof setUserCurrencyFromProfile === 'function') {
+                                setUserCurrencyFromProfile(displayedUserProfileData);
+                            }
+                            const j = (displayedUserProfileData.jCoins ?? 0);
+                            let fiatValue = 0;
+                            const uc = (typeof userCurrency === 'object' && userCurrency) ? userCurrency : { code: 'USD', symbol: '$', label: 'USD' };
+                            if (uc.code === 'NGN') {
+                                const rate = currentSystemSettings.jcoinNairaRate || 7.5;
+                                fiatValue = j * rate; // JCoins to NGN using configured rate
+                            } else {
+                                const nairaRate = currentSystemSettings.jcoinNairaRate || 7.5;
+                                const usdPerNaira = 0.001; // existing assumption in app
+                                fiatValue = j * nairaRate * usdPerNaira; // approximate USD
+                            }
+                            const fmt = (typeof formatLocalCurrency === 'function') ? formatLocalCurrency : (amt => `$${Number(amt).toFixed(2)}`);
+                            jcoinUSDValue.textContent = fmt(fiatValue);
                             jcoinExchangeRate.style.display = 'flex'; // Use flex to align icon and text
                             if (jCoinsSpan.closest('.stat-item')) jCoinsSpan.closest('.stat-item').style.display = 'block'; // Ensure the entire stat item is visible
                         } else {
@@ -5745,7 +7743,6 @@
                         }
                     }
 
-
                     // Action Buttons and Inline Edit Fields
                     if (isCurrentUserProfile) {
                         if (walletLink) walletLink.style.display = 'inline-flex'; // Null check
@@ -5814,7 +7811,6 @@
                         if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'flex';
                         if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'inline-flex';
 
-
                         // Populate customization selects
                         if (profileFrameSelect) profileFrameSelect.value = displayedUserProfileData.profileFrame || 'default';
                         if (chatBubbleStyleSelect) chatBubbleStyleSelect.value = displayedUserProfileData.chatBubbleStyle || 'default';
@@ -5824,7 +7820,6 @@
                         if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'flex';
                         if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'flex';
                         if (saveCustomizationButton) saveCustomizationButton.style.display = 'inline-flex';
-
 
                         if (profileEmailInput) profileEmailInput.value = displayedUserProfileData.email || ""; // Populate disabled email field, null check
 
@@ -5907,26 +7902,21 @@
                         if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
-
-
-                        // Ensure loader is dismissed in this case too, as profile display might not proceed.
-                        if (messageBox && messageBox.classList.contains('loading-pulse')) { // Null check
-                            messageBox.style.opacity = '0';
-                            messageBox.addEventListener('transitionend', function handler() {
-                                messageBox.style.display = 'none';
-                                messageBox.removeEventListener('transitionend', handler);
-                                messageBox.classList.remove('loading-pulse');
-                            }, { once: true });
-                        }
                     }
 
                     // Load user's posts (if desired on profile page)
                     // await fetchAndDisplayUserPosts(userIdToDisplay, displayedUserProfileData.username || "User");
                     if (userPostsFeed) userPostsFeed.style.display = 'none'; // Keep posts section hidden for now as it's not fully styled for this page., null check
 
-                    // NEW: Fetch and display friends snippet for any displayed profile
-                    await fetchAndDisplayFriendsSnippet();
+                    // Friends are now displayed via modal, no need to pre-load here
+                    
+                    // Fetch and update the real friend count for the Friends stat
+                    await fetchAndUpdateFriendCount();
 
+                    // NEW: Update profile completion progress
+                    if (isCurrentUserProfile) {
+                        updateProfileCompletion();
+                    }
 
                     showMessageBox("Profile loaded!", 'success');
 
@@ -5999,10 +7989,9 @@
                 if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
 
-
             } finally {
                 // Ensure the message box clears if it was persistent loading type
-                // This ensures the loader is always dismissed.
+                
                 if (messageBox && messageBox.classList.contains('loading-pulse')) { // Null check for messageBox
                     messageBox.style.opacity = '0';
                     messageBox.addEventListener('transitionend', function handler() {
@@ -6036,15 +8025,7 @@
                     fetchNotificationCount(user.uid); // Fetch notification count
                 } else {
                     console.warn("JCHAT_WARN: Authentication not fully ready or currentUserProfileData missing. Skipping profile display for now.");
-                    // Ensure loader is dismissed in this case too, as profile display might not proceed.
-                    if (messageBox && messageBox.classList.contains('loading-pulse')) { // Null check
-                        messageBox.style.opacity = '0';
-                        messageBox.addEventListener('transitionend', function handler() {
-                            messageBox.style.display = 'none';
-                            messageBox.removeEventListener('transitionend', handler);
-                            messageBox.classList.remove('loading-pulse');
-                        }, { once: true });
-                    }
+
                 }
 
             } else {
@@ -6101,17 +8082,6 @@
                 if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
-
-
-                // Ensure loader is dismissed in this case too
-                if (messageBox && messageBox.classList.contains('loading-pulse')) { // Null check
-                    messageBox.style.opacity = '0';
-                    messageBox.addEventListener('transitionend', function handler() {
-                        messageBox.style.display = 'none';
-                        messageBox.removeEventListener('transitionend', handler);
-                        messageBox.classList.remove('loading-pulse');
-                    }, { once: true });
-                }
             }
         });
         // --- Event Listeners (moved to DOMContentLoaded for safety) ---
@@ -6139,17 +8109,89 @@
             // Privacy Settings
             if (savePrivacySettingsButton) savePrivacySettingsButton.addEventListener('click', handleSavePrivacySettings);
 
-            // Initialize currency detection and exchange rates
-            detectUserCurrency().then(() => {
-                updateJCoinDisplay();
-            }).catch(() => {
-                // Even if currency detection fails, still update display with fallback rates
-                updateJCoinDisplay();
-            });
-
             // Customization Settings
             if (saveCustomizationButton) saveCustomizationButton.addEventListener('click', handleSaveCustomization);
 
+            // Identity & Availability Toggle
+            if (document.getElementById('toggleIdentityAvailabilityBtn')) {
+                document.getElementById('toggleIdentityAvailabilityBtn').addEventListener('click', toggleIdentityAvailability);
+            }
+
+            // Privacy Settings Toggle
+            if (document.getElementById('togglePrivacySettingsBtn')) {
+                document.getElementById('togglePrivacySettingsBtn').addEventListener('click', togglePrivacySettings);
+            }
+
+            // Profile Customization Toggle
+            if (document.getElementById('toggleCustomizationBtn')) {
+                document.getElementById('toggleCustomizationBtn').addEventListener('click', toggleCustomization);
+            }
+
+            // Skills & Endorsements Toggle
+            if (document.getElementById('toggleSkillsBtn')) {
+                document.getElementById('toggleSkillsBtn').addEventListener('click', toggleSkills);
+            }
+
+            // Featured Badges Toggle
+            if (document.getElementById('toggleBadgesBtn')) {
+                document.getElementById('toggleBadgesBtn').addEventListener('click', toggleBadges);
+            }
+
+            // Profile Insights Toggle
+            if (document.getElementById('toggleInsightsBtn')) {
+                document.getElementById('toggleInsightsBtn').addEventListener('click', toggleInsights);
+            }
+
+            // Share Profile Toggle
+            if (document.getElementById('toggleShareBtn')) {
+                document.getElementById('toggleShareBtn').addEventListener('click', toggleShare);
+            }
+
+            // Safety Toggle
+            if (document.getElementById('toggleSafetyBtn')) {
+                document.getElementById('toggleSafetyBtn').addEventListener('click', toggleSafety);
+            }
+
+            // Pinned Post Toggle
+            if (document.getElementById('togglePinnedPostBtn')) {
+                document.getElementById('togglePinnedPostBtn').addEventListener('click', togglePinnedPost);
+            }
+
+            // Initialize Tiny Toggle
+            initializeTinyToggle();
+            
+            // Ensure tiny toggle is properly initialized and visible
+            setTimeout(() => {
+                const toggle = document.getElementById('tinyToggle');
+                if (toggle) {
+                    console.log('JCHAT_DEBUG: Ensuring tiny toggle is visible');
+                    toggle.style.display = 'flex';
+                    toggle.style.visibility = 'visible';
+                    toggle.style.opacity = '1';
+                    toggle.style.pointerEvents = 'auto';
+                    toggle.style.zIndex = '1000';
+                    
+                    // Force re-render
+                    toggle.offsetHeight;
+                    
+                    console.log('JCHAT_DEBUG: Quick actions toggle styles applied:', {
+                        display: toggle.style.display,
+                        visibility: toggle.style.visibility,
+                        opacity: toggle.style.opacity,
+                        pointerEvents: toggle.style.pointerEvents,
+                        zIndex: toggle.style.zIndex
+                    });
+                }
+            }, 1000);
+
+            // Initialize Touch Gestures for Mobile
+            initializeTouchGestures();
+
+            // Initialize Theme Presets
+            initializeThemePresets();
+
+            // Initialize Profile Notifications
+            profileNotifications = new ProfileNotifications();
 
             // Account Settings Toggle
             if (toggleAccountSettingsButton) {
@@ -6162,6 +8204,67 @@
                             '<i class="fas fa-times-circle"></i> Close Settings' :
                             '<i class="fas fa-cog"></i> Manage Account Settings';
                     }
+                });
+            }
+
+            // NEW: Friends Button and Modal Event Listeners (exactly like Chat.html)
+            const friendsStatItem = document.getElementById('friendsStatItem');
+            const friendsButtonIcon = document.getElementById('friendsButtonIcon');
+            const selectFriendModal = document.getElementById('selectFriendModal');
+            const closeFriendModalBtn = document.getElementById('closeFriendModalBtn');
+            const friendSearchInput = document.getElementById('friendSearchInput');
+            
+            if (friendsStatItem && friendsButtonIcon && selectFriendModal) {
+                friendsStatItem.addEventListener('click', () => {
+                    // Add button press effect
+                    friendsStatItem.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        friendsStatItem.style.transform = '';
+                    }, 150);
+                    
+                    // Show modal
+                    selectFriendModal.classList.add('active');
+                    
+                    // Set up online status tracking
+                    setupOnlineStatusTracking();
+                    
+                    // Fetch and display friends in modal
+                    fetchAndDisplayFriendsInModal();
+                });
+            }
+
+            // Close modal with close button
+            if (closeFriendModalBtn) {
+                closeFriendModalBtn.addEventListener('click', () => {
+                    selectFriendModal.classList.remove('active');
+                    console.log('JCHAT_DEBUG: Modal closed via close button');
+                });
+            }
+
+            // Close modal when clicking outside
+            if (selectFriendModal) {
+                selectFriendModal.addEventListener('click', (e) => {
+                    if (e.target.id === 'selectFriendModal') {
+                        e.target.classList.remove('active');
+                        console.log('JCHAT_DEBUG: Modal closed via outside click');
+                    }
+                });
+            }
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (selectFriendModal && selectFriendModal.classList.contains('active')) {
+                        selectFriendModal.classList.remove('active');
+                        console.log('JCHAT_DEBUG: Modal closed via Escape key');
+                    }
+                }
+            });
+
+            // Search functionality
+            if (friendSearchInput) {
+                friendSearchInput.addEventListener('input', (e) => {
+                    filterFriendsInModal(e.target.value);
                 });
             }
 
@@ -6190,7 +8293,6 @@
                 });
             }
 
-
             // Handle receipt file input change
             if (receiptUploadInput && receiptFileNameSpan && receiptPreviewImg) { // Null check
                 receiptUploadInput.addEventListener('change', (event) => {
@@ -6211,7 +8313,6 @@
                 });
             }
 
-
             // Allow clicking the custom file input wrapper to trigger the hidden input
             const fileInputWrapper = document.querySelector('.file-input-wrapper');
             if (fileInputWrapper && receiptUploadInput) { // Null check
@@ -6224,7 +8325,7 @@
             if (progressBarContainer) { // Null check
                 progressBarContainer.style.cursor = 'pointer'; // Add pointer cursor to indicate clickability
                 progressBarContainer.addEventListener('click', () => {
-                    window.location.href = '/levels.html'; // Navigate to levels.html
+                    window.location.href = '/Levels.html'; // Navigate to levels.html
                 });
             }
 
@@ -6236,9 +8337,7 @@
             if (cancelReportButton) cancelReportButton.addEventListener('click', hideReportUserModal);
             if (submitReportButton) submitReportButton.addEventListener('click', submitReport);
 
-
-
-
+        }); // Close DOMContentLoaded event listener
 
         window.addEventListener('storage', (event) => {
             if (event.key === 'jchat-theme') {
