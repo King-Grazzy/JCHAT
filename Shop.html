@@ -128,6 +128,9 @@
     <div class="header">
       <div class="brand">
         <div class="logo"><span class="grad">JCHAT</span> Premium Themes</div>
+        <div id="currencyStatus" style="font-size: 0.85rem; color: var(--muted); margin-left: 12px;">
+          <span id="currencyStatusText">Detecting currency...</span>
+        </div>
       </div>
       <a class="back" href="/Home.html"><i class="fas fa-home"></i> Back to Home</a>
     </div>
@@ -269,6 +272,9 @@
           const currencyEntry = Object.values(CURRENCIES).find(c => c.code === storedCurrency);
           if (currencyEntry) userCurrency = currencyEntry;
         }
+        
+        // Still try to fetch exchange rates even if detection failed
+        await fetchExchangeRates();
       }
     }
 
@@ -332,6 +338,11 @@
       
       // Update currency indicator
       updateCurrencyIndicator();
+      
+      // Show success message if rates were just loaded
+      if (!isRatesLoading && Object.keys(exchangeRates).length > 1) {
+        showToast(`Prices updated in ${userCurrency.name}`, 'success');
+      }
     }
 
     function updateCurrencyIndicator() {
@@ -344,6 +355,24 @@
             ${isRatesLoading ? '<span class="loading">🔄</span>' : ''}
           </div>
         `;
+      }
+      
+      // Update currency status in header
+      const statusText = document.getElementById('currencyStatusText');
+      if (statusText) {
+        if (isRatesLoading) {
+          statusText.textContent = '🔄 Loading exchange rates...';
+        } else if (Object.keys(exchangeRates).length > 1) {
+          statusText.textContent = `Prices in ${userCurrency.symbol}${userCurrency.code}`;
+        } else {
+          statusText.textContent = 'Using approximate rates';
+        }
+      }
+      
+      // Also update the page title to show current currency
+      const titleElement = document.querySelector('title');
+      if (titleElement) {
+        titleElement.textContent = `JCHAT - Premium Themes Store (${userCurrency.symbol}${userCurrency.code})`;
       }
     }
 
@@ -379,6 +408,7 @@
           .currency-code { opacity: 0.8; }
           .loading { animation: spin 1s linear infinite; }
           @keyframes spin { 100% { transform: rotate(360deg); } }
+          .currency-info { display: flex; align-items: center; gap: 4px; }
         `;
         document.head.appendChild(style);
         
@@ -393,6 +423,9 @@
             showToast(`Switched to ${newCurrency.name}`, 'info');
           }
         });
+        
+        // Initialize currency indicator
+        updateCurrencyIndicator();
       }
     }
 
@@ -484,7 +517,7 @@
               <div class="name">${t.name}</div>
               <div class="description">${t.description}</div>
             </div>
-            <div class="price">${formatPrice(t.price)}</div>
+            <div class="price">${isRatesLoading ? '🔄 Loading...' : formatPrice(t.price)}</div>
           </div>
           <div class="preview theme-preview-${t.preview}"></div>
         `;
@@ -640,6 +673,9 @@
     
     // Initialize currency detection and exchange rates
     detectUserCurrency().then(() => {
+      updateAllPrices();
+    }).catch(() => {
+      // Even if currency detection fails, still update prices with fallback rates
       updateAllPrices();
     });
 
