@@ -1793,6 +1793,23 @@
                 <p id="noOrdersMessage" style="display:none; color:var(--text-light); text-align:center;">No orders to display.</p>
             </div>
 
+            <div class="admin-section" id="shopPaymentsSection">
+                <h2>Shop Payment Requests</h2>
+                <div class="input-group orders-toolbar">
+                    <label for="shopPaymentsStatusFilter" style="margin:0;">Filter:</label>
+                    <select id="shopPaymentsStatusFilter">
+                        <option value="pending" selected>Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="all">All</option>
+                    </select>
+                    <input id="shopPaymentsUserSearch" type="text" placeholder="Filter by User ID" style="flex:1;">
+                    <button id="shopPaymentsSearchBtn" class="admin-button secondary"><span class="button-text">Search</span></button>
+                </div>
+                <div id="shopPaymentsList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; width:100%;"></div>
+                <p id="noShopPaymentsMessage" style="display:none; color:var(--text-light); text-align:center;">No payment requests to display.</p>
+            </div>
+
             <div class="admin-section" id="stickersCategoryUnlockSection">
                 <h2><i class="fas fa-face-smile"></i> Stickers Category Unlock</h2>
                 <p>Unlock specific sticker categories for a user. By default only the first 3 emojis per category are free.</p>
@@ -1998,6 +2015,15 @@
         let unsubscribeFeatureOrdersListener = null;
         const ordersUserSearch = document.getElementById('ordersUserSearch');
         const ordersSearchBtn = document.getElementById('ordersSearchBtn');
+
+        // Shop payment requests elements
+        const shopPaymentsSection = document.getElementById('shopPaymentsSection');
+        const shopPaymentsStatusFilter = document.getElementById('shopPaymentsStatusFilter');
+        const shopPaymentsUserSearch = document.getElementById('shopPaymentsUserSearch');
+        const shopPaymentsSearchBtn = document.getElementById('shopPaymentsSearchBtn');
+        const shopPaymentsList = document.getElementById('shopPaymentsList');
+        const noShopPaymentsMessage = document.getElementById('noShopPaymentsMessage');
+        let unsubscribeShopPaymentsListener = null;
 
         // --- Global State Variables ---
         let currentUser = null;
@@ -4382,6 +4408,144 @@
         ordersStatusFilter?.addEventListener('change', subscribeFeatureOrders);
         ordersSearchBtn?.addEventListener('click', () => { subscribeFeatureOrders(); });
 
+        function renderShopPaymentCard(requestId, req) {
+            const card = document.createElement('div');
+            card.className = 'management-card';
+            const ts = req.timestamp ? new Date(req.timestamp.toDate()).toLocaleString() : 'N/A';
+            const isPdf = req.receiptUrl && /\.pdf(\?|$)/i.test(req.receiptUrl);
+            const receipt = req.receiptUrl
+                ? (isPdf
+                    ? `<div style="margin-top:6px;padding:8px;border:1px solid var(--border-light);border-radius:10px;display:flex;align-items:center;gap:8px;font-size:12px;">
+                         <i class=\"fas fa-file-pdf\" style=\"color:#e11d48\"></i>
+                         <span>PDF receipt</span>
+                         <a href=\"${req.receiptUrl}\" target=\"_blank\" class=\"admin-button secondary\" style=\"margin-left:auto;text-decoration:none;\"><i class=\"fas fa-external-link-alt\"></i> Open</a>
+                       </div>`
+                    : `<img src="${req.receiptUrl}" alt="Receipt" style="width:100%;max-height:180px;object-fit:contain;border-radius:10px;border:1px solid var(--border-light);margin-top:6px;"/>`)
+                : '<div style="color:var(--text-light);">No receipt</div>';
+            const itemsHtml = Array.isArray(req.items) && req.items.length
+                ? `<ul style="margin:6px 0 0 16px; padding:0; color:var(--text-light); font-size:.9rem;">${req.items.map(it => `<li>${(it.title||`Item ${it.id}`)} - ${it.price} JCoins (${it.category})</li>`).join('')}</ul>`
+                : '<div style="color:var(--text-light);">No items listed</div>';
+            card.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                    <div style="font-weight:700;">Shop Payment</div>
+                    <span style="opacity:.8;font-size:.85rem;">${req.status || 'pending'}</span>
+                </div>
+                <div style="margin-top:6px;color:var(--text-light);font-size:.9rem;">
+                    <div><strong>Request ID:</strong> ${requestId}</div>
+                    <div><strong>User:</strong> ${req.userId || 'N/A'}</div>
+                    <div><strong>Method:</strong> ${req.paymentMethod || 'N/A'}</div>
+                    <div><strong>Amount:</strong> ₦${(req.nairaAmount||0).toLocaleString()} | ${req.jcoinAmount||0} JCoins</div>
+                    <div><strong>When:</strong> ${ts}</div>
+                </div>
+                ${itemsHtml}
+                ${receipt}
+                <div class="order-actions" style="margin-top:10px;">
+                    <button class="admin-button" data-sp-action="approve" data-request-id="${requestId}"><span class="button-text">Approve</span></button>
+                    <button class="admin-button secondary" data-sp-action="reject" data-request-id="${requestId}"><span class="button-text">Reject</span></button>
+                    ${req.receiptUrl ? `<a href="${req.receiptUrl}" target="_blank" class="admin-button secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-download"></i> Receipt</a>` : ''}
+                </div>
+            `;
+            return card;
+        }
+
+        function subscribeShopPayments() {
+            if (unsubscribeShopPaymentsListener) { unsubscribeShopPaymentsListener(); unsubscribeShopPaymentsListener = null; }
+            let qRef = collection(db, 'artifacts', appId, 'public', 'data', 'shop_payment_requests');
+            const status = shopPaymentsStatusFilter?.value || 'pending';
+            const userQ = (shopPaymentsUserSearch?.value || '').trim();
+            const constraints = [];
+            if (status !== 'all') { constraints.push(where('status', '==', status)); }
+            if (userQ) { constraints.push(where('userId', '==', userQ)); }
+            if (constraints.length > 0) { qRef = query(qRef, ...constraints); }
+            unsubscribeShopPaymentsListener = onSnapshot(qRef, (snap) => {
+                shopPaymentsList.innerHTML = '';
+                if (snap.empty) {
+                    noShopPaymentsMessage.style.display = 'block';
+                } else {
+                    noShopPaymentsMessage.style.display = 'none';
+                    snap.forEach(docSnap => {
+                        const card = renderShopPaymentCard(docSnap.id, docSnap.data());
+                        shopPaymentsList.appendChild(card);
+                    });
+                }
+            }, (err) => {
+                console.error('JCHAT_ERROR: shop payments listener', err);
+                noShopPaymentsMessage.style.display = 'block';
+            });
+        }
+
+        shopPaymentsStatusFilter?.addEventListener('change', subscribeShopPayments);
+        shopPaymentsSearchBtn?.addEventListener('click', () => { subscribeShopPayments(); });
+
+        async function approveShopPayment(requestId, buttonEl) {
+            try {
+                if (!requestId) { showMessageBox('Invalid request.', 'error'); return; }
+                toggleButtonLoading(buttonEl, true);
+
+                const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'shop_payment_requests', requestId);
+                await runTransaction(db, async (tx) => {
+                    const reqSnap = await tx.get(reqRef);
+                    if (!reqSnap.exists()) { throw new Error('Request not found'); }
+                    const req = reqSnap.data();
+                    if (req.status === 'approved') { return; }
+                    if (req.status === 'rejected') { throw new Error('Request already rejected'); }
+                    const userId = req.userId;
+                    if (!userId) { throw new Error('Missing userId'); }
+
+                    // Merge items into profile.purchasedItems
+                    const userProfileRef = doc(db, 'artifacts', appId, 'users', userId, 'profiles', 'user_profile');
+                    const profileSnap = await tx.get(userProfileRef);
+                    const profile = profileSnap.exists() ? profileSnap.data() : {};
+                    const currentPurchased = Array.isArray(profile.purchasedItems) ? profile.purchasedItems : [];
+                    const toAdd = Array.isArray(req.items) ? req.items : [];
+                    const merged = [...currentPurchased];
+                    for (const item of toAdd) {
+                        if (!merged.some(p => p.id === item.id)) {
+                            merged.push({ ...item, purchaseDate: new Date(), paymentMethod: req.paymentMethod || 'manual' });
+                        }
+                    }
+                    tx.set(userProfileRef, { purchasedItems: merged, updatedAt: serverTimestamp() }, { merge: true });
+
+                    // Also mirror into users/{uid}/shop/purchases for quick reads
+                    const purchasesRef = doc(db, 'artifacts', appId, 'users', userId, 'shop', 'purchases');
+                    tx.set(purchasesRef, { items: merged, updatedAt: serverTimestamp() }, { merge: true });
+
+                    // Mark request approved
+                    tx.update(reqRef, { status: 'approved', approvedAt: serverTimestamp(), approvedBy: currentUser?.uid || null });
+                });
+
+                showMessageBox('Payment approved and items delivered.', 'success');
+            } catch (e) {
+                console.error(e);
+                showMessageBox(e?.message || 'Failed to approve request', 'error');
+            } finally {
+                toggleButtonLoading(buttonEl, false);
+            }
+        }
+
+        async function rejectShopPayment(requestId, buttonEl) {
+            try {
+                if (!requestId) { showMessageBox('Invalid request.', 'error'); return; }
+                toggleButtonLoading(buttonEl, true);
+                const reqRef = doc(db, 'artifacts', appId, 'public', 'data', 'shop_payment_requests', requestId);
+                await updateDoc(reqRef, { status: 'rejected', rejectedAt: serverTimestamp(), rejectedBy: currentUser?.uid || null });
+                showMessageBox('Payment request rejected.', 'info');
+            } catch (e) {
+                console.error(e);
+                showMessageBox(e?.message || 'Failed to reject request', 'error');
+            } finally {
+                toggleButtonLoading(buttonEl, false);
+            }
+        }
+
+        shopPaymentsSection?.addEventListener('click', (ev) => {
+            const btn = ev.target.closest('button.admin-button');
+            if (!btn) return;
+            const action = btn.dataset.spAction;
+            const requestId = btn.dataset.requestId;
+            if (action === 'approve') { approveShopPayment(requestId, btn); }
+            else if (action === 'reject') { rejectShopPayment(requestId, btn); }
+        });
         async function approveFeatureOrder(orderId, userId, itemType, itemId, buttonEl) {
             try {
                 if (!orderId || !userId || !itemType) { showMessageBox('Invalid order.', 'error'); return; }
@@ -4444,7 +4608,10 @@
 
         // Start orders listener on auth ready
         onAuthStateChanged(auth, (user) => {
-            if (user) { subscribeFeatureOrders(); }
+            if (user) {
+                subscribeFeatureOrders();
+                subscribeShopPayments();
+            }
         });
 
         // --- Authentication State Listener ---
