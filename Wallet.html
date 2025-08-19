@@ -19,6 +19,8 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
+    <link rel="preconnect" href="https://api.cloudinary.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
     
     <!-- Font Awesome for icons -->
@@ -141,6 +143,20 @@
             align-items: center;
             justify-content: center;
             font-weight: 600;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .user-avatar i {
+            color: white;
             font-size: 0.9rem;
         }
 
@@ -745,7 +761,10 @@
                 </div>
                 
                 <div class="user-info">
-                    <div class="user-avatar" id="user-avatar">J</div>
+                    <div class="user-avatar" id="user-avatar">
+                        <img id="headerProfilePic" style="display: none;" alt="Profile Picture">
+                        <i id="headerAvatarIcon" class="fas fa-user"></i>
+                    </div>
                     <span id="user-name">Loading...</span>
                 </div>
             </div>
@@ -756,7 +775,6 @@
     <div class="container">
         <!-- Hero section -->
         <section class="hero">
-            <h1>My Wallet</h1>
             <p>Manage your JCoins and Gas, track your earnings, and explore new opportunities to grow your digital wealth.</p>
         </section>
 
@@ -913,7 +931,7 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, onSnapshot, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, getDocs, onSnapshot, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -928,6 +946,12 @@
 
         const appId = 'default-app-id';
 
+        // Cloudinary Configuration
+        const cloudinaryConfig = {
+            cloudName: "dxld01rcp",
+            uploadPreset: "Storage_preset"
+        };
+
         // Initialize Firebase services
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -938,6 +962,46 @@
         let userProfile = null;
         let balanceChart = null;
         let transactionFilter = 'all';
+
+        // Cloudinary helper functions
+        function getCloudinaryImageUrl(urlOrPublicId, transformations = "w_auto,f_auto,q_auto") {
+            if (!urlOrPublicId) return null;
+            if (urlOrPublicId.startsWith('http://') || urlOrPublicId.startsWith('https://')) {
+                if (urlOrPublicId.includes('res.cloudinary.com')) {
+                    const parts = urlOrPublicId.split('/upload/');
+                    if (parts.length === 2) {
+                        const currentTransformations = parts[1].split('/')[0];
+                        if (currentTransformations.includes(transformations.split(',')[0])) {
+                            return urlOrPublicId;
+                        }
+                        return `${parts[0]}/upload/${transformations}/${parts[1]}`;
+                    }
+                }
+                return urlOrPublicId;
+            }
+            return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${transformations}/${urlOrPublicId}`;
+        }
+
+        function displayProfilePicture(imgElement, iconElement, profilePicId, usernameInitial, transformations) {
+            if (imgElement && iconElement) {
+                if (profilePicId) {
+                    const imageUrl = getCloudinaryImageUrl(profilePicId, transformations);
+                    imgElement.src = imageUrl;
+                    imgElement.style.display = 'block';
+                    iconElement.style.display = 'none';
+                    imgElement.onerror = () => {
+                        console.error(`Failed to load profile picture: ${profilePicId}. Using placeholder.`);
+                        imgElement.src = `https://placehold.co/120x120/CCCCCC/000000?text=${usernameInitial}`;
+                        imgElement.style.display = 'block';
+                        iconElement.style.display = 'none';
+                    };
+                } else {
+                    imgElement.src = '';
+                    imgElement.style.display = 'none';
+                    iconElement.style.display = 'block';
+                }
+            }
+        }
 
         // Authentication state management
         onAuthStateChanged(auth, async (user) => {
@@ -1029,23 +1093,27 @@
             }
         }
 
-        // Initialize wallet dashboard
+        // Initialize wallet dashboard (optimized)
         async function initializeWallet() {
             updateUserInfo();
-            await loadTransactions();
-            await loadEarningOpportunities();
+            loadEarningOpportunities(); // No longer async
             initializeChart();
             checkDailyReward();
             setupTransactionFilters();
+            
+            // Load transactions last to avoid blocking UI
+            setTimeout(() => loadTransactions(), 100);
         }
 
         // Update user info in header
         function updateUserInfo() {
-            const userAvatar = document.getElementById('user-avatar');
+            const headerProfilePic = document.getElementById('headerProfilePic');
+            const headerAvatarIcon = document.getElementById('headerAvatarIcon');
             const userName = document.getElementById('user-name');
             
             if (userProfile) {
-                userAvatar.textContent = (userProfile.username || 'U').charAt(0).toUpperCase();
+                const usernameInitial = (userProfile.username || "U").charAt(0).toUpperCase();
+                displayProfilePicture(headerProfilePic, headerAvatarIcon, userProfile?.profilePicId, usernameInitial, "w_70,h_70,c_fill,g_face,r_max");
                 userName.textContent = userProfile.username || 'JCHAT User';
             }
         }
@@ -1080,7 +1148,7 @@
             document.getElementById('current-level').textContent = userProfile.level || 1;
         }
 
-        // Load transaction history
+        // Load transaction history (optimized to reduce real-time listeners)
         async function loadTransactions() {
             if (!currentUser) return;
 
@@ -1088,14 +1156,14 @@
                 const transactionsRef = collection(db, "artifacts", appId, "users", currentUser.uid, "transactions");
                 const q = query(transactionsRef, orderBy("timestamp", "desc"), limit(20));
                 
-                onSnapshot(q, (querySnapshot) => {
-                    const transactions = [];
-                    querySnapshot.forEach((doc) => {
-                        transactions.push({ id: doc.id, ...doc.data() });
-                    });
-                    
-                    renderTransactions(transactions);
+                // Use getDocs instead of onSnapshot to reduce real-time listeners and improve performance
+                const querySnapshot = await getDocs(q);
+                const transactions = [];
+                querySnapshot.forEach((doc) => {
+                    transactions.push({ id: doc.id, ...doc.data() });
                 });
+                
+                renderTransactions(transactions);
             } catch (error) {
                 console.error("Error loading transactions:", error);
                 document.getElementById('transactions-container').innerHTML = `
@@ -1210,81 +1278,117 @@
             });
         }
 
-        // Initialize balance chart
+        // Initialize balance chart (optimized for better performance)
         function initializeChart() {
-            const ctx = document.getElementById('balanceChart').getContext('2d');
-            
-            // Mock data for the last 7 days
-            const labels = [];
-            const jcoinData = [];
-            const gasData = [];
-            
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+            // Use requestAnimationFrame to defer chart initialization and reduce initial load time
+            requestAnimationFrame(() => {
+                const ctx = document.getElementById('balanceChart').getContext('2d');
                 
-                // Mock historical data
+                // Simplified data generation for better performance
+                const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
                 const baseJcoin = userProfile?.jCoins || 100;
                 const baseGas = userProfile?.gas || 50;
-                jcoinData.push(Math.max(0, baseJcoin - Math.random() * 50 + Math.random() * 100));
-                gasData.push(Math.max(0, baseGas - Math.random() * 25 + Math.random() * 50));
-            }
+                
+                // Pre-calculate data to avoid runtime calculations
+                const jcoinData = [
+                    Math.max(0, baseJcoin - 30),
+                    Math.max(0, baseJcoin - 20),
+                    Math.max(0, baseJcoin - 10),
+                    Math.max(0, baseJcoin + 5),
+                    Math.max(0, baseJcoin + 15),
+                    Math.max(0, baseJcoin + 10),
+                    baseJcoin
+                ];
+                
+                const gasData = [
+                    Math.max(0, baseGas - 15),
+                    Math.max(0, baseGas - 10),
+                    Math.max(0, baseGas - 5),
+                    Math.max(0, baseGas + 2),
+                    Math.max(0, baseGas + 8),
+                    Math.max(0, baseGas + 5),
+                    baseGas
+                ];
 
-            balanceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'JCoins',
-                        data: jcoinData,
-                        borderColor: '#FFD700',
-                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }, {
-                        label: 'Gas',
-                        data: gasData,
-                        borderColor: '#00d5ff',
-                        backgroundColor: 'rgba(0, 213, 255, 0.1)',
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#ffffff'
-                            }
-                        }
+                balanceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'JCoins',
+                            data: jcoinData,
+                            borderColor: '#FFD700',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 3,
+                            pointHoverRadius: 5
+                        }, {
+                            label: 'Gas',
+                            data: gasData,
+                            borderColor: '#00d5ff',
+                            backgroundColor: 'rgba(0, 213, 255, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 3,
+                            pointHoverRadius: 5
+                        }]
                     },
-                    scales: {
-                        x: {
-                            ticks: {
-                                color: '#ffffff'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#ffffff',
+                                    usePointStyle: true,
+                                    padding: 15
+                                }
                             }
                         },
-                        y: {
-                            ticks: {
-                                color: '#ffffff'
+                        scales: {
+                            x: {
+                                ticks: {
+                                    color: '#ffffff',
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)',
+                                    drawBorder: false
+                                }
                             },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
+                            y: {
+                                ticks: {
+                                    color: '#ffffff',
+                                    font: {
+                                        size: 11
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)',
+                                    drawBorder: false
+                                }
+                            }
+                        },
+                        elements: {
+                            point: {
+                                hoverBackgroundColor: '#ffffff'
                             }
                         }
                     }
-                }
+                });
             });
         }
 
-        // Load earning opportunities
-        async function loadEarningOpportunities() {
+        // Load earning opportunities (optimized with static data)
+        function loadEarningOpportunities() {
+            // Use static data to avoid async operations and improve performance
             const opportunities = [
                 {
                     id: 'daily-chat',
@@ -1292,8 +1396,7 @@
                     description: 'Send 10 messages today to earn bonus Gas',
                     reward: '+25 Gas',
                     icon: 'fas fa-comments',
-                    progress: Math.floor(Math.random() * 100),
-                    action: () => window.location.href = 'Chat.html'
+                    progress: 35
                 },
                 {
                     id: 'friend-invite',
@@ -1301,8 +1404,7 @@
                     description: 'Invite 3 friends and earn JCoins for each one',
                     reward: '+100 JCoins per friend',
                     icon: 'fas fa-user-plus',
-                    progress: Math.floor(Math.random() * 100),
-                    action: () => window.location.href = 'Friends.html'
+                    progress: 67
                 },
                 {
                     id: 'profile-complete',
@@ -1310,8 +1412,7 @@
                     description: 'Fill out your profile to unlock premium features',
                     reward: '+50 JCoins',
                     icon: 'fas fa-user-edit',
-                    progress: Math.floor(Math.random() * 100),
-                    action: () => window.location.href = 'Profile.html'
+                    progress: 80
                 },
                 {
                     id: 'level-up',
@@ -1319,14 +1420,19 @@
                     description: 'Reach the next level to unlock exclusive rewards',
                     reward: '+200 JCoins',
                     icon: 'fas fa-trophy',
-                    progress: Math.floor(Math.random() * 100),
-                    action: () => window.location.href = 'Levels.html'
+                    progress: 45
                 }
             ];
 
+            // Use DocumentFragment for better performance
+            const fragment = document.createDocumentFragment();
             const container = document.getElementById('earning-opportunities');
-            container.innerHTML = opportunities.map(opp => `
-                <div class="earning-card" onclick="handleEarningAction('${opp.id}')">
+            
+            opportunities.forEach(opp => {
+                const div = document.createElement('div');
+                div.className = 'earning-card';
+                div.onclick = () => handleEarningAction(opp.id);
+                div.innerHTML = `
                     <div class="earning-header">
                         <div class="earning-icon">
                             <i class="${opp.icon}"></i>
@@ -1341,8 +1447,11 @@
                         <div class="earning-progress-bar" style="width: ${opp.progress}%"></div>
                     </div>
                     <div class="earning-progress-text">${opp.progress}% Complete</div>
-                </div>
-            `).join('');
+                `;
+                fragment.appendChild(div);
+            });
+            
+            container.appendChild(fragment);
 
             // Store opportunities for action handling
             window.earningOpportunities = opportunities;
@@ -1350,9 +1459,15 @@
 
         // Handle earning opportunity actions
         function handleEarningAction(opportunityId) {
-            const opportunity = window.earningOpportunities?.find(o => o.id === opportunityId);
-            if (opportunity && opportunity.action) {
-                opportunity.action();
+            const actions = {
+                'daily-chat': () => window.location.href = 'Chat.html',
+                'friend-invite': () => window.location.href = 'Friends.html',
+                'profile-complete': () => window.location.href = 'Profile.html',
+                'level-up': () => window.location.href = 'Levels.html'
+            };
+            
+            if (actions[opportunityId]) {
+                actions[opportunityId]();
             }
         }
 
