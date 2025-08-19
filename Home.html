@@ -111,82 +111,94 @@
             transform: scale(0.98);
         }
         /* --- Theme Definitions (Light and Dark Mode) --- */
-        /* Light Mode */
+        /* Light Mode - Premium Platinum Minimal */
         body.theme-light-mode {
-            background: #f0f2f5 !important;
-            background-color: #f0f2f5 !important;
-            background-image: radial-gradient(circle at top left, #e0e2e5, transparent 100px),
-                              radial-gradient(circle at bottom right, #d0d2d5, transparent 150px) !important;
-            --background-main: #f0f2f5;
-            --background-gradient-1: #e0e2e5;
-            --background-gradient-2: #d0d2d5;
-            --white: #333;
-            --text-light: #666;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%) !important;
+            background-size: 400% 400% !important;
+            animation: platinumShimmer 20s ease-in-out infinite !important;
+            background-attachment: fixed !important;
+            --background-main: linear-gradient(135deg, #f8fafc 0%, #64748b 100%);
+            --background-gradient-1: #e2e8f0;
+            --background-gradient-2: #cbd5e1;
+            --white: #1e293b;
+            --text-light: #475569;
             --card-background: rgba(255, 255, 255, 0.95);
-            --header-background: rgba(255, 255, 255, 0.98);
-            --border-light: rgba(0, 0, 0, 0.1);
-            --input-background: rgba(0, 0, 0, 0.05);
-            --button-background: linear-gradient(90deg, #6dd5ed, #2193b0);
-            --button-shadow: 0 4px 15px rgba(109, 213, 237, 0.4), 0 4px 15px rgba(33, 147, 176, 0.4);
-            --background-color-primary: #f0f2f5;
-            --background-color-secondary: #e0e2e5;
+            --header-background: rgba(248, 250, 252, 0.98);
+            --border-light: rgba(148, 163, 184, 0.2);
+            --input-background: rgba(241, 245, 249, 0.8);
+            --button-background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            --button-shadow: 0 4px 15px rgba(59, 130, 246, 0.3), 0 4px 15px rgba(29, 78, 216, 0.3);
+            --background-color-primary: #f8fafc;
+            --background-color-secondary: #e2e8f0;
             --header-background-color: #ffffff;
             --footer-background-color: #ffffff;
-            --content-background-color: #f7f9fb;
+            --content-background-color: #f1f5f9;
             --card-background-color: #ffffff;
-            --text-color-primary: #333333;
-            --text-color-secondary: #666666;
-            --text-color-light: #999999;
-            --accent-color: #007bff;
-            --accent-color-dark: #0056b3;
-            --border-color: #e0e0e0;
-            --input-background-color: #f0f0f0;
-            --button-background: #e9ecef;
-            --button-hover-background: #dee2e6;
-            --active-item-background: rgba(0, 123, 255, 0.1);
-            /* --notification-badge-color: Hardcoded for visibility */
-            --status-online: #28a745;
-            --status-offline: #6c757d;
-            --status-away: #ffc107;
-            --delete-button-color: #dc3545;
-            --warning-color: #ffc107;
+            --text-color-primary: #1e293b;
+            --text-color-secondary: #475569;
+            --text-color-light: #64748b;
+            --accent-color: #3b82f6;
+            --accent-color-dark: #1d4ed8;
+            --border-color: #e2e8f0;
+            --input-background-color: #f1f5f9;
+            --button-hover-background: #2563eb;
+            --active-item-background: rgba(59, 130, 246, 0.1);
+            --status-online: #10b981;
+            --status-offline: #6b7280;
+            --status-away: #f59e0b;
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+            box-shadow: inset 0 0 100px rgba(59, 130, 246, 0.05) !important;
+        }
+        
+        @keyframes platinumShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 25%; }
+            50% { background-position: 100% 75%; }
+            75% { background-position: 0% 100%; }
         }
 
-        /* Dark Mode */
+        /* Dark Mode - Premium Starlight Noir */
         body.theme-dark-mode {
-            background: #1a1a2e !important;
-            background-color: #1a1a2e !important;
-            background-image: radial-gradient(circle at top left, #16213e, transparent 100px),
-                              radial-gradient(circle at bottom right, #0f3460, transparent 150px) !important;
-            --background-main: #1a1a2e;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%) !important;
+            background-size: 400% 400% !important;
+            animation: starlightDrift 25s ease-in-out infinite !important;
+            background-attachment: fixed !important;
+            --background-main: linear-gradient(135deg, #0f0f23 0%, #533483 100%);
             --background-gradient-1: #16213e;
             --background-gradient-2: #0f3460;
-            --white: #e0e0e0;
-            --text-light: #a0a0a0;
-            --card-background: rgba(25, 25, 40, 0.7);
-            --header-background: linear-gradient(135deg, rgba(10, 10, 20, .85), rgba(10, 10, 20, .75));
-            --border-light: rgba(255, 255, 255, 0.08);
-            --input-background: rgba(255, 255, 255, 0.08);
-            --button-background: linear-gradient(90deg, #e94560, #ba2f49);
-            --button-shadow: 0 4px 15px rgba(233, 69, 96, 0.4), 0 4px 15px rgba(186, 47, 73, 0.4);
-            --background-color-primary: #121212;
-            --background-color-secondary: #1e1e1e;
-            --header-background-color: #2c2c2c;
-            --footer-background-color: #2c2c2c;
-            --content-background-color: #242424;
-            --card-background-color: #2c2c2c;
-            --text-color-primary: #ffffff;
-            --text-color-secondary: #bbbbbb;
-            --accent-color: #bb86fc;
-            --accent-color-dark: #9a67ea;
-            --border-color: #444444;
-            --input-background-color: #383838;
-            --button-background: #383838;
-            --button-hover-background: #505050;
-            --active-item-background: rgba(187, 134, 252, 0.2);
-            /* --notification-badge-color: Hardcoded for visibility */
-            --delete-button-color: #f44336;
-            --warning-color: #ffeb3b;
+            --white: #e2e8f0;
+            --text-light: #94a3b8;
+            --card-background: rgba(30, 41, 59, 0.8);
+            --header-background: linear-gradient(135deg, rgba(15, 15, 35, 0.95), rgba(26, 26, 46, 0.9));
+            --border-light: rgba(148, 163, 184, 0.15);
+            --input-background: rgba(51, 65, 85, 0.6);
+            --button-background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+            --button-shadow: 0 4px 15px rgba(139, 92, 246, 0.4), 0 4px 15px rgba(124, 58, 237, 0.4);
+            --background-color-primary: #0f172a;
+            --background-color-secondary: #1e293b;
+            --header-background-color: #1e293b;
+            --footer-background-color: #1e293b;
+            --content-background-color: #334155;
+            --card-background-color: #475569;
+            --text-color-primary: #f1f5f9;
+            --text-color-secondary: #cbd5e1;
+            --accent-color: #8b5cf6;
+            --accent-color-dark: #7c3aed;
+            --border-color: #475569;
+            --input-background-color: #334155;
+            --button-hover-background: #a855f7;
+            --active-item-background: rgba(139, 92, 246, 0.2);
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+            box-shadow: inset 0 0 100px rgba(139, 92, 246, 0.1) !important;
+        }
+        
+        @keyframes starlightDrift {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 25%; }
+            50% { background-position: 100% 75%; }
+            75% { background-position: 0% 100%; }
         }
 
         /* Sunset Theme */
@@ -221,39 +233,46 @@
             --delete-button-color: #dc143c;
             --warning-color: #ffd700;
         }
-        /* Glass Mode specific variables */
+        /* Glass Mode - Premium Diamond Glass */
         body.theme-glass-mode {
             --background-main: rgba(10, 10, 10, 0.75);
-            background-image: url('https://source.unsplash.com/random/1920x1080?abstract,blur') !important; /* Added !important */
+            background-image: url('https://source.unsplash.com/random/1920x1080?abstract,blur') !important;
             background-size: cover;
             background-attachment: fixed;
             background-position: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             --card-background: rgba(25, 25, 40, 0.7);
-            --white: #e0e0e0; /* text-color */
-            --text-light: rgba(255, 255, 255, 0.7);
-            --input-background: rgba(255, 255, 255, 0.05);
-            --border-light: rgba(255, 255, 255, 0.1); /* glass-border-color */
-            --button-background: linear-gradient(90deg, var(--pink), var(--blue));
-            --button-shadow: 0 4px 15px var(--blue), 0 4px 15px var(--pink);
-            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5); /* Inner shadow for glass effect */
+            --white: #e0e0e0;
+            --text-light: rgba(255, 255, 255, 0.8);
+            --input-background: rgba(255, 255, 255, 0.08);
+            --border-light: rgba(255, 255, 255, 0.15);
+            --button-background: linear-gradient(90deg, #00d5ff, #ff2e92);
+            --button-shadow: 0 4px 15px rgba(0, 213, 255, 0.4), 0 4px 15px rgba(255, 46, 146, 0.4);
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.3);
 
-            /* New variables override for glass mode */
+            /* Premium glass variables */
             --background-color-primary: rgba(10, 10, 10, 0.75);
             --background-color-secondary: rgba(10, 10, 10, 0.6);
-            --header-background-color: rgba(10, 10, 10, 0.85);
-            --footer-background-color: rgba(10, 10, 10, 0.85);
+            --header-background-color: rgba(10, 10, 10, 0.9);
+            --footer-background-color: rgba(10, 10, 10, 0.9);
             --content-background-color: rgba(10, 10, 10, 0.75);
-            --card-background-color: rgba(25, 25, 40, 0.7);
+            --card-background-color: rgba(25, 25, 40, 0.8);
             --text-color-primary: #e0e0e0;
             --text-color-secondary: #b0b0d0;
             --accent-color: #00d5ff;
             --accent-color-dark: #00aaff;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --input-background-color: rgba(255, 255, 255, 0.05);
-            --button-background: rgba(0, 213, 255, 0.15); /* Glassy button */
-            --button-hover-background: rgba(0, 213, 255, 0.25);
-            --active-item-background: rgba(0, 213, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.15);
+            --input-background-color: rgba(255, 255, 255, 0.08);
+            --button-hover-background: rgba(0, 213, 255, 0.3);
+            --active-item-background: rgba(0, 213, 255, 0.15);
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+            animation: glassRefraction 12s ease-in-out infinite !important;
+        }
+        
+        @keyframes glassRefraction {
+            0%, 100% { filter: brightness(1) contrast(1) saturate(1); }
+            50% { filter: brightness(1.05) contrast(1.02) saturate(1.1); }
         }
 
         /* Sunset Theme */
