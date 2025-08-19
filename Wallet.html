@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCHAT - My Wallet</title>
+    
+    <!-- Security Meta Tags -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="JCHAT Wallet - Manage your JCoins and Gas, view transaction history, and earn rewards">
+    <meta name="keywords" content="jchat, wallet, jcoins, gas, cryptocurrency, digital currency, rewards">
+    <meta name="author" content="JCHAT Team">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Tone.js for audio notifications -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <style>
+        /* Universal box-sizing for consistent layout */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Global CSS Variables */
+        :root {
+            --pink: #ff2e92;
+            --blue: #00d5ff;
+            --glass-black: rgba(10, 10, 10, .75);
+            --glass-blue: rgba(0, 213, 255, .15);
+            --radius: 20px;
+            --transition: .3s ease;
+            --white: #fff;
+            --text-light: rgba(255, 255, 255, .7);
+            --background-main: rgba(10, 10, 10, .75);
+            --background-gradient-1: #00d5ff;
+            --background-gradient-2: #ff2e92;
+            --card-background: linear-gradient(145deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .01));
+            --header-background: linear-gradient(135deg, rgba(10, 10, 10, .85), rgba(10, 10, 10, .75));
+            --border-light: rgba(255, 255, 255, .05);
+            --input-background: rgba(255, 255, 255, 0.05);
+            --button-background: linear-gradient(90deg, var(--blue), var(--pink));
+            --button-shadow: 0 4px 15px var(--blue), 0 4px 15px var(--pink);
+            --success-color: #4CAF50;
+            --warning-color: #FFC107;
+            --error-color: #F44336;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
+            --gas-color: #00d5ff;
+            --jcoin-color: #ffd700;
+        }
+
+        /* Base styles */
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--white);
+            background: 
+                radial-gradient(ellipse at top, rgba(0, 213, 255, 0.15), transparent 70%),
+                radial-gradient(ellipse at bottom, rgba(255, 46, 146, 0.15), transparent 70%),
+                linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--header-background);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .logo-gradient {
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin: 0 0 1rem 0;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Wallet overview cards */
+        .wallet-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .balance-card {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition);
+        }
+
+        .balance-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 213, 255, 0.1), 0 20px 40px rgba(255, 46, 146, 0.1);
+        }
+
+        .balance-card.jcoin {
+            background: linear-gradient(145deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+
+        .balance-card.gas {
+            background: linear-gradient(145deg, rgba(0, 213, 255, 0.1), rgba(0, 213, 255, 0.05));
+            border-color: rgba(0, 213, 255, 0.2);
+        }
+
+        .balance-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .balance-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .balance-icon.jcoin {
+            background: linear-gradient(45deg, var(--gold), #FFA500);
+            color: #000;
+        }
+
+        .balance-icon.gas {
+            background: linear-gradient(45deg, var(--blue), #0099cc);
+            color: #fff;
+        }
+
+        .balance-amount {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 2.5rem;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .balance-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .balance-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+        }
+
+        .balance-change.positive {
+            color: var(--success-color);
+        }
+
+        .balance-change.negative {
+            color: var(--error-color);
+        }
+
+        .balance-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--button-background);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            box-shadow: var(--button-shadow);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            color: var(--white);
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-light);
+        }
+
+        /* Quick actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .action-card {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 213, 255, 0.1);
+            border-color: var(--blue);
+        }
+
+        .action-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem auto;
+        }
+
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-description {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            line-height: 1.4;
+        }
+
+        /* Transaction history */
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin: 0;
+            flex: 1;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            color: var(--white);
+            cursor: pointer;
+            transition: all var(--transition);
+            font-size: 0.85rem;
+        }
+
+        .filter-btn.active {
+            background: var(--button-background);
+            box-shadow: var(--button-shadow);
+        }
+
+        .transactions-container {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            backdrop-filter: blur(20px);
+            overflow: hidden;
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            transition: all var(--transition);
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .transaction-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .transaction-icon.income {
+            background: linear-gradient(45deg, var(--success-color), #66BB6A);
+            color: white;
+        }
+
+        .transaction-icon.expense {
+            background: linear-gradient(45deg, var(--error-color), #EF5350);
+            color: white;
+        }
+
+        .transaction-icon.transfer {
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            color: white;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .transaction-description {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .transaction-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .transaction-value.positive {
+            color: var(--success-color);
+        }
+
+        .transaction-value.negative {
+            color: var(--error-color);
+        }
+
+        .transaction-time {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        /* Analytics section */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .chart-container {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+        }
+
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Earning opportunities */
+        .earning-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .earning-card {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            transition: all var(--transition);
+            cursor: pointer;
+        }
+
+        .earning-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 213, 255, 0.1);
+        }
+
+        .earning-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .earning-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .earning-title {
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .earning-reward {
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .earning-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .earning-progress {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+
+        .earning-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            border-radius: 10px;
+            transition: width var(--transition);
+        }
+
+        .earning-progress-text {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateX(400px);
+            transition: transform var(--transition);
+            z-index: 3000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: var(--error-color);
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+            color: #000;
+        }
+
+        /* Loading states */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-light);
+            border-top: 2px solid var(--blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .wallet-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+            }
+
+            .balance-amount {
+                font-size: 2rem;
+            }
+
+            .balance-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Security badge */
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--white);
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="Home.html" class="logo">
+                <i class="fas fa-wallet"></i>
+                <span class="logo-gradient">JCHAT</span>
+                <span>Wallet</span>
+            </a>
+            
+            <div class="nav-actions">
+                <div class="security-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secured</span>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">J</div>
+                    <span id="user-name">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <div class="container">
+        <!-- Hero section -->
+        <section class="hero">
+            <h1>My Wallet</h1>
+            <p>Manage your JCoins and Gas, track your earnings, and explore new opportunities to grow your digital wealth.</p>
+        </section>
+
+        <!-- Wallet overview -->
+        <section class="wallet-overview">
+            <!-- JCoin Balance -->
+            <div class="balance-card jcoin">
+                <div class="balance-header">
+                    <div class="balance-icon jcoin">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                </div>
+                <h2 class="balance-amount" id="jcoin-balance">Loading...</h2>
+                <p class="balance-label">JCoins Available</p>
+                <div class="balance-change positive" id="jcoin-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0 today</span>
+                </div>
+                <div class="balance-actions">
+                    <button class="btn btn-primary" onclick="openEarnModal('jcoin')">
+                        <i class="fas fa-plus"></i>
+                        Earn JCoins
+                    </button>
+                    <a href="Shop.html" class="btn btn-secondary">
+                        <i class="fas fa-shopping-cart"></i>
+                        Shop
+                    </a>
+                </div>
+            </div>
+
+            <!-- Gas Balance -->
+            <div class="balance-card gas">
+                <div class="balance-header">
+                    <div class="balance-icon gas">
+                        <i class="fas fa-fire"></i>
+                    </div>
+                </div>
+                <h2 class="balance-amount" id="gas-balance">Loading...</h2>
+                <p class="balance-label">Gas Available</p>
+                <div class="balance-change positive" id="gas-change">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0 today</span>
+                </div>
+                <div class="balance-actions">
+                    <button class="btn btn-primary" onclick="openEarnModal('gas')">
+                        <i class="fas fa-plus"></i>
+                        Earn Gas
+                    </button>
+                    <button class="btn btn-secondary" onclick="convertGasToJCoins()">
+                        <i class="fas fa-exchange-alt"></i>
+                        Convert
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <section class="quick-actions">
+            <a href="Chat.html" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="action-title">Start Chatting</div>
+                <div class="action-description">Earn Gas by participating in conversations</div>
+            </a>
+            
+            <a href="Friends.html" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <div class="action-title">Invite Friends</div>
+                <div class="action-description">Get bonus JCoins for each friend you invite</div>
+            </a>
+            
+            <a href="Levels.html" class="action-card">
+                <div class="action-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="action-title">Complete Challenges</div>
+                <div class="action-description">Level up and unlock premium rewards</div>
+            </a>
+            
+            <div class="action-card" onclick="claimDailyReward()">
+                <div class="action-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="action-title">Daily Reward</div>
+                <div class="action-description" id="daily-reward-status">Claim your daily bonus</div>
+            </div>
+        </section>
+
+        <!-- Analytics -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Analytics</h2>
+            </div>
+            <div class="analytics-grid">
+                <div class="chart-container">
+                    <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;">Balance History (7 Days)</h3>
+                    <canvas id="balanceChart" width="400" height="200"></canvas>
+                </div>
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-earned" style="color: var(--success-color);">0</div>
+                        <div class="stat-label">Total Earned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-spent" style="color: var(--error-color);">0</div>
+                        <div class="stat-label">Total Spent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-level" style="color: var(--gold);">1</div>
+                        <div class="stat-label">Current Level</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Earning Opportunities -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Earning Opportunities</h2>
+            </div>
+            <div class="earning-grid" id="earning-opportunities">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Transaction History -->
+        <section class="section">
+            <div class="section-header">
+                <h2 class="section-title">Recent Transactions</h2>
+                <div class="section-actions">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="income">Income</button>
+                    <button class="filter-btn" data-filter="expense">Expense</button>
+                </div>
+            </div>
+            <div class="transactions-container" id="transactions-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <span>Loading transactions...</span>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, query, orderBy, limit, onSnapshot, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebaseapp.com",
+            messagingSenderId: "328479683167",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+
+        const appId = 'default-app-id';
+
+        // Initialize Firebase services
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Global state
+        let currentUser = null;
+        let userProfile = null;
+        let balanceChart = null;
+        let transactionFilter = 'all';
+
+        // Authentication state management
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadUserProfile();
+                await initializeWallet();
+            } else {
+                showNotification('Please log in to access your wallet', 'error');
+                setTimeout(() => {
+                    window.location.href = 'Login.html';
+                }, 2000);
+            }
+        });
+
+        // Load user profile and wallet data
+        async function loadUserProfile() {
+            if (!currentUser) return;
+
+            try {
+                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
+                const privateDocSnap = await getDoc(privateProfileDocRef);
+
+                if (privateDocSnap.exists()) {
+                    userProfile = privateDocSnap.data();
+                    
+                    // Initialize missing wallet fields
+                    const updates = {};
+                    if (userProfile.jCoins === undefined) {
+                        updates.jCoins = 100; // Starting bonus
+                        userProfile.jCoins = 100;
+                    }
+                    if (userProfile.gas === undefined) {
+                        updates.gas = 50; // Starting bonus
+                        userProfile.gas = 50;
+                    }
+                    if (userProfile.totalGasEarned === undefined) {
+                        updates.totalGasEarned = 0;
+                        userProfile.totalGasEarned = 0;
+                    }
+                    if (userProfile.level === undefined) {
+                        updates.level = 1;
+                        userProfile.level = 1;
+                    }
+                    if (userProfile.lastDailyReward === undefined) {
+                        updates.lastDailyReward = null;
+                        userProfile.lastDailyReward = null;
+                    }
+                    if (userProfile.walletStats === undefined) {
+                        updates.walletStats = {
+                            totalEarned: 0,
+                            totalSpent: 0,
+                            transactionCount: 0
+                        };
+                        userProfile.walletStats = updates.walletStats;
+                    }
+                    
+                    // Update document if needed
+                    if (Object.keys(updates).length > 0) {
+                        await updateDoc(privateProfileDocRef, updates);
+                    }
+                } else {
+                    // Create new profile with wallet data
+                    userProfile = {
+                        username: currentUser.displayName || `User_${currentUser.uid.substring(0, 8)}`,
+                        email: currentUser.email || "",
+                        jCoins: 100,
+                        gas: 50,
+                        totalGasEarned: 0,
+                        level: 1,
+                        lastDailyReward: null,
+                        walletStats: {
+                            totalEarned: 0,
+                            totalSpent: 0,
+                            transactionCount: 0
+                        },
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    };
+                    await setDoc(privateProfileDocRef, userProfile);
+                }
+
+                // Update UI
+                updateWalletUI();
+                
+            } catch (error) {
+                console.error("Error loading user profile:", error);
+                showNotification('Error loading wallet data', 'error');
+            }
+        }
+
+        // Initialize wallet dashboard
+        async function initializeWallet() {
+            updateUserInfo();
+            await loadTransactions();
+            await loadEarningOpportunities();
+            initializeChart();
+            checkDailyReward();
+            setupTransactionFilters();
+        }
+
+        // Update user info in header
+        function updateUserInfo() {
+            const userAvatar = document.getElementById('user-avatar');
+            const userName = document.getElementById('user-name');
+            
+            if (userProfile) {
+                userAvatar.textContent = (userProfile.username || 'U').charAt(0).toUpperCase();
+                userName.textContent = userProfile.username || 'JCHAT User';
+            }
+        }
+
+        // Update wallet UI with current balances
+        function updateWalletUI() {
+            if (!userProfile) return;
+
+            // Update balances
+            document.getElementById('jcoin-balance').textContent = (userProfile.jCoins || 0).toLocaleString();
+            document.getElementById('gas-balance').textContent = (userProfile.gas || 0).toLocaleString();
+
+            // Update daily changes (mock data for now)
+            const jcoinChange = Math.floor(Math.random() * 50);
+            const gasChange = Math.floor(Math.random() * 25);
+            
+            document.getElementById('jcoin-change').innerHTML = `
+                <i class="fas fa-arrow-up"></i>
+                <span>+${jcoinChange} today</span>
+            `;
+            
+            document.getElementById('gas-change').innerHTML = `
+                <i class="fas fa-arrow-up"></i>
+                <span>+${gasChange} today</span>
+            `;
+
+            // Update stats
+            if (userProfile.walletStats) {
+                document.getElementById('total-earned').textContent = userProfile.walletStats.totalEarned?.toLocaleString() || '0';
+                document.getElementById('total-spent').textContent = userProfile.walletStats.totalSpent?.toLocaleString() || '0';
+            }
+            document.getElementById('current-level').textContent = userProfile.level || 1;
+        }
+
+        // Load transaction history
+        async function loadTransactions() {
+            if (!currentUser) return;
+
+            try {
+                const transactionsRef = collection(db, "artifacts", appId, "users", currentUser.uid, "transactions");
+                const q = query(transactionsRef, orderBy("timestamp", "desc"), limit(20));
+                
+                onSnapshot(q, (querySnapshot) => {
+                    const transactions = [];
+                    querySnapshot.forEach((doc) => {
+                        transactions.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    renderTransactions(transactions);
+                });
+            } catch (error) {
+                console.error("Error loading transactions:", error);
+                document.getElementById('transactions-container').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <h3>No transactions yet</h3>
+                        <p>Start earning JCoins and Gas to see your transaction history here.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render transactions
+        function renderTransactions(transactions) {
+            const container = document.getElementById('transactions-container');
+            
+            if (transactions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-receipt"></i>
+                        <h3>No transactions yet</h3>
+                        <p>Start earning JCoins and Gas to see your transaction history here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const filteredTransactions = transactionFilter === 'all' 
+                ? transactions 
+                : transactions.filter(t => {
+                    if (transactionFilter === 'income') return t.amount > 0;
+                    if (transactionFilter === 'expense') return t.amount < 0;
+                    return true;
+                });
+
+            container.innerHTML = filteredTransactions.map(transaction => {
+                const isPositive = transaction.amount > 0;
+                const iconClass = isPositive ? 'income' : (transaction.type === 'transfer' ? 'transfer' : 'expense');
+                const icon = getTransactionIcon(transaction.type);
+                const timeAgo = formatTimeAgo(transaction.timestamp);
+                
+                return `
+                    <div class="transaction-item">
+                        <div class="transaction-icon ${iconClass}">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div class="transaction-details">
+                            <div class="transaction-title">${transaction.description || transaction.type}</div>
+                            <div class="transaction-description">${timeAgo}</div>
+                        </div>
+                        <div class="transaction-amount">
+                            <div class="transaction-value ${isPositive ? 'positive' : 'negative'}">
+                                ${isPositive ? '+' : ''}${Math.abs(transaction.amount).toLocaleString()} ${transaction.currency || 'JCoins'}
+                            </div>
+                            <div class="transaction-time">${formatDate(transaction.timestamp)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Get transaction icon
+        function getTransactionIcon(type) {
+            const icons = {
+                'earn': 'fas fa-plus-circle',
+                'purchase': 'fas fa-shopping-cart',
+                'reward': 'fas fa-gift',
+                'daily': 'fas fa-calendar-day',
+                'level': 'fas fa-trophy',
+                'friend': 'fas fa-user-friends',
+                'chat': 'fas fa-comments',
+                'transfer': 'fas fa-exchange-alt',
+                'convert': 'fas fa-sync-alt'
+            };
+            return icons[type] || 'fas fa-coins';
+        }
+
+        // Format time ago
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return 'Unknown time';
+            
+            const now = new Date();
+            const time = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const diffMs = now - time;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            return `${diffDays}d ago`;
+        }
+
+        // Format date
+        function formatDate(timestamp) {
+            if (!timestamp) return '';
+            const time = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return time.toLocaleDateString();
+        }
+
+        // Setup transaction filters
+        function setupTransactionFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    transactionFilter = btn.dataset.filter;
+                    loadTransactions(); // Reload with new filter
+                });
+            });
+        }
+
+        // Initialize balance chart
+        function initializeChart() {
+            const ctx = document.getElementById('balanceChart').getContext('2d');
+            
+            // Mock data for the last 7 days
+            const labels = [];
+            const jcoinData = [];
+            const gasData = [];
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+                
+                // Mock historical data
+                const baseJcoin = userProfile?.jCoins || 100;
+                const baseGas = userProfile?.gas || 50;
+                jcoinData.push(Math.max(0, baseJcoin - Math.random() * 50 + Math.random() * 100));
+                gasData.push(Math.max(0, baseGas - Math.random() * 25 + Math.random() * 50));
+            }
+
+            balanceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'JCoins',
+                        data: jcoinData,
+                        borderColor: '#FFD700',
+                        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Gas',
+                        data: gasData,
+                        borderColor: '#00d5ff',
+                        backgroundColor: 'rgba(0, 213, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#ffffff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load earning opportunities
+        async function loadEarningOpportunities() {
+            const opportunities = [
+                {
+                    id: 'daily-chat',
+                    title: 'Daily Chat Goal',
+                    description: 'Send 10 messages today to earn bonus Gas',
+                    reward: '+25 Gas',
+                    icon: 'fas fa-comments',
+                    progress: Math.floor(Math.random() * 100),
+                    action: () => window.location.href = 'Chat.html'
+                },
+                {
+                    id: 'friend-invite',
+                    title: 'Invite Friends',
+                    description: 'Invite 3 friends and earn JCoins for each one',
+                    reward: '+100 JCoins per friend',
+                    icon: 'fas fa-user-plus',
+                    progress: Math.floor(Math.random() * 100),
+                    action: () => window.location.href = 'Friends.html'
+                },
+                {
+                    id: 'profile-complete',
+                    title: 'Complete Profile',
+                    description: 'Fill out your profile to unlock premium features',
+                    reward: '+50 JCoins',
+                    icon: 'fas fa-user-edit',
+                    progress: Math.floor(Math.random() * 100),
+                    action: () => window.location.href = 'Profile.html'
+                },
+                {
+                    id: 'level-up',
+                    title: 'Level Up',
+                    description: 'Reach the next level to unlock exclusive rewards',
+                    reward: '+200 JCoins',
+                    icon: 'fas fa-trophy',
+                    progress: Math.floor(Math.random() * 100),
+                    action: () => window.location.href = 'Levels.html'
+                }
+            ];
+
+            const container = document.getElementById('earning-opportunities');
+            container.innerHTML = opportunities.map(opp => `
+                <div class="earning-card" onclick="handleEarningAction('${opp.id}')">
+                    <div class="earning-header">
+                        <div class="earning-icon">
+                            <i class="${opp.icon}"></i>
+                        </div>
+                        <div>
+                            <h4 class="earning-title">${opp.title}</h4>
+                            <div class="earning-reward">${opp.reward}</div>
+                        </div>
+                    </div>
+                    <p class="earning-description">${opp.description}</p>
+                    <div class="earning-progress">
+                        <div class="earning-progress-bar" style="width: ${opp.progress}%"></div>
+                    </div>
+                    <div class="earning-progress-text">${opp.progress}% Complete</div>
+                </div>
+            `).join('');
+
+            // Store opportunities for action handling
+            window.earningOpportunities = opportunities;
+        }
+
+        // Handle earning opportunity actions
+        function handleEarningAction(opportunityId) {
+            const opportunity = window.earningOpportunities?.find(o => o.id === opportunityId);
+            if (opportunity && opportunity.action) {
+                opportunity.action();
+            }
+        }
+
+        // Check daily reward status
+        function checkDailyReward() {
+            if (!userProfile) return;
+
+            const now = new Date();
+            const lastReward = userProfile.lastDailyReward;
+            
+            let canClaim = true;
+            let statusText = 'Claim your daily bonus';
+
+            if (lastReward) {
+                const lastRewardDate = lastReward.toDate ? lastReward.toDate() : new Date(lastReward);
+                const timeDiff = now - lastRewardDate;
+                const hoursDiff = timeDiff / (1000 * 60 * 60);
+
+                if (hoursDiff < 24) {
+                    canClaim = false;
+                    const hoursLeft = Math.ceil(24 - hoursDiff);
+                    statusText = `Available in ${hoursLeft}h`;
+                }
+            }
+
+            const statusElement = document.getElementById('daily-reward-status');
+            statusElement.textContent = statusText;
+            
+            if (!canClaim) {
+                statusElement.style.color = 'var(--text-light)';
+            }
+        }
+
+        // Claim daily reward
+        async function claimDailyReward() {
+            if (!currentUser || !userProfile) {
+                showNotification('Please refresh the page and try again', 'error');
+                return;
+            }
+
+            const now = new Date();
+            const lastReward = userProfile.lastDailyReward;
+            
+            if (lastReward) {
+                const lastRewardDate = lastReward.toDate ? lastRewardDate.toDate() : new Date(lastReward);
+                const timeDiff = now - lastRewardDate;
+                const hoursDiff = timeDiff / (1000 * 60 * 60);
+
+                if (hoursDiff < 24) {
+                    const hoursLeft = Math.ceil(24 - hoursDiff);
+                    showNotification(`Daily reward available in ${hoursLeft} hours`, 'warning');
+                    return;
+                }
+            }
+
+            try {
+                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
+                
+                const rewardAmount = 50; // Daily JCoin reward
+                const gasBonus = 25; // Daily Gas bonus
+
+                await runTransaction(db, async (transaction) => {
+                    const profileDoc = await transaction.get(privateProfileDocRef);
+                    
+                    if (!profileDoc.exists()) {
+                        throw new Error("Profile not found");
+                    }
+                    
+                    const currentProfile = profileDoc.data();
+                    
+                    transaction.update(privateProfileDocRef, {
+                        jCoins: (currentProfile.jCoins || 0) + rewardAmount,
+                        gas: (currentProfile.gas || 0) + gasBonus,
+                        lastDailyReward: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    });
+                });
+
+                // Log the transaction
+                await addDoc(collection(db, "artifacts", appId, "users", currentUser.uid, "transactions"), {
+                    type: 'daily',
+                    amount: rewardAmount,
+                    currency: 'JCoins',
+                    description: `Daily reward: ${rewardAmount} JCoins + ${gasBonus} Gas`,
+                    timestamp: serverTimestamp()
+                });
+
+                // Update local state
+                userProfile.jCoins += rewardAmount;
+                userProfile.gas += gasBonus;
+                userProfile.lastDailyReward = now;
+
+                updateWalletUI();
+                checkDailyReward();
+                showNotification(`Daily reward claimed! +${rewardAmount} JCoins +${gasBonus} Gas`, 'success');
+                
+            } catch (error) {
+                console.error("Error claiming daily reward:", error);
+                showNotification('Failed to claim daily reward. Please try again.', 'error');
+            }
+        }
+
+        // Convert Gas to JCoins
+        async function convertGasToJCoins() {
+            if (!currentUser || !userProfile) {
+                showNotification('Please refresh the page and try again', 'error');
+                return;
+            }
+
+            const gasAmount = userProfile.gas || 0;
+            if (gasAmount < 10) {
+                showNotification('You need at least 10 Gas to convert to JCoins', 'warning');
+                return;
+            }
+
+            const conversionRate = 2; // 2 Gas = 1 JCoin
+            const gasToConvert = Math.floor(gasAmount / conversionRate) * conversionRate;
+            const jcoinsToAdd = gasToConvert / conversionRate;
+
+            if (gasToConvert === 0) {
+                showNotification('Not enough Gas to convert', 'warning');
+                return;
+            }
+
+            try {
+                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
+                
+                await runTransaction(db, async (transaction) => {
+                    const profileDoc = await transaction.get(privateProfileDocRef);
+                    
+                    if (!profileDoc.exists()) {
+                        throw new Error("Profile not found");
+                    }
+                    
+                    const currentProfile = profileDoc.data();
+                    
+                    transaction.update(privateProfileDocRef, {
+                        jCoins: (currentProfile.jCoins || 0) + jcoinsToAdd,
+                        gas: (currentProfile.gas || 0) - gasToConvert,
+                        updatedAt: serverTimestamp()
+                    });
+                });
+
+                // Log the transaction
+                await addDoc(collection(db, "artifacts", appId, "users", currentUser.uid, "transactions"), {
+                    type: 'convert',
+                    amount: jcoinsToAdd,
+                    currency: 'JCoins',
+                    description: `Converted ${gasToConvert} Gas to ${jcoinsToAdd} JCoins`,
+                    timestamp: serverTimestamp()
+                });
+
+                // Update local state
+                userProfile.jCoins += jcoinsToAdd;
+                userProfile.gas -= gasToConvert;
+
+                updateWalletUI();
+                showNotification(`Converted ${gasToConvert} Gas to ${jcoinsToAdd} JCoins!`, 'success');
+                
+            } catch (error) {
+                console.error("Error converting Gas:", error);
+                showNotification('Failed to convert Gas. Please try again.', 'error');
+            }
+        }
+
+        // Open earning modal (placeholder)
+        function openEarnModal(currency) {
+            const currencyName = currency === 'jcoin' ? 'JCoins' : 'Gas';
+            showNotification(`${currencyName} earning features coming soon!`, 'info');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notification-text');
+            
+            text.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Make functions globally available
+        window.claimDailyReward = claimDailyReward;
+        window.convertGasToJCoins = convertGasToJCoins;
+        window.openEarnModal = openEarnModal;
+        window.handleEarningAction = handleEarningAction;
+    </script>
+</body>
+</html>
