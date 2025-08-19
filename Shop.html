@@ -108,6 +108,19 @@
     .theme-preview-elegant { background: linear-gradient(45deg, #d4af37, #ffd700, #f4e4bc, #fff8dc); }
     .theme-preview-glass { background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2), rgba(255,255,255,0.1), rgba(255,255,255,0.05)); }
     .theme-preview-sunset { background: linear-gradient(45deg, #ff7e5f, #feb47b, #ff6b6b, #ffa07a); }
+
+    /* Currency selector styles */
+    .currency-selector { display: flex; align-items: center; gap: 8px; }
+    .currency-indicator { 
+      display: flex; align-items: center; gap: 4px; 
+      padding: 4px 8px; background: var(--card); 
+      border: 1px solid var(--border); border-radius: 6px; 
+      font-size: 0.85rem; 
+    }
+    .currency-symbol { font-weight: 700; }
+    .currency-code { opacity: 0.8; }
+    .loading { animation: spin 1s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -210,6 +223,179 @@
       { id: 10, key: 'theme-elegant-mode', name: 'Regal Gold Edition', price: 19.99, description: 'Luxury gold theme with premium shimmer effects', preview: 'elegant' }
     ];
 
+    // Currency configuration
+    const CURRENCIES = {
+      'US': { code: 'USD', symbol: '$', name: 'US Dollar' },
+      'GB': { code: 'GBP', symbol: '£', name: 'British Pound' },
+      'EU': { code: 'EUR', symbol: '€', name: 'Euro' },
+      'CA': { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
+      'AU': { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+      'IN': { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+      'JP': { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+      'KR': { code: 'KRW', symbol: '₩', name: 'South Korean Won' },
+      'BR': { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' },
+      'MX': { code: 'MXN', symbol: '$', name: 'Mexican Peso' },
+      'NG': { code: 'NGN', symbol: '₦', name: 'Nigerian Naira' }
+    };
+
+    // Default to Naira if detection fails
+    let userCurrency = CURRENCIES['NG'];
+    let exchangeRates = { NGN: 1 };
+    let isRatesLoading = false;
+
+    // Currency detection and exchange rate management
+    async function detectUserCurrency() {
+      try {
+        // Try to get user's country from IP
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        
+        if (data.country_code && CURRENCIES[data.country_code]) {
+          userCurrency = CURRENCIES[data.country_code];
+          showToast(`Prices shown in ${userCurrency.name}`, 'info');
+        }
+        
+        // Store user's currency preference
+        localStorage.setItem('jchat-user-currency', userCurrency.code);
+        
+        // Fetch exchange rates
+        await fetchExchangeRates();
+        
+      } catch (error) {
+        console.log('Currency detection failed, using Naira:', error);
+        // Fallback to stored preference or Naira
+        const storedCurrency = localStorage.getItem('jchat-user-currency');
+        if (storedCurrency) {
+          const currencyEntry = Object.values(CURRENCIES).find(c => c.code === storedCurrency);
+          if (currencyEntry) userCurrency = currencyEntry;
+        }
+      }
+    }
+
+    async function fetchExchangeRates() {
+      if (isRatesLoading) return;
+      isRatesLoading = true;
+      
+      try {
+        // Use a free exchange rate API
+        const response = await fetch(`https://api.exchangerate-api.com/v4/latest/NGN`);
+        const data = await response.json();
+        
+        if (data.rates) {
+          exchangeRates = data.rates;
+          updateAllPrices();
+          showToast('Exchange rates updated', 'success');
+        }
+      } catch (error) {
+        console.error('Failed to fetch exchange rates:', error);
+        // Fallback to approximate rates
+        exchangeRates = {
+          USD: 0.0012, EUR: 0.0011, GBP: 0.0009, CAD: 0.0016,
+          AUD: 0.0018, INR: 0.10, JPY: 0.18, KRW: 1.62,
+          BRL: 0.006, MXN: 0.020, NGN: 1
+        };
+      } finally {
+        isRatesLoading = false;
+      }
+    }
+
+    function convertPrice(priceInNaira, targetCurrency = userCurrency.code) {
+      const rate = exchangeRates[targetCurrency] || 1;
+      const converted = priceInNaira * rate;
+      
+      // Format based on currency
+      if (targetCurrency === 'JPY' || targetCurrency === 'KRW') {
+        return Math.round(converted);
+      } else if (targetCurrency === 'INR') {
+        return Math.round(converted);
+      } else {
+        return converted.toFixed(2);
+      }
+    }
+
+    function formatPrice(price, currency = userCurrency) {
+      const convertedPrice = convertPrice(price, currency.code);
+      return `${currency.symbol}${convertedPrice}`;
+    }
+
+    function updateAllPrices() {
+      // Update theme prices
+      const priceElements = document.querySelectorAll('.theme .price');
+      priceElements.forEach((el, index) => {
+        if (THEMES[index]) {
+          el.textContent = formatPrice(THEMES[index].price);
+        }
+      });
+      
+      // Update summary
+      updateSummary();
+      
+      // Update currency indicator
+      updateCurrencyIndicator();
+    }
+
+    function updateCurrencyIndicator() {
+      const indicator = document.getElementById('currencyIndicator');
+      if (indicator) {
+        indicator.innerHTML = `
+          <div class="currency-info">
+            <span class="currency-symbol">${userCurrency.symbol}</span>
+            <span class="currency-code">${userCurrency.code}</span>
+            ${isRatesLoading ? '<span class="loading">🔄</span>' : ''}
+          </div>
+        `;
+      }
+    }
+
+    // Add currency selector to header
+    function addCurrencySelector() {
+      const header = document.querySelector('.header');
+      if (header) {
+        const currencyDiv = document.createElement('div');
+        currencyDiv.className = 'currency-selector';
+        currencyDiv.innerHTML = `
+          <select id="currencySelect" style="background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 8px; font-size: 0.9rem;">
+            ${Object.entries(CURRENCIES).map(([code, currency]) => 
+              `<option value="${currency.code}" ${currency.code === userCurrency.code ? 'selected' : ''}>
+                ${currency.symbol} ${currency.code} - ${currency.name}
+              </option>`
+            ).join('')}
+          </select>
+          <div id="currencyIndicator" class="currency-indicator"></div>
+        `;
+        header.appendChild(currencyDiv);
+        
+        // Add currency selector styles
+        const style = document.createElement('style');
+        style.textContent = `
+          .currency-selector { display: flex; align-items: center; gap: 8px; }
+          .currency-indicator { 
+            display: flex; align-items: center; gap: 4px; 
+            padding: 4px 8px; background: var(--card); 
+            border: 1px solid var(--border); border-radius: 6px; 
+            font-size: 0.85rem; 
+          }
+          .currency-symbol { font-weight: 700; }
+          .currency-code { opacity: 0.8; }
+          .loading { animation: spin 1s linear infinite; }
+          @keyframes spin { 100% { transform: rotate(360deg); } }
+        `;
+        document.head.appendChild(style);
+        
+        // Handle currency change
+        document.getElementById('currencySelect').addEventListener('change', (e) => {
+          const newCurrencyCode = e.target.value;
+          const newCurrency = Object.values(CURRENCIES).find(c => c.code === newCurrencyCode);
+          if (newCurrency) {
+            userCurrency = newCurrency;
+            localStorage.setItem('jchat-user-currency', newCurrency.code);
+            updateAllPrices();
+            showToast(`Switched to ${newCurrency.name}`, 'info');
+          }
+        });
+      }
+    }
+
     const themesEl = document.getElementById('themes');
     const buyAllBtn = document.getElementById('buyAllBtn');
     const clearBtn = document.getElementById('clearBtn');
@@ -278,8 +464,10 @@
     function updateSummary() {
       const selectedIds = getSelectedThemeIds();
       const selectedThemes = THEMES.filter(t => selectedIds.includes(t.id.toString()));
-      const total = selectedThemes.reduce((sum, t) => sum + t.price, 0);
-      summaryAmount.textContent = `₦${total.toLocaleString('en-NG')}`;
+      const totalInNaira = selectedThemes.reduce((sum, t) => sum + t.price, 0);
+      const totalInUserCurrency = convertPrice(totalInNaira, userCurrency.code);
+      
+      summaryAmount.textContent = `${userCurrency.symbol}${totalInUserCurrency}`;
       summaryCount.textContent = `${selectedThemes.length} ${selectedThemes.length === 1 ? 'theme' : 'themes'}`;
       if (!orderIdEl.textContent) orderIdEl.textContent = generateOrderId();
     }
@@ -296,7 +484,7 @@
               <div class="name">${t.name}</div>
               <div class="description">${t.description}</div>
             </div>
-            <div class="price">₦${t.price}</div>
+            <div class="price">${formatPrice(t.price)}</div>
           </div>
           <div class="preview theme-preview-${t.preview}"></div>
         `;
@@ -357,7 +545,8 @@
       
       const orderId = orderIdEl.textContent || generateOrderId();
       const selectedThemes = THEMES.filter(t => selected.includes(t.id.toString()));
-      const total = selectedThemes.reduce((sum, t) => sum + t.price, 0);
+      const totalInNaira = selectedThemes.reduce((sum, t) => sum + t.price, 0);
+      const totalInUserCurrency = convertPrice(totalInNaira, userCurrency.code);
       
       let uploadedReceiptUrl = null;
       if (selectedReceiptFile) {
@@ -398,7 +587,9 @@
           orderId,
           userId: currentUser.uid,
           paymentMethod: 'bank_transfer',
-          nairaAmount: total,
+          nairaAmount: totalInNaira,
+          userCurrencyAmount: totalInUserCurrency,
+          userCurrencyCode: userCurrency.code,
           jcoinAmount: 0,
           status: 'pending',
           timestamp: serverTimestamp(),
@@ -407,6 +598,7 @@
             id: t.id,
             title: t.name,
             price: t.price,
+            userCurrencyPrice: convertPrice(t.price, userCurrency.code),
             category: 'premium_theme',
             key: t.key
           })),
@@ -444,6 +636,12 @@
 
     renderThemes();
     updateSummary();
+    addCurrencySelector(); // Call the new function to add the currency selector
+    
+    // Initialize currency detection and exchange rates
+    detectUserCurrency().then(() => {
+      updateAllPrices();
+    });
 
     // Preselect from URL params ?select=1,2,5
     (function preselectFromUrl(){

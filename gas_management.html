@@ -4426,7 +4426,16 @@
                 ? `<ul style="margin:6px 0 0 16px; padding:0; color:var(--text-light); font-size:.9rem;">${req.items.map(it => {
                     const isTheme = it.category === 'premium_theme';
                     const icon = isTheme ? '🎨' : '📦';
-                    const priceText = isTheme ? `₦${it.price}` : `${it.price} JCoins`;
+                    let priceText = '';
+                    if (isTheme) {
+                        if (req.userCurrencyAmount && req.userCurrencyCode) {
+                            priceText = `${req.userCurrencyCode} ${req.userCurrencyAmount} (₦${it.price})`;
+                        } else {
+                            priceText = `₦${it.price}`;
+                        }
+                    } else {
+                        priceText = `${it.price} JCoins`;
+                    }
                     return `<li>${icon} ${(it.title||`Item ${it.id}`)} - ${priceText} (${it.category})</li>`;
                 }).join('')}</ul>`
                 : '<div style="color:var(--text-light);">No items listed</div>';
@@ -4439,7 +4448,7 @@
                     <div><strong>Request ID:</strong> ${requestId}</div>
                     <div><strong>User:</strong> ${req.userId || 'N/A'}</div>
                     <div><strong>Method:</strong> ${req.paymentMethod || 'N/A'}</div>
-                    <div><strong>Amount:</strong> ₦${(req.nairaAmount||0).toLocaleString()} | ${req.jcoinAmount||0} JCoins</div>
+                    <div><strong>Amount:</strong> ${req.userCurrencyCode ? `${req.userCurrencyCode} ${req.userCurrencyAmount}` : '₦' + (req.nairaAmount||0).toLocaleString()} | ${req.jcoinAmount||0} JCoins</div>
                     <div><strong>When:</strong> ${ts}</div>
                 </div>
                 ${itemsHtml}
