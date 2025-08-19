@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCHAT - Premium Shop</title>
+    
+    <!-- Security Meta Tags -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="JCHAT Premium Shop - Buy themes, emoji packs, premium features, and more">
+    <meta name="keywords" content="jchat, shop, premium, themes, emoji, features, digital store">
+    <meta name="author" content="JCHAT Team">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <style>
+        /* Universal box-sizing for consistent layout */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Global CSS Variables */
+        :root {
+            --pink: #ff2e92;
+            --blue: #00d5ff;
+            --glass-black: rgba(10, 10, 10, .75);
+            --glass-blue: rgba(0, 213, 255, .15);
+            --radius: 20px;
+            --transition: .3s ease;
+            --white: #fff;
+            --text-light: rgba(255, 255, 255, .7);
+            --background-main: rgba(10, 10, 10, .75);
+            --background-gradient-1: #00d5ff;
+            --background-gradient-2: #ff2e92;
+            --card-background: linear-gradient(145deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .01));
+            --header-background: linear-gradient(135deg, rgba(10, 10, 10, .85), rgba(10, 10, 10, .75));
+            --border-light: rgba(255, 255, 255, .05);
+            --input-background: rgba(255, 255, 255, 0.05);
+            --button-background: linear-gradient(90deg, var(--blue), var(--pink));
+            --button-shadow: 0 4px 15px var(--blue), 0 4px 15px var(--pink);
+            --success-color: #4CAF50;
+            --warning-color: #FFC107;
+            --error-color: #F44336;
+            --gold: #FFD700;
+            --silver: #C0C0C0;
+            --bronze: #CD7F32;
+        }
+
+        /* Base styles */
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--white);
+            background: 
+                radial-gradient(ellipse at top, rgba(0, 213, 255, 0.15), transparent 70%),
+                radial-gradient(ellipse at bottom, rgba(255, 46, 146, 0.15), transparent 70%),
+                linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: var(--header-background);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .logo-gradient {
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .cart-btn {
+            position: relative;
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--transition);
+        }
+
+        .cart-btn:hover {
+            background: var(--button-background);
+            box-shadow: var(--button-shadow);
+            transform: translateY(-2px);
+        }
+
+        .cart-count {
+            background: var(--pink);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+        }
+
+        .jcoin-balance {
+            background: linear-gradient(45deg, var(--gold), #FFA500);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #000;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 3rem;
+            margin: 0 0 1rem 0;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Category filters */
+        .category-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .category-btn {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            color: var(--white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--transition);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .category-btn:hover, .category-btn.active {
+            background: var(--button-background);
+            box-shadow: var(--button-shadow);
+            transform: translateY(-2px);
+        }
+
+        /* Product grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .product-card {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            backdrop-filter: blur(20px);
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 213, 255, 0.1), 0 20px 40px rgba(255, 46, 146, 0.1);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--pink);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .product-badge.popular {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .product-badge.new {
+            background: var(--success-color);
+        }
+
+        .product-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin: 0 0 0.5rem 0;
+            color: var(--white);
+        }
+
+        .product-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .product-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.5rem 0;
+        }
+
+        .product-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-features li i {
+            color: var(--success-color);
+            width: 16px;
+        }
+
+        .product-price {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .price {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .jcoin-price {
+            color: var(--gold);
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .discount {
+            background: var(--error-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: var(--button-background);
+            border: none;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            box-shadow: var(--button-shadow);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 0.75rem;
+            color: var(--white);
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-light);
+        }
+
+        /* Cart sidebar */
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: var(--header-background);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid var(--border-light);
+            transition: right var(--transition);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cart-header h3 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all var(--transition);
+        }
+
+        .close-cart:hover {
+            background: var(--border-light);
+        }
+
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .cart-item {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .cart-item-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-title {
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+            font-size: 0.9rem;
+        }
+
+        .cart-item-price {
+            color: var(--gold);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: var(--error-color);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all var(--transition);
+        }
+
+        .remove-item:hover {
+            background: rgba(244, 67, 54, 0.1);
+        }
+
+        .cart-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .cart-total {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: var(--button-background);
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+            font-size: 1rem;
+        }
+
+        .checkout-btn:hover {
+            box-shadow: var(--button-shadow);
+        }
+
+        .checkout-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateX(400px);
+            transition: transform var(--transition);
+            z-index: 3000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: var(--error-color);
+        }
+
+        /* Empty cart */
+        .empty-cart {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-cart i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+            }
+
+            .nav-actions {
+                gap: 0.5rem;
+            }
+
+            .jcoin-balance {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Loading animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Premium glow effect */
+        .premium-glow {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            border-color: var(--gold);
+        }
+
+        /* Special offer banner */
+        .special-offer {
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .special-offer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .offer-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .offer-description {
+            margin: 0;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="Home.html" class="logo">
+                <i class="fas fa-comments"></i>
+                <span class="logo-gradient">JCHAT</span>
+                <span>Shop</span>
+            </a>
+            
+            <div class="nav-actions">
+                <div class="jcoin-balance">
+                    <i class="fas fa-coins"></i>
+                    <span id="jcoin-balance">1,250</span>
+                    <span>JCoins</span>
+                </div>
+                
+                <button class="cart-btn" onclick="toggleCart()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Cart</span>
+                    <span class="cart-count" id="cart-count">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <div class="container">
+        <!-- Hero section -->
+        <section class="hero">
+            <h1>Premium Store</h1>
+            <p>Enhance your JCHAT experience with premium themes, emoji packs, exclusive features, and more!</p>
+        </section>
+
+        <!-- Special offer banner -->
+        <div class="special-offer">
+            <h3 class="offer-title">🎉 Limited Time Offer!</h3>
+            <p class="offer-description">Get 25% off on all theme bundles this week only!</p>
+        </div>
+
+        <!-- Category filters -->
+        <div class="category-filters">
+            <button class="category-btn active" data-category="all">
+                <i class="fas fa-th"></i>
+                All Items
+            </button>
+            <button class="category-btn" data-category="themes">
+                <i class="fas fa-palette"></i>
+                Themes
+            </button>
+            <button class="category-btn" data-category="emojis">
+                <i class="fas fa-smile"></i>
+                Emoji Packs
+            </button>
+            <button class="category-btn" data-category="features">
+                <i class="fas fa-star"></i>
+                Premium Features
+            </button>
+            <button class="category-btn" data-category="badges">
+                <i class="fas fa-award"></i>
+                Badges & Titles
+            </button>
+            <button class="category-btn" data-category="sounds">
+                <i class="fas fa-volume-up"></i>
+                Sound Packs
+            </button>
+        </div>
+
+        <!-- Products grid -->
+        <div class="products-grid" id="products-grid">
+            <!-- Products will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <!-- Cart sidebar -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h3>Shopping Cart</h3>
+            <button class="close-cart" onclick="toggleCart()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <div class="cart-items" id="cart-items">
+            <div class="empty-cart">
+                <i class="fas fa-shopping-cart"></i>
+                <p>Your cart is empty</p>
+            </div>
+        </div>
+        
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cart-total">0 JCoins</span>
+            </div>
+            <button class="checkout-btn" id="checkout-btn" onclick="checkout()" disabled>
+                Checkout
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    <script>
+        // Product data
+        const products = [
+            // Themes
+            {
+                id: 1,
+                category: 'themes',
+                title: 'Neon Cyberpunk Theme',
+                description: 'Futuristic neon theme with animated backgrounds and glowing effects',
+                price: 500,
+                originalPrice: 750,
+                icon: 'fas fa-city',
+                badge: 'popular',
+                features: [
+                    'Animated neon backgrounds',
+                    'Custom cyberpunk UI elements',
+                    'Glowing text effects',
+                    'Futuristic sound effects'
+                ]
+            },
+            {
+                id: 2,
+                category: 'themes',
+                title: 'Ocean Breeze Theme',
+                description: 'Calming ocean-inspired theme with wave animations',
+                price: 400,
+                originalPrice: null,
+                icon: 'fas fa-water',
+                badge: 'new',
+                features: [
+                    'Wave animation backgrounds',
+                    'Ocean blue color palette',
+                    'Relaxing sound effects',
+                    'Beach-themed emojis included'
+                ]
+            },
+            {
+                id: 3,
+                category: 'themes',
+                title: 'Dark Galaxy Theme',
+                description: 'Deep space theme with starfield animations and cosmic colors',
+                price: 600,
+                originalPrice: 800,
+                icon: 'fas fa-rocket',
+                badge: null,
+                features: [
+                    'Animated starfield background',
+                    'Cosmic color gradients',
+                    'Space-themed icons',
+                    'Ambient space sounds'
+                ]
+            },
+
+            // Emoji Packs
+            {
+                id: 4,
+                category: 'emojis',
+                title: 'Anime Emoji Pack',
+                description: 'Exclusive anime-style emojis with kawaii expressions',
+                price: 200,
+                originalPrice: null,
+                icon: 'fas fa-cat',
+                badge: 'popular',
+                features: [
+                    '50+ unique anime emojis',
+                    'Kawaii expressions',
+                    'Animated reactions',
+                    'Exclusive to premium users'
+                ]
+            },
+            {
+                id: 5,
+                category: 'emojis',
+                title: 'Gaming Emoji Pack',
+                description: 'Gaming-themed emojis for all your gaming conversations',
+                price: 150,
+                originalPrice: null,
+                icon: 'fas fa-gamepad',
+                badge: 'new',
+                features: [
+                    '40+ gaming emojis',
+                    'Console and PC themed',
+                    'Victory and defeat reactions',
+                    'Popular game references'
+                ]
+            },
+            {
+                id: 6,
+                category: 'emojis',
+                title: 'Professional Emoji Pack',
+                description: 'Business and professional emojis for work conversations',
+                price: 100,
+                originalPrice: null,
+                icon: 'fas fa-briefcase',
+                badge: null,
+                features: [
+                    '30+ professional emojis',
+                    'Business meeting themes',
+                    'Success and achievement',
+                    'Office life expressions'
+                ]
+            },
+
+            // Premium Features
+            {
+                id: 7,
+                category: 'features',
+                title: 'Premium Plus Membership',
+                description: 'Unlock all premium features with unlimited access',
+                price: 1000,
+                originalPrice: 1500,
+                icon: 'fas fa-crown',
+                badge: 'popular',
+                features: [
+                    'Unlimited message history',
+                    'Priority customer support',
+                    'All themes and emojis included',
+                    'Advanced privacy controls',
+                    'Custom profile badges',
+                    'No ads forever'
+                ]
+            },
+            {
+                id: 8,
+                category: 'features',
+                title: 'Message Reactions Plus',
+                description: 'Enhanced reaction system with custom animations',
+                price: 250,
+                originalPrice: null,
+                icon: 'fas fa-heart',
+                badge: 'new',
+                features: [
+                    'Custom reaction animations',
+                    'Unlimited reaction history',
+                    'Special effect reactions',
+                    'Priority in group reactions'
+                ]
+            },
+            {
+                id: 9,
+                category: 'features',
+                title: 'Advanced Privacy Shield',
+                description: 'Enhanced privacy features and security controls',
+                price: 300,
+                originalPrice: null,
+                icon: 'fas fa-shield-alt',
+                badge: null,
+                features: [
+                    'End-to-end encryption',
+                    'Message disappearing timer',
+                    'Advanced blocking options',
+                    'Privacy analytics dashboard'
+                ]
+            },
+
+            // Badges & Titles
+            {
+                id: 10,
+                category: 'badges',
+                title: 'VIP Gold Badge',
+                description: 'Exclusive gold badge showing your VIP status',
+                price: 400,
+                originalPrice: null,
+                icon: 'fas fa-medal',
+                badge: 'popular',
+                features: [
+                    'Shiny gold badge display',
+                    'VIP chat privileges',
+                    'Priority in group chats',
+                    'Exclusive VIP events access'
+                ]
+            },
+            {
+                id: 11,
+                category: 'badges',
+                title: 'Legend Title Pack',
+                description: 'Collection of legendary titles to show your achievements',
+                price: 350,
+                originalPrice: null,
+                icon: 'fas fa-trophy',
+                badge: 'new',
+                features: [
+                    '10+ legendary titles',
+                    'Animated title effects',
+                    'Leaderboard priority',
+                    'Special mention privileges'
+                ]
+            },
+            {
+                id: 12,
+                category: 'badges',
+                title: 'Custom Badge Creator',
+                description: 'Create your own personalized badges and titles',
+                price: 500,
+                originalPrice: null,
+                icon: 'fas fa-paint-brush',
+                badge: null,
+                features: [
+                    'Design custom badges',
+                    'Upload custom icons',
+                    'Text customization',
+                    'Color palette selection'
+                ]
+            },
+
+            // Sound Packs
+            {
+                id: 13,
+                category: 'sounds',
+                title: 'Retro Gaming Sounds',
+                description: 'Classic 8-bit and 16-bit gaming notification sounds',
+                price: 150,
+                originalPrice: null,
+                icon: 'fas fa-music',
+                badge: 'popular',
+                features: [
+                    '20+ retro gaming sounds',
+                    'Classic arcade notifications',
+                    'Power-up sound effects',
+                    'Customizable sound triggers'
+                ]
+            },
+            {
+                id: 14,
+                category: 'sounds',
+                title: 'Nature Sounds Pack',
+                description: 'Peaceful nature sounds for a calming chat experience',
+                price: 120,
+                originalPrice: null,
+                icon: 'fas fa-leaf',
+                badge: 'new',
+                features: [
+                    'Rain and thunder sounds',
+                    'Forest and bird sounds',
+                    'Ocean wave notifications',
+                    'Wind chime alerts'
+                ]
+            },
+            {
+                id: 15,
+                category: 'sounds',
+                title: 'Sci-Fi Sound Effects',
+                description: 'Futuristic sci-fi sounds for the ultimate tech experience',
+                price: 180,
+                originalPrice: null,
+                icon: 'fas fa-robot',
+                badge: null,
+                features: [
+                    'Futuristic beeps and bloops',
+                    'Laser and energy sounds',
+                    'Robot voice notifications',
+                    'Space ambient sounds'
+                ]
+            }
+        ];
+
+        // Shopping cart
+        let cart = JSON.parse(localStorage.getItem('jchat_cart')) || [];
+        let currentCategory = 'all';
+
+        // Initialize the shop
+        document.addEventListener('DOMContentLoaded', function() {
+            renderProducts();
+            updateCartUI();
+            setupCategoryFilters();
+        });
+
+        // Render products
+        function renderProducts() {
+            const grid = document.getElementById('products-grid');
+            const filteredProducts = currentCategory === 'all' 
+                ? products 
+                : products.filter(p => p.category === currentCategory);
+
+            grid.innerHTML = filteredProducts.map(product => `
+                <div class="product-card ${product.badge === 'popular' ? 'premium-glow' : ''}" data-category="${product.category}">
+                    ${product.badge ? `<div class="product-badge ${product.badge}">${product.badge}</div>` : ''}
+                    
+                    <div class="product-icon">
+                        <i class="${product.icon}"></i>
+                    </div>
+                    
+                    <h3 class="product-title">${product.title}</h3>
+                    <p class="product-description">${product.description}</p>
+                    
+                    <ul class="product-features">
+                        ${product.features.map(feature => `
+                            <li><i class="fas fa-check"></i> ${feature}</li>
+                        `).join('')}
+                    </ul>
+                    
+                    <div class="product-price">
+                        <div class="price">
+                            <span class="jcoin-price">${product.price} JCoins</span>
+                            ${product.originalPrice ? `<span class="original-price">${product.originalPrice} JCoins</span>` : ''}
+                        </div>
+                        ${product.originalPrice ? `<div class="discount">-${Math.round((1 - product.price / product.originalPrice) * 100)}%</div>` : ''}
+                    </div>
+                    
+                    <div class="product-actions">
+                        <button class="btn-primary" onclick="addToCart(${product.id})">
+                            <i class="fas fa-cart-plus"></i>
+                            Add to Cart
+                        </button>
+                        <button class="btn-secondary" onclick="toggleWishlist(${product.id})">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Setup category filters
+        function setupCategoryFilters() {
+            const buttons = document.querySelectorAll('.category-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.dataset.category;
+                    renderProducts();
+                });
+            });
+        }
+
+        // Add to cart
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                showNotification('Item already in cart!', 'error');
+                return;
+            }
+            
+            cart.push({
+                id: product.id,
+                title: product.title,
+                price: product.price,
+                icon: product.icon
+            });
+            
+            localStorage.setItem('jchat_cart', JSON.stringify(cart));
+            updateCartUI();
+            showNotification('Added to cart!', 'success');
+        }
+
+        // Remove from cart
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            localStorage.setItem('jchat_cart', JSON.stringify(cart));
+            updateCartUI();
+            showNotification('Removed from cart!', 'success');
+        }
+
+        // Update cart UI
+        function updateCartUI() {
+            const cartCount = document.getElementById('cart-count');
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            
+            cartCount.textContent = cart.length;
+            cartCount.style.display = cart.length > 0 ? 'flex' : 'none';
+            
+            if (cart.length === 0) {
+                cartItems.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>Your cart is empty</p>
+                    </div>
+                `;
+                cartTotal.textContent = '0 JCoins';
+                checkoutBtn.disabled = true;
+            } else {
+                const total = cart.reduce((sum, item) => sum + item.price, 0);
+                
+                cartItems.innerHTML = cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-icon">
+                            <i class="${item.icon}"></i>
+                        </div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-title">${item.title}</div>
+                            <div class="cart-item-price">${item.price} JCoins</div>
+                        </div>
+                        <button class="remove-item" onclick="removeFromCart(${item.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `).join('');
+                
+                cartTotal.textContent = `${total} JCoins`;
+                checkoutBtn.disabled = false;
+            }
+        }
+
+        // Toggle cart sidebar
+        function toggleCart() {
+            const cartSidebar = document.getElementById('cart-sidebar');
+            cartSidebar.classList.toggle('open');
+        }
+
+        // Checkout
+        function checkout() {
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const currentBalance = parseInt(document.getElementById('jcoin-balance').textContent.replace(',', ''));
+            
+            if (total > currentBalance) {
+                showNotification('Insufficient JCoins!', 'error');
+                return;
+            }
+            
+            // Simulate purchase
+            const newBalance = currentBalance - total;
+            document.getElementById('jcoin-balance').textContent = newBalance.toLocaleString();
+            
+            // Clear cart
+            cart = [];
+            localStorage.setItem('jchat_cart', JSON.stringify(cart));
+            updateCartUI();
+            toggleCart();
+            
+            showNotification('Purchase successful! Items have been added to your account.', 'success');
+            
+            // Store purchased items
+            const purchasedItems = JSON.parse(localStorage.getItem('jchat_purchased_items')) || [];
+            cart.forEach(item => {
+                if (!purchasedItems.find(p => p.id === item.id)) {
+                    purchasedItems.push(item);
+                }
+            });
+            localStorage.setItem('jchat_purchased_items', JSON.stringify(purchasedItems));
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notification-text');
+            
+            text.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Toggle wishlist (placeholder)
+        function toggleWishlist(productId) {
+            showNotification('Added to wishlist!', 'success');
+        }
+
+        // Close cart when clicking outside
+        document.addEventListener('click', function(e) {
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const cartBtn = document.querySelector('.cart-btn');
+            
+            if (cartSidebar.classList.contains('open') && 
+                !cartSidebar.contains(e.target) && 
+                !cartBtn.contains(e.target)) {
+                cartSidebar.classList.remove('open');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const cartSidebar = document.getElementById('cart-sidebar');
+                if (cartSidebar.classList.contains('open')) {
+                    cartSidebar.classList.remove('open');
+                }
+            }
+        });
+
+        // Search functionality (placeholder for future implementation)
+        function searchProducts(query) {
+            // This could be implemented to filter products by search query
+            console.log('Searching for:', query);
+        }
+    </script>
+</body>
+</html>
