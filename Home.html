@@ -2656,17 +2656,23 @@
         let pendingThemeProductIds = new Set();
         // Map Shop product IDs (themes category) to Home theme classes
         const productIdToThemeClass = {
-            1: 'theme-glass-mode',     // Neon Cyberpunk -> Glass vibe
-            2: 'theme-sunset-mode',    // Ocean Breeze -> Sunset vibe
-            3: 'theme-dark-mode',      // Dark Galaxy -> Dark (already free)
-            4: 'theme-light-mode'      // Minimalist Pro -> Light (already free)
+            1: 'theme-glass-mode',     // Neon Cyberpunk Theme
+            2: 'theme-sunset-mode',    // Ocean Breeze Theme
+            3: 'theme-dark-mode',      // Dark Galaxy Theme
+            4: 'theme-light-mode'      // Minimalist Pro Theme
+        };
+        const themeClassToProductId = {
+            'theme-glass-mode': 1,
+            'theme-sunset-mode': 2,
+            'theme-dark-mode': 3,
+            'theme-light-mode': 4,
         };
         // Catalog for picker UI
         const themeCatalog = [
-            { key: 'theme-dark-mode',  name: 'Dark',   free: true,  productId: 3 },
-            { key: 'theme-light-mode', name: 'Light',  free: true,  productId: 4 },
-            { key: 'theme-glass-mode', name: 'Glass',  free: false, productId: 1 },
-            { key: 'theme-sunset-mode',name: 'Sunset', free: false, productId: 2 },
+            { key: 'theme-dark-mode',  name: 'Dark Galaxy Theme',        free: true,  productId: 3 },
+            { key: 'theme-light-mode', name: 'Minimalist Pro Theme',     free: true,  productId: 4 },
+            { key: 'theme-glass-mode', name: 'Neon Cyberpunk Theme',     free: false, productId: 1 },
+            { key: 'theme-sunset-mode',name: 'Ocean Breeze Theme',       free: false, productId: 2 },
         ];
         let themePickerEl = null;
 
@@ -2755,15 +2761,22 @@
                             <span style="${stateStyle}">${state}</span>
                         </button>`;
             }).join('');
-            el.innerHTML = `<div style="padding:8px 8px 0 8px;font-weight:700">Themes</div>${rows}<div style="padding:8px;color:var(--text-light);font-size:.85rem;">Locked themes require purchase from the Shop.</div>`;
+            el.innerHTML = `<div style=\"padding:8px 8px 0 8px;font-weight:700\">Themes</div>${rows}<div style=\"padding:8px;color:var(--text-light);font-size:.85rem;\">Locked themes require purchase from the Shop.</div>`;
             el.querySelectorAll('button[data-theme]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const themeKey = btn.getAttribute('data-theme');
                     const locked = btn.hasAttribute('data-locked');
                     const pid = Number(btn.getAttribute('data-product-id')||'0');
                     if (locked) {
-                        // Redirect to Shop for this product
-                        window.location.href = 'Shop.html';
+                        // Redirect to Shop with preselect for this theme
+                        try {
+                            const pid = themeClassToProductId[themeKey];
+                            const url = new URL(window.location.origin + '/Shop.html');
+                            url.searchParams.set('select', String(pid));
+                            window.location.href = url.toString();
+                        } catch (_e) {
+                            window.location.href = 'Shop.html';
+                        }
                         if (typeof showMessageBox === 'function') {
                             showMessageBox('This theme is locked. Purchase it in the Shop to unlock.', 'warning');
                         }
