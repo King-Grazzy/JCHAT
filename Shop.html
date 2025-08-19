@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JCHAT - Shop</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
   <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
     :root {
       --pink: #ff2e92;
       --blue: #00d5ff;
@@ -29,7 +33,6 @@
       --button-background: linear-gradient(90deg, var(--blue), var(--pink));
       --button-shadow: 0 4px 15px var(--blue), 0 4px 15px var(--pink);
 
-      /* New variables for consistent theming */
       --background-color-primary: #1a1a2e;
       --background-color-secondary: #0f0f1f;
       --header-background-color: #2a2a4a;
@@ -37,37 +40,77 @@
       --content-background-color: #20203a;
       --card-background-color: #2a2a4a;
       --text-color-primary: #e0e0e0;
-      --text-color-secondary: #bbbbbb;
-      --notification-badge-color: #ff2e92;
-      --status-online: #4CAF50;
-      --status-offline: #6c757d;
-      --status-away: #FFC107;
-      --delete-button-color: #dc3545;
-      --warning-color: #ffc107;
-      --accent-color: #00d5ff; /* A bright cyan */
+      --text-color-secondary: #b0b0d0;
+      --accent-color: #00d5ff;
       --accent-color-dark: #00aaff;
       --border-color: #3a3a5a;
-
-      /* New Green for Play Button */
-      --play-button-green: linear-gradient(90deg, #4CAF50, #8BC34A); /* Green gradient */
-      --play-button-shadow: 0 4px 10px rgba(76, 175, 80, 0.4);
+      --theme-gold: #ffd700;
     }
 
-    /* Dark Mode */
-    body.theme-dark-mode {
-      --background-main: #1a1a2e; /* Deep purple-dark blue */
-      --background-gradient-1: #16213e; /* Slightly lighter deep blue */
-      --background-gradient-2: #0f3460; /* Darker blue */
-      --white: #e0e0e0; /* Off-white text */
-      --text-light: #a0a0a0; /* Grayish text */
-      --card-background: rgba(25, 25, 40, 0.7); /* Darker, less transparent cards */
-      --header-background: linear-gradient(135deg, rgba(10, 10, 20, .85), rgba(10, 10, 20, .75)); /* Original dark header */
-      --border-light: rgba(255, 255, 255, 0.08); /* Subtle white borders */
-      --input-background: rgba(255, 255, 255, 0.08);
-      --button-background: linear-gradient(90deg, #e94560, #ba2f49); /* Reddish gradient */
-      --button-shadow: 0 4px 15px rgba(233, 69, 96, 0.4), 0 4px 15px rgba(186, 47, 73, 0.4);
+    /* Theme Switcher Button (from Home) */
+    .theme-switcher-btn {
+      background: linear-gradient(45deg, rgba(0, 213, 255, 0.7), rgba(255, 46, 146, 0.7));
+      color: var(--white);
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.8rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .theme-switcher-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25); }
+    .theme-switcher-btn:active { transform: scale(0.98); }
 
-      /* New variables override for dark mode */
+    /* Light Mode (trimmed to relevant vars) */
+    body.theme-light-mode {
+      background: #f0f2f5 !important;
+      background-color: #f0f2f5 !important;
+      background-image: radial-gradient(circle at top left, #e0e2e5, transparent 100px),
+                        radial-gradient(circle at bottom right, #d0d2d5, transparent 150px) !important;
+      --background-main: #f0f2f5;
+      --background-gradient-1: #e0e2e5;
+      --background-gradient-2: #d0d2d5;
+      --white: #333;
+      --text-light: #666;
+      --card-background: rgba(255, 255, 255, 0.95);
+      --header-background: rgba(255, 255, 255, 0.98);
+      --border-light: rgba(0, 0, 0, 0.1);
+      --input-background: rgba(0, 0, 0, 0.05);
+      --button-background: linear-gradient(90deg, #6dd5ed, #2193b0);
+      --button-shadow: 0 4px 15px rgba(109, 213, 237, 0.4), 0 4px 15px rgba(33, 147, 176, 0.4);
+      --background-color-primary: #f0f2f5;
+      --background-color-secondary: #e0e2e5;
+      --header-background-color: #ffffff;
+      --footer-background-color: #ffffff;
+      --content-background-color: #f7f9fb;
+      --card-background-color: #ffffff;
+      --text-color-primary: #333333;
+      --text-color-secondary: #666666;
+      --border-color: #e0e0e0;
+    }
+
+    /* Dark Mode (default) */
+    body.theme-dark-mode {
+      background: #1a1a2e !important;
+      background-color: #1a1a2e !important;
+      background-image: radial-gradient(circle at top left, #16213e, transparent 100px),
+                        radial-gradient(circle at bottom right, #0f3460, transparent 150px) !important;
+      --background-main: #1a1a2e;
+      --background-gradient-1: #16213e;
+      --background-gradient-2: #0f3460;
+      --white: #e0e0e0;
+      --text-light: #a0a0a0;
+      --card-background: rgba(25, 25, 40, 0.7);
+      --header-background: linear-gradient(135deg, rgba(10, 10, 20, .85), rgba(10, 10, 20, .75));
+      --border-light: rgba(255, 255, 255, 0.08);
+      --input-background: rgba(255, 255, 255, 0.08);
+      --button-background: linear-gradient(90deg, #e94560, #ba2f49);
+      --button-shadow: 0 4px 15px rgba(233, 69, 96, 0.4), 0 4px 15px rgba(186, 47, 73, 0.4);
       --background-color-primary: #121212;
       --background-color-secondary: #1e1e1e;
       --header-background-color: #2c2c2c;
@@ -79,19 +122,9 @@
       --accent-color: #bb86fc;
       --accent-color-dark: #9a67ea;
       --border-color: #444444;
-      --input-background-color: #383838;
-      --button-background: #383838;
-      --button-hover-background: #505050;
-      --active-item-background: rgba(187, 134, 252, 0.2);
-      --notification-badge-color: #cf6679;
-      --delete-button-color: #f44336;
-      --warning-color: #ffeb3b;
     }
 
-    /* Always show scrollbar to prevent layout shifts */
-    html {
-      overflow-y: scroll;
-    }
+    html { overflow-y: scroll; }
 
     body {
       min-height: 100vh;
@@ -101,266 +134,138 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-x: hidden; /* Prevent horizontal scroll */
-      padding-bottom: 40px; /* Adjusted padding as bottom nav is removed */
+      overflow-x: hidden;
       background-color: var(--background-main);
       background-image: radial-gradient(circle at top left, var(--background-gradient-1), transparent 100px),
                         radial-gradient(circle at bottom right, var(--background-gradient-2), transparent 150px);
       color: var(--white);
-      transition: background-color 0.5s ease, color 0.5s ease; /* Smooth theme transition */
+      transition: background-color 0.5s ease, color 0.5s ease;
     }
 
-    /* Header Styling */
+    /* Header (copied from Home) */
     header {
       background: var(--header-background);
       border-bottom: 1px solid var(--border-light);
       padding: 10px 0;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 55px;
-      z-index: 10;
-      display: flex;
-      justify-content: center;
+      top: 0; left: 0; width: 100%; height: 55px; z-index: 10;
+      display: flex; justify-content: center;
     }
-
     header .header-content-wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      max-width: 1200px;
-      padding: 0 30px;
+      display: flex; justify-content: space-between; align-items: center;
+      width: 100%; max-width: 1200px; padding: 0 30px;
     }
-
     .logo {
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 800;
-      background-clip: text;
-      color: transparent;
+      font-family: 'Poppins', sans-serif; font-size: 1.8rem; font-weight: 800;
+      background-clip: text; color: transparent;
       background-image: linear-gradient(90deg, var(--blue), var(--pink));
-      letter-spacing: -0.03em;
-      text-decoration: none;
+      letter-spacing: -0.03em; text-decoration: none;
     }
+    header nav { display: none; }
+    .user-profile-header { display: flex; align-items: center; gap: 10px; }
 
-    /* Header Navigation (Removed as per user request) */
-    header nav ul {
-      display: none; /* Explicitly hide navigation */
-    }
-
-    /* User Profile Header Styling */
-    .user-profile-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* Cool Notification Icon Styling */
-    .notification-icon-wrapper {
-      position: relative;
-      margin-right: 15px;
-    }
-
+    .notification-icon-wrapper { position: relative; margin-right: 15px; }
     .notification-icon-wrapper a {
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      text-decoration: none; color: inherit; display: flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(15px);
+      transition: all 0.3s ease; position: relative; overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15), 0 0 20px rgba(255, 255, 255, 0.05);
     }
-
     .notification-icon-wrapper a::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
       transition: left 0.5s ease;
     }
-
-    .notification-icon-wrapper a:hover::before {
-      left: 100%;
-    }
-
+    .notification-icon-wrapper a:hover::before { left: 100%; }
     .notification-icon-wrapper a:hover {
       transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 8px 25px rgba(0, 213, 255, 0.3);
-      border-color: var(--blue);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3), 0 0 30px rgba(255, 142, 83, 0.2), 0 2px 12px rgba(0, 0, 0, 0.15);
+      border-color: rgba(255, 215, 0, 0.7);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
     }
-
     .notification-icon-wrapper i {
-      font-size: 1.3rem;
-      background: linear-gradient(45deg, #ffd700, #ff6b35, #ff8e53);
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
-      transition: all 0.3s ease;
-      z-index: 1;
-      position: relative;
+      font-size: 1.2rem; color: #ffffff; text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 15px rgba(255, 142, 83, 0.6);
+      transition: all 0.3s ease; z-index: 1; position: relative; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
     }
-
     .notification-icon-wrapper a:hover i {
-      transform: rotate(15deg) scale(1.1);
-      background: linear-gradient(45deg, #ff8e53, #ffd700, #ff6b35);
-      background-clip: text;
-      -webkit-background-clip: text;
+      transform: rotate(10deg) scale(1.05);
+      color: #ffdf00; text-shadow: 0 0 15px rgba(255, 223, 0, 0.9), 0 0 20px rgba(255, 142, 83, 0.8);
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
     }
-
     .notification-badge {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: linear-gradient(45deg, #ffd700, #ff6b35, #ff8e53);
-      color: #000;
-      border-radius: 50%;
-      padding: 4px 8px;
-      font-size: 0.7rem;
-      font-weight: 800;
-      min-width: 22px;
-      height: 22px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid var(--background-main);
-      animation: pulse-notification 2s infinite;
-      z-index: 2;
+      position: absolute; top: -8px; right: -8px;
+      background: linear-gradient(135deg, #ff4757, #ff3742); color: #ffffff;
+      border-radius: 50%; padding: 3px 7px; font-size: 0.75rem; font-weight: 900;
+      min-width: 20px; height: 20px; text-align: center;
+      box-shadow: 0 2px 8px rgba(255, 71, 87, 0.6), 0 0 0 2px #ffffff, 0 0 0 3px rgba(255, 71, 87, 0.3);
+      display: flex; align-items: center; justify-content: center; animation: pulse-notification 2s infinite; z-index: 2; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      line-height: 1;
     }
+    @keyframes pulse-notification { 0% { transform: scale(1);} 50% { transform: scale(1.05);} 100% { transform: scale(1);} }
+    .notification-badge:empty { display: none; }
+    .notification-icon-wrapper a:active { transform: scale(0.98); }
+    .notification-icon-wrapper.has-notifications a { box-shadow: 0 0 12px rgba(255, 215, 0, 0.3); }
+    .notification-icon-wrapper.has-notifications a:hover { box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4), 0 0 35px rgba(255, 215, 0, 0.6), 0 2px 12px rgba(0, 0, 0, 0.15); }
+    .notification-icon-wrapper.has-notifications i { animation: bell-shake 3s ease-in-out infinite; transform-origin: top; }
+    @keyframes bell-shake { 0%, 90%, 100% { transform: rotate(0deg);} 5%,15%,25%,35% { transform: rotate(10deg);} 10%,20%,30% { transform: rotate(-10deg);} 40%,50%,60%,70%,80% { transform: rotate(0deg);} }
+    .notification-icon-wrapper.has-notifications a:hover i { animation-play-state: paused; }
 
-    @keyframes pulse-notification {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    .notification-badge:empty {
-      display: none;
-    }
-
-    /* Additional cool effects for notification icon */
-    .notification-icon-wrapper a:active {
-      transform: scale(0.95);
-    }
-
-    /* Glow effect when there are notifications */
-    .notification-icon-wrapper.has-notifications a {
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-    }
-
-    .notification-icon-wrapper.has-notifications a:hover {
-      box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
-    }
-
-    /* Shaking animation for notification bell when there are unread notifications */
-    .notification-icon-wrapper.has-notifications i {
-      animation: bell-shake 3s ease-in-out infinite;
-      transform-origin: top;
-    }
-
-    @keyframes bell-shake {
-      0% { transform: rotate(0deg); }
-      25% { transform: rotate(15deg); }
-      50% { transform: rotate(0deg); }
-      75% { transform: rotate(-15deg); }
-      100% { transform: rotate(0deg); }
-    }
-
-    /* Admin Icon Styling */
     #adminIconLink {
-      display: none; /* Hidden by default */
-      margin-right: 15px; /* Space it out from other icons */
-      /* Apply gradient to icons */
+      display: none; margin-right: 15px;
       background-image: linear-gradient(90deg, var(--blue), var(--pink));
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent; /* Fallback */
-      font-size: 1.5rem;
-      transition: transform 0.2s ease;
+      background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
+      font-size: 1.5rem; transition: transform 0.2s ease;
     }
+    #adminIconLink:hover { transform: scale(1.05); }
 
-    #adminIconLink:hover {
-      transform: scale(1.1);
+    .user-profile-header #profileLink {
+      display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white);
+      transition: opacity 0.3s ease, background-color 0.3s ease; padding: 5px 10px; border-radius: var(--radius);
     }
+    .user-profile-header #profileLink:hover { opacity: 0.8; background-color: rgba(255, 255, 255, 0.1); }
+    .user-profile-header img { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent-color); box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: opacity 0.3s ease; }
+    .user-profile-header i { font-size: 30px; background-image: linear-gradient(90deg, var(--blue), var(--pink)); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+    .user-profile-header span { font-weight: 600; font-size: 1rem; white-space: nowrap; }
 
-    /* Sound Toggle */
-    .sound-toggle {
-      display: flex;
-      align-items: center;
-      margin-right: 15px;
-    }
-
-    .sound-toggle i {
-      font-size: 1.5rem;
-      color: var(--text-light);
-      cursor: pointer;
-      transition: color 0.3s ease;
-    }
-
-    .sound-toggle i.active {
-      background-image: linear-gradient(90deg, var(--blue), var(--pink));
-      background-clip: text;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    /* Main Content Area */
     main {
-      flex-grow: 1;
-      padding: 40px 0;
-      padding-top: 55px; /* Adjust for fixed header */
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start; /* Align content to top */
-      text-align: center;
+      flex-grow: 1; padding: 40px 0; padding-top: 55px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; text-align: center;
     }
   </style>
 </head>
 <body class="theme-dark-mode">
+
   <header>
     <div class="header-content-wrapper">
+      <!-- Sidebar Toggle Button in Header (presentational only here) -->
+      <button id="sidebarToggleFab" aria-label="Toggle Navigation">
+        <i class="fas fa-bars"></i>
+      </button>
       <a href="/home.html" class="logo">JCHAT</a>
-      <nav>
-        <ul>
-          <!-- Removed Home and Profile links from header navigation -->
-        </ul>
-      </nav>
-      <div class="user-profile-header">
+      <!-- Removed Header Navigation (Home, Profile) -->
+      <div class="user-profile-header" style="display:flex;align-items:center;gap:10px;">
+        <!-- Theme Switcher Button -->
+        <button id="themeSwitcherBtn" class="theme-switcher-btn" aria-label="Switch Theme">
+          <i class="fas fa-key"></i>
+        </button>
         <!-- Admin Icon Link (visible only to admin) -->
-        <a href="/coin_management.html" id="adminIconLink" aria-label="Admin Dashboard" style="display: none;">
+        <a href="/Admin.html" id="adminIconLink" aria-label="Admin Dashboard" style="display: none;">
           <i class="fas fa-user-cog"></i>
         </a>
-        <div class="notification-icon-wrapper">
-          <a href="notifications.html" aria-label="Notifications">
+        <!-- Notification Icon with Badge -->
+        <div class="notification-icon-wrapper" style="position:relative;">
+          <a href="/notifications.html" aria-label="Notifications">
             <i class="fas fa-bell"></i>
-            <span id="notificationCount" class="notification-badge" style="display: none;">0</span>
+            <span class="notification-badge" id="notificationCount">0</span>
           </a>
         </div>
-        <!-- Sound Toggle -->
-        <div class="sound-toggle">
-          <i id="soundToggleIcon" class="fas fa-volume-up active" title="Toggle Notification Sounds"></i>
-        </div>
-        <a href="Profile.html" id="profileLink">
-          <img id="headerProfilePic" src="" alt="Profile Picture" style="display: none;">
-          <i id="headerAvatarIcon" class="fas fa-user-circle"></i>
+        <!-- Profile Link with Picture and Name -->
+        <a href="./Profile.html" id="profileLink" aria-label="View Profile" style="display:flex;align-items:center;gap:8px;">
+          <img id="headerProfilePic" src="" alt="Profile Picture" style="display:none;width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--border-light);">
+          <i id="headerAvatarIcon" class="fas fa-user-circle" role="img" aria-label="User Avatar" style="font-size:28px;"></i>
           <span id="headerDisplayName">Loading...</span>
         </a>
       </div>
@@ -369,5 +274,167 @@
 
   <main>
   </main>
+
+  <script type="module">
+    // Firebase (align with Home)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+      apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+      authDomain: "jchat-1.firebaseapp.com",
+      projectId: "jchat-1",
+      storageBucket: "jchat-1.firebasestorage.app",
+      messagingSenderId: "328479683167",
+      appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+      measurementId: "G-S6Z9GG0R9P"
+    };
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? initialAuthToken : null;
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const ADMIN_UID = 'cc96gdhCRPO72NFZtleRCujHvIq2';
+    let isAuthReady = false;
+
+    let themeSwitcherBtn = null;
+    let headerProfilePic = null;
+    let headerAvatarIcon = null;
+    let headerDisplayName = null;
+    let notificationCountElement = null;
+    let adminIconLink = null;
+    let profileLink = null;
+
+    function initializeDOMRefs() {
+      themeSwitcherBtn = document.getElementById('themeSwitcherBtn');
+      headerProfilePic = document.getElementById('headerProfilePic');
+      headerAvatarIcon = document.getElementById('headerAvatarIcon');
+      headerDisplayName = document.getElementById('headerDisplayName');
+      notificationCountElement = document.getElementById('notificationCount');
+      adminIconLink = document.getElementById('adminIconLink');
+      profileLink = document.getElementById('profileLink');
+    }
+
+    // Theme switching (from Home, trimmed)
+    let currentTheme = 'theme-dark-mode';
+    function initializeThemeSwitcher() {
+      const savedTheme = localStorage.getItem('jchat-theme') || 'theme-dark-mode';
+      setTheme(savedTheme);
+      themeSwitcherBtn = document.getElementById('themeSwitcherBtn');
+      if (themeSwitcherBtn) themeSwitcherBtn.addEventListener('click', cycleTheme);
+    }
+    function cycleTheme() { setTheme(currentTheme === 'theme-dark-mode' ? 'theme-light-mode' : 'theme-dark-mode'); }
+    function setTheme(theme) {
+      const body = document.body;
+      body.classList.remove('theme-dark-mode', 'theme-light-mode', 'theme-sunset-mode');
+      body.classList.add(theme);
+      currentTheme = theme;
+      localStorage.setItem('jchat-theme', theme);
+      const icon = themeSwitcherBtn ? themeSwitcherBtn.querySelector('i') : null;
+      if (icon) icon.className = (theme === 'theme-light-mode') ? 'fas fa-sun' : 'fas fa-key';
+    }
+
+    // Notification badge (from Home)
+    function updateNotificationBadge(count) {
+      const notificationWrapper = document.querySelector('.notification-icon-wrapper');
+      const badge = document.getElementById('notificationCount');
+      if (badge && notificationWrapper) {
+        if (count > 0) {
+          badge.textContent = count > 99 ? '99+' : count.toString();
+          badge.style.display = 'flex';
+          notificationWrapper.classList.add('has-notifications');
+        } else {
+          badge.style.display = 'none';
+          notificationWrapper.classList.remove('has-notifications');
+        }
+      }
+    }
+
+    async function fetchNotificationCount(userId) {
+      if (!isAuthReady) return;
+      try {
+        const notificationsCollectionRef = collection(db, 'artifacts', appId, 'users', userId, 'notifications');
+        const q = query(notificationsCollectionRef, where('read', '==', false));
+        const querySnapshot = await getDocs(q);
+        const unreadCount = querySnapshot.size;
+        updateNotificationBadge(unreadCount);
+      } catch (error) {
+        console.error('JCHAT_ERROR: Error fetching notification count:', error);
+        updateNotificationBadge(0);
+      }
+    }
+
+    // Cloudinary helpers (from Home)
+    function getCloudinaryImageUrl(urlOrPublicId, transformations = "w_auto,f_auto,q_auto") {
+      if (!urlOrPublicId) return null;
+      if (urlOrPublicId.startsWith('http://') || urlOrPublicId.startsWith('https://')) {
+        if (urlOrPublicId.includes('res.cloudinary.com')) {
+          const parts = urlOrPublicId.split('/upload/');
+          if (parts.length === 2) {
+            const currentTransformations = parts[1].split('/')[0];
+            if (!currentTransformations.includes('w_')) {
+              return `${parts[0]}/upload/${transformations}/${parts[1]}`;
+            }
+            return urlOrPublicId;
+          }
+          return urlOrPublicId;
+        }
+        return urlOrPublicId;
+      }
+      return `https://res.cloudinary.com/dxld01rcp/image/upload/${transformations}/${urlOrPublicId}.jpg`;
+    }
+    function displayProfilePicture(imgElement, iconElement, profilePicId, usernameInitial, transformations) {
+      if (imgElement && iconElement) {
+        if (profilePicId) {
+          const imageUrl = getCloudinaryImageUrl(profilePicId, transformations);
+          imgElement.src = imageUrl;
+          imgElement.style.display = 'block';
+          iconElement.style.display = 'none';
+          imgElement.onerror = () => {
+            imgElement.src = `https://placehold.co/120x120/CCCCCC/000000?text=${usernameInitial}`;
+            imgElement.style.display = 'block';
+            iconElement.style.display = 'none';
+          };
+        } else {
+          imgElement.src = '';
+          imgElement.style.display = 'none';
+          iconElement.style.display = 'block';
+        }
+      }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      initializeDOMRefs();
+      if (user) {
+        isAuthReady = true;
+        const usernameInitial = (user.displayName || 'J').charAt(0).toUpperCase();
+        if (headerProfilePic && headerAvatarIcon && headerDisplayName) {
+          displayProfilePicture(headerProfilePic, headerAvatarIcon, user.photoURL, usernameInitial, 'w_70,h_70,c_fill,g_face,r_max');
+          headerDisplayName.textContent = user.displayName || 'JCHAT User';
+        }
+        if (profileLink) profileLink.href = `./Profile.html?userId=${user.uid}`;
+        if (adminIconLink) adminIconLink.style.display = (user.uid === ADMIN_UID) ? 'block' : 'none';
+        fetchNotificationCount(user.uid);
+      } else {
+        try {
+          if (initialAuthToken) {
+            await signInWithCustomToken(auth, initialAuthToken);
+          } else {
+            await signInAnonymously(auth);
+          }
+        } catch (error) {
+          console.error('Auth error:', error);
+        }
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initializeDOMRefs();
+      initializeThemeSwitcher();
+    });
+  </script>
 </body>
 </html>
