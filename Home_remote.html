@@ -3187,7 +3187,7 @@
                 const owned = t.free || purchasedThemeProductIds.has(t.productId);
                 const pending = !owned && pendingThemeProductIds.has(t.productId);
                 const active = currentTheme === t.key;
-                const state = owned ? (active ? 'Current' : 'Owned') : (pending ? 'Pending' : 'Locked');
+                const state = owned ? (active ? 'Current' : 'Owned') : (pending ? 'Pending' : `Buy ${formatPrice(t.price)}`);
                 const stateStyle = owned ? 'color:#7CFC00' : (pending ? 'color:#FFC107' : 'color:#ff9aa2');
                 const disabledAttr = owned ? '' : 'data-locked="true"';
                 const themeIcons = {
@@ -3202,7 +3202,7 @@
                             <span style="${stateStyle};font-weight:600;font-size:0.85em;">${state}</span>
                         </button>`;
             }).join('');
-            el.innerHTML = `<div style=\"padding:12px 12px 8px 12px;font-weight:700;color:var(--white);font-size:1.1rem;\">🎨 Choose Theme (${themeCatalog.length} Available)</div>${rows}<div style=\"padding:8px 12px;color:var(--text-light);font-size:.85rem;border-top:1px solid var(--border-light);margin-top:4px;\">Click any theme to apply it instantly!</div>`;
+            el.innerHTML = `<div style=\"padding:12px 12px 8px 12px;font-weight:700;color:var(--white);font-size:1.1rem;\">🎨 Choose Theme (${themeCatalog.length} Available) <span style=\"font-size:0.8rem;color:var(--text-light);font-weight:400;\">- Prices in ${userCurrency.symbol}${userCurrency.code}</span></div>${rows}<div style=\"padding:8px 12px;color:var(--text-light);font-size:.85rem;border-top:1px solid var(--border-light);margin-top:4px;\">Click any theme to apply it instantly!</div>`;
             el.querySelectorAll('button[data-theme]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const themeKey = btn.getAttribute('data-theme');
@@ -3229,11 +3229,20 @@
             });
         }
 
-        function openThemePicker() {
+        async function openThemePicker() {
             console.log('JCHAT_DEBUG: Opening theme picker with', themeCatalog.length, 'themes');
-            buildThemePickerList();
+            
+            // Show loading state first
             const el = ensureThemePicker();
             el.style.display = 'block';
+            el.innerHTML = `<div style=\"padding:20px;text-align:center;color:var(--text-light);\">🔄 Loading prices in your currency...</div>`;
+            
+            // Ensure currency detection is complete before building theme picker
+            if (!exchangeRates || Object.keys(exchangeRates).length <= 1) {
+                await fetchExchangeRates();
+            }
+            
+            buildThemePickerList();
             console.log('JCHAT_DEBUG: Theme picker element:', el);
             // Close on outside click
             const handler = (e) => {
