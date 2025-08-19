@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JCHAT - Premium Themes Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --pink: #ff2e92;
+      --blue: #00d5ff;
+      --bg: #0d0f13;
+      --card: rgba(255,255,255,0.03);
+      --text: #f5f7fa;
+      --muted: rgba(255,255,255,0.65);
+      --border: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at -10% -20%, rgba(0,213,255,0.12), transparent 60%),
+                  radial-gradient(1200px 800px at 110% 120%, rgba(255,46,146,0.12), transparent 60%),
+                  var(--bg);
+      min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px;
+    }
+    .container { width: 100%; max-width: 1200px; }
+    .header {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      margin: 8px 0 16px; padding: 12px 16px; border: 1px solid var(--border);
+      background: var(--card); border-radius: 14px; backdrop-filter: blur(8px);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo { font-family: Poppins, sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+    .logo .grad { background: linear-gradient(90deg, var(--blue), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .back { color: var(--text); text-decoration: none; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; display: inline-flex; align-items: center; gap: 8px; }
+    .grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    .card { border: 1px solid var(--border); background: var(--card); border-radius: 14px; padding: 14px; }
+    h1 { font-family: Poppins, sans-serif; font-weight: 800; margin: 0 0 8px; font-size: 1.6rem; }
+    .muted { color: var(--muted); font-size: 0.95rem; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 6px; }
+    .btn {
+      border: 1px solid var(--border); background: linear-gradient(90deg, rgba(0,213,255,0.12), rgba(255,46,146,0.12));
+      color: var(--text); padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn.primary { background: linear-gradient(90deg, var(--blue), var(--pink)); border-color: transparent; }
+    .btn.block { width: 100%; justify-content: center; }
+
+    .themes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 10px; }
+    .theme { 
+      border: 1px solid var(--border); background: rgba(255,255,255,0.02); border-radius: 12px; padding: 12px; 
+      display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: all 0.3s ease;
+    }
+    .theme:hover { border-color: var(--blue); background: rgba(0,213,255,0.05); }
+    .theme.selected { border-color: var(--pink); background: rgba(255,46,146,0.1); }
+    .theme input { accent-color: #25d366; width: 18px; height: 18px; }
+    .theme .name { font-weight: 700; font-size: 1.1rem; }
+    .theme .description { color: var(--muted); font-size: 0.85rem; }
+    .theme .price { font-weight: 800; color: #e6f4ff; background: rgba(0,213,255,0.12); border: 1px solid var(--border); border-radius: 999px; padding: 4px 8px; align-self: flex-start; }
+    .theme .preview { 
+      height: 60px; border-radius: 8px; margin: 4px 0; 
+      background: linear-gradient(45deg, var(--blue), var(--pink));
+      position: relative; overflow: hidden;
+    }
+    .theme .preview::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: inherit; opacity: 0.7;
+    }
+
+    .summary { display: grid; gap: 10px; }
+    .row { display: flex; align-items: center; gap: 10px; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); font-weight: 800; }
+    .copy { border: 1px solid var(--border); background: transparent; color: var(--text); border-radius: 10px; padding: 6px 8px; cursor: pointer; }
+
+    .info { border: 1px dashed var(--border); border-radius: 12px; padding: 10px; }
+    .bank { display: grid; gap: 10px; }
+    .bank .card { padding: 10px; }
+
+    input[type="file"] { display: block; }
+
+    .msg { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); padding: 10px 16px; border-radius: 10px; color: #fff; display: none; }
+    .msg.show { display: block; }
+    .msg.success { background: #16a34a; }
+    .msg.error { background: #dc2626; }
+    .msg.info { background: #2563eb; }
+
+    /* Pulse highlight for preselected items */
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(37,211,102,0.6)} 70%{box-shadow:0 0 0 10px rgba(37,211,102,0)} 100%{box-shadow:0 0 0 0 rgba(37,211,102,0)} }
+    .highlight { animation: pulse 1.6s ease-out 2; border-color: #25d366 !important; }
+
+    /* Receipt upload styles */
+    .file-input-wrapper { display:flex; align-items:center; gap:8px; border:1px dashed var(--border); padding:8px 10px; border-radius:10px; cursor:pointer; }
+    .file-input-wrapper i { color: var(--pink); }
+    .file-input-wrapper .file-name { font-size:.85rem; color:var(--muted); }
+    .receipt-preview { width:100%; max-height:160px; object-fit:contain; margin-top:8px; border:1px solid var(--border); border-radius:10px; }
+
+    /* Theme-specific preview styles */
+    .theme-preview-ocean { background: linear-gradient(45deg, #006994, #00b4d8, #90e0ef, #caf0f8); }
+    .theme-preview-forest { background: linear-gradient(45deg, #2d5016, #4a7c59, #6b8e23, #9acd32); }
+    .theme-preview-cosmic { background: linear-gradient(45deg, #1a0033, #4a0080, #8000ff, #b366ff); }
+    .theme-preview-retro { background: linear-gradient(45deg, #ff006e, #ff6b35, #f7931e, #ffd23f); }
+    .theme-preview-neon { background: linear-gradient(45deg, #00ff41, #00d4ff, #ff00ff, #ffff00); }
+    .theme-preview-elegant { background: linear-gradient(45deg, #d4af37, #ffd700, #f4e4bc, #fff8dc); }
+    .theme-preview-glass { background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2), rgba(255,255,255,0.1), rgba(255,255,255,0.05)); }
+    .theme-preview-sunset { background: linear-gradient(45deg, #ff7e5f, #feb47b, #ff6b6b, #ffa07a); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="brand">
+        <div class="logo"><span class="grad">JCHAT</span> Premium Themes</div>
+      </div>
+      <a class="back" href="/Home.html"><i class="fas fa-home"></i> Back to Home</a>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h1>Premium Themes Collection</h1>
+        <div class="muted">Transform your JCHAT experience with our exclusive premium themes. Each theme is carefully crafted for the ultimate visual experience.</div>
+        <div class="actions">
+          <button id="buyAllBtn" class="btn primary"><i class="fas fa-gem"></i> Buy All Premium Themes</button>
+          <button id="clearBtn" class="btn"><i class="fas fa-rotate-left"></i> Clear Selection</button>
+        </div>
+        <div class="themes" id="themes"></div>
+      </div>
+
+      <div class="card">
+        <h1>Checkout</h1>
+        <div class="summary">
+          <div class="row">
+            <div class="chip"><i class="fas fa-tag"></i> <span id="summaryAmount">₦0</span></div>
+            <div class="chip"><i class="fas fa-palette"></i> <span id="summaryCount">0 themes</span></div>
+          </div>
+          <div class="row">
+            <div><strong>Order ID:</strong> <span id="orderId"></span></div>
+            <button id="copyOrderId" class="copy"><i class="fas fa-copy"></i></button>
+          </div>
+          <div class="info">
+            <div class="muted" style="margin-bottom:6px">Step 1: Make a bank transfer using the details below. Use your Order ID as reference.</div>
+            <div class="bank">
+              <div class="card">
+                <div class="row" style="gap:8px"><i class="fas fa-university" style="color:#ffd700"></i><div><strong>Bank:</strong> OPay</div></div>
+                <div><strong>Account Name:</strong> ELECHI JOSHUA</div>
+                <div><strong>Account Number:</strong> <span id="opayAcct">8111609765</span> <button id="copyOpay" class="copy">Copy</button></div>
+              </div>
+              <div class="card">
+                <div class="row" style="gap:8px"><i class="fas fa-university" style="color:#ffd700"></i><div><strong>Bank:</strong> Keystone Bank</div></div>
+                <div><strong>Account Name:</strong> ELECHI OSOUNDU JOSHUA</div>
+                <div><strong>Account Number:</strong> <span id="keystoneAcct">6042862356</span> <button id="copyKeystone" class="copy">Copy</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="info">
+            <label for="receiptUploadInput" style="display:block; font-weight:700; margin-bottom:6px">Step 2: Upload payment receipt (optional)</label>
+            <div class="file-input-wrapper">
+              <input type="file" id="receiptUploadInput" accept="image/*,.pdf" style="display:none;">
+              <i class="fas fa-upload"></i>
+              <span class="file-name" id="receiptFileName">No file chosen</span>
+            </div>
+            <img id="receiptPreview" class="receipt-preview" style="display:none;">
+            <div id="checkoutError" class="muted" style="color:#ffb4b4"></div>
+          </div>
+          <button id="submitBtn" class="btn primary block"><span class="text">Submit Order</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="msg info">Info</div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+      apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+      authDomain: "jchat-1.firebaseapp.com",
+      projectId: "jchat-1",
+      storageBucket: "jchat-1.firebasestorage.app",
+      messagingSenderId: "328479683167",
+      appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+      measurementId: "G-S6Z9GG0R9P"
+    };
+    const cloudinaryConfig = { cloudName: "dxld01rcp", uploadPreset: "Storage_preset" };
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? initialAuthToken : null;
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // Premium themes catalog matching Home.html
+    const THEMES = [
+      { id: 1, key: 'theme-glass-mode', name: 'Diamond Glass', price: 9.99, description: 'Premium glass morphism with diamond-like effects', preview: 'glass' },
+      { id: 2, key: 'theme-sunset-mode', name: 'Sunset Luxe', price: 9.99, description: 'Luxurious sunset gradients with warm tones', preview: 'sunset' },
+      { id: 5, key: 'theme-ocean-mode', name: 'Aqua Marine Royale', price: 9.99, description: 'Deep ocean waves with premium animations', preview: 'ocean' },
+      { id: 6, key: 'theme-forest-mode', name: 'Enchanted Forest Elite', price: 12.99, description: 'Magical forest with mystical particle effects', preview: 'forest' },
+      { id: 7, key: 'theme-cosmic-mode', name: 'Cosmic Nebula Premier', price: 14.99, description: 'Premium space experience with stellar animations', preview: 'cosmic' },
+      { id: 8, key: 'theme-retro-mode', name: 'Synthwave Signature', price: 11.99, description: 'Authentic 80s synthwave with neon effects', preview: 'retro' },
+      { id: 9, key: 'theme-neon-mode', name: 'Cyber Matrix Royale', price: 13.99, description: 'Premium cyberpunk with matrix animations', preview: 'neon' },
+      { id: 10, key: 'theme-elegant-mode', name: 'Regal Gold Edition', price: 19.99, description: 'Luxury gold theme with premium shimmer effects', preview: 'elegant' }
+    ];
+
+    const themesEl = document.getElementById('themes');
+    const buyAllBtn = document.getElementById('buyAllBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const summaryAmount = document.getElementById('summaryAmount');
+    const summaryCount = document.getElementById('summaryCount');
+    const orderIdEl = document.getElementById('orderId');
+    const copyOrderIdBtn = document.getElementById('copyOrderId');
+    const copyOpay = document.getElementById('copyOpay');
+    const copyKeystone = document.getElementById('copyKeystone');
+    const submitBtn = document.getElementById('submitBtn');
+    const checkoutError = document.getElementById('checkoutError');
+    const toast = document.getElementById('toast');
+    const receiptUploadInput = document.getElementById('receiptUploadInput');
+    const receiptFileNameSpan = document.getElementById('receiptFileName');
+    const receiptPreviewImg = document.getElementById('receiptPreview');
+    let selectedReceiptFile = null;
+    
+    if (receiptUploadInput) {
+      const fileInputWrapper = document.querySelector('.file-input-wrapper');
+      fileInputWrapper?.addEventListener('click', () => receiptUploadInput.click());
+      receiptUploadInput.addEventListener('change', handleReceiptUpload);
+    }
+
+    let currentUser = null;
+
+    function showToast(message, type = 'info') {
+      toast.textContent = message;
+      toast.className = `msg show ${type}`;
+      setTimeout(() => { toast.className = 'msg'; }, 2500);
+    }
+
+    // Play transaction sound
+    async function playTransactionSound() {
+      try {
+        const audio = new Audio('ne.mp3');
+        audio.volume = 0.7;
+        await audio.play();
+        return;
+      } catch (_) {
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.value = 880;
+          gain.gain.value = 0.0001;
+          osc.connect(gain).connect(ctx.destination);
+          osc.start();
+          gain.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.15);
+          osc.stop(ctx.currentTime + 0.16);
+        } catch {}
+      }
+    }
+
+    function generateOrderId() {
+      const ts = Date.now().toString(36).toUpperCase();
+      const rand = Math.random().toString(36).substring(2, 6).toUpperCase();
+      return `THEME-${ts}-${rand}`;
+    }
+    
+    function getSelectedThemeIds() {
+      return Array.from(document.querySelectorAll('.theme input[type="checkbox"]:checked')).map(i => i.value);
+    }
+    
+    function updateSummary() {
+      const selectedIds = getSelectedThemeIds();
+      const selectedThemes = THEMES.filter(t => selectedIds.includes(t.id.toString()));
+      const total = selectedThemes.reduce((sum, t) => sum + t.price, 0);
+      summaryAmount.textContent = `₦${total.toLocaleString('en-NG')}`;
+      summaryCount.textContent = `${selectedThemes.length} ${selectedThemes.length === 1 ? 'theme' : 'themes'}`;
+      if (!orderIdEl.textContent) orderIdEl.textContent = generateOrderId();
+    }
+
+    function renderThemes() {
+      themesEl.innerHTML = '';
+      for (const t of THEMES) {
+        const div = document.createElement('label');
+        div.className = 'theme';
+        div.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" value="${t.id}">
+            <div style="flex:1;">
+              <div class="name">${t.name}</div>
+              <div class="description">${t.description}</div>
+            </div>
+            <div class="price">₦${t.price}</div>
+          </div>
+          <div class="preview theme-preview-${t.preview}"></div>
+        `;
+        div.querySelector('input').addEventListener('change', updateSummary);
+        themesEl.appendChild(div);
+      }
+    }
+
+    buyAllBtn.addEventListener('click', () => {
+      document.querySelectorAll('.theme input[type="checkbox"]').forEach(chk => chk.checked = true);
+      orderIdEl.textContent = generateOrderId();
+      updateSummary();
+    });
+    
+    clearBtn.addEventListener('click', () => {
+      document.querySelectorAll('.theme input[type="checkbox"]').forEach(chk => chk.checked = false);
+      orderIdEl.textContent = '';
+      updateSummary();
+    });
+
+    copyOrderIdBtn.addEventListener('click', () => {
+      const t = orderIdEl.textContent || '';
+      if (!t) return;
+      navigator.clipboard.writeText(t).then(() => showToast('Order ID copied', 'success'));
+    });
+    
+    copyOpay.addEventListener('click', () => {
+      const t = document.getElementById('opayAcct').textContent || '';
+      if (t) navigator.clipboard.writeText(t).then(() => showToast('OPay account copied', 'success'));
+    });
+    
+    copyKeystone.addEventListener('click', () => {
+      const t = document.getElementById('keystoneAcct').textContent || '';
+      if (t) navigator.clipboard.writeText(t).then(() => showToast('Keystone account copied', 'success'));
+    });
+
+    async function handleReceiptUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        selectedReceiptFile = file;
+        if (receiptFileNameSpan) receiptFileNameSpan.textContent = file.name;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (receiptPreviewImg) { receiptPreviewImg.src = e.target.result; receiptPreviewImg.style.display = 'block'; }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        selectedReceiptFile = null;
+        if (receiptFileNameSpan) receiptFileNameSpan.textContent = 'No file chosen';
+        if (receiptPreviewImg) { receiptPreviewImg.style.display = 'none'; receiptPreviewImg.src = ''; }
+      }
+    }
+
+    async function submitOrder() {
+      checkoutError.textContent = '';
+      const selected = getSelectedThemeIds();
+      if (selected.length === 0) { checkoutError.textContent = 'Please select at least one theme.'; return; }
+      
+      const orderId = orderIdEl.textContent || generateOrderId();
+      const selectedThemes = THEMES.filter(t => selected.includes(t.id.toString()));
+      const total = selectedThemes.reduce((sum, t) => sum + t.price, 0);
+      
+      let uploadedReceiptUrl = null;
+      if (selectedReceiptFile) {
+        try {
+          const formData = new FormData();
+          formData.append('file', selectedReceiptFile);
+          formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+          const resp = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/image/upload`, { method:'POST', body: formData });
+          if (!resp.ok) throw new Error('Receipt upload failed');
+          const data = await resp.json();
+          uploadedReceiptUrl = data.secure_url;
+        } catch (e) {
+          console.error('Cloudinary upload failed:', e);
+        }
+      }
+      
+      if (!currentUser) { showToast('Please log in.', 'error'); return; }
+
+      try {
+        submitBtn.disabled = true; submitBtn.querySelector('.text').textContent = 'Submitting...';
+
+        // Cap UI waiting time to 3 seconds max
+        let finalized = false;
+        const finalizeUI = () => {
+          if (finalized) return;
+          finalized = true;
+          submitBtn.disabled = false; submitBtn.querySelector('.text').textContent = 'Submit Order';
+          showToast('Order submitted. Complete transfer and wait for approval.', 'success');
+          playTransactionSound();
+          orderIdEl.textContent = generateOrderId();
+          if (receiptUploadInput) receiptUploadInput.value = '';
+        };
+        const uiTimeout = setTimeout(finalizeUI, 3000);
+
+        // Create shop payment request for theme purchases
+        const paymentRequestRef = doc(collection(db, 'artifacts', appId, 'public', 'data', 'shop_payment_requests'));
+        const paymentData = {
+          orderId,
+          userId: currentUser.uid,
+          paymentMethod: 'bank_transfer',
+          nairaAmount: total,
+          jcoinAmount: 0,
+          status: 'pending',
+          timestamp: serverTimestamp(),
+          assignedAdminId: 'cc96gdhCRPO72NFZtleRCujHvIq2',
+          items: selectedThemes.map(t => ({
+            id: t.id,
+            title: t.name,
+            price: t.price,
+            category: 'premium_theme',
+            key: t.key
+          })),
+          ...(uploadedReceiptUrl ? { receiptUrl: uploadedReceiptUrl } : {})
+        };
+        await setDoc(paymentRequestRef, paymentData);
+
+        // Finalize UI now (or by timeout if already elapsed)
+        clearTimeout(uiTimeout);
+        finalizeUI();
+
+      } catch (e) {
+        console.error(e);
+        checkoutError.textContent = e?.message || 'Failed to submit order';
+      } finally {
+        // UI finalized above (either immediately or by timeout)
+      }
+    }
+
+    submitBtn.addEventListener('click', submitOrder);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        currentUser = user;
+      } else {
+        try {
+          if (initialAuthToken) {
+            await signInWithCustomToken(auth, initialAuthToken);
+          } else {
+            await signInAnonymously(auth);
+          }
+        } catch (_) { /* ignore */ }
+      }
+    });
+
+    renderThemes();
+    updateSummary();
+
+    // Preselect from URL params ?select=1,2,5
+    (function preselectFromUrl(){
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const raw = (params.get('select') || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (raw.length === 0) return;
+        let firstEl = null;
+        const items = Array.from(themesEl.querySelectorAll('.theme'));
+        items.forEach((div) => {
+          const inp = div.querySelector('input[type="checkbox"]');
+          if (!inp) return;
+          if (raw.includes(inp.value)) {
+            inp.checked = true;
+            div.classList.add('highlight');
+            if (!firstEl) firstEl = div;
+          }
+        });
+        updateSummary();
+        if (firstEl) firstEl.scrollIntoView({behavior:'smooth', block:'center'});
+      } catch (_) {}
+    })();
+  </script>
+</body>
+</html>
