@@ -950,7 +950,7 @@
                             emailPublic: false, allowFriendRequests: true, allowMessages: true,
                         },
                         totalPosts: 0,
-                        jCoins: 1000, // Starting balance for premium themes
+                        jCoins: 100, // Starting balance for premium themes
                         gas: 0,
                         level: 1,
                         currentXp: 0,
@@ -959,7 +959,7 @@
                         inCall: false,
                         ownedThemes: []
                     });
-                    userBalance = 1000;
+                    userBalance = 100;
                     ownedThemes = [];
                 }
                 updateUserBalance();
@@ -980,30 +980,75 @@
                     const defaultThemes = [
                         {
                             id: 'theme1',
-                            name: 'Midnight Blue',
-                            description: 'A sleek dark theme with blue accents',
-                            price: 150,
-                            category: 'dark',
-                            image: 'https://via.placeholder.com/300x200/1e3a8a/ffffff?text=Midnight+Blue',
-                            features: ['Dark mode', 'Blue accents', 'Professional look']
+                            name: 'Diamond Glass',
+                            description: 'Premium glass morphism with diamond-like effects',
+                            price: 19.99,
+                            category: 'premium',
+                            image: 'https://via.placeholder.com/300x200/00d5ff/ffffff?text=Diamond+Glass',
+                            features: ['Glass morphism', 'Diamond effects', 'Premium animations']
                         },
                         {
                             id: 'theme2',
-                            name: 'Sunset Glow',
-                            description: 'Warm orange and red gradient theme',
-                            price: 200,
-                            category: 'gradient',
-                            image: 'https://via.placeholder.com/300x200/f97316/ffffff?text=Sunset+Glow',
-                            features: ['Gradient background', 'Warm colors', 'Modern design']
+                            name: 'Sunset Luxe',
+                            description: 'Luxurious sunset gradients with warm tones',
+                            price: 17.99,
+                            category: 'premium',
+                            image: 'https://via.placeholder.com/300x200/ff7e5f/ffffff?text=Sunset+Luxe',
+                            features: ['Sunset gradients', 'Warm tones', 'Luxury feel']
                         },
                         {
                             id: 'theme3',
-                            name: 'Forest Green',
-                            description: 'Nature-inspired green theme',
-                            price: 180,
-                            category: 'nature',
-                            image: 'https://via.placeholder.com/300x200/16a34a/ffffff?text=Forest+Green',
-                            features: ['Green palette', 'Nature inspired', 'Calming']
+                            name: 'Aqua Marine Royale',
+                            description: 'Deep ocean waves with premium animations',
+                            price: 24.99,
+                            category: 'premium',
+                            image: 'https://via.placeholder.com/300x200/006994/ffffff?text=Aqua+Marine',
+                            features: ['Ocean waves', 'Premium animations', 'Deep blue']
+                        },
+                        {
+                            id: 'theme4',
+                            name: 'Enchanted Forest Elite',
+                            description: 'Magical forest with mystical particle effects',
+                            price: 29.99,
+                            category: 'premium',
+                            image: 'https://via.placeholder.com/300x200/2d5016/ffffff?text=Enchanted+Forest',
+                            features: ['Mystical effects', 'Forest theme', 'Particle animations']
+                        },
+                        {
+                            id: 'theme5',
+                            name: 'Cosmic Nebula Premier',
+                            description: 'Premium space experience with stellar animations',
+                            price: 34.99,
+                            category: 'premium',
+                            image: 'https://via.placeholder.com/300x200/1a0033/ffffff?text=Cosmic+Nebula',
+                            features: ['Space theme', 'Stellar animations', 'Premium experience']
+                        },
+                        {
+                            id: 'theme6',
+                            name: 'Synthwave Signature',
+                            description: 'Authentic 80s synthwave with neon effects',
+                            price: 22.99,
+                            category: 'premium',
+                            image: 'https://via.placeholder.com/300x200/ff006e/ffffff?text=Synthwave',
+                            features: ['80s synthwave', 'Neon effects', 'Retro feel']
+                        },
+                        {
+                            id: 'theme7',
+                            name: 'Cyber Matrix Royale',
+                            description: 'Premium cyberpunk with matrix animations',
+                            price: 27.99,
+                            category: 'premium',
+                            image: 'https://via.placeholder.com/300x200/00ff41/ffffff?text=Cyber+Matrix',
+                            features: ['Cyberpunk', 'Matrix effects', 'Premium animations']
+                        },
+                        {
+                            id: 'theme8',
+                            name: 'Regal Gold Edition',
+                            description: 'Luxury gold theme with premium shimmer effects',
+                            price: 39.99,
+                            category: 'premium',
+                            image: 'https://via.placeholder.com/300x200/d4af37/ffffff?text=Regal+Gold',
+                            features: ['Gold theme', 'Shimmer effects', 'Luxury design']
                         }
                     ];
 

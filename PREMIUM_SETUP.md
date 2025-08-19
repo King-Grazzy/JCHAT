@@ -49,7 +49,7 @@ Your Profile.html now has a **complete premium unlock system** that:
 Edit the list in the HTML:
 ```html
 <ul>
-    <li>✨ 10+ Premium Themes</li>
+    <li>✨ 8 Premium Themes (₦17.99 - ₦39.99 each)</li>
     <li>🎨 Custom Profile Colors</li>
     <li>🚫 No Watermarks</li>
     <li>🎯 Priority Support</li>
