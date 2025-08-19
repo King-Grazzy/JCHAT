@@ -1229,7 +1229,7 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, runTransaction, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -1254,6 +1254,7 @@
         let userProfile = null;
         let cart = [];
         let currentCategory = 'all';
+        let pendingItemIds = new Set();
 
         // Product data
         const products = [
@@ -1598,6 +1599,24 @@
                 await loadUserCart();
                 await loadUserPurchases();
                 initializeShop();
+                // Subscribe to pending shop payment requests for this user
+                try {
+                    const reqCol = collection(db, "artifacts", appId, "public", "data", "shop_payment_requests");
+                    const qRef = query(reqCol, where('userId', '==', currentUser.uid), where('status', '==', 'pending'));
+                    onSnapshot(qRef, (snap) => {
+                        const next = new Set();
+                        snap.forEach(docSnap => {
+                            const r = docSnap.data();
+                            if (Array.isArray(r.items)) {
+                                r.items.forEach(it => { if (it && typeof it.id === 'number') next.add(it.id); });
+                            }
+                        });
+                        pendingItemIds = next;
+                        renderProducts();
+                    });
+                } catch (e) {
+                    console.warn('Pending requests subscription failed:', e);
+                }
             } else {
                 // Redirect to login if not authenticated
                 showNotification('Please log in to access the shop', 'error');
@@ -1771,12 +1790,13 @@
 
             grid.innerHTML = filteredProducts.map(product => {
                 const isPurchased = window.purchasedItemIds && window.purchasedItemIds.includes(product.id);
+                const isPending = pendingItemIds.has(product.id);
                 const isInCart = cart.some(item => item.id === product.id);
                 
                 return `
                     <div class="product-card ${product.badge === 'popular' ? 'premium-glow' : ''} ${isPurchased ? 'purchased' : ''}" data-category="${product.category}">
                         ${product.badge ? `<div class="product-badge ${product.badge}">${product.badge}</div>` : ''}
-                        ${isPurchased ? `<div class="product-badge purchased">owned</div>` : ''}
+                        ${isPurchased ? `<div class="product-badge purchased">owned</div>` : (isPending ? `<div class="product-badge" style="background:#FFC107;color:#000;">pending</div>` : '')}
                         
                         <div class="product-icon">
                             <i class="${product.icon}"></i>
@@ -1806,11 +1826,11 @@
                                     Owned
                                 </button>
                             ` : `
-                                <button class="btn-primary" onclick="addToCart(${product.id})" ${isInCart ? 'disabled style="opacity: 0.5;"' : ''}>
+                                <button class="btn-primary" onclick="addToCart(${product.id})" ${isInCart || isPending ? 'disabled style="opacity: 0.5;"' : ''}>
                                     <i class="fas fa-cart-plus"></i>
-                                    ${isInCart ? 'In Cart' : 'Add to Cart'}
+                                    ${isPending ? 'Pending' : (isInCart ? 'In Cart' : 'Add to Cart')}
                                 </button>
-                                <button class="btn-secondary" onclick="openSingleItemPayment(${product.id})">
+                                <button class="btn-secondary" onclick="openSingleItemPayment(${product.id})" ${isPending ? 'disabled style="opacity:0.5;"' : ''}>
                                     <i class="fas fa-file-invoice"></i>
                                     Pay with Receipt
                                 </button>
@@ -1849,6 +1869,10 @@
             
             if (existingItem) {
                 showNotification('Item already in cart!', 'error');
+                return;
+            }
+            if (pendingItemIds.has(productId)) {
+                showNotification('This item has a pending payment request. Please wait for approval.', 'warning');
                 return;
             }
             
