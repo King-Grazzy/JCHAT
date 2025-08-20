@@ -648,6 +648,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        console.log('JCHAT_DEBUG: JCoin Store script loaded');
+
         const headerProfilePic = document.getElementById('headerProfilePic');
         const headerAvatarIcon = document.getElementById('headerAvatarIcon');
         const headerDisplayName = document.getElementById('headerDisplayName');
@@ -749,41 +751,47 @@
         }
 
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                try {
-                    await fetchAndDisplayHeaderProfile(user);
-                    const prof = await getUserProfile(user.uid);
-                    currentUserProfileData = prof;
-                    currentJCoinsEl.textContent = String(prof?.jCoins || 0);
+            try {
+                if (user) {
+                    currentUser = user;
                     try {
-                        const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
-                        const s = await getDoc(settingsRef);
-                        const rate = s.exists() ? (s.data().jcoinNairaRate || 0) : 0;
-                        nairaPerJEl.textContent = String(rate);
-                    } catch (_) { nairaPerJEl.textContent = '—'; }
-                    setUserCurrencyFromProfile(prof || {});
-                    orderId = generateOrderId();
-                    orderIdValueEl.textContent = orderId;
-                } catch (error) {
-                    displayProfilePicture(headerProfilePic, headerAvatarIcon, user.photoURL, (user.displayName || 'J').charAt(0).toUpperCase(), 'w_70,h_70,c_fill,g_face,r_max');
-                    headerDisplayName.textContent = user.displayName || 'JCHAT User';
-                    showMessage(`Error loading header profile: ${error.message}`, 'error');
-                }
-            } else {
-                currentUser = null;
-                headerDisplayName.textContent = 'Guest';
-                headerAvatarIcon.style.display = 'block';
-                headerProfilePic.style.display = 'none';
-                // Anonymous sign-in for access
-                try {
-                    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        await signInAnonymously(auth);
+                        await fetchAndDisplayHeaderProfile(user);
+                        const prof = await getUserProfile(user.uid);
+                        currentUserProfileData = prof;
+                        currentJCoinsEl.textContent = String(prof?.jCoins || 0);
+                        try {
+                            const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
+                            const s = await getDoc(settingsRef);
+                            const rate = s.exists() ? (s.data().jcoinNairaRate || 0) : 0;
+                            nairaPerJEl.textContent = String(rate);
+                        } catch (_) { nairaPerJEl.textContent = '—'; }
+                        setUserCurrencyFromProfile(prof || {});
+                        orderId = generateOrderId();
+                        orderIdValueEl.textContent = orderId;
+                    } catch (error) {
+                        displayProfilePicture(headerProfilePic, headerAvatarIcon, user.photoURL, (user.displayName || 'J').charAt(0).toUpperCase(), 'w_70,h_70,c_fill,g_face,r_max');
+                        headerDisplayName.textContent = user.displayName || 'JCHAT User';
+                        showMessage(`Error loading header profile: ${error.message}`, 'error');
                     }
-                } catch (_) {}
+                } else {
+                    currentUser = null;
+                    headerDisplayName.textContent = 'Guest';
+                    headerAvatarIcon.style.display = 'block';
+                    headerProfilePic.style.display = 'none';
+                    // Anonymous sign-in for access
+                    try {
+                        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (e) {
+                        showMessage('Auth initialization failed', 'error');
+                    }
+                }
+            } catch (fatal) {
+                showMessage('Unexpected error. Reload the page.', 'error');
             }
         });
 
