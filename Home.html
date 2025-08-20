@@ -866,6 +866,14 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
+        /* Stop theme animations (disable moving effects) */
+        body[class*="theme-"] *,
+        body[class*="theme-"]::before,
+        body[class*="theme-"]::after {
+            animation: none !important;
+            animation-play-state: paused !important;
+        }
+
         body {
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
