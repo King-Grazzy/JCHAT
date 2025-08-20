@@ -173,6 +173,10 @@
         <div class="muted">Transform your JCHAT experience with our exclusive premium themes. Each theme is carefully crafted for the ultimate visual experience.</div>
         <div class="actions">
           <button id="buyAllBtn" class="btn primary"><i class="fas fa-gem"></i> Buy All Premium Themes</button>
+          <button id="buyAllBestValueBtn" class="btn" style="position:relative;">
+            <span class="best-value-badge" style="position:absolute; top:-8px; right:-8px; background: linear-gradient(90deg, #22c55e, #16a34a); color:#0d0f13; padding:2px 6px; border-radius:999px; font-weight:800; font-size:.7rem;">Best Value</span>
+            <i class="fas fa-bolt"></i> <span id="buyAllBestValueText">All Premium – Save 35%</span>
+          </button>
           <button id="clearBtn" class="btn"><i class="fas fa-rotate-left"></i> Clear Selection</button>
         </div>
         <div class="themes" id="themes"></div>
@@ -705,6 +709,12 @@
           chk.checked = true;
         }
       });
+      // Clear VIP and coupons when using base 'Buy All' (still benefits from bulk)
+      const vipChecked = document.querySelector('input[name="vipPass"]:checked');
+      if (vipChecked) vipChecked.checked = false;
+      appliedCouponCode = null; appliedCouponPercent = 0;
+      const couponMessage = document.getElementById('couponMessage');
+      if (couponMessage) couponMessage.textContent = '';
       orderIdEl.textContent = generateOrderId();
       updateSummary();
     });
@@ -714,6 +724,23 @@
       orderIdEl.textContent = '';
       updateSummary();
     });
+
+    // Best Value: select all premium, clear coupons, clear VIP, rely on built-in 35% bulk
+    const buyAllBestValueBtn = document.getElementById('buyAllBestValueBtn');
+    if (buyAllBestValueBtn) {
+      buyAllBestValueBtn.addEventListener('click', () => {
+        document.querySelectorAll('.theme input[type="checkbox"]').forEach(chk => {
+          if (!chk.disabled) chk.checked = true;
+        });
+        const vipChecked = document.querySelector('input[name="vipPass"]:checked');
+        if (vipChecked) vipChecked.checked = false;
+        appliedCouponCode = null; appliedCouponPercent = 0;
+        if (couponInput) couponInput.value = '';
+        if (couponMessage) { couponMessage.textContent = 'All premium selected. Best Value 35% applied automatically.'; couponMessage.style.color = '#86efac'; }
+        orderIdEl.textContent = generateOrderId();
+        updateSummary();
+      });
+    }
 
     copyOrderIdBtn.addEventListener('click', () => {
       const t = orderIdEl.textContent || '';
