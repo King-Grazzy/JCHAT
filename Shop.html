@@ -214,16 +214,19 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // Premium themes catalog matching Home.html
+    // Premium themes catalog matching Home2.html exactly
     const THEMES = [
-      { id: 1, key: 'theme-glass-mode', name: 'Diamond Glass', price: 1500, description: 'Premium glass morphism with diamond-like effects', preview: 'glass' },
-      { id: 2, key: 'theme-sunset-mode', name: 'Sunset Luxe', price: 1800, description: 'Luxurious sunset gradients with warm tones', preview: 'sunset' },
-      { id: 5, key: 'theme-ocean-mode', name: 'Aqua Marine Royale', price: 2200, description: 'Deep ocean waves with premium animations', preview: 'ocean' },
-      { id: 6, key: 'theme-forest-mode', name: 'Enchanted Forest Elite', price: 2500, description: 'Magical forest with mystical particle effects', preview: 'forest' },
-      { id: 7, key: 'theme-cosmic-mode', name: 'Cosmic Nebula Premier', price: 3000, description: 'Premium space experience with stellar animations', preview: 'cosmic' },
-      { id: 8, key: 'theme-retro-mode', name: 'Synthwave Signature', price: 2000, description: 'Authentic 80s synthwave with neon effects', preview: 'retro' },
-      { id: 9, key: 'theme-neon-mode', name: 'Cyber Matrix Royale', price: 2400, description: 'Premium cyberpunk with matrix animations', preview: 'neon' },
-      { id: 10, key: 'theme-elegant-mode', name: 'Regal Gold Edition', price: 3500, description: 'Luxury gold theme with premium shimmer effects', preview: 'elegant' }
+      { id: 1, key: 'theme-ocean-mode', name: 'Ocean Theme', price: 499, description: 'Premium deep waters with animated waves', preview: 'ocean' },
+      { id: 2, key: 'theme-forest-mode', name: 'Forest Theme', price: 499, description: 'Premium enchanted woods with particle effects', preview: 'forest' },
+      { id: 3, key: 'theme-cosmic-mode', name: 'Cosmic Theme', price: 499, description: 'Premium nebula with stellar animation', preview: 'cosmic' },
+      { id: 4, key: 'theme-retro-mode', name: 'Retro Theme', price: 499, description: 'Premium 80s synthwave with grid animation', preview: 'retro' },
+      { id: 5, key: 'theme-neon-mode', name: 'Neon Theme', price: 499, description: 'Premium digital matrix with code rain', preview: 'neon' },
+      { id: 6, key: 'theme-elegant-mode', name: 'Elegant Theme', price: 499, description: 'Premium luxury with golden shimmer', preview: 'elegant' },
+      { id: 7, key: 'theme-quantum-nexus', name: '🌌 Quantum Nexus', price: 499, description: 'Premium particle physics simulation with quantum effects', preview: 'quantum' },
+      { id: 8, key: 'theme-holographic-matrix', name: '🎭 Holographic Matrix', price: 499, description: 'Premium 3D holographic projection with matrix effects', preview: 'holographic' },
+      { id: 9, key: 'theme-stellar-genesis', name: '🌟 Stellar Genesis', price: 499, description: 'Premium cosmic birth simulation with stellar evolution', preview: 'stellar' },
+      { id: 10, key: 'theme-circus-maximus', name: '🎪 Circus Maximus', price: 499, description: 'Premium interactive performance theater with circus physics', preview: 'circus' },
+      { id: 11, key: 'theme-temporal-paradox', name: '🔮 Temporal Paradox', price: 499, description: 'Premium time manipulation interface with temporal effects', preview: 'temporal' }
     ];
 
     // Currency configuration

@@ -3812,23 +3812,23 @@
         let currentTheme = 'theme-dark-mode'; // Default theme
         const themeSwitcherThemes = ['theme-light-mode', 'theme-dark-mode', 'theme-sunset-mode', 'theme-glass-mode', 'theme-ocean-mode', 'theme-forest-mode', 'theme-cosmic-mode', 'theme-retro-mode', 'theme-neon-mode', 'theme-elegant-mode', 'theme-quantum-nexus', 'theme-holographic-matrix', 'theme-stellar-genesis', 'theme-circus-maximus', 'theme-temporal-paradox'];
         
-        // Theme catalog with pricing and product IDs - ALL THEMES UNLOCKED
+        // Theme catalog with pricing and product IDs - Premium themes locked
         const themeCatalog = {
             'theme-light-mode': { name: 'Light Mode', price: 0, currency: 'USD', isFree: true, productId: null },
             'theme-dark-mode': { name: 'Dark Mode', price: 0, currency: 'USD', isFree: true, productId: null },
             'theme-sunset-mode': { name: 'Sunset Theme', price: 0, currency: 'USD', isFree: true, productId: null },
             'theme-glass-mode': { name: 'Glass Mode', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-ocean-mode': { name: 'Ocean Theme', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-forest-mode': { name: 'Forest Theme', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-cosmic-mode': { name: 'Cosmic Theme', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-retro-mode': { name: 'Retro Theme', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-neon-mode': { name: 'Neon Theme', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-elegant-mode': { name: 'Elegant Theme', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-quantum-nexus': { name: '🌌 Quantum Nexus', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-holographic-matrix': { name: '🎭 Holographic Matrix', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-stellar-genesis': { name: '🌟 Stellar Genesis', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-circus-maximus': { name: '🎪 Circus Maximus', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-temporal-paradox': { name: '🔮 Temporal Paradox', price: 0, currency: 'USD', isFree: true, productId: null }
+            'theme-ocean-mode': { name: 'Ocean Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_ocean_premium' },
+            'theme-forest-mode': { name: 'Forest Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_forest_premium' },
+            'theme-cosmic-mode': { name: 'Cosmic Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_cosmic_premium' },
+            'theme-retro-mode': { name: 'Retro Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_retro_premium' },
+            'theme-neon-mode': { name: 'Neon Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_neon_premium' },
+            'theme-elegant-mode': { name: 'Elegant Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_elegant_premium' },
+            'theme-quantum-nexus': { name: '🌌 Quantum Nexus', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_quantum_nexus_premium' },
+            'theme-holographic-matrix': { name: '🎭 Holographic Matrix', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_holographic_matrix_premium' },
+            'theme-stellar-genesis': { name: '🌟 Stellar Genesis', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_stellar_genesis_premium' },
+            'theme-circus-maximus': { name: '🎪 Circus Maximus', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_circus_maximus_premium' },
+            'theme-temporal-paradox': { name: '🔮 Temporal Paradox', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_temporal_paradox_premium' }
         };
 
         // Theme purchase/lock state
@@ -3842,7 +3842,12 @@
             'theme_cosmic_premium': 'theme-cosmic-mode',
             'theme_retro_premium': 'theme-retro-mode',
             'theme_neon_premium': 'theme-neon-mode',
-            'theme_elegant_premium': 'theme-elegant-mode'
+            'theme_elegant_premium': 'theme-elegant-mode',
+            'theme_quantum_nexus_premium': 'theme-quantum-nexus',
+            'theme_holographic_matrix_premium': 'theme-holographic-matrix',
+            'theme_stellar_genesis_premium': 'theme-stellar-genesis',
+            'theme_circus_maximus_premium': 'theme-circus-maximus',
+            'theme_temporal_paradox_premium': 'theme-temporal-paradox'
         };
 
         const themeClassToProductId = {
@@ -3851,7 +3856,12 @@
             'theme-cosmic-mode': 'theme_cosmic_premium',
             'theme-retro-mode': 'theme_retro_premium',
             'theme-neon-mode': 'theme_neon_premium',
-            'theme-elegant-mode': 'theme_elegant_premium'
+            'theme-elegant-mode': 'theme_elegant_premium',
+            'theme-quantum-nexus': 'theme_quantum_nexus_premium',
+            'theme-holographic-matrix': 'theme_holographic_matrix_premium',
+            'theme-stellar-genesis': 'theme_stellar_genesis_premium',
+            'theme-circus-maximus': 'theme_circus_maximus_premium',
+            'theme-temporal-paradox': 'theme_temporal_paradox_premium'
         };
 
         // Currency configuration
@@ -3947,13 +3957,26 @@
             }
         }
 
-        // Check if a theme is locked (requires purchase) - ALL THEMES UNLOCKED
+        // Check if a theme is locked (requires purchase)
         function isThemeLocked(theme) {
-            return false; // All themes are now free and unlocked
+            if (themeCatalog[theme].isFree) return false;
+            const productId = themeClassToProductId[theme];
+            return !purchasedThemeProductIds.has(productId);
         }
 
         // Set theme
         function setTheme(theme) {
+            // Check if theme is locked
+            if (isThemeLocked(theme)) {
+                // Redirect to shop to purchase the theme
+                if (typeof openShop === 'function') {
+                    openShop();
+                } else {
+                    showMessageBox('This theme requires purchase. Please visit the shop.', 'info');
+                }
+                return;
+            }
+
             const body = document.body;
             
             // Remove all theme classes
@@ -4038,26 +4061,40 @@
             
             themeSwitcherThemes.forEach(theme => {
                 const themeInfo = themeCatalog[theme];
+                const isLocked = isThemeLocked(theme);
                 const isCurrent = currentTheme === theme;
+                const isOwned = !isLocked;
                 const icon = themeIcons[theme] || 'fas fa-palette';
                 
                 const button = document.createElement('button');
                 button.className = 'theme-picker-btn';
                 button.setAttribute('data-theme', theme);
+                button.setAttribute('data-locked', isLocked);
                 
                 let statusText = '';
                 if (isCurrent) statusText = ' (Current)';
-                else statusText = ' (Free)';
+                else if (isOwned) statusText = ' (Owned)';
+                else statusText = ` (${formatPrice(convertPrice(themeInfo.price))})`;
                 
                 button.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span><i class="${icon}"></i> ${themeInfo.name}${statusText}</span>
+                        ${isLocked ? '<i class="fas fa-lock" style="color: #ff6b6b;"></i>' : ''}
                     </div>
                 `;
                 
                 button.addEventListener('click', () => {
-                    setTheme(theme);
-                    closeThemePicker();
+                    if (isLocked) {
+                        if (typeof openShop === 'function') {
+                            openShop();
+                        } else {
+                            showMessageBox('This theme requires purchase. Please visit the shop.', 'info');
+                        }
+                        closeThemePicker();
+                    } else {
+                        setTheme(theme);
+                        closeThemePicker();
+                    }
                 });
                 
                 picker.appendChild(button);
