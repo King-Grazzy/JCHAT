@@ -62,6 +62,38 @@
     .theme .name { font-weight: 700; font-size: 1.1rem; }
     .theme .description { color: var(--muted); font-size: 0.85rem; }
     .theme .price { font-weight: 800; color: #e6f4ff; background: rgba(0,213,255,0.12); border: 1px solid var(--border); border-radius: 999px; padding: 4px 8px; align-self: flex-start; }
+    
+    .theme .price-free { 
+      background: rgba(34,197,94,0.15); 
+      color: #22c55e; 
+      border-color: rgba(34,197,94,0.3);
+    }
+    
+    .theme .price-premium { 
+      background: rgba(168,85,247,0.15); 
+      color: #a855f7; 
+      border-color: rgba(168,85,247,0.3);
+    }
+    
+    .status-badge {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+    
+    .status-badge.free {
+      background: rgba(34,197,94,0.2);
+      color: #22c55e;
+      border: 1px solid rgba(34,197,94,0.4);
+    }
+    
+    .status-badge.premium {
+      background: rgba(168,85,247,0.2);
+      color: #a855f7;
+      border: 1px solid rgba(168,85,247,0.4);
+    }
     .theme .preview { 
       height: 60px; border-radius: 8px; margin: 4px 0; 
       background: linear-gradient(45deg, var(--blue), var(--pink));
@@ -214,19 +246,26 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // Premium themes catalog matching Home.html exactly - USD pricing
+    // Premium themes catalog matching Home.html exactly - ALL 15 THEMES
     const THEMES = [
-      { id: 1, key: 'theme-ocean-mode', name: 'Ocean Theme', price: 4.99, description: 'Premium deep waters with animated waves', preview: 'ocean' },
-      { id: 2, key: 'theme-forest-mode', name: 'Forest Theme', price: 4.99, description: 'Premium enchanted woods with particle effects', preview: 'forest' },
-      { id: 3, key: 'theme-cosmic-mode', name: 'Cosmic Theme', price: 4.99, description: 'Premium nebula with stellar animation', preview: 'cosmic' },
-      { id: 4, key: 'theme-retro-mode', name: 'Retro Theme', price: 4.99, description: 'Premium 80s synthwave with grid animation', preview: 'retro' },
-      { id: 5, key: 'theme-neon-mode', name: 'Neon Theme', price: 4.99, description: 'Premium digital matrix with code rain', preview: 'neon' },
-      { id: 6, key: 'theme-elegant-mode', name: 'Elegant Theme', price: 4.99, description: 'Premium luxury with golden shimmer', preview: 'elegant' },
-      { id: 7, key: 'theme-quantum-nexus', name: '🌌 Quantum Nexus', price: 4.99, description: 'Premium particle physics simulation with quantum effects', preview: 'quantum' },
-      { id: 8, key: 'theme-holographic-matrix', name: '🎭 Holographic Matrix', price: 4.99, description: 'Premium 3D holographic projection with matrix effects', preview: 'holographic' },
-      { id: 9, key: 'theme-stellar-genesis', name: '🌟 Stellar Genesis', price: 4.99, description: 'Premium cosmic birth simulation with stellar evolution', preview: 'stellar' },
-      { id: 10, key: 'theme-circus-maximus', name: '🎪 Circus Maximus', price: 4.99, description: 'Premium interactive performance theater with circus physics', preview: 'circus' },
-      { id: 11, key: 'theme-temporal-paradox', name: '🔮 Temporal Paradox', price: 4.99, description: 'Premium time manipulation interface with temporal effects', preview: 'temporal' }
+      // FREE THEMES (4)
+      { id: 1, key: 'theme-light-mode', name: 'Light Mode', price: 0, description: 'Premium Platinum Minimal - Clean and elegant light interface', preview: 'light', isFree: true },
+      { id: 2, key: 'theme-dark-mode', name: 'Dark Mode', price: 0, description: 'Premium Starlight Noir - Sophisticated dark experience', preview: 'dark', isFree: true },
+      { id: 3, key: 'theme-sunset-mode', name: 'Sunset Theme', price: 0, description: 'Free sunset gradient theme', preview: 'sunset', isFree: true },
+      { id: 4, key: 'theme-glass-mode', name: 'Glass Mode', price: 0, description: 'Free glass morphism effect', preview: 'glass', isFree: true },
+      
+      // PREMIUM THEMES - $4.99 EACH (11)
+      { id: 5, key: 'theme-ocean-mode', name: 'Ocean Theme', price: 4.99, description: 'Premium deep waters with animated waves and ocean effects', preview: 'ocean', isFree: false },
+      { id: 6, key: 'theme-forest-mode', name: 'Forest Theme', price: 4.99, description: 'Premium enchanted woods with mystical particle effects', preview: 'forest', isFree: false },
+      { id: 7, key: 'theme-cosmic-mode', name: 'Cosmic Theme', price: 4.99, description: 'Premium nebula with stellar animation and space effects', preview: 'cosmic', isFree: false },
+      { id: 8, key: 'theme-retro-mode', name: 'Retro Theme', price: 4.99, description: 'Premium 80s synthwave with authentic grid animation', preview: 'retro', isFree: false },
+      { id: 9, key: 'theme-neon-mode', name: 'Neon Theme', price: 4.99, description: 'Premium digital matrix with code rain effects', preview: 'neon', isFree: false },
+      { id: 10, key: 'theme-elegant-mode', name: 'Elegant Theme', price: 4.99, description: 'Premium luxury with golden shimmer and elegance', preview: 'elegant', isFree: false },
+      { id: 11, key: 'theme-quantum-nexus', name: '🌌 Quantum Nexus', price: 4.99, description: 'Premium particle physics simulation with quantum flux effects', preview: 'quantum', isFree: false },
+      { id: 12, key: 'theme-holographic-matrix', name: '🎭 Holographic Matrix', price: 4.99, description: 'Premium 3D holographic projection with matrix glitch effects', preview: 'holographic', isFree: false },
+      { id: 13, key: 'theme-stellar-genesis', name: '🌟 Stellar Genesis', price: 4.99, description: 'Premium cosmic birth simulation with stellar evolution effects', preview: 'stellar', isFree: false },
+      { id: 14, key: 'theme-circus-maximus', name: '🎪 Circus Maximus', price: 4.99, description: 'Premium interactive performance theater with circus physics', preview: 'circus', isFree: false },
+      { id: 15, key: 'theme-temporal-paradox', name: '🔮 Temporal Paradox', price: 4.99, description: 'Premium time manipulation interface with temporal shift effects', preview: 'temporal', isFree: false }
     ];
 
     // Currency configuration
@@ -500,11 +539,23 @@
     function updateSummary() {
       const selectedIds = getSelectedThemeIds();
       const selectedThemes = THEMES.filter(t => selectedIds.includes(t.id.toString()));
-      const totalInNaira = selectedThemes.reduce((sum, t) => sum + t.price, 0);
-      const totalInUserCurrency = convertPrice(totalInNaira, userCurrency.code);
       
-      summaryAmount.textContent = `${userCurrency.symbol}${totalInUserCurrency}`;
-      summaryCount.textContent = `${selectedThemes.length} ${selectedThemes.length === 1 ? 'theme' : 'themes'}`;
+      // Filter out free themes from payment calculation
+      const premiumThemes = selectedThemes.filter(t => !t.isFree && t.price > 0);
+      const freeThemes = selectedThemes.filter(t => t.isFree || t.price === 0);
+      
+      const totalInUSD = premiumThemes.reduce((sum, t) => sum + t.price, 0);
+      const totalInUserCurrency = convertPrice(totalInUSD, userCurrency.code);
+      
+      // Display summary with free vs premium breakdown
+      if (premiumThemes.length > 0) {
+        summaryAmount.textContent = `${userCurrency.symbol}${totalInUserCurrency}`;
+        summaryCount.textContent = `${premiumThemes.length} premium theme(s)`;
+      } else {
+        summaryAmount.textContent = 'FREE';
+        summaryCount.textContent = `${freeThemes.length} free theme(s)`;
+      }
+      
       if (!orderIdEl.textContent) orderIdEl.textContent = generateOrderId();
     }
 
@@ -513,24 +564,41 @@
       for (const t of THEMES) {
         const div = document.createElement('label');
         div.className = 'theme';
+        
+        // Determine if theme is free or premium
+        const isFree = t.isFree || t.price === 0;
+        const priceDisplay = isFree ? 'FREE' : (isRatesLoading ? '🔄 Loading...' : formatPrice(t.price));
+        const priceClass = isFree ? 'price-free' : 'price-premium';
+        const statusBadge = isFree ? '<span class="status-badge free">FREE</span>' : '<span class="status-badge premium">PREMIUM</span>';
+        
         div.innerHTML = `
           <div style="display:flex; align-items:center; gap:8px;">
-            <input type="checkbox" value="${t.id}">
+            <input type="checkbox" value="${t.id}" ${isFree ? 'disabled' : ''}>
             <div style="flex:1;">
-              <div class="name">${t.name}</div>
+              <div class="name">${t.name} ${statusBadge}</div>
               <div class="description">${t.description}</div>
             </div>
-            <div class="price">${isRatesLoading ? '🔄 Loading...' : formatPrice(t.price)}</div>
+            <div class="price ${priceClass}">${priceDisplay}</div>
           </div>
           <div class="preview theme-preview-${t.preview}"></div>
         `;
-        div.querySelector('input').addEventListener('change', updateSummary);
+        
+        // Only add event listener for premium themes
+        if (!isFree) {
+          div.querySelector('input').addEventListener('change', updateSummary);
+        }
+        
         themesEl.appendChild(div);
       }
     }
 
     buyAllBtn.addEventListener('click', () => {
-      document.querySelectorAll('.theme input[type="checkbox"]').forEach(chk => chk.checked = true);
+      // Only select premium themes (not free ones)
+      document.querySelectorAll('.theme input[type="checkbox"]').forEach(chk => {
+        if (!chk.disabled) { // Only check premium themes
+          chk.checked = true;
+        }
+      });
       orderIdEl.textContent = generateOrderId();
       updateSummary();
     });
@@ -581,8 +649,19 @@
       
       const orderId = orderIdEl.textContent || generateOrderId();
       const selectedThemes = THEMES.filter(t => selected.includes(t.id.toString()));
-      const totalInNaira = selectedThemes.reduce((sum, t) => sum + t.price, 0);
-      const totalInUserCurrency = convertPrice(totalInNaira, userCurrency.code);
+      
+      // Filter themes by type
+      const premiumThemes = selectedThemes.filter(t => !t.isFree && t.price > 0);
+      const freeThemes = selectedThemes.filter(t => t.isFree || t.price === 0);
+      
+      // Check if user selected only free themes
+      if (premiumThemes.length === 0 && freeThemes.length > 0) {
+        showToast('Free themes are already available! No payment needed.', 'info');
+        return;
+      }
+      
+      const totalInUSD = premiumThemes.reduce((sum, t) => sum + t.price, 0);
+      const totalInUserCurrency = convertPrice(totalInUSD, userCurrency.code);
       
       let uploadedReceiptUrl = null;
       if (selectedReceiptFile) {
@@ -634,7 +713,7 @@
           adminApproved: false,
           adminUid: null,
           adminApprovalTime: null,
-          items: selectedThemes.map(t => ({
+          items: premiumThemes.map(t => ({
             id: t.id,
             themeKey: t.key,
             themeName: t.name,
