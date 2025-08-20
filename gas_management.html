@@ -1386,467 +1386,493 @@
 
     <main>
         <div class="content-wrapper">
-            <div class="admin-section">
-                <h2>Admin Dashboard</h2>
-
-                <!-- System Settings Management Section -->
-                <h3>System Settings</h3>
-                <div class="user-management-grid">
-                    <div class="management-card">
-                        <h4>Economy Settings</h4>
-                        <div class="input-group">
-                            <label for="jcoinNairaRateInput">JCoin per Naira:</label>
-                            <input type="number" id="jcoinNairaRateInput" step="0.01" min="0.01">
-                        </div>
-                        <div class="input-group">
-                            <label for="gasJcoinRateInput">Gas per JCoin:</label>
-                            <input type="number" id="gasJcoinRateInput" step="0.01" min="0.01">
-                        </div>
-                        <div class="input-group">
-                            <label for="dailyBonusAmountInput">Daily Bonus (JCoins):</label>
-                            <input type="number" id="dailyBonusAmountInput" min="0">
-                        </div>
-                    </div>
-
-                    <div class="management-card">
-                        <h4>Feature Toggles</h4>
-                        <div class="input-group">
-                            <label for="enableUserRegistrationToggle">Enable User Registration:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="enableUserRegistrationToggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="input-group">
-                            <label for="enableFriendRequestsToggle">Enable Friend Requests:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="enableFriendRequestsToggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="input-group">
-                            <label for="enablePublicChatToggle">Enable Public Chat:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="enablePublicChatToggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="input-group">
-                            <label for="enablePostCreationToggle">Enable Post Creation:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="enablePostCreationToggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="input-group">
-                            <label for="enableEmailNotificationsToggle">Enable Email Notifications:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="enableEmailNotificationsToggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="input-group">
-                            <label for="enableCallsToggle">Enable Calls:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="enableCallsToggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="management-card">
-                        <h4>Maintenance & Announcements</h4>
-                        <div class="input-group">
-                            <label for="maintenanceModeToggle">Maintenance Mode:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="maintenanceModeToggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="input-group">
-                            <label for="globalAnnouncementInput">Global Announcement Text:</label>
-                            <textarea id="globalAnnouncementInput" placeholder="Enter global announcement text" rows="3"></textarea>
-                        </div>
-                         <div class="input-group">
-                            <label for="announcementStartTime">Start Time:</label>
-                            <input type="datetime-local" id="announcementStartTime">
-                        </div>
-                        <div class="input-group">
-                            <label for="announcementEndTime">End Time:</label>
-                            <input type="datetime-local" id="announcementEndTime">
-                        </div>
-                        <div class="input-group">
-                            <label for="profanityFilterSensitivityInput">Profanity Filter Sensitivity (1-10):</label>
-                            <input type="number" id="profanityFilterSensitivityInput" min="1" max="10">
-                        </div>
-                    </div>
-
-                    <div class="management-card">
-                        <h4>Admin Announcement</h4>
-                        <div class="input-group">
-                            <label for="announcementEnabledToggle">Enable Announcement:</label>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="announcementEnabledToggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="input-group">
-                            <label for="announcementTextInput">Announcement Text:</label>
-                            <textarea id="announcementTextInput" placeholder="Type the public announcement" rows="3"></textarea>
-                        </div>
-                        <div class="input-group">
-                            <label for="announcementDurationInput">Display Duration (minutes):</label>
-                            <input type="number" id="announcementDurationInput" min="1" max="60" placeholder="5">
-                        </div>
-                        <div class="input-group">
-                            <label>Preview:</label>
-                            <div class="announcement-ticker" style="border:1px solid var(--border-light);border-radius:10px;padding:6px;overflow:hidden;">
-                                <div class="announcement-track" id="announcementPreviewTrack"></div>
-                            </div>
-                        </div>
-                    </div>
+            <div style="display:flex; gap:8px; align-items:center; margin: 8px 0 12px;">
+                <button id="expandAllBtn" class="btn" style="padding:8px 10px; border-radius:10px; border:1px solid var(--border-color); background: rgba(255,255,255,0.06); color: var(--text-color-primary);"><i class="fas fa-expand"></i> Expand All</button>
+                <button id="collapseAllBtn" class="btn" style="padding:8px 10px; border-radius:10px; border:1px solid var(--border-color); background: rgba(255,255,255,0.06); color: var(--text-color-primary);"><i class="fas fa-compress"></i> Collapse All</button>
+            </div>
+            <div class="admin-section" id="adminDashboardSection">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <h2 style="margin:0;">Admin Dashboard</h2>
+                    <button class="toggle-btn" aria-controls="adminDashboardContent" aria-expanded="true" data-section="adminDashboardSection">Hide</button>
                 </div>
-                <button id="saveSystemSettingsButton" class="admin-button">
-                    <span class="button-text">Save System Settings</span>
-                    
-                </button>
-
-                <!-- User Lookup Section -->
-                <h3>Lookup User</h3>
-                <div class="input-group">
-                    <label for="searchTypeSelect">Search By:</label>
-                    <select id="searchTypeSelect">
-                        <option value="uid">User ID</option>
-                        <option value="username">Username</option>
-                        <option value="email">Email</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="lookupUserInput">Search Value:</label>
-                    <input type="text" id="lookupUserInput" placeholder="Enter User ID">
-                </div>
-                <button id="lookupUserButton" class="admin-button">
-                    <span class="button-text">Lookup User</span>
-                    
-                </button>
-
-                <!-- Looked-up User Details Display -->
-                <div id="lookedUpUserDetails" class="user-details-display">
-                    <img id="lookedUpUserPic" src="" alt="User Profile Picture" style="display: none;">
-                    <i id="lookedUpUserAvatarIcon" class="fas fa-user-circle" style="font-size: 80px; color: var(--text-light);"></i>
-                    <p>Username: <strong id="lookedUpUsername">N/A</strong></p>
-                    <p>User ID: <span id="lookedUpUserIdDisplay" class="user-id">N/A</span></p>
-                    <p>Current Level: <strong id="lookedUpUserLevel">N/A</strong></p>
-                    <p>Current JCoins: <strong id="lookedUpUserJCoins">N/A</strong></p>
-                    <p>Current Gas (XP): <strong id="lookedUpUserGas">N/A</strong></p>
-                    <p>Wallet Status: <strong id="lookedUpUserWalletStatus">N/A</strong></p>
-                    <p>Ban Status: <strong id="lookedUpUserBanStatus">N/A</strong></p>
-                </div>
-
-                <!-- User Management Section (visible only after lookup) -->
-                <div id="userManagementSection" style="display: none;">
-                    <h3>Manage User Data</h3>
-                    <div class="user-management-grid">
-                        <!-- Level Management Card -->
-                        <div class="management-card">
-                            <h4>Level Management</h4>
-                            <p>Current: <span class="current-value" id="currentLevelValue">N/A</span></p>
-                            <div class="input-group">
-                                <label for="setLevelInput">Set New Level:</label>
-                                <input type="number" id="setLevelInput" min="1" value="1">
+                <div id="adminDashboardContent">
+                    <h2>Admin Dashboard</h2>
+                    <div class="admin-section">
+                        <h3>System Settings</h3>
+                        <div class="user-management-grid">
+                            <div class="management-card">
+                                <h4>Economy Settings</h4>
+                                <div class="input-group">
+                                    <label for="jcoinNairaRateInput">JCoin per Naira:</label>
+                                    <input type="number" id="jcoinNairaRateInput" step="0.01" min="0.01">
+                                </div>
+                                <div class="input-group">
+                                    <label for="gasJcoinRateInput">Gas per JCoin:</label>
+                                    <input type="number" id="gasJcoinRateInput" step="0.01" min="0.01">
+                                </div>
+                                <div class="input-group">
+                                    <label for="dailyBonusAmountInput">Daily Bonus (JCoins):</label>
+                                    <input type="number" id="dailyBonusAmountInput" min="0">
+                                </div>
                             </div>
-                            <div class="button-group">
-                                <button id="updateLevelButton" class="admin-button">
-                                    <span class="button-text">Update Level</span>
-                                    
-                                </button>
+
+                            <div class="management-card">
+                                <h4>Feature Toggles</h4>
+                                <div class="input-group">
+                                    <label for="enableUserRegistrationToggle">Enable User Registration:</label>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="enableUserRegistrationToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="input-group">
+                                    <label for="enableFriendRequestsToggle">Enable Friend Requests:</label>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="enableFriendRequestsToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="input-group">
+                                    <label for="enablePublicChatToggle">Enable Public Chat:</label>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="enablePublicChatToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="input-group">
+                                    <label for="enablePostCreationToggle">Enable Post Creation:</label>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="enablePostCreationToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="input-group">
+                                    <label for="enableEmailNotificationsToggle">Enable Email Notifications:</label>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="enableEmailNotificationsToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="input-group">
+                                    <label for="enableCallsToggle">Enable Calls:</label>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="enableCallsToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="management-card">
+                                <h4>Maintenance & Announcements</h4>
+                                <div class="input-group">
+                                    <label for="maintenanceModeToggle">Maintenance Mode:</label>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="maintenanceModeToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="input-group">
+                                    <label for="globalAnnouncementInput">Global Announcement Text:</label>
+                                    <textarea id="globalAnnouncementInput" placeholder="Enter global announcement text" rows="3"></textarea>
+                                </div>
+                                 <div class="input-group">
+                                    <label for="announcementStartTime">Start Time:</label>
+                                    <input type="datetime-local" id="announcementStartTime">
+                                </div>
+                                <div class="input-group">
+                                    <label for="announcementEndTime">End Time:</label>
+                                    <input type="datetime-local" id="announcementEndTime">
+                                </div>
+                                <div class="input-group">
+                                    <label for="profanityFilterSensitivityInput">Profanity Filter Sensitivity (1-10):</label>
+                                    <input type="number" id="profanityFilterSensitivityInput" min="1" max="10">
+                                </div>
+                            </div>
+
+                            <div class="management-card">
+                                <h4>Admin Announcement</h4>
+                                <div class="input-group">
+                                    <label for="announcementEnabledToggle">Enable Announcement:</label>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="announcementEnabledToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <div class="input-group">
+                                    <label for="announcementTextInput">Announcement Text:</label>
+                                    <textarea id="announcementTextInput" placeholder="Type the public announcement" rows="3"></textarea>
+                                </div>
+                                <div class="input-group">
+                                    <label for="announcementDurationInput">Display Duration (minutes):</label>
+                                    <input type="number" id="announcementDurationInput" min="1" max="60" placeholder="5">
+                                </div>
+                                <div class="input-group">
+                                    <label>Preview:</label>
+                                    <div class="announcement-ticker" style="border:1px solid var(--border-light);border-radius:10px;padding:6px;overflow:hidden;">
+                                        <div class="announcement-track" id="announcementPreviewTrack"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-                        <!-- JCoin Management Card -->
-                        <div class="management-card">
-                            <h4>JCoin Management</h4>
-                            <p>Current: <span class="current-value" id="currentJCoinsValue">N/A</span></p>
-                            <div class="input-group">
-                                <label for="jcoinAmountInput">Amount:</label>
-                                <input type="number" id="jcoinAmountInput" min="1" value="10">
-                            </div>
-                            <div class="button-group">
-                                <button id="creditJCoinsButton" class="admin-button">
-                                    <span class="button-text">Credit JCoins</span>
-                                    
-                                </button>
-                                <button id="deductJCoinsButton" class="admin-button secondary">
-                                    <span class="button-text">Deduct JCoins</span>
-                                    
-                                </button>
-                                <button id="grantDailyBonusButton" class="admin-button secondary">
-                                    <span class="button-text">Grant Daily Bonus</span>
-                                    
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Gas (XP) Management Card -->
-                        <div class="management-card">
-                            <h4>Gas (XP) Management</h4>
-                            <p>Current: <span class="current-value" id="currentGasValue">N/A</span></p>
-                            <div class="input-group">
-                                <label for="gasAmountInput">Amount:</label>
-                                <input type="number" id="gasAmountInput" min="1" value="100">
-                            </div>
-                            <div class="button-group">
-                                <button id="creditGasButton" class="admin-button">
-                                    <span class="button-text">Credit Gas</span>
-                                    
-                                </button>
-                                <button id="deductGasButton" class="admin-button secondary">
-                                    <span class="button-text">Deduct Gas</span>
-                                    
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Wallet & Ban Management Card -->
-                        <div class="management-card">
-                            <h4>Wallet & Ban Management</h4>
-                            <p>Wallet Status: <strong id="currentWalletStatus">N/A</strong></p>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="walletLockToggle">
-                                <span class="slider"></span>
-                            </label>
-                            <button id="toggleWalletLockButton" class="admin-button">
-                                <span class="button-text">Toggle Wallet Lock</span>
-                                
-                            </button>
-                            <p>Ban Status: <strong id="currentBanStatus">N/A</strong></p>
-                            <label class="toggle-switch">
-                                <input type="checkbox" id="banUserToggle">
-                                <span class="slider"></span>
-                            </label>
-                            <button id="toggleBanButton" class="admin-button secondary">
-                                <span class="button-text">Toggle Ban Status</span>
-                                
-                            </button>
-                            <button id="deleteUserAccountButton" class="admin-button danger">
-                                <span class="button-text"><i class="fas fa-trash-alt"></i> Delete User Account</span>
-                                
-                            </button>
-                        </div>
-                    </div>
-                     <!-- Admin Chat/Direct Message to User -->
-                    <div class="management-card" style="width: 100%;">
-                        <h4>Send Message to User</h4>
-                        <div class="input-group">
-                            <label for="adminMessageInput">Message:</label>
-                            <textarea id="adminMessageInput" placeholder="Enter message to user" rows="3"></textarea>
-                        </div>
-                        <button id="sendAdminMessageButton" class="admin-button">
-                            <span class="button-text">Send Message</span>
+                        <button id="saveSystemSettingsButton" class="admin-button">
+                            <span class="button-text">Save System Settings</span>
                             
                         </button>
+
+                        <!-- User Lookup Section -->
+                        <h3>Lookup User</h3>
+                        <div class="input-group">
+                            <label for="searchTypeSelect">Search By:</label>
+                            <select id="searchTypeSelect">
+                                <option value="uid">User ID</option>
+                                <option value="username">Username</option>
+                                <option value="email">Email</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="lookupUserInput">Search Value:</label>
+                            <input type="text" id="lookupUserInput" placeholder="Enter User ID">
+                        </div>
+                        <button id="lookupUserButton" class="admin-button">
+                            <span class="button-text">Lookup User</span>
+                            
+                        </button>
+
+                        <!-- Looked-up User Details Display -->
+                        <div id="lookedUpUserDetails" class="user-details-display">
+                            <img id="lookedUpUserPic" src="" alt="User Profile Picture" style="display: none;">
+                            <i id="lookedUpUserAvatarIcon" class="fas fa-user-circle" style="font-size: 80px; color: var(--text-light);"></i>
+                            <p>Username: <strong id="lookedUpUsername">N/A</strong></p>
+                            <p>User ID: <span id="lookedUpUserIdDisplay" class="user-id">N/A</span></p>
+                            <p>Current Level: <strong id="lookedUpUserLevel">N/A</strong></p>
+                            <p>Current JCoins: <strong id="lookedUpUserJCoins">N/A</strong></p>
+                            <p>Current Gas (XP): <strong id="lookedUpUserGas">N/A</strong></p>
+                            <p>Wallet Status: <strong id="lookedUpUserWalletStatus">N/A</strong></p>
+                            <p>Ban Status: <strong id="lookedUpUserBanStatus">N/A</strong></p>
+                        </div>
+
+                        <!-- User Management Section (visible only after lookup) -->
+                        <div id="userManagementSection" style="display: none;">
+                            <h3>Manage User Data</h3>
+                            <div class="user-management-grid">
+                                <!-- Level Management Card -->
+                                <div class="management-card">
+                                    <h4>Level Management</h4>
+                                    <p>Current: <span class="current-value" id="currentLevelValue">N/A</span></p>
+                                    <div class="input-group">
+                                        <label for="setLevelInput">Set New Level:</label>
+                                        <input type="number" id="setLevelInput" min="1" value="1">
+                                    </div>
+                                    <div class="button-group">
+                                        <button id="updateLevelButton" class="admin-button">
+                                            <span class="button-text">Update Level</span>
+                                            
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- JCoin Management Card -->
+                                <div class="management-card">
+                                    <h4>JCoin Management</h4>
+                                    <p>Current: <span class="current-value" id="currentJCoinsValue">N/A</span></p>
+                                    <div class="input-group">
+                                        <label for="jcoinAmountInput">Amount:</label>
+                                        <input type="number" id="jcoinAmountInput" min="1" value="10">
+                                    </div>
+                                    <div class="button-group">
+                                        <button id="creditJCoinsButton" class="admin-button">
+                                            <span class="button-text">Credit JCoins</span>
+                                            
+                                        </button>
+                                        <button id="deductJCoinsButton" class="admin-button secondary">
+                                            <span class="button-text">Deduct JCoins</span>
+                                            
+                                        </button>
+                                        <button id="grantDailyBonusButton" class="admin-button secondary">
+                                            <span class="button-text">Grant Daily Bonus</span>
+                                            
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Gas (XP) Management Card -->
+                                <div class="management-card">
+                                    <h4>Gas (XP) Management</h4>
+                                    <p>Current: <span class="current-value" id="currentGasValue">N/A</span></p>
+                                    <div class="input-group">
+                                        <label for="gasAmountInput">Amount:</label>
+                                        <input type="number" id="gasAmountInput" min="1" value="100">
+                                    </div>
+                                    <div class="button-group">
+                                        <button id="creditGasButton" class="admin-button">
+                                            <span class="button-text">Credit Gas</span>
+                                            
+                                        </button>
+                                        <button id="deductGasButton" class="admin-button secondary">
+                                            <span class="button-text">Deduct Gas</span>
+                                            
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Wallet & Ban Management Card -->
+                                <div class="management-card">
+                                    <h4>Wallet & Ban Management</h4>
+                                    <p>Wallet Status: <strong id="currentWalletStatus">N/A</strong></p>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="walletLockToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <button id="toggleWalletLockButton" class="admin-button">
+                                        <span class="button-text">Toggle Wallet Lock</span>
+                                        
+                                    </button>
+                                    <p>Ban Status: <strong id="currentBanStatus">N/A</strong></p>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="banUserToggle">
+                                        <span class="slider"></span>
+                                    </label>
+                                    <button id="toggleBanButton" class="admin-button secondary">
+                                        <span class="button-text">Toggle Ban Status</span>
+                                        
+                                    </button>
+                                    <button id="deleteUserAccountButton" class="admin-button danger">
+                                        <span class="button-text"><i class="fas fa-trash-alt"></i> Delete User Account</span>
+                                        
+                                    </button>
+                                </div>
+                            </div>
+                             <!-- Admin Chat/Direct Message to User -->
+                            <div class="management-card" style="width: 100%;">
+                                <h4>Send Message to User</h4>
+                                <div class="input-group">
+                                    <label for="adminMessageInput">Message:</label>
+                                    <textarea id="adminMessageInput" placeholder="Enter message to user" rows="3"></textarea>
+                                </div>
+                                <button id="sendAdminMessageButton" class="admin-button">
+                                    <span class="button-text">Send Message</span>
+                                    
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Global User Search and Filter -->
+                        <h3>Global User Management</h3>
+                        <div class="input-group">
+                            <label for="globalUserSearchInput">Search Username or User ID:</label>
+                            <input type="text" id="globalUserSearchInput" placeholder="Search all users">
+                        </div>
+                        <div class="input-group">
+                            <label for="globalUserBanStatusFilter">Filter by Ban Status:</label>
+                            <select id="globalUserBanStatusFilter">
+                                <option value="all">All</option>
+                                <option value="banned">Banned</option>
+                                <option value="not_banned">Not Banned</option>
+                            </select>
+                        </div>
+                         <div class="input-group">
+                            <label for="globalUserWalletStatusFilter">Filter by Wallet Status:</label>
+                            <select id="globalUserWalletStatusFilter">
+                                <option value="all">All</option>
+                                <option value="locked">Locked</option>
+                                <option value="unlocked">Unlocked</option>
+                            </select>
+                        </div>
+                        <button id="filterGlobalUsersButton" class="admin-button secondary">
+                            <span class="button-text"><i class="fas fa-filter"></i> Apply Filters</span>
+                            
+                        </button>
+                        <div class="users-table-container">
+                            <table class="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Username</th>
+                                        <th>User ID</th>
+                                        <th>Level</th>
+                                        <th>JCoins</th>
+                                        <th>Gas</th>
+                                        <th>Wallet</th>
+                                        <th>Ban Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="globalUsersTableBody">
+                                    <!-- Global user list will be loaded here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="noUsersMessage" style="display: none;">No users found matching the criteria.</p>
+
+                        <!-- Pending JCoin Requests Section -->
+                        <h3>Pending JCoin Requests</h3>
+                        <div id="pendingRequestsList">
+                            <p class="no-requests-message" id="noPendingRequestsMessage">No pending JCoin requests.</p>
+                            <!-- Pending requests will be dynamically loaded here -->
+                        </div>
+
+                        <!-- Pending Activity Rewards Section -->
+                        <h3>Pending Activity Rewards</h3>
+                        <div class="bulk-actions-container">
+                            <button id="approveSelectedBtn" disabled aria-label="Approve Selected Rewards">
+                                <span class="button-text"><i class="fas fa-check-double"></i> Approve Selected</span>
+                                
+                            </button>
+                            <!-- Could add a "Reject Selected" button here too if desired -->
+                        </div>
+
+                        <div class="rewards-table-container">
+                            <table class="rewards-table">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAllRewards" aria-label="Select All Rewards"></th>
+                                        <th>User ID</th>
+                                        <th>Username</th>
+                                        <th>Activity Type</th>
+                                        <th>XP</th>
+                                        <th>JCoins</th>
+                                        <th>Timestamp</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingRewardsTableBody">
+                                    <!-- Pending rewards will be loaded here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="noRewardsMessage" style="display: none;">No pending activity rewards at the moment.</p>
+
+                        <!-- New: Reported Content & Users Section -->
+                        <h3>Reported Content & Users</h3>
+                        <div class="reports-table-container">
+                            <table class="reports-table">
+                                <thead>
+                                    <tr>
+                                        <th>Report ID</th>
+                                        <th>Reported By</th>
+                                        <th>Reported User/Content ID</th>
+                                        <th>Type</th>
+                                        <th>Reason</th>
+                                        <th>Timestamp</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportedContentTableBody">
+                                    <!-- Reported content will be loaded here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="noReportsMessage" style="display: none;">No pending reports at the moment.</p>
+
+                        <!-- New: Public Posts Overview Section -->
+                        <h3>Public Posts Overview</h3>
+                        <div class="posts-table-container">
+                            <table class="posts-table">
+                                <thead>
+                                    <tr>
+                                        <th>Post ID</th>
+                                        <th>Author</th>
+                                        <th>Content Snippet</th>
+                                        <th>Likes</th>
+                                        <th>Comments</th>
+                                        <th>Timestamp</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="publicPostsTableBody">
+                                    <!-- Public posts will be loaded here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <p id="noPostsMessage" style="display: none;">No public posts to display.</p>
                     </div>
                 </div>
-
-                <!-- Global User Search and Filter -->
-                <h3>Global User Management</h3>
-                <div class="input-group">
-                    <label for="globalUserSearchInput">Search Username or User ID:</label>
-                    <input type="text" id="globalUserSearchInput" placeholder="Search all users">
-                </div>
-                <div class="input-group">
-                    <label for="globalUserBanStatusFilter">Filter by Ban Status:</label>
-                    <select id="globalUserBanStatusFilter">
-                        <option value="all">All</option>
-                        <option value="banned">Banned</option>
-                        <option value="not_banned">Not Banned</option>
-                    </select>
-                </div>
-                 <div class="input-group">
-                    <label for="globalUserWalletStatusFilter">Filter by Wallet Status:</label>
-                    <select id="globalUserWalletStatusFilter">
-                        <option value="all">All</option>
-                        <option value="locked">Locked</option>
-                        <option value="unlocked">Unlocked</option>
-                    </select>
-                </div>
-                <button id="filterGlobalUsersButton" class="admin-button secondary">
-                    <span class="button-text"><i class="fas fa-filter"></i> Apply Filters</span>
-                    
-                </button>
-                <div class="users-table-container">
-                    <table class="users-table">
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>User ID</th>
-                                <th>Level</th>
-                                <th>JCoins</th>
-                                <th>Gas</th>
-                                <th>Wallet</th>
-                                <th>Ban Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="globalUsersTableBody">
-                            <!-- Global user list will be loaded here dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-                <p id="noUsersMessage" style="display: none;">No users found matching the criteria.</p>
-
-                <!-- Pending JCoin Requests Section -->
-                <h3>Pending JCoin Requests</h3>
-                <div id="pendingRequestsList">
-                    <p class="no-requests-message" id="noPendingRequestsMessage">No pending JCoin requests.</p>
-                    <!-- Pending requests will be dynamically loaded here -->
-                </div>
-
-                <!-- Pending Activity Rewards Section -->
-                <h3>Pending Activity Rewards</h3>
-                <div class="bulk-actions-container">
-                    <button id="approveSelectedBtn" disabled aria-label="Approve Selected Rewards">
-                        <span class="button-text"><i class="fas fa-check-double"></i> Approve Selected</span>
-                        
-                    </button>
-                    <!-- Could add a "Reject Selected" button here too if desired -->
-                </div>
-
-                <div class="rewards-table-container">
-                    <table class="rewards-table">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" id="selectAllRewards" aria-label="Select All Rewards"></th>
-                                <th>User ID</th>
-                                <th>Username</th>
-                                <th>Activity Type</th>
-                                <th>XP</th>
-                                <th>JCoins</th>
-                                <th>Timestamp</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="pendingRewardsTableBody">
-                            <!-- Pending rewards will be loaded here dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-                <p id="noRewardsMessage" style="display: none;">No pending activity rewards at the moment.</p>
-
-                <!-- New: Reported Content & Users Section -->
-                <h3>Reported Content & Users</h3>
-                <div class="reports-table-container">
-                    <table class="reports-table">
-                        <thead>
-                            <tr>
-                                <th>Report ID</th>
-                                <th>Reported By</th>
-                                <th>Reported User/Content ID</th>
-                                <th>Type</th>
-                                <th>Reason</th>
-                                <th>Timestamp</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reportedContentTableBody">
-                            <!-- Reported content will be loaded here dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-                <p id="noReportsMessage" style="display: none;">No pending reports at the moment.</p>
-
-                <!-- New: Public Posts Overview Section -->
-                <h3>Public Posts Overview</h3>
-                <div class="posts-table-container">
-                    <table class="posts-table">
-                        <thead>
-                            <tr>
-                                <th>Post ID</th>
-                                <th>Author</th>
-                                <th>Content Snippet</th>
-                                <th>Likes</th>
-                                <th>Comments</th>
-                                <th>Timestamp</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="publicPostsTableBody">
-                            <!-- Public posts will be loaded here dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-                <p id="noPostsMessage" style="display: none;">No public posts to display.</p>
             </div>
-            
             <div class="admin-section" id="featureOrdersSection">
-                <h2>Feature Orders</h2>
-                <div class="input-group orders-toolbar">
-                    <label for="ordersStatusFilter" style="margin:0;">Filter:</label>
-                    <select id="ordersStatusFilter" style="padding:8px 10px; border-radius:8px; border:1px solid var(--border-light); background:var(--input-background); color:var(--white);">
-                        <option value="pending" selected>Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                        <option value="all">All</option>
-                    </select>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <h2 style="margin:0;">Feature Orders</h2>
+                    <button class="toggle-btn" aria-controls="featureOrdersContent" aria-expanded="true" data-section="featureOrdersSection">Hide</button>
                 </div>
-                <div id="ordersList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; width:100%;"></div>
-                <p id="noOrdersMessage" style="display:none; color:var(--text-light); text-align:center;">No orders to display.</p>
+                <div id="featureOrdersContent">
+                    <h2>Feature Orders</h2>
+                    <div class="input-group orders-toolbar">
+                        <label for="ordersStatusFilter" style="margin:0;">Filter:</label>
+                        <select id="ordersStatusFilter" style="padding:8px 10px; border-radius:8px; border:1px solid var(--border-light); background:var(--input-background); color:var(--white);">
+                            <option value="pending" selected>Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+                    <div id="ordersList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; width:100%;"></div>
+                    <p id="noOrdersMessage" style="display:none; color:var(--text-light); text-align:center;">No orders to display.</p>
+                </div>
             </div>
 
             <div class="admin-section" id="shopPaymentsSection">
-                <h2>Shop Payment Requests</h2>
-                <div class="input-group orders-toolbar">
-                    <label for="shopPaymentsStatusFilter" style="margin:0;">Filter:</label>
-                    <select id="shopPaymentsStatusFilter">
-                        <option value="pending" selected>Pending</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                        <option value="all">All</option>
-                    </select>
-                    <input id="shopPaymentsUserSearch" type="text" placeholder="Filter by User ID" style="flex:1;">
-                    <button id="shopPaymentsSearchBtn" class="admin-button secondary"><span class="button-text">Search</span></button>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <h2 style="margin:0;">Shop Payment Requests</h2>
+                    <button class="toggle-btn" aria-controls="shopPaymentsContent" aria-expanded="true" data-section="shopPaymentsSection">Hide</button>
                 </div>
-                <div id="shopPaymentsList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; width:100%;"></div>
-                <p id="noShopPaymentsMessage" style="display:none; color:var(--text-light); text-align:center;">No payment requests to display.</p>
+                <div id="shopPaymentsContent">
+                    <h2>Shop Payment Requests</h2>
+                    <div class="input-group orders-toolbar">
+                        <label for="shopPaymentsStatusFilter" style="margin:0;">Filter:</label>
+                        <select id="shopPaymentsStatusFilter">
+                            <option value="pending" selected>Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="all">All</option>
+                        </select>
+                        <input id="shopPaymentsUserSearch" type="text" placeholder="Filter by User ID" style="flex:1;">
+                        <button id="shopPaymentsSearchBtn" class="admin-button secondary"><span class="button-text">Search</span></button>
+                    </div>
+                    <div id="shopPaymentsList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; width:100%;"></div>
+                    <p id="noShopPaymentsMessage" style="display:none; color:var(--text-light); text-align:center;">No payment requests to display.</p>
+                </div>
             </div>
 
             <div class="admin-section" id="stickersCategoryUnlockSection">
-                <h2><i class="fas fa-face-smile"></i> Stickers Category Unlock</h2>
-                <p>Unlock specific sticker categories for a user. By default only the first 3 emojis per category are free.</p>
-                <div class="input-group" style="display:grid; grid-template-columns: 1fr 1fr auto; gap:12px; align-items:end;">
-                    <div>
-                        <label for="stickersCatUserId">User ID</label>
-                        <input type="text" id="stickersCatUserId" placeholder="Enter user UID" style="width:100%" />
-                    </div>
-                    <div>
-                        <label for="stickersCatSelect">Category</label>
-                        <select id="stickersCatSelect" style="width:100%">
-                            <option value="stickers:smileys">Smileys</option>
-                            <option value="stickers:hands">Hands</option>
-                            <option value="stickers:hearts">Hearts</option>
-                            <option value="stickers:party">Party</option>
-                            <option value="stickers:animals">Animals</option>
-                            <option value="stickers:food">Food</option>
-                            <option value="stickers:misc">More</option>
-                            <option value="stickers:travel">Travel</option>
-                            <option value="stickers:nature">Nature</option>
-                            <option value="stickers:sports">Sports</option>
-                            <option value="stickers:music">Music</option>
-                            <option value="stickers:objects">Objects</option>
-                            <option value="stickers:food2">Foods 2</option>
-                            <option value="stickers:faces2">Faces 2</option>
-                            <option value="stickers:activity">Activities</option>
-                        </select>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                        <button id="stickersCatGrantBtn" class="admin-button"><span class="button-text">Grant</span></button>
-                        <button id="stickersCatRevokeBtn" class="admin-button" style="background:#ef4444;border-color:#ef4444"><span class="button-text">Lock</span></button>
-                    </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <h2 style="margin:0;"><i class="fas fa-face-smile"></i> Stickers Category Unlock</h2>
+                    <button class="toggle-btn" aria-controls="stickersCategoryUnlockContent" aria-expanded="true" data-section="stickersCategoryUnlockSection">Hide</button>
                 </div>
-                <small style="color:var(--text-light)">This writes to user_entitlements.packs adding the selected key.</small>
+                <div id="stickersCategoryUnlockContent">
+                    <h2><i class="fas fa-face-smile"></i> Stickers Category Unlock</h2>
+                    <p>Unlock specific sticker categories for a user. By default only the first 3 emojis per category are free.</p>
+                    <div class="input-group" style="display:grid; grid-template-columns: 1fr 1fr auto; gap:12px; align-items:end;">
+                        <div>
+                            <label for="stickersCatUserId">User ID</label>
+                            <input type="text" id="stickersCatUserId" placeholder="Enter user UID" style="width:100%" />
+                        </div>
+                        <div>
+                            <label for="stickersCatSelect">Category</label>
+                            <select id="stickersCatSelect" style="width:100%">
+                                <option value="stickers:smileys">Smileys</option>
+                                <option value="stickers:hands">Hands</option>
+                                <option value="stickers:hearts">Hearts</option>
+                                <option value="stickers:party">Party</option>
+                                <option value="stickers:animals">Animals</option>
+                                <option value="stickers:food">Food</option>
+                                <option value="stickers:misc">More</option>
+                                <option value="stickers:travel">Travel</option>
+                                <option value="stickers:nature">Nature</option>
+                                <option value="stickers:sports">Sports</option>
+                                <option value="stickers:music">Music</option>
+                                <option value="stickers:objects">Objects</option>
+                                <option value="stickers:food2">Foods 2</option>
+                                <option value="stickers:faces2">Faces 2</option>
+                                <option value="stickers:activity">Activities</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; gap:8px;">
+                            <button id="stickersCatGrantBtn" class="admin-button"><span class="button-text">Grant</span></button>
+                            <button id="stickersCatRevokeBtn" class="admin-button" style="background:#ef4444;border-color:#ef4444"><span class="button-text">Lock</span></button>
+                        </div>
+                    </div>
+                    <small style="color:var(--text-light)">This writes to user_entitlements.packs adding the selected key.</small>
+                </div>
             </div>
-
-    </div>
+        </div>
     </main>
 
     <!-- Custom Message Box -->
@@ -5152,6 +5178,161 @@
             if (e.target && (e.target.id === 'announcementTextInput')) updateAnnouncementPreview();
         });
         document.addEventListener('DOMContentLoaded', updateAnnouncementPreview);
+
+        // Toggle system for sections
+        const STORAGE_KEY_PREFIX = 'gm-toggle:';
+        function isExpanded(id) {
+            try { return localStorage.getItem(STORAGE_KEY_PREFIX + id) !== 'collapsed'; } catch { return true; }
+        }
+        function setExpanded(id, expanded) {
+            try { localStorage.setItem(STORAGE_KEY_PREFIX + id, expanded ? 'expanded' : 'collapsed'); } catch { /* ignore */ }
+        }
+        function toggleSection(sectionId, force) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            const btn = section.querySelector('.toggle-btn');
+            const contentId = btn?.getAttribute('aria-controls');
+            const content = contentId ? document.getElementById(contentId) : null;
+            const expanded = typeof force === 'boolean' ? force : btn?.getAttribute('aria-expanded') !== 'true';
+            if (btn) btn.setAttribute('aria-expanded', String(expanded));
+            if (content) {
+                if (expanded) { content.removeAttribute('hidden'); } else { content.setAttribute('hidden', ''); }
+            }
+            setExpanded(sectionId, expanded);
+        }
+        function initToggles() {
+            document.querySelectorAll('.admin-section .toggle-btn').forEach((btn) => {
+                const sectionId = btn.getAttribute('data-section');
+                const expanded = isExpanded(sectionId);
+                btn.setAttribute('aria-expanded', String(expanded));
+                const contentId = btn.getAttribute('aria-controls');
+                const content = document.getElementById(contentId);
+                if (!expanded && content) content.setAttribute('hidden', '');
+                btn.textContent = expanded ? 'Hide' : 'Show';
+                btn.addEventListener('click', () => {
+                    const isNowExpanded = btn.getAttribute('aria-expanded') !== 'true';
+                    btn.textContent = isNowExpanded ? 'Hide' : 'Show';
+                    toggleSection(sectionId, isNowExpanded);
+                });
+            });
+            const expandAllBtn = document.getElementById('expandAllBtn');
+            const collapseAllBtn = document.getElementById('collapseAllBtn');
+            expandAllBtn?.addEventListener('click', () => {
+                document.querySelectorAll('.admin-section .toggle-btn').forEach(btn => {
+                    const sectionId = btn.getAttribute('data-section');
+                    btn.textContent = 'Hide';
+                    toggleSection(sectionId, true);
+                });
+            });
+            collapseAllBtn?.addEventListener('click', () => {
+                document.querySelectorAll('.admin-section .toggle-btn').forEach(btn => {
+                    const sectionId = btn.getAttribute('data-section');
+                    btn.textContent = 'Show';
+                    toggleSection(sectionId, false);
+                });
+            });
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            console.log("JCHAT_DEBUG: onAuthStateChanged triggered. User:", user ? user.uid : "null");
+            if (user) {
+                currentUser = user;
+                // init toggles after DOM is ready
+                initToggles();
+                // Check if the user is the ADMIN_UID
+                if (currentUser.uid === ADMIN_UID) {
+                    await fetchAndDisplayHeaderProfile(user);
+                    fetchNotificationCount(user.uid);
+                    fetchPendingJCoinRequests(); // Start listening for pending JCoin requests
+                    fetchAndDisplayPendingRewards(); // Start listening for pending Activity Rewards
+                    fetchAndDisplayReportedContent(); // New: Start listening for reported content
+                    fetchAndDisplayPublicPosts(); // New: Start listening for public posts
+                    fetchAndFilterAllUsers(); // New: Initial load of global users
+                    await fetchSystemSettings(); // Fetch system settings and apply.
+
+                    // Listen to system settings in real-time for admin
+                    if (unsubscribeSystemSettingsListener) unsubscribeSystemSettingsListener(); // Clear previous listener
+                    unsubscribeSystemSettingsListener = onSnapshot(SYSTEM_SETTINGS_DOC_REF, (docSnap) => {
+                        if (docSnap.exists()) {
+                            currentSystemSettings = docSnap.data();
+                            console.log("JCHAT_DEBUG: Real-time system settings update for admin:", currentSystemSettings);
+                            populateSystemSettingsUI(currentSystemSettings); // Update UI elements
+                            applySystemSettings(currentSystemSettings); // Apply maintenance mode etc.
+                        } else {
+                            console.warn("JCHAT_WARNING: System settings document not found during snapshot. Re-fetching.");
+                            fetchSystemSettings();
+                        }
+                    }, (error) => {
+                        console.error("JCHAT_ERROR: Error listening to system settings:", error);
+                        showMessageBox("Failed to get real-time settings updates.", 'error', true);
+                    });
+                    unsubscribeListeners.push(unsubscribeSystemSettingsListener); // Add to global unsubscribe list
+
+                    showMessageBox("Welcome, Admin!", 'success', false, 2000);
+
+                } else {
+                    // Non-admin user: Check if they are banned
+                    const userProfileDocRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
+                    const userProfileSnap = await getDoc(userProfileDocRef);
+                    if (userProfileSnap.exists() && userProfileSnap.data().banned) {
+                        console.log("JCHAT_DEBUG: Banned user detected. Redirecting to login page.");
+                        showMessageBox("Your account has been banned. Please contact support.", 'error', true);
+                        playNotificationSound('error');
+                        setTimeout(async () => {
+                            await signOut(auth); // Sign out banned user
+                            window.location.href = '/login.html';
+                        }, 2000);
+                        return; // Stop further execution for banned users
+                    }
+
+                    console.log("JCHAT_DEBUG: Non-admin user detected. Redirecting to home page.");
+                    showMessageBox("Access Denied. You are not authorized to view this page.", 'error', true);
+                    playNotificationSound('error');
+                    setTimeout(() => {
+                        window.location.href = '/Home.html'; // Redirect non-admins
+                    }, 2000);
+                }
+            } else {
+                console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                        console.log("JCHAT_DEBUG: Signed in with custom token.");
+                    } else {
+                        await signInAnonymously(auth);
+                        console.log("JCHAT_DEBUG: Signed in anonymously.");
+                    }
+                    // onAuthStateChanged will be triggered again with the new user
+                } catch (error) {
+                    console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
+                    if (!auth.currentUser) {
+                        window.location.href = '/login.html';
+                        return;
+                    }
+                }
+                // Re-check currentUser after potential anonymous sign-in.
+                currentUser = auth.currentUser;
+                if (currentUser && currentUser.uid === ADMIN_UID) {
+                    // If anonymous sign-in resulted in admin, proceed.
+                    isAuthReady = true;
+                    await fetchAndDisplayHeaderProfile(currentUser);
+                    fetchPendingJCoinRequests();
+                    fetchAndDisplayPendingRewards();
+                    fetchAndDisplayReportedContent(); // New: Fetch reports after auth
+                    fetchAndDisplayPublicPosts(); // New: Fetch posts after auth
+                    fetchAndFilterAllUsers(); // New: Fetch global users after auth
+                    await fetchSystemSettings();
+                } else {
+                    // If still no user or not admin after anonymous attempt, redirect.
+                    console.log("JCHAT_DEBUG: Anonymous/Custom Token Auth successful but not admin. Redirecting.");
+                    showMessageBox("Access Denied: Please log in as an administrator.", 'error', true);
+                    playNotificationSound('error');
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 2000);
+                }
+            }
+        });
 
     </script>
 </body>
