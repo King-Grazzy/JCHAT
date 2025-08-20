@@ -176,6 +176,26 @@
           <button id="clearBtn" class="btn"><i class="fas fa-rotate-left"></i> Clear Selection</button>
         </div>
         <div class="themes" id="themes"></div>
+        
+        <!-- VIP Pass Card -->
+        <div class="card" style="margin-top:12px; border: 1px solid var(--border); background: rgba(255,255,255,0.03);">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+            <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
+              <span class="vip-badge" style="background: linear-gradient(90deg, #f59e0b, #ef4444); color:#0d0f13; padding:4px 8px; border-radius:999px; font-weight:800; font-size:.8rem;">Best Value</span>
+              VIP Pass
+            </h2>
+          </div>
+          <div class="muted" style="margin:6px 0 10px">Unlock all current and future premium themes.</div>
+          <div id="vipOptions" style="display:flex; gap:10px; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:8px; border:1px solid var(--border); padding:8px 10px; border-radius:10px; cursor:pointer;">
+              <input type="radio" name="vipPass" value="lifetime"> Lifetime – ₦9,999
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; border:1px solid var(--border); padding:8px 10px; border-radius:10px; cursor:pointer;">
+              <input type="radio" name="vipPass" value="yearly"> Yearly – ₦2,999
+            </label>
+          </div>
+          <div class="muted" style="font-size:.85rem; margin-top:6px;">VIP purchases are not eligible for bundle/coupon discounts.</div>
+        </div>
       </div>
 
       <div class="card">
@@ -587,22 +607,33 @@
       // Filter out free themes from payment calculation
       const premiumThemes = selectedThemes.filter(t => !t.isFree && t.price > 0);
       const freeThemes = selectedThemes.filter(t => t.isFree || t.price === 0);
+      const vipChoice = (document.querySelector('input[name="vipPass"]:checked')?.value) || null;
       
       const subtotalNgn = premiumThemes.reduce((sum, t) => sum + t.price, 0);
-      const bulkPercent = calcBulkPercent(premiumThemes.length);
+      let bulkPercent = calcBulkPercent(premiumThemes.length);
       const bulkDiscountNgn = Math.round(subtotalNgn * (bulkPercent / 100));
       const couponPercent = appliedCouponPercent || 0;
       const couponDiscountNgn = Math.round(subtotalNgn * (couponPercent / 100));
-      const totalDiscountNgn = Math.min(subtotalNgn, bulkDiscountNgn + couponDiscountNgn);
-      const totalNgn = Math.max(0, subtotalNgn - totalDiscountNgn);
+      let totalDiscountNgn = Math.min(subtotalNgn, bulkDiscountNgn + couponDiscountNgn);
+      let totalNgn = Math.max(0, subtotalNgn - totalDiscountNgn);
+
+      // VIP logic: if VIP selected, override totals and disable discounts
+      let vipAmountNgn = 0;
+      if (vipChoice === 'lifetime') vipAmountNgn = 9999;
+      if (vipChoice === 'yearly') vipAmountNgn = 2999;
+      if (vipAmountNgn > 0) {
+        totalNgn = vipAmountNgn;
+        totalDiscountNgn = 0;
+        bulkPercent = 0;
+      }
       const totalInUserCurrency = convertPrice(totalNgn, userCurrency.code);
       
       // Display summary with free vs premium breakdown
       if (premiumThemes.length > 0) {
         summaryAmount.textContent = `${userCurrency.symbol}${totalInUserCurrency}`;
         summaryCount.textContent = `${premiumThemes.length} premium theme(s)`;
-        const totalPercent = subtotalNgn > 0 ? Math.round((totalDiscountNgn / subtotalNgn) * 100) : 0;
-        summarySubtotalEl.textContent = `₦${subtotalNgn.toLocaleString()}`;
+        const totalPercent = (vipAmountNgn > 0) ? 0 : (subtotalNgn > 0 ? Math.round((totalDiscountNgn / subtotalNgn) * 100) : 0);
+        summarySubtotalEl.textContent = vipAmountNgn > 0 ? `₦${vipAmountNgn.toLocaleString()}` : `₦${subtotalNgn.toLocaleString()}`;
         summaryDiscountEl.textContent = `₦${totalDiscountNgn.toLocaleString()} (${totalPercent}%)`;
         summaryTotalEl.textContent = `₦${totalNgn.toLocaleString()}`;
       } else {
@@ -724,6 +755,7 @@
       
       const orderId = orderIdEl.textContent || generateOrderId();
       const selectedThemes = THEMES.filter(t => selected.includes(t.id.toString()));
+      const vipChoice = (document.querySelector('input[name="vipPass"]:checked')?.value) || null;
       
       // Filter themes by type
       const premiumThemes = selectedThemes.filter(t => !t.isFree && t.price > 0);
@@ -736,8 +768,21 @@
       }
       
       const subtotalNgn = premiumThemes.reduce((sum, t) => sum + t.price, 0);
-      const discountNgn = calcDiscount(subtotalNgn, premiumThemes.length);
-      const totalNgn = Math.max(0, subtotalNgn - discountNgn);
+      const bulkPercent = calcBulkPercent(premiumThemes.length);
+      const bulkDiscountNgn = Math.round(subtotalNgn * (bulkPercent / 100));
+      const couponPercent = appliedCouponPercent || 0;
+      const couponDiscountNgn = Math.round(subtotalNgn * (couponPercent / 100));
+      let totalDiscountNgn = Math.min(subtotalNgn, bulkDiscountNgn + couponDiscountNgn);
+      let totalNgn = Math.max(0, subtotalNgn - totalDiscountNgn);
+
+      // VIP overrides
+      let vipAmountNgn = 0;
+      if (vipChoice === 'lifetime') vipAmountNgn = 9999;
+      if (vipChoice === 'yearly') vipAmountNgn = 2999;
+      if (vipAmountNgn > 0) {
+        totalNgn = vipAmountNgn;
+        totalDiscountNgn = 0;
+      }
       const totalInUserCurrency = convertPrice(totalNgn, userCurrency.code);
       
       let uploadedReceiptUrl = null;
@@ -783,11 +828,12 @@
           nairaAmount: totalNgn,
           userCurrencyAmount: totalInUserCurrency,
           userCurrencyCode: userCurrency.code,
-          subtotalNgn: subtotalNgn,
-          bulkDiscountPercent: bulkPercent,
-          couponCode: appliedCouponCode,
-          couponPercent: couponPercent,
-          totalDiscountNgn: totalDiscountNgn,
+          subtotalNgn: vipAmountNgn > 0 ? vipAmountNgn : subtotalNgn,
+          bulkDiscountPercent: vipAmountNgn > 0 ? 0 : bulkPercent,
+          couponCode: vipAmountNgn > 0 ? null : appliedCouponCode,
+          couponPercent: vipAmountNgn > 0 ? 0 : couponPercent,
+          totalDiscountNgn: vipAmountNgn > 0 ? 0 : totalDiscountNgn,
+          vipPass: vipChoice || null,
           jcoinAmount: 0,
           status: 'pending',
           timestamp: serverTimestamp(),
