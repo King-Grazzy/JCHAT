@@ -3532,18 +3532,18 @@
         let currentTheme = 'theme-dark-mode'; // Default theme
         const themeSwitcherThemes = ['theme-light-mode', 'theme-dark-mode', 'theme-sunset-mode', 'theme-glass-mode', 'theme-ocean-mode', 'theme-forest-mode', 'theme-cosmic-mode', 'theme-retro-mode', 'theme-neon-mode', 'theme-elegant-mode'];
         
-        // Theme catalog with pricing and product IDs
+        // Theme catalog with pricing and product IDs - ALL THEMES UNLOCKED
         const themeCatalog = {
             'theme-light-mode': { name: 'Light Mode', price: 0, currency: 'USD', isFree: true, productId: null },
             'theme-dark-mode': { name: 'Dark Mode', price: 0, currency: 'USD', isFree: true, productId: null },
             'theme-sunset-mode': { name: 'Sunset Theme', price: 0, currency: 'USD', isFree: true, productId: null },
             'theme-glass-mode': { name: 'Glass Mode', price: 0, currency: 'USD', isFree: true, productId: null },
-            'theme-ocean-mode': { name: 'Ocean Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_ocean_premium' },
-            'theme-forest-mode': { name: 'Forest Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_forest_premium' },
-            'theme-cosmic-mode': { name: 'Cosmic Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_cosmic_premium' },
-            'theme-retro-mode': { name: 'Retro Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_retro_premium' },
-            'theme-neon-mode': { name: 'Neon Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_neon_premium' },
-            'theme-elegant-mode': { name: 'Elegant Theme', price: 4.99, currency: 'USD', isFree: false, productId: 'theme_elegant_premium' }
+            'theme-ocean-mode': { name: 'Ocean Theme', price: 0, currency: 'USD', isFree: true, productId: null },
+            'theme-forest-mode': { name: 'Forest Theme', price: 0, currency: 'USD', isFree: true, productId: null },
+            'theme-cosmic-mode': { name: 'Cosmic Theme', price: 0, currency: 'USD', isFree: true, productId: null },
+            'theme-retro-mode': { name: 'Retro Theme', price: 0, currency: 'USD', isFree: true, productId: null },
+            'theme-neon-mode': { name: 'Neon Theme', price: 0, currency: 'USD', isFree: true, productId: null },
+            'theme-elegant-mode': { name: 'Elegant Theme', price: 0, currency: 'USD', isFree: true, productId: null }
         };
 
         // Theme purchase/lock state
@@ -3662,26 +3662,13 @@
             }
         }
 
-        // Check if a theme is locked (requires purchase)
+        // Check if a theme is locked (requires purchase) - ALL THEMES UNLOCKED
         function isThemeLocked(theme) {
-            if (themeCatalog[theme].isFree) return false;
-            const productId = themeClassToProductId[theme];
-            return !purchasedThemeProductIds.has(productId);
+            return false; // All themes are now free and unlocked
         }
 
         // Set theme
         function setTheme(theme) {
-            // Check if theme is locked
-            if (isThemeLocked(theme)) {
-                // Redirect to shop to purchase the theme
-                if (typeof openShop === 'function') {
-                    openShop();
-                } else {
-                    showMessageBox('This theme requires purchase. Please visit the shop.', 'info');
-                }
-                return;
-            }
-
             const body = document.body;
             
             // Remove all theme classes
@@ -3754,32 +3741,20 @@
                 const button = document.createElement('button');
                 button.className = 'theme-picker-btn';
                 button.setAttribute('data-theme', theme);
-                button.setAttribute('data-locked', isLocked);
                 
                 let statusText = '';
                 if (isCurrent) statusText = ' (Current)';
-                else if (isOwned) statusText = ' (Owned)';
-                else statusText = ` (${formatPrice(convertPrice(themeInfo.price))})`;
+                else statusText = ' (Free)';
                 
                 button.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span>${themeInfo.name}${statusText}</span>
-                        ${isLocked ? '<i class="fas fa-lock" style="color: #ff6b6b;"></i>' : ''}
                     </div>
                 `;
                 
                 button.addEventListener('click', () => {
-                    if (isLocked) {
-                        if (typeof openShop === 'function') {
-                            openShop();
-                        } else {
-                            showMessageBox('This theme requires purchase. Please visit the shop.', 'info');
-                        }
-                        closeThemePicker();
-                    } else {
-                        setTheme(theme);
-                        closeThemePicker();
-                    }
+                    setTheme(theme);
+                    closeThemePicker();
                 });
                 
                 picker.appendChild(button);
