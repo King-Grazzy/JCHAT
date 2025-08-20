@@ -1,263 +1,594 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JCHAT - My Wallet</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        *, *::before, *::after { box-sizing: border-box; }
         :root {
-            --pink: #ff2e92; --blue: #00d5ff; --gold: #ffd700;
-            --bgA: #0b0f1c; --bgB: #111827; --glass: rgba(255,255,255,0.06);
-            --text: #e8eefc; --muted: rgba(232,238,252,0.7); --border: rgba(255,255,255,0.12);
-            --glow: 0 0 20px rgba(0,213,255,0.25), 0 0 28px rgba(255,46,146,0.12);
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --gradient-info: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--text);
-            background: radial-gradient(1000px 700px at -10% -20%, rgba(0,213,255,0.18), transparent 60%),
-                        radial-gradient(1000px 700px at 110% 120%, rgba(255,46,146,0.16), transparent 60%),
-                        linear-gradient(135deg, var(--bgA), var(--bgB));
-            min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
-        .container { width: 100%; max-width: 1200px; }
-        .header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 16px; padding: 16px; border: 1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius: 16px; backdrop-filter: blur(10px); box-shadow: var(--glow); }
-        .brand { display: flex; align-items: center; gap: 14px; }
-        .logo { font-family: Poppins, sans-serif; font-weight: 800; letter-spacing: -0.02em; font-size: 1.1rem; }
-        .logo .grad { background: linear-gradient(90deg, var(--blue), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .badge { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background: rgba(255,255,255,0.04); font-weight:700; font-size:.8rem; }
-        .nav-actions { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
-        .back { color: var(--text); text-decoration: none; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); }
 
-        .grid { display:grid; grid-template-columns: 1.2fr 0.8fr; gap:16px; }
-        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-        .card { border: 1px solid var(--border); background: rgba(255,255,255,0.04); border-radius: 16px; padding: 18px; box-shadow: var(--glow); }
-        .glass { background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03)); backdrop-filter: blur(12px); }
-        h1, h2, h3 { font-family: Poppins, sans-serif; margin: 0 0 10px; }
-        h1 { font-size: 1.6rem; letter-spacing:-0.01em; }
-        .muted { color: var(--muted); font-size: 0.95rem; }
-        .row { display:flex; align-items:center; gap:10px; }
-        .wrap { flex-wrap: wrap; }
-        .btn { border: 1px solid var(--border); background: linear-gradient(90deg, rgba(0,213,255,0.12), rgba(255,46,146,0.12)); color: var(--text); padding: 10px 12px; border-radius: 12px; cursor: pointer; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; }
-        .btn.primary { background: linear-gradient(90deg, var(--blue), var(--pink)); border-color: transparent; }
-        .btn.block { width: 100%; justify-content: center; }
-        .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; background: rgba(255,255,255,0.06); font-weight: 800; }
-        .kv { display:flex; align-items:center; justify-content: space-between; gap: 8px; padding:8px 0; }
-        .divider { height:1px; background: var(--border); margin:10px 0; }
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
 
-        .file-input-wrapper { display:flex; align-items:center; gap:8px; border:1px dashed var(--border); padding:10px 12px; border-radius:12px; cursor:pointer; background: rgba(255,255,255,0.03); }
-        .file-input-wrapper i { color: var(--pink); }
-        .file-name { font-size:.85rem; color:var(--muted); }
-        .receipt-preview { width:100%; max-height:160px; object-fit:contain; margin-top:8px; border:1px solid var(--border); border-radius:12px; display:none; }
-        .progress { width: 100%; height: 6px; border-radius:999px; background: rgba(255,255,255,0.08); overflow:hidden; display:none; }
-        .progress > div { height:100%; width:0%; background: linear-gradient(90deg, var(--blue), var(--pink)); transition: width .1s linear; }
+        /* Header */
+        .header {
+            background: var(--bg-primary);
+            padding: 20px 0;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-        .empty { color: var(--muted); text-align:center; padding: 12px 8px; border: 1px dashed var(--border); border-radius: 10px; }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        .auth-overlay { position: fixed; inset: 0; background: rgba(5,8,15,0.8); display: none; place-items: center; z-index: 30; }
-        .auth-card { width: 92%; max-width: 560px; border:1px solid var(--border); border-radius: 16px; padding: 18px; background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); backdrop-filter: blur(14px); box-shadow: var(--glow); text-align:center; }
-        .auth-card h3 { margin:0 0 8px; font-family:Poppins,sans-serif; }
-        .auth-card p { color: var(--muted); margin: 4px 0 12px; }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
 
-        .msg { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); padding: 10px 16px; border-radius: 12px; color: #fff; display: none; z-index: 40; }
-        .msg.show { display: block; }
-        .msg.success { background: #16a34a; }
-        .msg.error { background: #dc2626; }
-        .msg.info { background: #2563eb; }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Balance Cards */
+        .balance-section {
+            padding: 24px 0;
+        }
+
+        .balance-card {
+            background: var(--gradient-primary);
+            border-radius: 24px;
+            padding: 32px 24px;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .balance-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .balance-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .balance-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Quick Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .stat-icon.income { background: var(--gradient-success); }
+        .stat-icon.expense { background: var(--gradient-warning); }
+        .stat-icon.requests { background: var(--gradient-info); }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Actions Section */
+        .actions-section {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .action-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .action-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            color: white;
+            font-size: 20px;
+        }
+
+        .action-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Transactions */
+        .transactions-section {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+
+        .transactions-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-item:hover {
+            background: var(--bg-tertiary);
+            margin: 0 -24px;
+            padding-left: 24px;
+            padding-right: 24px;
+            border-radius: 12px;
+        }
+
+        .transaction-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--gradient-info);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 16px;
+        }
+
+        .transaction-content {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .transaction-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .transaction-amount.positive { color: var(--success); }
+        .transaction-amount.negative { color: var(--danger); }
+        .transaction-amount.neutral { color: var(--text-secondary); }
+
+        .transaction-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+            
+            .balance-card {
+                padding: 24px 20px;
+            }
+            
+            .balance-amount {
+                font-size: 32px;
+            }
+            
+            .stats-grid {
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 16px;
+            }
+            
+            .action-grid {
+                gap: 12px;
+            }
+            
+            .action-btn {
+                padding: 16px;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .blurred { filter: blur(4px); }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.warning { border-left: 4px solid var(--warning); }
+        .toast.info { border-left: 4px solid var(--info); }
     </style>
 </head>
 <body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">JCHAT Wallet</div>
+                <div class="user-avatar" id="userAvatar">U</div>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
-        <div class="header glass">
-            <div class="brand">
-                <div class="logo"><span class="grad">JCHAT</span> Wallet</div>
-                <span class="badge"><i class="fas fa-circle" style="color:var(--blue);"></i> <span id="authState">Signing in…</span></span>
-            </div>
-            <div class="nav-actions">
-                <a class="back" href="/Home.html"><i class="fas fa-home"></i> Home</a>
-                <a class="back" href="/Profile.html"><i class="fas fa-user"></i> Profile</a>
-                <a class="back" href="/JCoin.html"><i class="fas fa-coins"></i> JCoin Store</a>
-            </div>
-        </div>
-
-        <div class="grid">
-            <div class="card glass">
-                <h1>Overview</h1>
-                <div class="kv"><div class="muted">Username</div><div id="username">—</div></div>
-                <div class="kv"><div class="muted">Wallet Status</div><div id="walletStatus">—</div></div>
-                <div class="kv"><div class="muted">JCoins</div><div><strong id="jBalance">0</strong> J</div></div>
-                <div class="kv"><div class="muted">Gas</div><div><strong id="gBalance">0</strong></div></div>
-                <div class="divider"></div>
-                <div class="row wrap" style="margin-top:6px; gap:8px;">
-                    <a class="btn" href="/JCoin.html"><i class="fas fa-plus-circle"></i> Buy JCoins</a>
-                    <button id="requestUnlockBtn" class="btn"><i class="fas fa-unlock"></i> Request Unlock</button>
+        <!-- Balance Section -->
+        <section class="balance-section">
+            <div class="balance-card">
+                <div class="balance-label">Total Balance</div>
+                <div class="balance-amount" id="totalBalance">0 JCoins</div>
+                <div class="balance-actions">
+                    <button class="balance-btn" id="sendBtn">
+                        <i class="fas fa-arrow-up"></i> Send
+                    </button>
+                    <button class="balance-btn" id="receiveBtn">
+                        <i class="fas fa-arrow-down"></i> Receive
+                    </button>
                 </div>
-                <p class="muted" style="margin-top:10px;">Keep your payment receipts handy. A developer verifies and unlocks/credits accordingly.</p>
             </div>
+        </section>
 
-            <div class="card glass" id="txCard">
-                <div class="row" style="justify-content:space-between; align-items:center;">
-                    <h2 style="margin:0;">Recent Transactions</h2>
-                    <button id="txViewToggle" class="btn" title="Toggle widget view"><i class="fas fa-th-large"></i> Widget</button>
+        <!-- Quick Stats -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon income">
+                    <i class="fas fa-arrow-down"></i>
                 </div>
-                <div class="row" style="justify-content:space-between; align-items:center; gap:8px; margin-top:8px;">
-                    <div>
-                        <div class="chip"><i class="fas fa-arrow-down"></i> In: <strong id="txWIn">0</strong> J</div>
-                        <div class="chip" style="margin-left:6px;"><i class="fas fa-arrow-up"></i> Out: <strong id="txWOut">0</strong> J</div>
-                        <div class="chip" style="margin-left:6px;"><i class="fas fa-receipt"></i> Requests: <strong id="txWReq">0</strong></div>
+                <div class="stat-value" id="incomeTotal">0</div>
+                <div class="stat-label">Income</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon expense">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="stat-value" id="expenseTotal">0</div>
+                <div class="stat-label">Expense</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon requests">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <div class="stat-value" id="requestsTotal">0</div>
+                <div class="stat-label">Requests</div>
+            </div>
+        </section>
+
+        <!-- Actions Section -->
+        <section class="actions-section">
+            <h2 class="section-title">Quick Actions</h2>
+            <div class="action-grid">
+                <a href="#" class="action-btn" id="sendJCoinsBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-paper-plane"></i>
                     </div>
-                    <div style="flex:1; max-width:300px;">
-                        <input id="txSearchInput" type="text" placeholder="Search notes or user..." style="width:100%; padding:8px 10px; border:1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text); border-radius:10px;" />
+                    <div class="action-label">Send JCoins</div>
+                </a>
+                <a href="#" class="action-btn" id="createPayRequestBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-hand-holding-usd"></i>
                     </div>
-                </div>
-                <div id="txList" style="margin-top:8px; display:grid; gap:8px;"></div>
-                <div id="txEmpty" class="empty" style="display:none;">No transactions yet.</div>
-            </div>
-        </div>
-
-        <div id="actionsCard" class="card glass" style="margin-top:16px; display:none;">
-            <h2>Wallet Actions</h2>
-            <div class="divider"></div>
-            <div class="row wrap" style="gap:16px;">
-                <div style="flex:1; min-width:260px;">
-                    <h3 style="margin:0 0 8px;">Send JCoins</h3>
-                    <div class="form" style="display:grid; gap:8px;">
-                        <input id="sendTargetUid" type="text" placeholder="Recipient User ID (UID)" />
-                        <input id="sendAmount" type="number" min="1" step="1" placeholder="Amount (J)" />
-                        <input id="sendNote" type="text" placeholder="Note (optional)" />
-                        <button id="sendJCoinsBtn" class="btn primary"><i class="fas fa-paper-plane"></i> Send</button>
+                    <div class="action-label">Request Payment</div>
+                </a>
+                <a href="#" class="action-btn" id="swapBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-exchange-alt"></i>
                     </div>
-                </div>
-                <div style="flex:1; min-width:260px;">
-                    <h3 style="margin:0 0 8px;">Request JCoins</h3>
-                    <div class="form" style="display:grid; gap:8px;">
-                        <input id="requestAmount" type="number" min="1" step="1" placeholder="Amount (J)" />
-                        <input id="requestNote" type="text" placeholder="Note (optional)" />
-                        <button id="createPayRequestBtn" class="btn"><i class="fas fa-link"></i> Create Request</button>
-                        <div id="payRequestShare" class="muted" style="display:none; word-break:break-all;"></div>
+                    <div class="action-label">Swap</div>
+                </a>
+                <a href="#" class="action-btn" id="settingsBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-cog"></i>
                     </div>
+                    <div class="action-label">Settings</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Transactions Section -->
+        <section class="transactions-section">
+            <div class="transactions-header">
+                <h2 class="section-title">Recent Transactions</h2>
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" id="txSearchInput" placeholder="Search transactions...">
                 </div>
             </div>
-        </div>
-
-        <div id="payRequestCard" class="card glass" style="margin-top:16px; display:none;">
-            <h2>Pay Request</h2>
-            <div id="payReqDetails" class="muted">Loading…</div>
-            <div class="divider"></div>
-            <div class="row wrap" style="gap:8px;">
-                <button id="payRequestNowBtn" class="btn primary"><i class="fas fa-check"></i> Pay Now</button>
-                <button id="cancelPayRequestBtn" class="btn"><i class="fas fa-times"></i> Cancel</button>
+            
+            <div id="txList">
+                <!-- Transactions will be rendered here -->
             </div>
-        </div>
-
-        <div id="paymentCard" class="card glass" style="margin-top:16px; display:none;">
-            <h2 id="paymentTitle">Payment</h2>
-            <p id="paymentCaption" class="muted">—</p>
-            <div class="divider"></div>
-            <div class="row wrap" style="gap:10px;">
-                <div class="chip"><i class="fas fa-university"></i> OPay: <strong id="opayAcct">8111609765</strong></div>
-                <div class="chip"><i class="fas fa-user"></i> Name: <strong>ELECHI JOSHUA</strong></div>
-            </div>
-            <div class="row wrap" style="gap:10px; margin-top:8px;">
-                <div class="chip"><i class="fas fa-university"></i> Keystone: <strong id="keystoneAcct">6042862356</strong></div>
-                <div class="chip"><i class="fas fa-user"></i> Name: <strong>ELECHI OSOUNDU JOSHUA</strong></div>
-            </div>
-            <div class="row wrap" style="gap:8px; margin-top:8px;">
-                <button class="btn" id="copyOpay"><i class="fas fa-copy"></i> Copy OPay</button>
-                <button class="btn" id="copyKeystone"><i class="fas fa-copy"></i> Copy Keystone</button>
-            </div>
-
-            <div class="divider"></div>
-            <div class="row wrap" style="gap:10px;">
-                <div class="chip"><i class="fas fa-tag"></i> Amount: ₦<strong id="payAmount">0</strong></div>
-                <div class="chip" id="premiumChip" style="display:none;"><i class="fas fa-gem"></i> Tier: <strong id="premiumTier">—</strong></div>
-            </div>
-
-            <div style="margin-top:10px;">
-                <label class="muted" for="receiptInput">Upload Receipt (optional)</label>
-                <div class="file-input-wrapper" id="receiptTrigger">
-                    <i class="fas fa-upload"></i>
-                    <span class="file-name" id="receiptFileName">No file chosen</span>
+            
+            <div id="txEmpty" class="empty-state hidden">
+                <div class="empty-icon">
+                    <i class="fas fa-receipt"></i>
                 </div>
-                <input type="file" id="receiptInput" accept="image/*,.pdf" />
-                <div class="progress" id="uploadProgress"><div></div></div>
-                <img id="receiptPreview" class="receipt-preview" />
+                <div class="empty-title">No transactions yet</div>
+                <div class="empty-description">Your transaction history will appear here once you start using your wallet.</div>
             </div>
-
-            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-                <button id="submitPaymentBtn" class="btn primary"><i class="fas fa-paper-plane"></i> Submit Payment</button>
-                <a id="openJCoinBtn" href="/JCoin.html" class="btn"><i class="fas fa-coins"></i> Open JCoin Store</a>
-            </div>
-        </div>
-
-        <div id="securityCard" class="card glass" style="margin-top:16px;">
-            <h2>Security</h2>
-            <div class="divider"></div>
-            <div class="row wrap" style="gap:16px; align-items:center;">
-                <label style="display:flex; align-items:center; gap:8px;">
-                    <input id="requirePinToggle" type="checkbox" /> Require PIN for Send/Pay
-                </label>
-                <button id="setChangePinBtn" class="btn"><i class="fas fa-key"></i> Set/Change PIN</button>
-                <label style="display:flex; align-items:center; gap:8px;">
-                    <input id="privacyBlurToggle" type="checkbox" /> Blur Balances
-                </label>
-                <label style="display:flex; align-items:center; gap:8px;">
-                    Auto‑lock
-                    <select id="autoLockSelect">
-                        <option value="0">Off</option>
-                        <option value="60">1 min</option>
-                        <option value="300">5 min</option>
-                        <option value="900">15 min</option>
-                    </select>
-                </label>
-            </div>
-            <p class="muted" style="margin-top:8px;">PIN is verified only on device using a salted hash. Do not share your PIN.</p>
-        </div>
+        </section>
     </div>
 
-    <div class="auth-overlay" id="authOverlay">
-        <div class="auth-card glass">
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Info</div>
+
+    <!-- Hidden Elements for Functionality -->
+    <div id="authOverlay" class="hidden">
+        <div class="auth-card">
             <h3>Sign In Required</h3>
             <p>Please sign in to manage your wallet.</p>
             <div style="display:flex; gap:10px; justify-content:center;">
-                <a href="/Login.html" class="btn primary"><i class="fas fa-right-to-bracket"></i> Go to Login</a>
-                <a href="/Home.html" class="btn"><i class="fas fa-home"></i> Back to Home</a>
+                <a href="/Login.html" class="btn primary">Go to Login</a>
+                <a href="/Home.html" class="btn">Back to Home</a>
             </div>
         </div>
     </div>
-
-    <div class="auth-overlay" id="sessionLockOverlay" style="display:none;">
-        <div class="auth-card glass">
-            <h3>Wallet Locked</h3>
-            <p>Enter your wallet PIN to continue.</p>
-            <input id="sessionPinInput" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="PIN" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text);" />
-            <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
-                <button id="unlockSessionBtn" class="btn primary"><i class="fas fa-unlock"></i> Unlock</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="auth-overlay" id="pinModalOverlay" style="display:none;">
-        <div class="auth-card glass">
-            <h3 id="pinModalTitle">Set Wallet PIN</h3>
-            <div id="pinModalBody" style="display:grid; gap:8px;">
-                <input id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="Enter PIN (min 4)" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text);" />
-                <input id="pinConfirmInput" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="Confirm PIN" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text);" />
-                <p id="pinHint" class="muted" style="margin:4px 0 0;">PIN is stored as a salted hash.</p>
-            </div>
-            <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
-                <button id="pinModalConfirmBtn" class="btn primary"><i class="fas fa-check"></i> Confirm</button>
-                <button id="pinModalCancelBtn" class="btn"><i class="fas fa-times"></i> Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="toast" class="msg info">Info</div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
@@ -279,81 +610,30 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const authState = document.getElementById('authState');
+        // DOM Elements
+        const userAvatar = document.getElementById('userAvatar');
+        const totalBalance = document.getElementById('totalBalance');
+        const incomeTotal = document.getElementById('incomeTotal');
+        const expenseTotal = document.getElementById('expenseTotal');
+        const requestsTotal = document.getElementById('requestsTotal');
+        const txList = document.getElementById('txList');
+        const txEmpty = document.getElementById('txEmpty');
         const toast = document.getElementById('toast');
         const authOverlay = document.getElementById('authOverlay');
 
-        const usernameEl = document.getElementById('username');
-        const walletStatusEl = document.getElementById('walletStatus');
-        const jBalanceEl = document.getElementById('jBalance');
-        const gBalanceEl = document.getElementById('gBalance');
-        const requestUnlockBtn = document.getElementById('requestUnlockBtn');
-        const txList = document.getElementById('txList');
-        const txEmpty = document.getElementById('txEmpty');
-
-        const paymentCard = document.getElementById('paymentCard');
-        const paymentTitle = document.getElementById('paymentTitle');
-        const paymentCaption = document.getElementById('paymentCaption');
-        const payAmount = document.getElementById('payAmount');
-        const premiumChip = document.getElementById('premiumChip');
-        const premiumTierEl = document.getElementById('premiumTier');
-        const submitPaymentBtn = document.getElementById('submitPaymentBtn');
-        const openJCoinBtn = document.getElementById('openJCoinBtn');
-
-        // Actions
-        const actionsCard = document.getElementById('actionsCard');
-        const sendTargetUid = document.getElementById('sendTargetUid');
-        const sendAmountInput = document.getElementById('sendAmount');
-        const sendNoteInput = document.getElementById('sendNote');
-        const sendJCoinsBtn = document.getElementById('sendJCoinsBtn');
-        const requestAmountInput = document.getElementById('requestAmount');
-        const requestNoteInput = document.getElementById('requestNote');
-        const createPayRequestBtn = document.getElementById('createPayRequestBtn');
-        const payRequestShare = document.getElementById('payRequestShare');
-
-        // Pay Request Viewer
-        const payRequestCard = document.getElementById('payRequestCard');
-        const payReqDetails = document.getElementById('payReqDetails');
-        const payRequestNowBtn = document.getElementById('payRequestNowBtn');
-        const cancelPayRequestBtn = document.getElementById('cancelPayRequestBtn');
-
-        // Security elements
-        const requirePinToggle = document.getElementById('requirePinToggle');
-        const setChangePinBtn = document.getElementById('setChangePinBtn');
-        const privacyBlurToggle = document.getElementById('privacyBlurToggle');
-        const autoLockSelect = document.getElementById('autoLockSelect');
-        const sessionLockOverlay = document.getElementById('sessionLockOverlay');
-        const sessionPinInput = document.getElementById('sessionPinInput');
-        const unlockSessionBtn = document.getElementById('unlockSessionBtn');
-        const pinModalOverlay = document.getElementById('pinModalOverlay');
-        const pinModalTitle = document.getElementById('pinModalTitle');
-        const pinInput = document.getElementById('pinInput');
-        const pinConfirmInput = document.getElementById('pinConfirmInput');
-        const pinModalConfirmBtn = document.getElementById('pinModalConfirmBtn');
-        const pinModalCancelBtn = document.getElementById('pinModalCancelBtn');
-
-        const receiptTrigger = document.getElementById('receiptTrigger');
-        const receiptInput = document.getElementById('receiptInput');
-        const receiptFileName = document.getElementById('receiptFileName');
-        const receiptPreview = document.getElementById('receiptPreview');
-        const uploadProgress = document.getElementById('uploadProgress');
-        const uploadBar = uploadProgress.querySelector('div');
-
-        const copyOpay = document.getElementById('copyOpay');
-        const copyKeystone = document.getElementById('copyKeystone');
-
+        // Variables
         let currentUser = null;
         let currentProfile = null;
-        let paymentContext = null; // { type: 'unlock'|'premium', amount: number, tier?: string }
-        let overlayTimer = null;
-        let payRequestContext = null; // { id, requesterId, amount, note }
-        let inactivityTimer = null;
-        const SECURITY_DEFAULTS = { walletRequirePin: false, privacyBlur: false, autoLockSeconds: 0 };
-        let walletSecurity = { ...SECURITY_DEFAULTS, walletPinHash: null, walletPinSalt: null };
+        let txSearchTerm = ''; // Transaction search term for filtering
 
+        // Functions
         function showToast(message, type = 'info') {
-            toast.textContent = message; toast.className = `msg show ${type}`;
-            setTimeout(() => { toast.className = 'msg'; }, 2500);
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
         }
 
         function getParams() {
@@ -365,7 +645,6 @@
         async function ensureAuthenticated() {
             try {
                 if (auth.currentUser) return;
-                authState.textContent = 'Checking session…';
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
                 }
@@ -380,11 +659,6 @@
             const snap = await getDoc(profRef);
             if (snap.exists()) {
                 currentProfile = snap.data();
-                walletSecurity.walletPinHash = currentProfile.walletPinHash || null;
-                walletSecurity.walletPinSalt = currentProfile.walletPinSalt || null;
-                walletSecurity.walletRequirePin = !!currentProfile.walletRequirePin;
-                walletSecurity.privacyBlur = !!currentProfile.privacyBlur;
-                walletSecurity.autoLockSeconds = Number(currentProfile.autoLockSeconds || 0);
             } else {
                 currentProfile = { jCoins: 0, gas: 0, walletUnlocked: false };
                 await setDoc(profRef, { ...currentProfile, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
@@ -393,588 +667,101 @@
 
         function renderOverview() {
             const name = currentUser?.displayName || currentUser?.email || currentProfile?.username || 'User';
-            usernameEl.textContent = name;
-            jBalanceEl.textContent = String(currentProfile?.jCoins ?? 0);
-            gBalanceEl.textContent = String(currentProfile?.gas ?? 0);
-            const unlocked = !!currentProfile?.walletUnlocked;
-            walletStatusEl.innerHTML = unlocked ? '<span class="chip" style="border-color:rgba(16,185,129,.4)"><i class="fas fa-unlock"></i> Unlocked</span>' : '<span class="chip" style="border-color:rgba(220,38,38,.4)"><i class="fas fa-lock"></i> Locked</span>';
-            requestUnlockBtn.style.display = unlocked ? 'none' : '';
-            actionsCard.style.display = unlocked ? '' : 'none';
-            // Apply security toggles
-            requirePinToggle.checked = !!walletSecurity.walletRequirePin;
-            privacyBlurToggle.checked = !!walletSecurity.privacyBlur;
-            autoLockSelect.value = String(walletSecurity.autoLockSeconds || 0);
-            // Blur balances
-            const blurCls = 'blurred';
-            if (walletSecurity.privacyBlur) { jBalanceEl.classList.add(blurCls); gBalanceEl.classList.add(blurCls); }
-            else { jBalanceEl.classList.remove(blurCls); gBalanceEl.classList.remove(blurCls); }
-            // Setup inactivity lock timer
-            resetInactivityTimer();
+            userAvatar.textContent = name.charAt(0).toUpperCase();
+            totalBalance.textContent = `${currentProfile?.jCoins ?? 0} JCoins`;
         }
 
         async function renderTransactions() {
             txList.innerHTML = '';
-            txEmpty.style.display = 'none';
+            txEmpty.classList.add('hidden');
+            
             try {
                 const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), orderBy('timestamp', 'desc'), limit(50));
                 const snap = await getDocs(q);
-                if (snap.empty) { txEmpty.style.display = ''; updateTxWidgetCounts(0,0,0); return; }
+                
+                if (snap.empty) {
+                    txEmpty.classList.remove('hidden');
+                    updateStats(0, 0, 0);
+                    return;
+                }
+                
                 let sumIn = 0, sumOut = 0, countReq = 0;
+                
                 for (const d of snap.docs) {
                     const t = d.data();
                     const type = (t.type || '').toString();
                     const isIn = ['p2p_transfer_in','p2p_request_pay_in'].includes(type);
                     const isOut = ['p2p_transfer_out','p2p_request_pay_out','premium_payment'].includes(type);
                     const isReq = type.includes('request');
+                    
                     const noteStr = ((t.note || t.description || '').toString()).toLowerCase();
                     const cp = (t.counterpartyId || '').toString().toLowerCase();
+                    
                     if (txSearchTerm && !(noteStr.includes(txSearchTerm) || cp.includes(txSearchTerm) || type.includes(txSearchTerm))) continue;
 
                     const card = document.createElement('div');
-                    card.className = 'tx-card';
+                    card.className = 'transaction-item';
+                    
                     const tsDate = t.timestamp?.toDate ? new Date(t.timestamp.toDate()) : new Date();
                     const amtNum = typeof t.amount === 'number' ? t.amount : null;
                     const amtStr = amtNum !== null ? (isIn ? `+${amtNum}` : isOut ? `-${amtNum}` : `${amtNum}`) : '';
-                    const amtCls = isIn ? 'amt-pos' : isOut ? 'amt-neg' : '';
-                    const badgeCls = isReq ? 'warn' : (isIn ? 'ok' : 'neu');
-                    const title = type.replace(/_/g,' ');
+                    const amtCls = isIn ? 'positive' : isOut ? 'negative' : 'neutral';
+                    const title = type.replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase());
                     const cpLabel = (t.counterpartyId ? ` • ${t.counterpartyId}` : '');
+                    
                     card.innerHTML = `
-                        <div class="tx-left">
-                            <div class="avatar">${(t.counterpartyId||'U').toString().slice(0,1).toUpperCase()}</div>
-                            <div class="tx-meta">
-                                <div class="tx-title">${title}<span class="badge ${badgeCls}" style="margin-left:8px;">${isIn?'IN':isOut?'OUT':isReq?'REQ':'INFO'}</span></div>
-                                <div class="tx-note">${(t.note || t.description || '—')}${cpLabel}</div>
-                            </div>
+                        <div class="transaction-avatar">${(t.counterpartyId||'U').toString().slice(0,1).toUpperCase()}</div>
+                        <div class="transaction-content">
+                            <div class="transaction-title">${title}</div>
+                            <div class="transaction-subtitle">${(t.note || t.description || '—')}${cpLabel}</div>
                         </div>
-                        <div class="tx-right">
-                            <div class="${amtCls}">${amtStr}</div>
-                            <div class="ts">${tsDate.toLocaleString()}</div>
+                        <div style="text-align: right;">
+                            <div class="transaction-amount ${amtCls}">${amtStr}</div>
+                            <div class="transaction-time">${tsDate.toLocaleDateString()}</div>
                         </div>
                     `;
+                    
                     txList.appendChild(card);
+                    
                     if (isIn && typeof t.amount === 'number') sumIn += t.amount;
                     if (isOut && typeof t.amount === 'number') sumOut += t.amount;
                     if (isReq) countReq += 1;
                 }
-                updateTxWidgetCounts(sumIn, sumOut, countReq);
+                
+                updateStats(sumIn, sumOut, countReq);
+                
             } catch (e) {
                 console.error('tx load error', e);
-                txEmpty.style.display = '';
+                txEmpty.classList.remove('hidden');
             }
         }
 
-        function updateTxWidgetCounts(sumIn, sumOut, countReq) {
-            const elIn = document.getElementById('txWIn');
-            const elOut = document.getElementById('txWOut');
-            const elReq = document.getElementById('txWReq');
-            if (elIn) elIn.textContent = String(sumIn);
-            if (elOut) elOut.textContent = String(sumOut);
-            if (elReq) elReq.textContent = String(countReq);
+        function updateStats(sumIn, sumOut, countReq) {
+            incomeTotal.textContent = sumIn;
+            expenseTotal.textContent = sumOut;
+            requestsTotal.textContent = countReq;
         }
 
-        function setupPaymentContextFromParams() {
-            const p = getParams();
-            if (p.unlock === '1') {
-                const amt = Number(p.amount || 0) || 0;
-                paymentContext = { type: 'unlock', amount: amt };
-            } else if (p.premium) {
-                const tier = String(p.premium);
-                const amt = Number(p.amount || 0) || 0;
-                paymentContext = { type: 'premium', tier, amount: amt };
-            } else {
-                paymentContext = null;
-            }
-            // Payment request viewer
-            if (p.payreq) {
-                payRequestContext = { id: String(p.payreq) };
-            } else {
-                payRequestContext = null;
-            }
-        }
-
-        function renderPaymentCard() {
-            if (!paymentContext) { paymentCard.style.display = 'none'; return; }
-            paymentCard.style.display = '';
-            payAmount.textContent = String(paymentContext.amount || 0);
-            premiumChip.style.display = paymentContext.type === 'premium' ? '' : 'none';
-            if (paymentContext.type === 'unlock') {
-                paymentTitle.textContent = 'Wallet Unlock Payment';
-                paymentCaption.textContent = 'Transfer the amount shown to any of the accounts below and upload your receipt. A developer will unlock your wallet after verification.';
-            } else {
-                paymentTitle.textContent = 'Premium Subscription Payment';
-                paymentCaption.textContent = 'Complete your premium upgrade by paying the amount below, then upload your receipt. A developer will activate your premium after verification.';
-                premiumTierEl.textContent = String(paymentContext.tier || 'premium');
-            }
-        }
-        // --- Security helpers ---
-        function resetInactivityTimer() {
-            if (!walletSecurity.autoLockSeconds) return;
-            if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; }
-            inactivityTimer = setTimeout(() => {
-                if (walletSecurity.walletRequirePin && walletSecurity.walletPinHash) {
-                    sessionLockOverlay.style.display = 'grid';
-                    sessionPinInput.value = '';
-                    try { sessionPinInput.focus(); } catch {}
-                }
-            }, walletSecurity.autoLockSeconds * 1000);
-        }
-
-        ['click','keydown','mousemove','touchstart'].forEach(evt => {
-            window.addEventListener(evt, () => { if (walletSecurity.autoLockSeconds) resetInactivityTimer(); }, { passive: true });
-        });
-
-        function toBase64(bytes) {
-            const bin = String.fromCharCode(...new Uint8Array(bytes));
-            return btoa(bin);
-        }
-        function fromBase64(b64) {
-            const bin = atob(b64);
-            const len = bin.length;
-            const bytes = new Uint8Array(len);
-            for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i);
-            return bytes.buffer;
-        }
-        async function pbkdf2HashPin(pin, saltB64) {
-            const enc = new TextEncoder();
-            const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveBits']);
-            const salt = saltB64 ? new Uint8Array(fromBase64(saltB64)) : crypto.getRandomValues(new Uint8Array(16));
-            const bits = await crypto.subtle.deriveBits({ name:'PBKDF2', hash:'SHA-256', salt, iterations: 100000 }, keyMaterial, 256);
-            return { saltB64: toBase64(salt), hashB64: toBase64(bits) };
-        }
-
-        async function setWalletPinFlow() {
-            pinModalTitle.textContent = 'Set/Change Wallet PIN';
-            pinModalOverlay.style.display = 'grid';
-            pinConfirmInput.style.display = '';
-            pinInput.value = ''; pinConfirmInput.value = '';
-            return new Promise((resolve) => {
-                function cleanup(ok) {
-                    pinModalOverlay.style.display = 'none';
-                    pinModalConfirmBtn.removeEventListener('click', onConfirm);
-                    pinModalCancelBtn.removeEventListener('click', onCancel);
-                }
-                async function onConfirm() {
-                    const p1 = (pinInput.value || '').trim();
-                    const p2 = (pinConfirmInput.value || '').trim();
-                    if (p1.length < 4) { showToast('PIN must be at least 4 digits.', 'warning'); return; }
-                    if (p1 !== p2) { showToast('PINs do not match.', 'error'); return; }
-                    const { saltB64, hashB64 } = await pbkdf2HashPin(p1);
-                    // Save to Firestore profile
-                    try {
-                        await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), {
-                            walletPinSalt: saltB64,
-                            walletPinHash: hashB64,
-                            walletRequirePin: true,
-                            updatedAt: serverTimestamp()
-                        }, { merge: true });
-                        walletSecurity.walletPinSalt = saltB64;
-                        walletSecurity.walletPinHash = hashB64;
-                        walletSecurity.walletRequirePin = true;
-                        requirePinToggle.checked = true;
-                        showToast('PIN set.', 'success');
-                    } catch (e) { console.error(e); showToast('Failed to save PIN', 'error'); }
-                    cleanup(true); resolve(true);
-                }
-                function onCancel() { cleanup(false); resolve(false); }
-                pinModalConfirmBtn.addEventListener('click', onConfirm);
-                pinModalCancelBtn.addEventListener('click', onCancel);
-            });
-        }
-
-        async function verifyPinFlow() {
-            if (!walletSecurity.walletRequirePin || !walletSecurity.walletPinHash) return true;
-            // Prompt for PIN
-            pinModalTitle.textContent = 'Enter Wallet PIN';
-            pinModalOverlay.style.display = 'grid';
-            pinConfirmInput.style.display = 'none';
-            pinInput.value = '';
-            return new Promise((resolve) => {
-                function cleanup(ok) {
-                    pinModalOverlay.style.display = 'none';
-                    pinModalConfirmBtn.removeEventListener('click', onConfirm);
-                    pinModalCancelBtn.removeEventListener('click', onCancel);
-                }
-                async function onConfirm() {
-                    const p = (pinInput.value || '').trim();
-                    const { hashB64 } = await pbkdf2HashPin(p, walletSecurity.walletPinSalt);
-                    if (hashB64 === walletSecurity.walletPinHash) { cleanup(true); resolve(true); }
-                    else { showToast('Incorrect PIN.', 'error'); }
-                }
-                function onCancel() { cleanup(false); resolve(false); }
-                pinModalConfirmBtn.addEventListener('click', onConfirm);
-                pinModalCancelBtn.addEventListener('click', onCancel);
-            });
-        }
-
-        unlockSessionBtn.addEventListener('click', async () => {
-            const p = (sessionPinInput.value || '').trim();
-            try {
-                const { hashB64 } = await pbkdf2HashPin(p, walletSecurity.walletPinSalt);
-                if (hashB64 === walletSecurity.walletPinHash) {
-                    sessionLockOverlay.style.display = 'none';
-                    resetInactivityTimer();
-                } else {
-                    showToast('Incorrect PIN.', 'error');
-                }
-            } catch (e) { showToast('Unlock failed', 'error'); }
-        });
-
-        setChangePinBtn.addEventListener('click', setWalletPinFlow);
-        requirePinToggle.addEventListener('change', async () => {
-            if (!currentUser) return;
-            try {
-                const enabled = !!requirePinToggle.checked;
-                if (enabled && !walletSecurity.walletPinHash) {
-                    requirePinToggle.checked = false;
-                    await setWalletPinFlow();
-                    return;
-                }
-                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), {
-                    walletRequirePin: enabled,
-                    updatedAt: serverTimestamp()
-                }, { merge: true });
-                walletSecurity.walletRequirePin = enabled;
-            } catch (e) { console.error(e); showToast('Failed to update setting', 'error'); }
-        });
-        privacyBlurToggle.addEventListener('change', async () => {
-            if (!currentUser) return;
-            try {
-                const enabled = !!privacyBlurToggle.checked;
-                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), {
-                    privacyBlur: enabled,
-                    updatedAt: serverTimestamp()
-                }, { merge: true });
-                walletSecurity.privacyBlur = enabled; renderOverview();
-            } catch (e) { console.error(e); showToast('Failed to update setting', 'error'); }
-        });
-        autoLockSelect.addEventListener('change', async () => {
-            if (!currentUser) return;
-            try {
-                const secs = Number(autoLockSelect.value || '0') || 0;
-                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), {
-                    autoLockSeconds: secs,
-                    updatedAt: serverTimestamp()
-                }, { merge: true });
-                walletSecurity.autoLockSeconds = secs; resetInactivityTimer();
-            } catch (e) { console.error(e); showToast('Failed to update setting', 'error'); }
-        });
-
-        receiptTrigger.addEventListener('click', () => receiptInput.click());
-        receiptInput.addEventListener('change', () => {
-            const f = receiptInput.files?.[0];
-            if (!f) { receiptFileName.textContent = 'No file chosen'; receiptPreview.style.display = 'none'; return; }
-            receiptFileName.textContent = f.name;
-            if (f.type.startsWith('image/')) { receiptPreview.src = URL.createObjectURL(f); receiptPreview.style.display = ''; } else { receiptPreview.style.display = 'none'; }
-        });
-
-        copyOpay.addEventListener('click', () => { navigator.clipboard.writeText('8111609765'); showToast('OPay account copied', 'success'); });
-        copyKeystone.addEventListener('click', () => { navigator.clipboard.writeText('6042862356'); showToast('Keystone account copied', 'success'); });
-
-        async function uploadReceiptIfAny() {
-            const f = receiptInput.files?.[0];
-            if (!f) return null;
-            try {
-                uploadProgress.style.display = '';
-                uploadBar.style.width = '0%';
-                const url = 'https://api.cloudinary.com/v1_1/dxld01rcp/auto/upload';
-                const fd = new FormData();
-                fd.append('file', f);
-                fd.append('upload_preset', 'Storage_preset');
-                const res = await new Promise((resolve, reject) => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', url);
-                    xhr.upload.onprogress = (e) => {
-                        if (e.lengthComputable) {
-                            const pct = Math.round((e.loaded / e.total) * 100);
-                            uploadBar.style.width = pct + '%';
-                        }
-                    };
-                    xhr.onload = () => resolve(xhr);
-                    xhr.onerror = () => reject(new Error('Upload failed'));
-                    xhr.send(fd);
-                });
-                if (res.status < 200 || res.status >= 300) throw new Error('Upload failed');
-                const data = JSON.parse(res.responseText);
-                uploadBar.style.width = '100%';
-                return data.secure_url || null;
-            } catch (e) { console.error('Receipt upload error', e); return null; }
-            finally { setTimeout(() => { uploadProgress.style.display = 'none'; }, 600); }
-        }
-
-        async function submitPayment() {
-            if (!paymentContext) { showToast('Nothing to submit.', 'error'); return; }
-            if (!currentUser) { showToast('Please sign in first', 'error'); return; }
-            try {
-                submitPaymentBtn.disabled = true;
-                const proofUrl = await uploadReceiptIfAny();
-
-                if (paymentContext.type === 'unlock') {
-                    // Create central request and a user transaction log
-                    const req = {
-                        userId: currentUser.uid,
-                        username: currentUser.displayName || currentUser.email || 'Unknown User',
-                        amountNaira: Number(paymentContext.amount || 0),
-                        type: 'wallet_unlock',
-                        status: 'pending',
-                        ...(proofUrl ? { paymentProof: proofUrl } : {}),
-                        timestamp: serverTimestamp()
-                    };
-                    await addDoc(collection(db, 'artifacts', appId, 'wallet_unlock_requests'), req);
-                    await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), {
-                        type: 'wallet_unlock_request',
-                        amount: Number(paymentContext.amount || 0),
-                        description: 'User submitted wallet unlock payment',
-                        timestamp: serverTimestamp()
-                    });
-                    showToast('Unlock payment submitted. Await verification.', 'success');
-                } else if (paymentContext.type === 'premium') {
-                    const req = {
-                        userId: currentUser.uid,
-                        username: currentUser.displayName || currentUser.email || 'Unknown User',
-                        tier: String(paymentContext.tier || 'premium'),
-                        amountNaira: Number(paymentContext.amount || 0),
-                        type: 'premium_upgrade',
-                        status: 'pending',
-                        ...(proofUrl ? { paymentProof: proofUrl } : {}),
-                        timestamp: serverTimestamp()
-                    };
-                    await addDoc(collection(db, 'artifacts', appId, 'premium_payments'), req);
-                    await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), {
-                        type: 'premium_payment',
-                        amount: Number(paymentContext.amount || 0),
-                        description: `User paid for premium tier: ${String(paymentContext.tier || 'premium')}`,
-                        timestamp: serverTimestamp()
-                    });
-                    showToast('Premium payment submitted. Await activation.', 'success');
-                }
-            } catch (e) {
-                console.error('submit payment error', e);
-                showToast(e?.message || 'Failed to submit', 'error');
-            } finally {
-                submitPaymentBtn.disabled = false;
-                renderTransactions();
-            }
-        }
-
-        submitPaymentBtn.addEventListener('click', submitPayment);
-
-        requestUnlockBtn.addEventListener('click', () => {
-            if (!currentUser) { showToast('Please sign in first', 'error'); return; }
-            // Default unlock fee if not provided in URL
-            if (!paymentContext || paymentContext.type !== 'unlock') {
-                paymentContext = { type: 'unlock', amount: 5000 };
-                renderPaymentCard();
-                window.history.replaceState({}, '', '/Wallet.html?unlock=1&amount=5000');
-            } else {
-                renderPaymentCard();
-            }
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-        });
-
-        // --- Send JCoins (client Firestore transaction; no Cloud Functions) ---
-        async function sendJCoins() {
-            try {
-                if (!currentUser || !currentProfile?.walletUnlocked) { showToast('Wallet locked or not signed in.', 'error'); return; }
-                const ok = await verifyPinFlow(); if (!ok) return;
-                const targetUid = (sendTargetUid.value || '').trim();
-                const amount = Math.floor(Number(sendAmountInput.value || 0));
-                const note = (sendNoteInput.value || '').trim();
-                if (!targetUid) { showToast('Enter recipient user ID.', 'warning'); return; }
-                if (targetUid === currentUser.uid) { showToast('Cannot send to yourself.', 'warning'); return; }
-                if (!amount || amount <= 0) { showToast('Enter a valid amount.', 'warning'); return; }
-
-                sendJCoinsBtn.disabled = true;
-                await runTransaction(db, async (tx) => {
-                    const senderRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
-                    const recipientRef = doc(db, 'artifacts', appId, 'users', targetUid, 'profiles', 'user_profile');
-                    const senderSnap = await tx.get(senderRef);
-                    if (!senderSnap.exists()) { throw new Error('Sender profile not found.'); }
-                    const senderCoins = Number(senderSnap.data().jCoins || 0);
-                    if (senderCoins < amount) { throw new Error('Insufficient JCoins.'); }
-                    const recipientSnap = await tx.get(recipientRef);
-                    const recipientCoins = recipientSnap.exists() ? Number(recipientSnap.data().jCoins || 0) : 0;
-
-                    tx.update(senderRef, { jCoins: senderCoins - amount, updatedAt: serverTimestamp() });
-                    if (recipientSnap.exists()) {
-                        tx.update(recipientRef, { jCoins: recipientCoins + amount, updatedAt: serverTimestamp() });
-                    } else {
-                        tx.set(recipientRef, { jCoins: recipientCoins + amount, gas: 0, level: 1, currentXp: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
-                    }
-
-                    const senderTxCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions');
-                    const recipientTxCol = collection(db, 'artifacts', appId, 'users', targetUid, 'transactions');
-                    tx.set(doc(senderTxCol), { type: 'p2p_transfer_out', amount, note, counterpartyId: targetUid, timestamp: serverTimestamp() });
-                    tx.set(doc(recipientTxCol), { type: 'p2p_transfer_in', amount, note, counterpartyId: currentUser.uid, timestamp: serverTimestamp() });
-                });
-
-                showToast('JCoins sent!', 'success');
-                // Update local snapshot values
-                try { await loadProfile(); renderOverview(); await renderTransactions(); } catch {}
-                sendAmountInput.value = ''; sendTargetUid.value = ''; sendNoteInput.value = '';
-            } catch (e) {
-                console.error('send jcoins error', e);
-                showToast(e?.message || 'Send failed', 'error');
-            } finally {
-                sendJCoinsBtn.disabled = false;
-            }
-        }
-
-        // --- Create Payment Request ---
-        async function createPaymentRequest() {
-            try {
-                if (!currentUser || !currentProfile?.walletUnlocked) { showToast('Wallet locked or not signed in.', 'error'); return; }
-                const amount = Math.floor(Number(requestAmountInput.value || 0));
-                const note = (requestNoteInput.value || '').trim();
-                if (!amount || amount <= 0) { showToast('Enter a valid amount.', 'warning'); return; }
-                createPayRequestBtn.disabled = true;
-                const ref = await addDoc(collection(db, 'artifacts', appId, 'payment_requests'), {
-                    requesterId: currentUser.uid,
-                    amount,
-                    note,
-                    status: 'pending',
-                    timestamp: serverTimestamp()
-                });
-                const link = `${location.origin}/Wallet.html?payreq=${ref.id}`;
-                payRequestShare.style.display = '';
-                payRequestShare.innerHTML = `<i class="fas fa-link"></i> Share this link: <span>${link}</span>`;
-                navigator.clipboard?.writeText(link).catch(()=>{});
-                showToast('Payment request created and link copied.', 'success');
-                requestAmountInput.value = ''; requestNoteInput.value = '';
-            } catch (e) {
-                console.error('create request', e);
-                showToast(e?.message || 'Failed to create request', 'error');
-            } finally {
-                createPayRequestBtn.disabled = false;
-            }
-        }
-
-        async function loadPayRequest() {
-            try {
-                if (!payRequestContext?.id) return;
-                payRequestCard.style.display = '';
-                payReqDetails.textContent = 'Loading…';
-                const prRef = doc(db, 'artifacts', appId, 'payment_requests', payRequestContext.id);
-                const snap = await getDoc(prRef);
-                if (!snap.exists()) { payReqDetails.textContent = 'Request not found.'; payRequestNowBtn.disabled = true; return; }
-                const d = snap.data();
-                payRequestContext = { ...payRequestContext, requesterId: d.requesterId, amount: d.amount, note: d.note, status: d.status };
-                const youAreRequester = currentUser && currentUser.uid === d.requesterId;
-                payReqDetails.innerHTML = `
-                    <div><strong>From:</strong> ${d.requesterId}</div>
-                    <div><strong>Amount:</strong> ${d.amount} J</div>
-                    <div><strong>Note:</strong> ${d.note || '—'}</div>
-                    <div><strong>Status:</strong> ${d.status}</div>
-                `;
-                payRequestNowBtn.style.display = youAreRequester ? 'none' : '';
-            } catch (e) {
-                console.error('load payreq', e);
-                payReqDetails.textContent = 'Failed to load request.';
-            }
-        }
-
-        async function payRequestNow() {
-            try {
-                if (!currentUser || !currentProfile?.walletUnlocked) { showToast('Wallet locked or not signed in.', 'error'); return; }
-                const ok = await verifyPinFlow(); if (!ok) return;
-                if (!payRequestContext?.id || !payRequestContext?.requesterId) { showToast('Invalid request.', 'error'); return; }
-                if (currentUser.uid === payRequestContext.requesterId) { showToast('Cannot pay your own request.', 'warning'); return; }
-                const amount = Math.floor(Number(payRequestContext.amount || 0));
-                if (!amount || amount <= 0) { showToast('Invalid amount.', 'error'); return; }
-                payRequestNowBtn.disabled = true;
-                const reqRef = doc(db, 'artifacts', appId, 'payment_requests', payRequestContext.id);
-                await runTransaction(db, async (tx) => {
-                    const reqSnap = await tx.get(reqRef);
-                    if (!reqSnap.exists()) { throw new Error('Request not found'); }
-                    const req = reqSnap.data();
-                    if (req.status === 'paid') { return; }
-                    if (req.status === 'rejected') { throw new Error('Request rejected'); }
-
-                    const payerRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
-                    const payeeRef = doc(db, 'artifacts', appId, 'users', req.requesterId, 'profiles', 'user_profile');
-                    const payerSnap = await tx.get(payerRef);
-                    if (!payerSnap.exists()) { throw new Error('Payer profile not found'); }
-                    const payerCoins = Number(payerSnap.data().jCoins || 0);
-                    if (payerCoins < amount) { throw new Error('Insufficient JCoins.'); }
-                    const payeeSnap = await tx.get(payeeRef);
-                    const payeeCoins = payeeSnap.exists() ? Number(payeeSnap.data().jCoins || 0) : 0;
-
-                    tx.update(payerRef, { jCoins: payerCoins - amount, updatedAt: serverTimestamp() });
-                    if (payeeSnap.exists()) {
-                        tx.update(payeeRef, { jCoins: payeeCoins + amount, updatedAt: serverTimestamp() });
-                    } else {
-                        tx.set(payeeRef, { jCoins: payeeCoins + amount, gas: 0, level: 1, currentXp: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
-                    }
-                    const payerTxCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions');
-                    const payeeTxCol = collection(db, 'artifacts', appId, 'users', req.requesterId, 'transactions');
-                    tx.set(doc(payerTxCol), { type: 'p2p_request_pay_out', amount, note: req.note || '', counterpartyId: req.requesterId, paymentRequestId: reqRef.id, timestamp: serverTimestamp() });
-                    tx.set(doc(payeeTxCol), { type: 'p2p_request_pay_in', amount, note: req.note || '', counterpartyId: currentUser.uid, paymentRequestId: reqRef.id, timestamp: serverTimestamp() });
-                    tx.update(reqRef, { status: 'paid', payerId: currentUser.uid, paidAt: serverTimestamp() });
-                });
-
-                showToast('Payment completed!', 'success');
-                try { await loadProfile(); renderOverview(); await renderTransactions(); } catch {}
-            } catch (e) {
-                console.error('pay request', e);
-                showToast(e?.message || 'Payment failed', 'error');
-            } finally {
-                payRequestNowBtn.disabled = false;
-            }
-        }
-
+        // Event Listeners
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                authState.textContent = 'Signed in';
-                if (overlayTimer) { try { clearTimeout(overlayTimer); } catch {} overlayTimer = null; }
-                authOverlay.style.display = 'none';
                 await loadProfile();
                 renderOverview();
                 await renderTransactions();
-                if (payRequestContext?.id) { await loadPayRequest(); }
             } else {
-                authState.textContent = 'Guest';
-                if (overlayTimer) { try { clearTimeout(overlayTimer); } catch {} }
-                overlayTimer = setTimeout(() => { if (!auth.currentUser) authOverlay.style.display = 'grid'; }, 1500);
+                authOverlay.classList.remove('hidden');
             }
         });
 
-        // Theme application (keeps parity with Home/Profile saved setting)
-        (function applySavedTheme() {
-            const themes = ['theme-light-mode', 'theme-dark-mode', 'theme-glass-mode', 'theme-sunset-mode'];
-            function applyTheme(themeName) { document.body.classList.remove(...themes); document.body.classList.add(themeName); }
-            const savedTheme = localStorage.getItem('jchat-theme');
-            if (savedTheme && themes.includes(savedTheme)) { applyTheme(savedTheme); } else { applyTheme('theme-dark-mode'); }
-            window.addEventListener('storage', (event) => {
-                if (event.key === 'jchat-theme') {
-                    const newTheme = event.newValue || 'theme-dark-mode';
-                    if (themes.includes(newTheme)) { applyTheme(newTheme); }
-                }
-            });
-        })();
+        // Search functionality
+        document.getElementById('txSearchInput')?.addEventListener('input', (e) => {
+            txSearchTerm = (e.target.value || '').toLowerCase();
+            renderTransactions();
+        });
 
-        // Init
-        setupPaymentContextFromParams();
-        renderPaymentCard();
-        if (payRequestContext?.id) { payRequestCard.style.display = ''; }
+        // Initialize
         ensureAuthenticated();
-
-        // Bind action listeners
-        sendJCoinsBtn?.addEventListener('click', sendJCoins);
-        createPayRequestBtn?.addEventListener('click', createPaymentRequest);
-        payRequestNowBtn?.addEventListener('click', payRequestNow);
-        cancelPayRequestBtn?.addEventListener('click', () => { payRequestCard.style.display = 'none'; });
-        // Transactions: search and widget toggle
-        document.getElementById('txSearchInput')?.addEventListener('input', (e) => { txSearchTerm = (e.target.value||'').toLowerCase(); renderTransactions(); });
-        document.getElementById('txViewToggle')?.addEventListener('click', () => {
-            const list = document.getElementById('txList');
-            const widget = document.getElementById('txCard')?.querySelector('.row + .row');
-            if (list && widget) {
-                const showingList = list.style.display !== 'none';
-                list.style.display = showingList ? 'none' : 'grid';
-                widget.style.display = showingList ? 'flex' : 'flex';
-            }
-        });
     </script>
 </body>
 </html>
