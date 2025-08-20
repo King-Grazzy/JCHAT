@@ -150,9 +150,9 @@
     <div id="toast" class="msg info">Info</div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
@@ -213,23 +213,26 @@
             rateValue.textContent = rate ? String(rate) : '—';
         }
 
-        async function fetchAndRenderRequests(user) {
+        function subscribeRequests(user) {
             try {
                 const col = collection(db, 'artifacts', appId, 'coin_requests');
                 const q = query(col, where('requesterId', '==', user.uid));
-                const res = await getDocs(q);
-                const rows = [];
-                res.forEach((docSnap) => {
-                    const d = docSnap.data();
-                    const ts = d.timestamp?.toDate ? d.timestamp.toDate() : null;
-                    rows.push({ type: d.requestedCoins > 0 ? 'JCoin Purchase' : (d.type || 'Wallet Unlock'), coins: d.requestedCoins || 0, status: d.status || 'Pending', when: ts ? ts.toLocaleString() : '—' });
+                onSnapshot(q, (snap) => {
+                    const rows = [];
+                    snap.forEach((docSnap) => {
+                        const d = docSnap.data();
+                        const ts = d.timestamp?.toDate ? d.timestamp.toDate() : null;
+                        rows.push({ type: d.requestedCoins > 0 ? 'JCoin Purchase' : (d.type || 'Wallet Unlock'), coins: d.requestedCoins || 0, status: d.status || 'Pending', when: ts ? ts.toLocaleString() : '—' });
+                    });
+                    rows.sort((a,b) => (a.when< b.when?1:-1));
+                    if (rows.length === 0) {
+                        requestsTbody.innerHTML = '<tr><td colspan="4" class="muted">No requests yet.</td></tr>';
+                        return;
+                    }
+                    requestsTbody.innerHTML = rows.map(r => `<tr><td>${r.type}</td><td>${r.coins}</td><td>${r.status}</td><td>${r.when}</td></tr>`).join('');
+                }, () => {
+                    requestsTbody.innerHTML = '<tr><td colspan="4" class="muted">Failed to load.</td></tr>';
                 });
-                rows.sort((a,b) => (a.when< b.when?1:-1));
-                if (rows.length === 0) {
-                    requestsTbody.innerHTML = '<tr><td colspan="4" class="muted">No requests yet.</td></tr>';
-                    return;
-                }
-                requestsTbody.innerHTML = rows.map(r => `<tr><td>${r.type}</td><td>${r.coins}</td><td>${r.status}</td><td>${r.when}</td></tr>`).join('');
             } catch (e) {
                 requestsTbody.innerHTML = '<tr><td colspan="4" class="muted">Failed to load.</td></tr>';
             }
@@ -285,13 +288,13 @@
         });
 
         refreshBtn?.addEventListener('click', async () => {
-            const user = auth.currentUser; if (!user) return; await fetchAndRenderRequests(user);
+            const user = auth.currentUser; if (!user) return; subscribeRequests(user);
         });
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = '/Login.html'; return; }
             await fetchAndRenderWallet(user);
-            await fetchAndRenderRequests(user);
+            subscribeRequests(user);
         });
     </script>
 </body>
