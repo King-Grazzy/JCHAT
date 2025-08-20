@@ -36,6 +36,7 @@
             --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
             --gradient-info: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            --danger: #ef4444;
         }
 
         * {
@@ -557,6 +558,300 @@
             border-color: var(--primary);
         }
 
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-light);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            padding: 16px 24px 24px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-help {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        /* Fee Display */
+        .fee-display {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .fee-display span {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .fee-info {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Transaction Summary */
+        .transaction-summary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item.total {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--primary);
+            border-top: 2px solid var(--border);
+            padding-top: 12px;
+            margin-top: 8px;
+        }
+
+        /* Request Preview */
+        .request-preview {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .request-preview h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 16px 0;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Swap Styles */
+        .swap-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .swap-from, .swap-to {
+            flex: 1;
+        }
+
+        .swap-from label, .swap-to label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .swap-input-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .swap-input-group .form-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+        }
+
+        .swap-currency {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            min-width: 80px;
+        }
+
+        .swap-currency span {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .swap-currency small {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .swap-arrow {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .swap-direction-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .swap-direction-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: rotate(180deg);
+        }
+
+        .swap-details {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .swap-details > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 14px;
+        }
+
+        .swap-details span:first-child {
+            color: var(--text-muted);
+        }
+
+        .swap-details span:last-child {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .swap-summary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
         .search-box {
             position: relative;
             flex: 1;
@@ -802,12 +1097,12 @@
         <section class="actions-section">
             <h2 class="section-title">Quick Actions</h2>
             <div class="action-grid">
-                <a href="#" class="action-btn" id="sendJCoinsBtn">
+                <button class="action-btn" id="sendJCoinsBtn">
                     <div class="action-icon">
                         <i class="fas fa-paper-plane"></i>
                     </div>
                     <div class="action-label">Send JCoins</div>
-                </a>
+                </button>
                 <a href="#" class="action-btn" id="createPayRequestBtn">
                     <div class="action-icon">
                         <i class="fas fa-hand-holding-usd"></i>
@@ -828,6 +1123,197 @@
                 </a>
             </div>
         </section>
+
+        <!-- Send JCoins Modal -->
+        <div id="sendModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Send JCoins</h3>
+                    <button class="close-btn" id="closeSendModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="recipientId">Recipient User ID</label>
+                        <input type="text" id="recipientId" placeholder="Enter recipient's user ID" class="form-input">
+                        <small class="form-help">Enter the exact user ID of the person you want to send JCoins to</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sendAmount">Amount (JCoins)</label>
+                        <input type="number" id="sendAmount" placeholder="0" min="1" step="1" class="form-input">
+                        <small class="form-help">Minimum amount: 1 JCoin</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sendNote">Note (Optional)</label>
+                        <textarea id="sendNote" placeholder="Add a note to this transaction..." class="form-textarea" rows="3"></textarea>
+                        <small class="form-help">This note will be visible to both you and the recipient</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sendFee">Transaction Fee</label>
+                        <div class="fee-display">
+                            <span id="feeAmount">0</span> JCoins
+                            <small class="fee-info">Standard network fee</small>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-summary">
+                        <div class="summary-item">
+                            <span>Amount:</span>
+                            <span id="summaryAmount">0 JCoins</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Fee:</span>
+                            <span id="summaryFee">0 JCoins</span>
+                        </div>
+                        <div class="summary-item total">
+                            <span>Total:</span>
+                            <span id="summaryTotal">0 JCoins</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="cancelSend">Cancel</button>
+                    <button class="btn primary" id="confirmSend" disabled>Send JCoins</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Request Payment Modal -->
+        <div id="requestModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Request Payment</h3>
+                    <button class="close-btn" id="closeRequestModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="requestAmount">Amount (JCoins)</label>
+                        <input type="number" id="requestAmount" placeholder="0" min="1" step="1" class="form-input">
+                        <small class="form-help">Enter the amount you want to request</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="requestNote">Note (Optional)</label>
+                        <textarea id="requestNote" placeholder="Explain what this payment is for..." class="form-textarea" rows="3"></textarea>
+                        <small class="form-help">This note will help the payer understand the request</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="requestExpiry">Expiry Time</label>
+                        <select id="requestExpiry" class="form-select">
+                            <option value="3600">1 Hour</option>
+                            <option value="86400" selected>24 Hours</option>
+                            <option value="604800">7 Days</option>
+                            <option value="2592000">30 Days</option>
+                        </select>
+                        <small class="form-help">Payment request will expire after this time</small>
+                    </div>
+                    
+                    <div class="request-preview">
+                        <h4>Payment Request Preview</h4>
+                        <div class="preview-item">
+                            <span>Amount:</span>
+                            <span id="previewAmount">0 JCoins</span>
+                        </div>
+                        <div class="preview-item">
+                            <span>Note:</span>
+                            <span id="previewNote">—</span>
+                        </div>
+                        <div class="preview-item">
+                            <span>Expires:</span>
+                            <span id="previewExpiry">24 Hours</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="cancelRequest">Cancel</button>
+                    <button class="btn primary" id="confirmRequest" disabled>Create Request</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Swap Modal -->
+        <div id="swapModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Swap JCoins</h3>
+                    <button class="close-btn" id="closeSwapModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="swap-container">
+                        <div class="swap-from">
+                            <label>From</label>
+                            <div class="swap-input-group">
+                                <input type="number" id="swapFromAmount" placeholder="0" min="1" step="1" class="form-input">
+                                <div class="swap-currency">
+                                    <span>JCoins</span>
+                                    <small>Balance: <span id="swapBalance">0</span></small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="swap-arrow">
+                            <button id="swapDirectionBtn" class="swap-direction-btn">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="swap-to">
+                            <label>To</label>
+                            <div class="swap-input-group">
+                                <input type="number" id="swapToAmount" placeholder="0" class="form-input" readonly>
+                                <div class="swap-currency">
+                                    <span>Gas</span>
+                                    <small>Rate: 1 JCoin = 10 Gas</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="swap-details">
+                        <div class="swap-rate">
+                            <span>Exchange Rate:</span>
+                            <span>1 JCoin = 10 Gas</span>
+                        </div>
+                        <div class="swap-fee">
+                            <span>Swap Fee:</span>
+                            <span>0.5%</span>
+                        </div>
+                        <div class="swap-slippage">
+                            <span>Slippage Tolerance:</span>
+                            <span>1%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="swap-summary">
+                        <div class="summary-item">
+                            <span>You Pay:</span>
+                            <span id="swapPayAmount">0 JCoins</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>You Receive:</span>
+                            <span id="swapReceiveAmount">0 Gas</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Fee:</span>
+                            <span id="swapFeeAmount">0 JCoins</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="cancelSwap">Cancel</button>
+                    <button class="btn primary" id="confirmSwap" disabled>Confirm Swap</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Settings Section -->
         <section class="settings-section" id="settingsSection" style="display: none;">
@@ -1381,11 +1867,404 @@
             }
         }
 
+        // Quick Actions Functionality
+        // Send JCoins Functions
+        function showSendModal() {
+            const sendModal = document.getElementById('sendModal');
+            if (sendModal) {
+                sendModal.style.display = 'flex';
+                document.getElementById('recipientId').focus();
+                updateSendSummary();
+            }
+        }
+
+        function hideSendModal() {
+            const sendModal = document.getElementById('sendModal');
+            if (sendModal) {
+                sendModal.style.display = 'none';
+                resetSendForm();
+            }
+        }
+
+        function resetSendForm() {
+            document.getElementById('recipientId').value = '';
+            document.getElementById('sendAmount').value = '';
+            document.getElementById('sendNote').value = '';
+            updateSendSummary();
+        }
+
+        function updateSendSummary() {
+            const amount = parseFloat(document.getElementById('sendAmount').value) || 0;
+            const fee = Math.max(1, Math.ceil(amount * 0.01)); // 1% fee, minimum 1
+            const total = amount + fee;
+            
+            document.getElementById('feeAmount').textContent = fee;
+            document.getElementById('summaryAmount').textContent = `${amount} JCoins`;
+            document.getElementById('summaryFee').textContent = `${fee} JCoins`;
+            document.getElementById('summaryTotal').textContent = `${total} JCoins`;
+            
+            // Enable/disable confirm button
+            const confirmBtn = document.getElementById('confirmSend');
+            const recipientId = document.getElementById('recipientId').value.trim();
+            confirmBtn.disabled = amount < 1 || !recipientId || amount > (currentProfile?.jCoins || 0);
+        }
+
+        async function confirmSendTransaction() {
+            const recipientId = document.getElementById('recipientId').value.trim();
+            const amount = parseFloat(document.getElementById('sendAmount').value);
+            const note = document.getElementById('sendNote').value.trim();
+            const fee = Math.max(1, Math.ceil(amount * 0.01));
+            const total = amount + fee;
+            
+            if (!recipientId) {
+                showToast('Please enter recipient ID', 'error');
+                return;
+            }
+            
+            if (amount < 1) {
+                showToast('Amount must be at least 1 JCoin', 'error');
+                return;
+            }
+            
+            if (total > (currentProfile?.jCoins || 0)) {
+                showToast('Insufficient balance', 'error');
+                return;
+            }
+            
+            if (recipientId === currentUser.uid) {
+                showToast('Cannot send to yourself', 'error');
+                return;
+            }
+            
+            try {
+                // Check if recipient exists
+                const recipientRef = doc(db, 'artifacts', appId, 'users', recipientId, 'profiles', 'user_profile');
+                const recipientSnap = await getDoc(recipientRef);
+                
+                if (!recipientSnap.exists()) {
+                    showToast('Recipient not found', 'error');
+                    return;
+                }
+                
+                // Execute transaction
+                await runTransaction(db, async (tx) => {
+                    const senderRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
+                    const senderSnap = await tx.get(senderRef);
+                    
+                    if (!senderSnap.exists()) {
+                        throw new Error('Sender profile not found');
+                    }
+                    
+                    const senderCoins = Number(senderSnap.data().jCoins || 0);
+                    if (senderCoins < total) {
+                        throw new Error('Insufficient balance');
+                    }
+                    
+                    // Update sender balance
+                    tx.update(senderRef, { 
+                        jCoins: senderCoins - total, 
+                        updatedAt: serverTimestamp() 
+                    });
+                    
+                    // Update recipient balance
+                    const recipientCoins = Number(recipientSnap.data().jCoins || 0);
+                    tx.update(recipientRef, { 
+                        jCoins: recipientCoins + amount, 
+                        updatedAt: serverTimestamp() 
+                    });
+                    
+                    // Create transaction records
+                    const senderTxRef = doc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'));
+                    const recipientTxRef = doc(collection(db, 'artifacts', appId, 'users', recipientId, 'transactions'));
+                    
+                    tx.set(senderTxRef, {
+                        type: 'p2p_transfer_out',
+                        amount: amount,
+                        fee: fee,
+                        note: note,
+                        counterpartyId: recipientId,
+                        timestamp: serverTimestamp()
+                    });
+                    
+                    tx.set(recipientTxRef, {
+                        type: 'p2p_transfer_in',
+                        amount: amount,
+                        note: note,
+                        counterpartyId: currentUser.uid,
+                        timestamp: serverTimestamp()
+                    });
+                });
+                
+                showToast('JCoins sent successfully!', 'success');
+                hideSendModal();
+                
+                // Refresh data
+                await loadProfile();
+                renderOverview();
+                await renderTransactions();
+                
+            } catch (error) {
+                console.error('Send transaction error:', error);
+                showToast(error.message || 'Failed to send JCoins', 'error');
+            }
+        }
+
+        // Request Payment Functions
+        function showRequestModal() {
+            const requestModal = document.getElementById('requestModal');
+            if (requestModal) {
+                requestModal.style.display = 'flex';
+                document.getElementById('requestAmount').focus();
+                updateRequestPreview();
+            }
+        }
+
+        function hideRequestModal() {
+            const requestModal = document.getElementById('requestModal');
+            if (requestModal) {
+                requestModal.style.display = 'none';
+                resetRequestForm();
+            }
+        }
+
+        function resetRequestForm() {
+            document.getElementById('requestAmount').value = '';
+            document.getElementById('requestNote').value = '';
+            document.getElementById('requestExpiry').value = '86400';
+            updateRequestPreview();
+        }
+
+        function updateRequestPreview() {
+            const amount = parseFloat(document.getElementById('requestAmount').value) || 0;
+            const note = document.getElementById('requestNote').value.trim();
+            const expiry = document.getElementById('requestExpiry').value;
+            
+            document.getElementById('previewAmount').textContent = `${amount} JCoins`;
+            document.getElementById('previewNote').textContent = note || '—';
+            
+            const expiryText = {
+                '3600': '1 Hour',
+                '86400': '24 Hours',
+                '604800': '7 Days',
+                '2592000': '30 Days'
+            }[expiry] || '24 Hours';
+            
+            document.getElementById('previewExpiry').textContent = expiryText;
+            
+            // Enable/disable confirm button
+            const confirmBtn = document.getElementById('confirmRequest');
+            confirmBtn.disabled = amount < 1;
+        }
+
+        async function createPaymentRequest() {
+            const amount = parseFloat(document.getElementById('requestAmount').value);
+            const note = document.getElementById('requestNote').value.trim();
+            const expiry = parseInt(document.getElementById('requestExpiry').value);
+            
+            if (amount < 1) {
+                showToast('Amount must be at least 1 JCoin', 'error');
+                return;
+            }
+            
+            try {
+                const requestRef = await addDoc(collection(db, 'artifacts', appId, 'payment_requests'), {
+                    requesterId: currentUser.uid,
+                    amount: amount,
+                    note: note,
+                    expiry: expiry,
+                    status: 'pending',
+                    createdAt: serverTimestamp(),
+                    expiresAt: new Date(Date.now() + expiry * 1000)
+                });
+                
+                showToast('Payment request created successfully!', 'success');
+                hideRequestModal();
+                
+                // Generate shareable link
+                const shareLink = `${window.location.origin}/Wallet.html?payreq=${requestRef.id}`;
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Payment Request',
+                        text: `Please pay me ${amount} JCoins`,
+                        url: shareLink
+                    });
+                } else {
+                    // Fallback: copy to clipboard
+                    navigator.clipboard.writeText(shareLink);
+                    showToast('Payment link copied to clipboard!', 'info');
+                }
+                
+            } catch (error) {
+                console.error('Create request error:', error);
+                showToast('Failed to create payment request', 'error');
+            }
+        }
+
+        // Swap Functions
+        function showSwapModal() {
+            const swapModal = document.getElementById('swapModal');
+            if (swapModal) {
+                swapModal.style.display = 'flex';
+                document.getElementById('swapFromAmount').focus();
+                updateSwapBalance();
+                updateSwapCalculations();
+            }
+        }
+
+        function hideSwapModal() {
+            const swapModal = document.getElementById('swapModal');
+            if (swapModal) {
+                swapModal.style.display = 'none';
+                resetSwapForm();
+            }
+        }
+
+        function resetSwapForm() {
+            document.getElementById('swapFromAmount').value = '';
+            document.getElementById('swapToAmount').value = '';
+            updateSwapCalculations();
+        }
+
+        function updateSwapBalance() {
+            const balance = currentProfile?.jCoins || 0;
+            document.getElementById('swapBalance').textContent = balance;
+        }
+
+        function updateSwapCalculations() {
+            const fromAmount = parseFloat(document.getElementById('swapFromAmount').value) || 0;
+            const exchangeRate = 10; // 1 JCoin = 10 Gas
+            const fee = fromAmount * 0.005; // 0.5% fee
+            const toAmount = (fromAmount - fee) * exchangeRate;
+            
+            document.getElementById('swapToAmount').value = toAmount.toFixed(2);
+            document.getElementById('swapPayAmount').textContent = `${fromAmount} JCoins`;
+            document.getElementById('swapReceiveAmount').textContent = `${toAmount.toFixed(2)} Gas`;
+            document.getElementById('swapFeeAmount').textContent = `${fee.toFixed(2)} JCoins`;
+            
+            // Enable/disable confirm button
+            const confirmBtn = document.getElementById('confirmSwap');
+            confirmBtn.disabled = fromAmount < 1 || fromAmount > (currentProfile?.jCoins || 0);
+        }
+
+        async function confirmSwap() {
+            const fromAmount = parseFloat(document.getElementById('swapFromAmount').value);
+            const exchangeRate = 10;
+            const fee = fromAmount * 0.005;
+            const toAmount = (fromAmount - fee) * exchangeRate;
+            
+            if (fromAmount < 1) {
+                showToast('Amount must be at least 1 JCoin', 'error');
+                return;
+            }
+            
+            if (fromAmount > (currentProfile?.jCoins || 0)) {
+                showToast('Insufficient balance', 'error');
+                return;
+            }
+            
+            try {
+                await runTransaction(db, async (tx) => {
+                    const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
+                    const userSnap = await tx.get(userRef);
+                    
+                    if (!userSnap.exists()) {
+                        throw new Error('User profile not found');
+                    }
+                    
+                    const currentJCoins = Number(userSnap.data().jCoins || 0);
+                    const currentGas = Number(userSnap.data().gas || 0);
+                    
+                    if (currentJCoins < fromAmount) {
+                        throw new Error('Insufficient JCoins balance');
+                    }
+                    
+                    // Update balances
+                    tx.update(userRef, {
+                        jCoins: currentJCoins - fromAmount,
+                        gas: currentGas + toAmount,
+                        updatedAt: serverTimestamp()
+                    });
+                    
+                    // Create swap transaction record
+                    const swapTxRef = doc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'));
+                    tx.set(swapTxRef, {
+                        type: 'swap_jcoins_to_gas',
+                        fromAmount: fromAmount,
+                        toAmount: toAmount,
+                        fee: fee,
+                        exchangeRate: exchangeRate,
+                        timestamp: serverTimestamp()
+                    });
+                });
+                
+                showToast('Swap completed successfully!', 'success');
+                hideSwapModal();
+                
+                // Refresh data
+                await loadProfile();
+                renderOverview();
+                await renderTransactions();
+                
+            } catch (error) {
+                console.error('Swap error:', error);
+                showToast(error.message || 'Failed to complete swap', 'error');
+            }
+        }
+
         // Initialize
         ensureAuthenticated();
 
         // Settings event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            // Quick Actions event listeners
+            document.getElementById('sendJCoinsBtn')?.addEventListener('click', showSendModal);
+            document.getElementById('createPayRequestBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showRequestModal();
+            });
+            document.getElementById('swapBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSwapModal();
+            });
+
+            // Send JCoins event listeners
+            document.getElementById('closeSendModal')?.addEventListener('click', hideSendModal);
+            document.getElementById('cancelSend')?.addEventListener('click', hideSendModal);
+            document.getElementById('confirmSend')?.addEventListener('click', confirmSendTransaction);
+            
+            // Send form input listeners
+            document.getElementById('recipientId')?.addEventListener('input', updateSendSummary);
+            document.getElementById('sendAmount')?.addEventListener('input', updateSendSummary);
+            
+            // Request Payment event listeners
+            document.getElementById('closeRequestModal')?.addEventListener('click', hideRequestModal);
+            document.getElementById('cancelRequest')?.addEventListener('click', hideRequestModal);
+            document.getElementById('confirmRequest')?.addEventListener('click', createPaymentRequest);
+            
+            // Request form input listeners
+            document.getElementById('requestAmount')?.addEventListener('input', updateRequestPreview);
+            document.getElementById('requestNote')?.addEventListener('input', updateRequestPreview);
+            document.getElementById('requestExpiry')?.addEventListener('change', updateRequestPreview);
+            
+            // Swap event listeners
+            document.getElementById('closeSwapModal')?.addEventListener('click', hideSwapModal);
+            document.getElementById('cancelSwap')?.addEventListener('click', hideSwapModal);
+            document.getElementById('confirmSwap')?.addEventListener('click', confirmSwap);
+            document.getElementById('swapDirectionBtn')?.addEventListener('click', function() {
+                // Toggle swap direction (JCoins ↔ Gas)
+                const fromAmount = document.getElementById('swapFromAmount').value;
+                const toAmount = document.getElementById('swapToAmount').value;
+                
+                if (fromAmount && toAmount) {
+                    document.getElementById('swapFromAmount').value = toAmount;
+                    document.getElementById('swapToAmount').value = fromAmount;
+                    updateSwapCalculations();
+                }
+            });
+            
+            // Swap form input listeners
+            document.getElementById('swapFromAmount')?.addEventListener('input', updateSwapCalculations);
+
             // Settings button click
             document.getElementById('settingsBtn')?.addEventListener('click', (e) => {
                 e.preventDefault();
