@@ -4357,7 +4357,7 @@
                 return;
             }
             
-            const userEntitlementsRef = doc(db, 'artifacts', appId, 'users', userId, 'user_entitlements');
+            const userEntitlementsRef = doc(db, 'artifacts', appId, 'users', userId, 'profiles', 'user_entitlements');
             
             return onSnapshot(userEntitlementsRef, (doc) => {
                 if (doc.exists()) {
