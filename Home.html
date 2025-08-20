@@ -3233,7 +3233,7 @@
                 </a>
                 <!-- Notification Icon with Badge -->
                 <div class="notification-icon-wrapper" style="position:relative;">
-                    <a href="#" id="notificationToggle" aria-label="Notifications">
+                    <a href="/notifications.html" id="notificationToggle" aria-label="Notifications">
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge" id="notificationCount">0</span>
                     </a>
@@ -8194,13 +8194,16 @@
             
             if (notificationToggle) {
                 notificationToggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    if (notificationDropdown.style.display === 'none' || !notificationDropdown.style.display) {
-                        showNotificationDropdown();
-                    } else {
-                        hideNotificationDropdown();
+                    const href = notificationToggle.getAttribute('href');
+                    if (!href || href === '#' || href === '') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        if (notificationDropdown.style.display === 'none' || !notificationDropdown.style.display) {
+                            showNotificationDropdown();
+                        } else {
+                            hideNotificationDropdown();
+                        }
                     }
                 });
             }
