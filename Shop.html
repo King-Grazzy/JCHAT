@@ -214,19 +214,19 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // Premium themes catalog matching Home2.html exactly
+    // Premium themes catalog matching Home.html exactly - USD pricing
     const THEMES = [
-      { id: 1, key: 'theme-ocean-mode', name: 'Ocean Theme', price: 499, description: 'Premium deep waters with animated waves', preview: 'ocean' },
-      { id: 2, key: 'theme-forest-mode', name: 'Forest Theme', price: 499, description: 'Premium enchanted woods with particle effects', preview: 'forest' },
-      { id: 3, key: 'theme-cosmic-mode', name: 'Cosmic Theme', price: 499, description: 'Premium nebula with stellar animation', preview: 'cosmic' },
-      { id: 4, key: 'theme-retro-mode', name: 'Retro Theme', price: 499, description: 'Premium 80s synthwave with grid animation', preview: 'retro' },
-      { id: 5, key: 'theme-neon-mode', name: 'Neon Theme', price: 499, description: 'Premium digital matrix with code rain', preview: 'neon' },
-      { id: 6, key: 'theme-elegant-mode', name: 'Elegant Theme', price: 499, description: 'Premium luxury with golden shimmer', preview: 'elegant' },
-      { id: 7, key: 'theme-quantum-nexus', name: '🌌 Quantum Nexus', price: 499, description: 'Premium particle physics simulation with quantum effects', preview: 'quantum' },
-      { id: 8, key: 'theme-holographic-matrix', name: '🎭 Holographic Matrix', price: 499, description: 'Premium 3D holographic projection with matrix effects', preview: 'holographic' },
-      { id: 9, key: 'theme-stellar-genesis', name: '🌟 Stellar Genesis', price: 499, description: 'Premium cosmic birth simulation with stellar evolution', preview: 'stellar' },
-      { id: 10, key: 'theme-circus-maximus', name: '🎪 Circus Maximus', price: 499, description: 'Premium interactive performance theater with circus physics', preview: 'circus' },
-      { id: 11, key: 'theme-temporal-paradox', name: '🔮 Temporal Paradox', price: 499, description: 'Premium time manipulation interface with temporal effects', preview: 'temporal' }
+      { id: 1, key: 'theme-ocean-mode', name: 'Ocean Theme', price: 4.99, description: 'Premium deep waters with animated waves', preview: 'ocean' },
+      { id: 2, key: 'theme-forest-mode', name: 'Forest Theme', price: 4.99, description: 'Premium enchanted woods with particle effects', preview: 'forest' },
+      { id: 3, key: 'theme-cosmic-mode', name: 'Cosmic Theme', price: 4.99, description: 'Premium nebula with stellar animation', preview: 'cosmic' },
+      { id: 4, key: 'theme-retro-mode', name: 'Retro Theme', price: 4.99, description: 'Premium 80s synthwave with grid animation', preview: 'retro' },
+      { id: 5, key: 'theme-neon-mode', name: 'Neon Theme', price: 4.99, description: 'Premium digital matrix with code rain', preview: 'neon' },
+      { id: 6, key: 'theme-elegant-mode', name: 'Elegant Theme', price: 4.99, description: 'Premium luxury with golden shimmer', preview: 'elegant' },
+      { id: 7, key: 'theme-quantum-nexus', name: '🌌 Quantum Nexus', price: 4.99, description: 'Premium particle physics simulation with quantum effects', preview: 'quantum' },
+      { id: 8, key: 'theme-holographic-matrix', name: '🎭 Holographic Matrix', price: 4.99, description: 'Premium 3D holographic projection with matrix effects', preview: 'holographic' },
+      { id: 9, key: 'theme-stellar-genesis', name: '🌟 Stellar Genesis', price: 4.99, description: 'Premium cosmic birth simulation with stellar evolution', preview: 'stellar' },
+      { id: 10, key: 'theme-circus-maximus', name: '🎪 Circus Maximus', price: 4.99, description: 'Premium interactive performance theater with circus physics', preview: 'circus' },
+      { id: 11, key: 'theme-temporal-paradox', name: '🔮 Temporal Paradox', price: 4.99, description: 'Premium time manipulation interface with temporal effects', preview: 'temporal' }
     ];
 
     // Currency configuration
@@ -244,9 +244,9 @@
       'NG': { code: 'NGN', symbol: '₦', name: 'Nigerian Naira' }
     };
 
-    // Default to Naira if detection fails
-    let userCurrency = CURRENCIES['NG'];
-    let exchangeRates = { NGN: 1 };
+    // Default to USD since all prices are in USD
+    let userCurrency = CURRENCIES['US'];
+    let exchangeRates = { USD: 1 };
     let isRatesLoading = false;
 
     // Currency detection and exchange rate management
@@ -287,7 +287,7 @@
       
       try {
         // Use a free exchange rate API
-        const response = await fetch(`https://api.exchangerate-api.com/v4/latest/NGN`);
+        const response = await fetch(`https://api.exchangerate-api.com/v4/latest/USD`);
         const data = await response.json();
         
         if (data.rates) {
@@ -297,11 +297,11 @@
         }
       } catch (error) {
         console.error('Failed to fetch exchange rates:', error);
-        // Fallback to approximate rates
+        // Fallback to approximate rates (USD as base)
         exchangeRates = {
-          USD: 0.0012, EUR: 0.0011, GBP: 0.0009, CAD: 0.0016,
-          AUD: 0.0018, INR: 0.10, JPY: 0.18, KRW: 1.62,
-          BRL: 0.006, MXN: 0.020, NGN: 1
+          USD: 1, EUR: 0.92, GBP: 0.79, CAD: 1.35,
+          AUD: 1.52, INR: 83.12, JPY: 149.85, KRW: 1337.50,
+          BRL: 4.95, MXN: 16.67, NGN: 1580.00
         };
       } finally {
         isRatesLoading = false;
