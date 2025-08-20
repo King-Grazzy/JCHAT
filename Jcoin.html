@@ -681,6 +681,23 @@
             }
         }
 
+        // Auto-auth support (Canvas or fallback anonymous)
+        const initialAuthToken = (typeof __initial_auth_token !== 'undefined') ? __initial_auth_token : null;
+        async function ensureAuthenticated() {
+            try {
+                if (auth.currentUser) return;
+                headerDisplayName.textContent = 'Signing in…';
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error('JCHAT_DEBUG: ensureAuthenticated failed:', e);
+                showMessage('Authentication failed. Retrying…', 'error');
+            }
+        }
+
         function showMessage(text, type='info') {
             showMessageBox(text, type);
         }
@@ -806,6 +823,9 @@
             } else {
                 document.body.classList.add('theme-dark-mode');
             }
+            // Kick off auth immediately and retry once after a short delay if needed
+            ensureAuthenticated();
+            setTimeout(() => { if (!auth.currentUser) ensureAuthenticated(); }, 2000);
         });
 
         window.addEventListener('storage', (event) => {
