@@ -100,8 +100,21 @@
                 <p class="muted" style="margin-top:10px;">Keep your payment receipts handy. A developer verifies and unlocks/credits accordingly.</p>
             </div>
 
-            <div class="card glass">
-                <h2>Recent Transactions</h2>
+            <div class="card glass" id="txCard">
+                <div class="row" style="justify-content:space-between; align-items:center;">
+                    <h2 style="margin:0;">Recent Transactions</h2>
+                    <button id="txViewToggle" class="btn" title="Toggle widget view"><i class="fas fa-th-large"></i> Widget</button>
+                </div>
+                <div class="row" style="justify-content:space-between; align-items:center; gap:8px; margin-top:8px;">
+                    <div>
+                        <div class="chip"><i class="fas fa-arrow-down"></i> In: <strong id="txWIn">0</strong> J</div>
+                        <div class="chip" style="margin-left:6px;"><i class="fas fa-arrow-up"></i> Out: <strong id="txWOut">0</strong> J</div>
+                        <div class="chip" style="margin-left:6px;"><i class="fas fa-receipt"></i> Requests: <strong id="txWReq">0</strong></div>
+                    </div>
+                    <div style="flex:1; max-width:300px;">
+                        <input id="txSearchInput" type="text" placeholder="Search notes or user..." style="width:100%; padding:8px 10px; border:1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text); border-radius:10px;" />
+                    </div>
+                </div>
                 <div id="txList" style="margin-top:8px; display:grid; gap:8px;"></div>
                 <div id="txEmpty" class="empty" style="display:none;">No transactions yet.</div>
             </div>
@@ -403,46 +416,61 @@
             txList.innerHTML = '';
             txEmpty.style.display = 'none';
             try {
-                const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), orderBy('timestamp', 'desc'), limit(20));
+                const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), orderBy('timestamp', 'desc'), limit(50));
                 const snap = await getDocs(q);
-                if (snap.empty) { txEmpty.style.display = ''; return; }
+                if (snap.empty) { txEmpty.style.display = ''; updateTxWidgetCounts(0,0,0); return; }
+                let sumIn = 0, sumOut = 0, countReq = 0;
                 for (const d of snap.docs) {
                     const t = d.data();
-                    const row = document.createElement('div');
-                    row.className = 'row';
-                    row.style.justifyContent = 'space-between';
-                    row.style.border = '1px solid var(--border)';
-                    row.style.borderRadius = '10px';
-                    row.style.padding = '8px 10px';
-                    const left = document.createElement('div');
-                    left.className = 'row wrap';
-                    left.style.gap = '8px';
-                    const typeChip = document.createElement('div');
-                    typeChip.className = 'chip';
-                    typeChip.innerHTML = `<i class="fas fa-receipt"></i> ${t.type || 'activity'}`;
-                    const desc = document.createElement('div');
-                    desc.className = 'muted';
-                    desc.textContent = t.description || '';
-                    left.appendChild(typeChip); left.appendChild(desc);
-                    const right = document.createElement('div');
-                    right.className = 'row';
-                    right.style.gap = '8px';
-                    if (typeof t.amount === 'number') {
-                        const amt = document.createElement('div');
-                        amt.innerHTML = `<strong>${t.amount}</strong>`;
-                        right.appendChild(amt);
-                    }
-                    const ts = document.createElement('div');
-                    ts.className = 'muted';
-                    ts.textContent = t.timestamp?.toDate ? new Date(t.timestamp.toDate()).toLocaleString() : new Date().toLocaleString();
-                    right.appendChild(ts);
-                    row.appendChild(left); row.appendChild(right);
-                    txList.appendChild(row);
+                    const type = (t.type || '').toString();
+                    const isIn = ['p2p_transfer_in','p2p_request_pay_in'].includes(type);
+                    const isOut = ['p2p_transfer_out','p2p_request_pay_out','premium_payment'].includes(type);
+                    const isReq = type.includes('request');
+                    const noteStr = ((t.note || t.description || '').toString()).toLowerCase();
+                    const cp = (t.counterpartyId || '').toString().toLowerCase();
+                    if (txSearchTerm && !(noteStr.includes(txSearchTerm) || cp.includes(txSearchTerm) || type.includes(txSearchTerm))) continue;
+
+                    const card = document.createElement('div');
+                    card.className = 'tx-card';
+                    const tsDate = t.timestamp?.toDate ? new Date(t.timestamp.toDate()) : new Date();
+                    const amtNum = typeof t.amount === 'number' ? t.amount : null;
+                    const amtStr = amtNum !== null ? (isIn ? `+${amtNum}` : isOut ? `-${amtNum}` : `${amtNum}`) : '';
+                    const amtCls = isIn ? 'amt-pos' : isOut ? 'amt-neg' : '';
+                    const badgeCls = isReq ? 'warn' : (isIn ? 'ok' : 'neu');
+                    const title = type.replace(/_/g,' ');
+                    const cpLabel = (t.counterpartyId ? ` • ${t.counterpartyId}` : '');
+                    card.innerHTML = `
+                        <div class="tx-left">
+                            <div class="avatar">${(t.counterpartyId||'U').toString().slice(0,1).toUpperCase()}</div>
+                            <div class="tx-meta">
+                                <div class="tx-title">${title}<span class="badge ${badgeCls}" style="margin-left:8px;">${isIn?'IN':isOut?'OUT':isReq?'REQ':'INFO'}</span></div>
+                                <div class="tx-note">${(t.note || t.description || '—')}${cpLabel}</div>
+                            </div>
+                        </div>
+                        <div class="tx-right">
+                            <div class="${amtCls}">${amtStr}</div>
+                            <div class="ts">${tsDate.toLocaleString()}</div>
+                        </div>
+                    `;
+                    txList.appendChild(card);
+                    if (isIn && typeof t.amount === 'number') sumIn += t.amount;
+                    if (isOut && typeof t.amount === 'number') sumOut += t.amount;
+                    if (isReq) countReq += 1;
                 }
+                updateTxWidgetCounts(sumIn, sumOut, countReq);
             } catch (e) {
                 console.error('tx load error', e);
                 txEmpty.style.display = '';
             }
+        }
+
+        function updateTxWidgetCounts(sumIn, sumOut, countReq) {
+            const elIn = document.getElementById('txWIn');
+            const elOut = document.getElementById('txWOut');
+            const elReq = document.getElementById('txWReq');
+            if (elIn) elIn.textContent = String(sumIn);
+            if (elOut) elOut.textContent = String(sumOut);
+            if (elReq) elReq.textContent = String(countReq);
         }
 
         function setupPaymentContextFromParams() {
@@ -936,6 +964,17 @@
         createPayRequestBtn?.addEventListener('click', createPaymentRequest);
         payRequestNowBtn?.addEventListener('click', payRequestNow);
         cancelPayRequestBtn?.addEventListener('click', () => { payRequestCard.style.display = 'none'; });
+        // Transactions: search and widget toggle
+        document.getElementById('txSearchInput')?.addEventListener('input', (e) => { txSearchTerm = (e.target.value||'').toLowerCase(); renderTransactions(); });
+        document.getElementById('txViewToggle')?.addEventListener('click', () => {
+            const list = document.getElementById('txList');
+            const widget = document.getElementById('txCard')?.querySelector('.row + .row');
+            if (list && widget) {
+                const showingList = list.style.display !== 'none';
+                list.style.display = showingList ? 'none' : 'grid';
+                widget.style.display = showingList ? 'flex' : 'flex';
+            }
+        });
     </script>
 </body>
 </html>
