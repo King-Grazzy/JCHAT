@@ -126,7 +126,10 @@
         <div class="card" style="margin-top:16px;">
             <div class="row" style="margin-bottom:8px;">
                 <h2>My Requests</h2>
-                <button class="btn" id="refreshBtn"><i class="fas fa-rotate-right"></i> Refresh</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn" id="refreshBtn"><i class="fas fa-rotate-right"></i> Refresh</button>
+                    <button class="btn" id="exportBtn"><i class="fas fa-file-export"></i> Export CSV</button>
+                </div>
             </div>
             <div class="muted" style="margin-bottom:8px;">These include JCoin purchase requests and any wallet unlock requests.</div>
             <div style="overflow:auto;">
@@ -181,6 +184,7 @@
         const requestsTbody = document.getElementById('requestsTbody');
         const refreshBtn = document.getElementById('refreshBtn');
         const toast = document.getElementById('toast');
+        const exportBtn = document.getElementById('exportBtn');
 
         function showToast(message, type = 'info') {
             toast.textContent = message; toast.className = `msg show ${type}`;
@@ -230,12 +234,24 @@
                         return;
                     }
                     requestsTbody.innerHTML = rows.map(r => `<tr><td>${r.type}</td><td>${r.coins}</td><td>${r.status}</td><td>${r.when}</td></tr>`).join('');
+                    // Bind export
+                    exportBtn.onclick = () => exportRowsAsCSV(rows);
                 }, () => {
                     requestsTbody.innerHTML = '<tr><td colspan="4" class="muted">Failed to load.</td></tr>';
                 });
             } catch (e) {
                 requestsTbody.innerHTML = '<tr><td colspan="4" class="muted">Failed to load.</td></tr>';
             }
+        }
+
+        function exportRowsAsCSV(rows) {
+            const header = ['Type','Coins','Status','When'];
+            const lines = [header.join(',')].concat(rows.map(r => [r.type, r.coins, r.status, r.when].map(v => '"'+String(v).replace(/"/g,'""')+'"').join(',')));
+            const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'jcoin-requests.csv'; a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
         unlockFileTrigger?.addEventListener('click', () => unlockReceiptInput.click());

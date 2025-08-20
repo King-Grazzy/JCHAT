@@ -13,49 +13,67 @@
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         :root {
-            --pink: #ff2e92; --blue: #00d5ff; --bg: #0d0f13; --card: rgba(255,255,255,0.03);
-            --text: #f5f7fa; --muted: rgba(255,255,255,0.65); --border: rgba(255,255,255,0.08);
+            --pink: #ff2e92; --blue: #00d5ff; --gold: #ffd700;
+            --bgA: #0b0f1c; --bgB: #111827; --glass: rgba(255,255,255,0.06);
+            --text: #e8eefc; --muted: rgba(232,238,252,0.7); --border: rgba(255,255,255,0.12);
+            --glow: 0 0 20px rgba(0,213,255,0.3), 0 0 30px rgba(255,46,146,0.15);
         }
         body {
             margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--text);
-            background: radial-gradient(1200px 800px at -10% -20%, rgba(0,213,255,0.12), transparent 60%),
-                        radial-gradient(1200px 800px at 110% 120%, rgba(255,46,146,0.12), transparent 60%), var(--bg);
+            background: radial-gradient(1000px 700px at -10% -20%, rgba(0,213,255,0.18), transparent 60%),
+                        radial-gradient(1000px 700px at 110% 120%, rgba(255,46,146,0.16), transparent 60%),
+                        linear-gradient(135deg, var(--bgA), var(--bgB));
             min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px;
         }
-        .container { width: 100%; max-width: 1100px; }
-        .header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 16px; padding: 12px 16px; border: 1px solid var(--border); background: var(--card); border-radius: 14px; backdrop-filter: blur(8px); }
-        .brand { display: flex; align-items: center; gap: 10px; }
-        .logo { font-family: Poppins, sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+        .container { width: 100%; max-width: 1200px; }
+        .header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 16px; padding: 16px; border: 1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius: 16px; backdrop-filter: blur(10px); box-shadow: var(--glow); }
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .logo { font-family: Poppins, sans-serif; font-weight: 800; letter-spacing: -0.02em; font-size: 1.1rem; }
         .logo .grad { background: linear-gradient(90deg, var(--blue), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .back { color: var(--text); text-decoration: none; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; display: inline-flex; align-items: center; gap: 8px; }
+        .badge { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background: rgba(255,255,255,0.04); font-weight:700; font-size:.8rem; }
+        .nav-actions { display:flex; gap:10px; align-items:center; }
+        .back { color: var(--text); text-decoration: none; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); }
 
-        .grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; }
-        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-        .card { border: 1px solid var(--border); background: var(--card); border-radius: 14px; padding: 16px; }
+        .hero { display:grid; grid-template-columns: 1.2fr 0.8fr; gap:16px; }
+        @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+        .card { border: 1px solid var(--border); background: rgba(255,255,255,0.04); border-radius: 16px; padding: 18px; box-shadow: var(--glow); }
+        .glass { background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03)); backdrop-filter: blur(12px); }
         h1, h2 { font-family: Poppins, sans-serif; margin: 0 0 10px; }
-        h1 { font-size: 1.6rem; }
+        h1 { font-size: 1.8rem; letter-spacing:-0.01em; }
         .muted { color: var(--muted); font-size: 0.95rem; }
-        .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 6px; }
-        .btn { border: 1px solid var(--border); background: linear-gradient(90deg, rgba(0,213,255,0.12), rgba(255,46,146,0.12)); color: var(--text); padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+        .actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 12px 0; }
+        .pack { border:1px solid var(--border); border-radius:14px; padding:12px; background: rgba(255,255,255,0.03); cursor:pointer; display:flex; flex-direction:column; gap:8px; transition: transform .15s ease, box-shadow .15s ease, border-color .2s ease; }
+        .pack:hover { transform: translateY(-2px); box-shadow: var(--glow); border-color: rgba(0,213,255,0.4); }
+        .pack .title { font-weight:800; }
+        .pack .tagline { color: var(--muted); font-size:.85rem; }
+        .meter { height:6px; background: rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; }
+        .meter > div { height:100%; background: linear-gradient(90deg, var(--blue), var(--pink)); width: 50%; }
+        .best { border-image: linear-gradient(90deg, var(--gold), var(--pink)) 1; border-width:1px; border-style: solid; }
+
+        .form { display: grid; gap: 12px; margin-top: 8px; }
+        label { font-weight: 700; }
+        input[type="number"], input[type="text"] { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); color: var(--text); }
+        .file-input-wrapper { display:flex; align-items:center; gap:8px; border:1px dashed var(--border); padding:10px 12px; border-radius:12px; cursor:pointer; background: rgba(255,255,255,0.03); }
+        .file-input-wrapper i { color: var(--pink); }
+        .file-name { font-size:.85rem; color:var(--muted); }
+        .receipt-preview { width:100%; max-height:160px; object-fit:contain; margin-top:8px; border:1px solid var(--border); border-radius:12px; display:none; }
+        .progress { width: 100%; height: 6px; border-radius:999px; background: rgba(255,255,255,0.08); overflow:hidden; display:none; }
+        .progress > div { height:100%; width:0%; background: linear-gradient(90deg, var(--blue), var(--pink)); transition: width .1s linear; }
+
+        .btn { border: 1px solid var(--border); background: linear-gradient(90deg, rgba(0,213,255,0.12), rgba(255,46,146,0.12)); color: var(--text); padding: 12px 14px; border-radius: 12px; cursor: pointer; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; }
         .btn.primary { background: linear-gradient(90deg, var(--blue), var(--pink)); border-color: transparent; }
         .btn.block { width: 100%; justify-content: center; }
         .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; background: rgba(255,255,255,0.06); font-weight: 800; }
 
-        .form { display: grid; gap: 10px; }
-        label { font-weight: 700; }
-        input[type="number"], select, input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); color: var(--text); }
-        input[type="file"] { display: none; }
-        .file-input-wrapper { display:flex; align-items:center; gap:8px; border:1px dashed var(--border); padding:8px 10px; border-radius:10px; cursor:pointer; }
-        .file-input-wrapper i { color: var(--pink); }
-        .file-name { font-size:.85rem; color:var(--muted); }
-        .receipt-preview { width:100%; max-height:160px; object-fit:contain; margin-top:8px; border:1px solid var(--border); border-radius:10px; display:none; }
+        .summary-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 0; }
+        .summary-total { font-weight:800; font-size:1.1rem; }
 
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: left; }
-        th { color: var(--muted); font-weight: 700; font-size: .85rem; }
+        .auth-overlay { position: fixed; inset: 0; background: rgba(5,8,15,0.8); display: none; place-items: center; z-index: 30; }
+        .auth-card { width: 92%; max-width: 560px; border:1px solid var(--border); border-radius: 16px; padding: 18px; background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); backdrop-filter: blur(14px); box-shadow: var(--glow); text-align:center; }
+        .auth-card h3 { margin:0 0 8px; font-family:Poppins,sans-serif; }
+        .auth-card p { color: var(--muted); margin: 4px 0 12px; }
 
-        .msg { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); padding: 10px 16px; border-radius: 10px; color: #fff; display: none; }
+        .msg { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); padding: 10px 16px; border-radius: 12px; color: #fff; display: none; z-index: 40; }
         .msg.show { display: block; }
         .msg.success { background: #16a34a; }
         .msg.error { background: #dc2626; }
@@ -64,29 +82,55 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <div class="header glass">
             <div class="brand">
                 <div class="logo"><span class="grad">JCHAT</span> JCoin Store</div>
-                <div id="authState" class="muted">Signing in…</div>
+                <span class="badge"><i class="fas fa-circle" style="color:var(--blue);"></i> <span id="authState">Signing in…</span></span>
             </div>
-            <div style="display:flex; gap:8px; align-items:center;">
+            <div class="nav-actions">
                 <a class="back" href="/Home.html"><i class="fas fa-home"></i> Home</a>
                 <a class="back" href="/Wallet.html"><i class="fas fa-wallet"></i> Wallet</a>
             </div>
         </div>
 
-        <div class="grid">
-            <div class="card">
-                <h1>Buy JCoins</h1>
-                <div class="muted">Choose a package or enter a custom amount. Transfer to the bank details below and upload your receipt (optional).</div>
-                <div class="actions">
-                    <button class="btn" data-pack="200">200 J</button>
-                    <button class="btn" data-pack="500">500 J</button>
-                    <button class="btn" data-pack="1000">1,000 J</button>
-                    <button class="btn" data-pack="2000">2,000 J</button>
-                    <button class="btn" data-pack="5000">5,000 J</button>
-                    <button class="btn" data-pack="10000">10,000 J</button>
+        <div class="hero">
+            <div class="card glass">
+                <h1>Unlock More with JCoins</h1>
+                <p class="muted">Choose a pack or set a custom amount. Transfer to the bank below and upload your receipt. Developer approval credits JCoins instantly.</p>
+                <div id="coinAnim" style="width:100%; height:140px; margin:8px 0 2px; opacity:.9;"></div>
+                <div class="actions" id="packsGrid">
+                    <div class="pack best" data-pack="200">
+                        <div class="title">200 J</div>
+                        <div class="tagline">Starter Boost</div>
+                        <div class="meter"><div style="width:35%"></div></div>
+                    </div>
+                    <div class="pack" data-pack="500">
+                        <div class="title">500 J</div>
+                        <div class="tagline">Level Up</div>
+                        <div class="meter"><div style="width:45%"></div></div>
+                    </div>
+                    <div class="pack" data-pack="1000">
+                        <div class="title">1,000 J</div>
+                        <div class="tagline">Pro Bundle</div>
+                        <div class="meter"><div style="width:60%"></div></div>
+                    </div>
+                    <div class="pack" data-pack="2000">
+                        <div class="title">2,000 J</div>
+                        <div class="tagline">Creator Pack</div>
+                        <div class="meter"><div style="width:75%"></div></div>
+                    </div>
+                    <div class="pack" data-pack="5000">
+                        <div class="title">5,000 J</div>
+                        <div class="tagline">Best Value</div>
+                        <div class="meter"><div style="width:90%"></div></div>
+                    </div>
+                    <div class="pack" data-pack="10000">
+                        <div class="title">10,000 J</div>
+                        <div class="tagline">Ultimate</div>
+                        <div class="meter"><div style="width:98%"></div></div>
+                    </div>
                 </div>
+
                 <div class="form">
                     <div>
                         <label for="jcoinsInput">Custom JCoins</label>
@@ -114,26 +158,39 @@
                             <span class="file-name" id="receiptFileName">No file chosen</span>
                         </div>
                         <input type="file" id="receiptInput" accept="image/*,.pdf" />
+                        <div class="progress" id="uploadProgress"><div></div></div>
                         <img id="receiptPreview" class="receipt-preview" />
                     </div>
                     <button id="submitBtn" class="btn primary"><i class="fas fa-shopping-cart"></i> Submit Request</button>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card glass">
                 <h2>Summary</h2>
-                <div class="row"><div class="muted">Order ID</div><div id="orderId">—</div></div>
-                <div class="row"><div class="muted">Selected JCoins</div><div><strong id="summaryJ">0</strong> J</div></div>
-                <div class="row"><div class="muted">Rate</div><div>₦<strong id="rate">—</strong> / J</div></div>
-                <div class="row" style="font-weight:800;"><div>Total (NGN)</div><div>₦<strong id="total">0</strong></div></div>
-                <div class="muted" style="margin-top:10px;">After the developer approves, your JCoins will be credited immediately.</div>
+                <div class="summary-row"><div class="muted">Order ID</div><div id="orderId">—</div></div>
+                <div class="summary-row"><div class="muted">Selected JCoins</div><div><strong id="summaryJ">0</strong> J</div></div>
+                <div class="summary-row"><div class="muted">Rate</div><div>₦<strong id="rate">—</strong> / J</div></div>
+                <div class="summary-row summary-total"><div>Total (NGN)</div><div>₦<strong id="total">0</strong></div></div>
+                <div class="muted" style="margin-top:10px;">After approval, your JCoins will be credited immediately.</div>
                 <div style="margin-top:12px;"><button id="toWalletBtn" class="btn"><i class="fas fa-wallet"></i> Go to Wallet</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card glass">
+            <h3>Sign In Required</h3>
+            <p>To purchase JCoins, please sign in to your account.</p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <a href="/Login.html" class="btn primary"><i class="fas fa-right-to-bracket"></i> Go to Login</a>
+                <a href="/Home.html" class="btn"><i class="fas fa-home"></i> Back to Home</a>
             </div>
         </div>
     </div>
 
     <div id="toast" class="msg info">Info</div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
@@ -158,7 +215,8 @@
         const toast = document.getElementById('toast');
         const submitBtn = document.getElementById('submitBtn');
         const jcoinsInput = document.getElementById('jcoinsInput');
-        const packButtons = Array.from(document.querySelectorAll('[data-pack]'));
+        const packsGrid = document.getElementById('packsGrid');
+        const packButtons = () => Array.from(document.querySelectorAll('.pack'));
         const orderIdEl = document.getElementById('orderId');
         const summaryJ = document.getElementById('summaryJ');
         const rateEl = document.getElementById('rate');
@@ -167,15 +225,23 @@
         const receiptInput = document.getElementById('receiptInput');
         const receiptFileName = document.getElementById('receiptFileName');
         const receiptPreview = document.getElementById('receiptPreview');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const uploadBar = uploadProgress.querySelector('div');
         const toWalletBtn = document.getElementById('toWalletBtn');
         const copyOpay = document.getElementById('copyOpay');
         const copyKeystone = document.getElementById('copyKeystone');
+        const authOverlay = document.getElementById('authOverlay');
 
         let currentUser = null;
         let selectedJ = 0;
         let rate = 0;
         let orderId = genOrderId();
         orderIdEl.textContent = orderId;
+
+        // Lottie animation (simple loop)
+        try {
+            const anim = lottie?.loadAnimation?.({ container: document.getElementById('coinAnim'), renderer: 'svg', loop: true, autoplay: true, path: 'https://assets8.lottiefiles.com/packages/lf20_cx7m4yui.json' });
+        } catch (_) { /* ignore */ }
 
         function showToast(message, type = 'info') {
             toast.textContent = message; toast.className = `msg show ${type}`;
@@ -194,8 +260,17 @@
                 }
             } catch (e) {
                 console.error('Auth error', e);
-                authState.textContent = 'Auth failed (retrying)';
-                setTimeout(ensureAuthenticated, 1500);
+                authState.textContent = 'Sign-in required';
+                // Only show overlay for admin-restricted-operation or missing provider
+                const code = (e && e.code) ? String(e.code) : '';
+                if (code.includes('admin-restricted-operation') || code.includes('operation-not-allowed')) {
+                    authOverlay.style.display = 'grid';
+                    submitBtn.disabled = true;
+                    disableStore(true);
+                } else {
+                    // Soft fail: allow anon retry once
+                    setTimeout(() => { if (!auth.currentUser) ensureAuthenticated(); }, 1500);
+                }
             }
         }
 
@@ -216,12 +291,16 @@
             totalEl.textContent = String(total);
         }
 
+        function selectPack(btn) {
+            packButtons().forEach(b => b.style.outline = 'none');
+            btn.style.outline = '2px solid rgba(0,213,255,0.6)';
+            selectedJ = Number(btn.getAttribute('data-pack')) || 0;
+            jcoinsInput.value = '';
+            computeTotal();
+        }
+
         function bindUI() {
-            packButtons.forEach(btn => btn.addEventListener('click', () => {
-                selectedJ = Number(btn.getAttribute('data-pack')) || 0;
-                jcoinsInput.value = '';
-                computeTotal();
-            }));
+            packButtons().forEach(btn => btn.addEventListener('click', () => selectPack(btn)));
             jcoinsInput.addEventListener('input', () => { selectedJ = 0; computeTotal(); });
             receiptTrigger.addEventListener('click', () => receiptInput.click());
             receiptInput.addEventListener('change', () => {
@@ -235,18 +314,40 @@
             toWalletBtn.addEventListener('click', () => { window.location.href = '/Wallet.html'; });
         }
 
+        function disableStore(flag) {
+            [...packButtons(), jcoinsInput, receiptTrigger, submitBtn].forEach(el => { if (el) el.disabled = !!flag; });
+        }
+
         async function uploadReceiptIfAny() {
             const f = receiptInput.files?.[0];
             if (!f) return null;
             try {
+                uploadProgress.style.display = '';
+                uploadBar.style.width = '0%';
+                // Using Cloudinary unsigned upload via XHR to track progress
+                const url = 'https://api.cloudinary.com/v1_1/dxld01rcp/auto/upload';
                 const fd = new FormData();
                 fd.append('file', f);
                 fd.append('upload_preset', 'Storage_preset');
-                const resp = await fetch('https://api.cloudinary.com/v1_1/dxld01rcp/auto/upload', { method: 'POST', body: fd });
-                if (!resp.ok) throw new Error('Upload failed');
-                const data = await resp.json();
+                const res = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', url);
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            const pct = Math.round((e.loaded / e.total) * 100);
+                            uploadBar.style.width = pct + '%';
+                        }
+                    };
+                    xhr.onload = () => resolve(xhr);
+                    xhr.onerror = () => reject(new Error('Upload failed'));
+                    xhr.send(fd);
+                });
+                if (res.status < 200 || res.status >= 300) throw new Error('Upload failed');
+                const data = JSON.parse(res.responseText);
+                uploadBar.style.width = '100%';
                 return data.secure_url || null;
             } catch (e) { console.error('Receipt upload error', e); return null; }
+            finally { setTimeout(() => { uploadProgress.style.display = 'none'; }, 600); }
         }
 
         async function submitRequest() {
@@ -287,16 +388,17 @@
             if (user) {
                 currentUser = user;
                 authState.textContent = 'Signed in';
-                // Ensure profile exists and jCoins field initialized
+                authOverlay.style.display = 'none';
+                submitBtn.disabled = false; disableStore(false);
                 try {
                     const profRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profiles', 'user_profile');
                     const snap = await getDoc(profRef);
                     if (!snap.exists()) {
                         await setDoc(profRef, { jCoins: 0, level: 1, currentXp: 0, xpToNextLevel: 100, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
-                    } else if (snap.exists() && typeof (snap.data().jCoins) === 'undefined') {
+                    } else if (typeof (snap.data().jCoins) === 'undefined') {
                         await setDoc(profRef, { jCoins: 0, updatedAt: serverTimestamp() }, { merge: true });
                     }
-                } catch (e) { /* non-blocking */ }
+                } catch (_) { /* ignore */ }
             } else {
                 authState.textContent = 'Guest';
             }
