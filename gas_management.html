@@ -4427,16 +4427,22 @@
                     const isTheme = it.category === 'premium_theme';
                     const icon = isTheme ? '🎨' : '📦';
                     let priceText = '';
+                    let itemName = '';
+                    
                     if (isTheme) {
+                        // Use themeKey and themeName if available, fallback to old system
+                        itemName = it.themeName || it.title || `Theme ${it.id}`;
                         if (req.userCurrencyAmount && req.userCurrencyCode) {
-                            priceText = `${req.userCurrencyCode} ${req.userCurrencyAmount} (₦${it.price})`;
+                            priceText = `${req.userCurrencyCode} ${req.userCurrencyAmount} ($${it.price})`;
                         } else {
-                            priceText = `₦${it.price}`;
+                            priceText = `$${it.price}`;
                         }
                     } else {
+                        itemName = it.title || `Item ${it.id}`;
                         priceText = `${it.price} JCoins`;
                     }
-                    return `<li>${icon} ${(it.title||`Item ${it.id}`)} - ${priceText} (${it.category})</li>`;
+                    
+                    return `<li>${icon} <strong>${itemName}</strong> - ${priceText} (${it.category})</li>`;
                 }).join('')}</ul>`
                 : '<div style="color:var(--text-light);">No items listed</div>';
             card.innerHTML = `
@@ -4515,18 +4521,30 @@
                     const otherItems = toAdd.filter(item => item.category !== 'premium_theme');
                     
                     if (themeItems.length > 0) {
-                        // Handle theme purchases - unlock themes for user
-                        const userEntitlementsRef = doc(db, 'artifacts', appId, 'users', userId, 'user_entitlements', 'packs');
+                        // Handle theme purchases - unlock themes for user using new system
+                        const userEntitlementsRef = doc(db, 'artifacts', appId, 'users', userId, 'user_entitlements');
                         const entitlementsSnap = await tx.get(userEntitlementsRef);
                         const entitlements = entitlementsSnap.exists() ? entitlementsSnap.data() : {};
                         
-                        // Add purchased theme product IDs
-                        const currentPurchasedThemeIds = Array.isArray(entitlements.purchasedThemeProductIds) ? entitlements.purchasedThemeProductIds : [];
-                        const newThemeIds = themeItems.map(item => item.id).filter(id => !currentPurchasedThemeIds.includes(id));
-                        const updatedThemeIds = [...currentPurchasedThemeIds, ...newThemeIds];
+                        // Add purchased themes to user's entitlements
+                        const currentPurchasedThemes = Array.isArray(entitlements.themes) ? entitlements.themes : [];
+                        const newThemes = themeItems.map(item => item.themeKey).filter(themeKey => 
+                            themeKey && !currentPurchasedThemes.includes(themeKey)
+                        );
+                        const updatedThemes = [...currentPurchasedThemes, ...newThemes];
+                        
+                        // Also mark individual themes as purchased
+                        const themeUpdates = {};
+                        themeItems.forEach(item => {
+                            if (item.themeKey) {
+                                themeUpdates[`theme_${item.themeKey}_purchased`] = true;
+                                themeUpdates[`theme_${item.themeKey}_purchase_date`] = serverTimestamp();
+                            }
+                        });
                         
                         tx.set(userEntitlementsRef, { 
-                            purchasedThemeProductIds: updatedThemeIds,
+                            themes: updatedThemes,
+                            ...themeUpdates,
                             updatedAt: serverTimestamp() 
                         }, { merge: true });
                         

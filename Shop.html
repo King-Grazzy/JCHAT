@@ -622,6 +622,7 @@
         const paymentData = {
           orderId,
           userId: currentUser.uid,
+          userName: currentUser.displayName || 'Anonymous',
           paymentMethod: 'bank_transfer',
           nairaAmount: totalInNaira,
           userCurrencyAmount: totalInUserCurrency,
@@ -630,14 +631,24 @@
           status: 'pending',
           timestamp: serverTimestamp(),
           assignedAdminId: 'cc96gdhCRPO72NFZtleRCujHvIq2',
+          adminApproved: false,
+          adminUid: null,
+          adminApprovalTime: null,
           items: selectedThemes.map(t => ({
             id: t.id,
-            title: t.name,
+            themeKey: t.key,
+            themeName: t.name,
             price: t.price,
+            currency: 'USD',
             userCurrencyPrice: convertPrice(t.price, userCurrency.code),
             category: 'premium_theme',
-            key: t.key
+            description: t.description
           })),
+          bankDetails: {
+            bankName: 'Keystone Bank',
+            accountName: 'ELECHI OSOUNDU JOSHUA',
+            accountNumber: '6042862356'
+          },
           ...(uploadedReceiptUrl ? { receiptUrl: uploadedReceiptUrl } : {})
         };
         await setDoc(paymentRequestRef, paymentData);
@@ -702,6 +713,39 @@
         updateSummary();
         if (firstEl) firstEl.scrollIntoView({behavior:'smooth', block:'center'});
       } catch (_) {}
+    })();
+
+    // Auto-select theme from URL parameters if redirected from Home.html
+    (function autoSelectThemeFromURL(){
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const themeKey = params.get('theme');
+        const themeName = params.get('name');
+        const themePrice = params.get('price');
+        
+        if (themeKey) {
+          // Find theme in THEMES array
+          const themeIndex = THEMES.findIndex(t => t.key === themeKey);
+          if (themeIndex !== -1) {
+            // Auto-select the theme
+            const themeId = themeIndex + 1; // +1 because IDs start at 1
+            const themeElement = themesEl.querySelector(`.theme input[value="${themeId}"]`);
+            if (themeElement) {
+              themeElement.checked = true;
+              themeElement.closest('.theme').classList.add('highlight');
+              updateSummary();
+              
+              // Show success message
+              showToast(`Selected: ${themeName}`, 'success');
+              
+              // Scroll to the selected theme
+              themeElement.closest('.theme').scrollIntoView({behavior:'smooth', block:'center'});
+            }
+          }
+        }
+      } catch (error) {
+        console.log('Error auto-selecting theme:', error);
+      }
     })();
   </script>
 </body>

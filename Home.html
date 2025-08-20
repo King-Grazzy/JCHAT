@@ -4022,6 +4022,18 @@
             });
         }
 
+        // Redirect to shop with specific theme pre-selected
+        function redirectToShop(themeKey) {
+            const themeInfo = themeCatalog[themeKey];
+            if (themeInfo) {
+                const shopUrl = `Shop.html?theme=${themeKey}&name=${encodeURIComponent(themeInfo.name)}&price=${themeInfo.price}`;
+                window.location.href = shopUrl;
+            } else {
+                // Fallback to general shop
+                window.location.href = 'Shop.html';
+            }
+        }
+
         // Add currency selector to theme picker
         function addCurrencySelector() {
             const picker = document.querySelector('.theme-picker');
@@ -4078,6 +4090,15 @@
             if (themeSwitcherBtn) {
                 themeSwitcherBtn.addEventListener('click', openThemePicker);
             }
+            
+            // Subscribe to real-time theme unlocks for authenticated users
+            if (typeof onAuthStateChanged !== 'undefined') {
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        subscribeToThemeUnlocks(user.uid);
+                    }
+                });
+            }
         }
 
         // Check if a theme is locked (requires purchase)
@@ -4091,12 +4112,8 @@
         function setTheme(theme) {
             // Check if theme is locked
             if (isThemeLocked(theme)) {
-                // Redirect to shop to purchase the theme
-                if (typeof openShop === 'function') {
-                    openShop();
-                } else {
-                    showMessageBox('This theme requires purchase. Please visit the shop.', 'info');
-                }
+                // Redirect to shop to purchase the specific theme
+                redirectToShop(theme);
                 return;
             }
 
@@ -4214,11 +4231,7 @@
                 
                 button.addEventListener('click', () => {
                     if (isLocked) {
-                        if (typeof openShop === 'function') {
-                            openShop();
-                        } else {
-                            showMessageBox('This theme requires purchase. Please visit the shop.', 'info');
-                        }
+                        redirectToShop(theme);
                         closeThemePicker();
                     } else {
                         setTheme(theme);
@@ -4311,6 +4324,51 @@
                             userData.pendingProducts
                                 .filter(productId => productIdToThemeClass[productId])
                         );
+                    }
+                }
+            });
+        }
+
+        // Subscribe to real-time theme unlocks from new system
+        function subscribeToThemeUnlocks(userId) {
+            if (!userId) return;
+            
+            // Check if Firebase is available
+            if (typeof db === 'undefined' || typeof appId === 'undefined') {
+                console.log('Firebase not available for theme unlocks');
+                return;
+            }
+            
+            const userEntitlementsRef = doc(db, 'artifacts', appId, 'users', userId, 'user_entitlements');
+            
+            return onSnapshot(userEntitlementsRef, (doc) => {
+                if (doc.exists()) {
+                    const data = doc.data();
+                    
+                    // Check if any new themes were unlocked
+                    if (data.themes && Array.isArray(data.themes)) {
+                        data.themes.forEach(themeKey => {
+                            if (themeCatalog[themeKey]) {
+                                // Theme is now unlocked - add to purchased set
+                                const productId = themeClassToProductId[themeKey];
+                                if (productId) {
+                                    purchasedThemeProductIds.add(productId);
+                                }
+                            }
+                        });
+                        
+                        // Refresh theme picker if open
+                        if (document.querySelector('.theme-picker')) {
+                            buildThemePickerList();
+                        }
+                        
+                        // Show notification if themes were just unlocked
+                        const unlockedThemes = data.themes.filter(themeKey => 
+                            themeCatalog[themeKey] && !isThemeLocked(themeKey)
+                        );
+                        if (unlockedThemes.length > 0) {
+                            showMessageBox(`🎉 ${unlockedThemes.length} premium theme(s) unlocked!`, 'success');
+                        }
                     }
                 }
             });
