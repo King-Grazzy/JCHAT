@@ -181,6 +181,30 @@
                 <a id="openJCoinBtn" href="/JCoin.html" class="btn"><i class="fas fa-coins"></i> Open JCoin Store</a>
             </div>
         </div>
+
+        <div id="securityCard" class="card glass" style="margin-top:16px;">
+            <h2>Security</h2>
+            <div class="divider"></div>
+            <div class="row wrap" style="gap:16px; align-items:center;">
+                <label style="display:flex; align-items:center; gap:8px;">
+                    <input id="requirePinToggle" type="checkbox" /> Require PIN for Send/Pay
+                </label>
+                <button id="setChangePinBtn" class="btn"><i class="fas fa-key"></i> Set/Change PIN</button>
+                <label style="display:flex; align-items:center; gap:8px;">
+                    <input id="privacyBlurToggle" type="checkbox" /> Blur Balances
+                </label>
+                <label style="display:flex; align-items:center; gap:8px;">
+                    Auto‑lock
+                    <select id="autoLockSelect">
+                        <option value="0">Off</option>
+                        <option value="60">1 min</option>
+                        <option value="300">5 min</option>
+                        <option value="900">15 min</option>
+                    </select>
+                </label>
+            </div>
+            <p class="muted" style="margin-top:8px;">PIN is verified only on device using a salted hash. Do not share your PIN.</p>
+        </div>
     </div>
 
     <div class="auth-overlay" id="authOverlay">
@@ -190,6 +214,32 @@
             <div style="display:flex; gap:10px; justify-content:center;">
                 <a href="/Login.html" class="btn primary"><i class="fas fa-right-to-bracket"></i> Go to Login</a>
                 <a href="/Home.html" class="btn"><i class="fas fa-home"></i> Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-overlay" id="sessionLockOverlay" style="display:none;">
+        <div class="auth-card glass">
+            <h3>Wallet Locked</h3>
+            <p>Enter your wallet PIN to continue.</p>
+            <input id="sessionPinInput" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="PIN" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text);" />
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+                <button id="unlockSessionBtn" class="btn primary"><i class="fas fa-unlock"></i> Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-overlay" id="pinModalOverlay" style="display:none;">
+        <div class="auth-card glass">
+            <h3 id="pinModalTitle">Set Wallet PIN</h3>
+            <div id="pinModalBody" style="display:grid; gap:8px;">
+                <input id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="Enter PIN (min 4)" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text);" />
+                <input id="pinConfirmInput" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="Confirm PIN" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text);" />
+                <p id="pinHint" class="muted" style="margin:4px 0 0;">PIN is stored as a salted hash.</p>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:10px;">
+                <button id="pinModalConfirmBtn" class="btn primary"><i class="fas fa-check"></i> Confirm</button>
+                <button id="pinModalCancelBtn" class="btn"><i class="fas fa-times"></i> Cancel</button>
             </div>
         </div>
     </div>
@@ -254,6 +304,21 @@
         const payRequestNowBtn = document.getElementById('payRequestNowBtn');
         const cancelPayRequestBtn = document.getElementById('cancelPayRequestBtn');
 
+        // Security elements
+        const requirePinToggle = document.getElementById('requirePinToggle');
+        const setChangePinBtn = document.getElementById('setChangePinBtn');
+        const privacyBlurToggle = document.getElementById('privacyBlurToggle');
+        const autoLockSelect = document.getElementById('autoLockSelect');
+        const sessionLockOverlay = document.getElementById('sessionLockOverlay');
+        const sessionPinInput = document.getElementById('sessionPinInput');
+        const unlockSessionBtn = document.getElementById('unlockSessionBtn');
+        const pinModalOverlay = document.getElementById('pinModalOverlay');
+        const pinModalTitle = document.getElementById('pinModalTitle');
+        const pinInput = document.getElementById('pinInput');
+        const pinConfirmInput = document.getElementById('pinConfirmInput');
+        const pinModalConfirmBtn = document.getElementById('pinModalConfirmBtn');
+        const pinModalCancelBtn = document.getElementById('pinModalCancelBtn');
+
         const receiptTrigger = document.getElementById('receiptTrigger');
         const receiptInput = document.getElementById('receiptInput');
         const receiptFileName = document.getElementById('receiptFileName');
@@ -269,6 +334,9 @@
         let paymentContext = null; // { type: 'unlock'|'premium', amount: number, tier?: string }
         let overlayTimer = null;
         let payRequestContext = null; // { id, requesterId, amount, note }
+        let inactivityTimer = null;
+        const SECURITY_DEFAULTS = { walletRequirePin: false, privacyBlur: false, autoLockSeconds: 0 };
+        let walletSecurity = { ...SECURITY_DEFAULTS, walletPinHash: null, walletPinSalt: null };
 
         function showToast(message, type = 'info') {
             toast.textContent = message; toast.className = `msg show ${type}`;
@@ -299,6 +367,11 @@
             const snap = await getDoc(profRef);
             if (snap.exists()) {
                 currentProfile = snap.data();
+                walletSecurity.walletPinHash = currentProfile.walletPinHash || null;
+                walletSecurity.walletPinSalt = currentProfile.walletPinSalt || null;
+                walletSecurity.walletRequirePin = !!currentProfile.walletRequirePin;
+                walletSecurity.privacyBlur = !!currentProfile.privacyBlur;
+                walletSecurity.autoLockSeconds = Number(currentProfile.autoLockSeconds || 0);
             } else {
                 currentProfile = { jCoins: 0, gas: 0, walletUnlocked: false };
                 await setDoc(profRef, { ...currentProfile, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
@@ -314,6 +387,16 @@
             walletStatusEl.innerHTML = unlocked ? '<span class="chip" style="border-color:rgba(16,185,129,.4)"><i class="fas fa-unlock"></i> Unlocked</span>' : '<span class="chip" style="border-color:rgba(220,38,38,.4)"><i class="fas fa-lock"></i> Locked</span>';
             requestUnlockBtn.style.display = unlocked ? 'none' : '';
             actionsCard.style.display = unlocked ? '' : 'none';
+            // Apply security toggles
+            requirePinToggle.checked = !!walletSecurity.walletRequirePin;
+            privacyBlurToggle.checked = !!walletSecurity.privacyBlur;
+            autoLockSelect.value = String(walletSecurity.autoLockSeconds || 0);
+            // Blur balances
+            const blurCls = 'blurred';
+            if (walletSecurity.privacyBlur) { jBalanceEl.classList.add(blurCls); gBalanceEl.classList.add(blurCls); }
+            else { jBalanceEl.classList.remove(blurCls); gBalanceEl.classList.remove(blurCls); }
+            // Setup inactivity lock timer
+            resetInactivityTimer();
         }
 
         async function renderTransactions() {
@@ -396,6 +479,158 @@
                 premiumTierEl.textContent = String(paymentContext.tier || 'premium');
             }
         }
+        // --- Security helpers ---
+        function resetInactivityTimer() {
+            if (!walletSecurity.autoLockSeconds) return;
+            if (inactivityTimer) { clearTimeout(inactivityTimer); inactivityTimer = null; }
+            inactivityTimer = setTimeout(() => {
+                if (walletSecurity.walletRequirePin && walletSecurity.walletPinHash) {
+                    sessionLockOverlay.style.display = 'grid';
+                    sessionPinInput.value = '';
+                    try { sessionPinInput.focus(); } catch {}
+                }
+            }, walletSecurity.autoLockSeconds * 1000);
+        }
+
+        ['click','keydown','mousemove','touchstart'].forEach(evt => {
+            window.addEventListener(evt, () => { if (walletSecurity.autoLockSeconds) resetInactivityTimer(); }, { passive: true });
+        });
+
+        function toBase64(bytes) {
+            const bin = String.fromCharCode(...new Uint8Array(bytes));
+            return btoa(bin);
+        }
+        function fromBase64(b64) {
+            const bin = atob(b64);
+            const len = bin.length;
+            const bytes = new Uint8Array(len);
+            for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i);
+            return bytes.buffer;
+        }
+        async function pbkdf2HashPin(pin, saltB64) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(pin), 'PBKDF2', false, ['deriveBits']);
+            const salt = saltB64 ? new Uint8Array(fromBase64(saltB64)) : crypto.getRandomValues(new Uint8Array(16));
+            const bits = await crypto.subtle.deriveBits({ name:'PBKDF2', hash:'SHA-256', salt, iterations: 100000 }, keyMaterial, 256);
+            return { saltB64: toBase64(salt), hashB64: toBase64(bits) };
+        }
+
+        async function setWalletPinFlow() {
+            pinModalTitle.textContent = 'Set/Change Wallet PIN';
+            pinModalOverlay.style.display = 'grid';
+            pinConfirmInput.style.display = '';
+            pinInput.value = ''; pinConfirmInput.value = '';
+            return new Promise((resolve) => {
+                function cleanup(ok) {
+                    pinModalOverlay.style.display = 'none';
+                    pinModalConfirmBtn.removeEventListener('click', onConfirm);
+                    pinModalCancelBtn.removeEventListener('click', onCancel);
+                }
+                async function onConfirm() {
+                    const p1 = (pinInput.value || '').trim();
+                    const p2 = (pinConfirmInput.value || '').trim();
+                    if (p1.length < 4) { showToast('PIN must be at least 4 digits.', 'warning'); return; }
+                    if (p1 !== p2) { showToast('PINs do not match.', 'error'); return; }
+                    const { saltB64, hashB64 } = await pbkdf2HashPin(p1);
+                    // Save to Firestore profile
+                    try {
+                        await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), {
+                            walletPinSalt: saltB64,
+                            walletPinHash: hashB64,
+                            walletRequirePin: true,
+                            updatedAt: serverTimestamp()
+                        }, { merge: true });
+                        walletSecurity.walletPinSalt = saltB64;
+                        walletSecurity.walletPinHash = hashB64;
+                        walletSecurity.walletRequirePin = true;
+                        requirePinToggle.checked = true;
+                        showToast('PIN set.', 'success');
+                    } catch (e) { console.error(e); showToast('Failed to save PIN', 'error'); }
+                    cleanup(true); resolve(true);
+                }
+                function onCancel() { cleanup(false); resolve(false); }
+                pinModalConfirmBtn.addEventListener('click', onConfirm);
+                pinModalCancelBtn.addEventListener('click', onCancel);
+            });
+        }
+
+        async function verifyPinFlow() {
+            if (!walletSecurity.walletRequirePin || !walletSecurity.walletPinHash) return true;
+            // Prompt for PIN
+            pinModalTitle.textContent = 'Enter Wallet PIN';
+            pinModalOverlay.style.display = 'grid';
+            pinConfirmInput.style.display = 'none';
+            pinInput.value = '';
+            return new Promise((resolve) => {
+                function cleanup(ok) {
+                    pinModalOverlay.style.display = 'none';
+                    pinModalConfirmBtn.removeEventListener('click', onConfirm);
+                    pinModalCancelBtn.removeEventListener('click', onCancel);
+                }
+                async function onConfirm() {
+                    const p = (pinInput.value || '').trim();
+                    const { hashB64 } = await pbkdf2HashPin(p, walletSecurity.walletPinSalt);
+                    if (hashB64 === walletSecurity.walletPinHash) { cleanup(true); resolve(true); }
+                    else { showToast('Incorrect PIN.', 'error'); }
+                }
+                function onCancel() { cleanup(false); resolve(false); }
+                pinModalConfirmBtn.addEventListener('click', onConfirm);
+                pinModalCancelBtn.addEventListener('click', onCancel);
+            });
+        }
+
+        unlockSessionBtn.addEventListener('click', async () => {
+            const p = (sessionPinInput.value || '').trim();
+            try {
+                const { hashB64 } = await pbkdf2HashPin(p, walletSecurity.walletPinSalt);
+                if (hashB64 === walletSecurity.walletPinHash) {
+                    sessionLockOverlay.style.display = 'none';
+                    resetInactivityTimer();
+                } else {
+                    showToast('Incorrect PIN.', 'error');
+                }
+            } catch (e) { showToast('Unlock failed', 'error'); }
+        });
+
+        setChangePinBtn.addEventListener('click', setWalletPinFlow);
+        requirePinToggle.addEventListener('change', async () => {
+            if (!currentUser) return;
+            try {
+                const enabled = !!requirePinToggle.checked;
+                if (enabled && !walletSecurity.walletPinHash) {
+                    requirePinToggle.checked = false;
+                    await setWalletPinFlow();
+                    return;
+                }
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), {
+                    walletRequirePin: enabled,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                walletSecurity.walletRequirePin = enabled;
+            } catch (e) { console.error(e); showToast('Failed to update setting', 'error'); }
+        });
+        privacyBlurToggle.addEventListener('change', async () => {
+            if (!currentUser) return;
+            try {
+                const enabled = !!privacyBlurToggle.checked;
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), {
+                    privacyBlur: enabled,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                walletSecurity.privacyBlur = enabled; renderOverview();
+            } catch (e) { console.error(e); showToast('Failed to update setting', 'error'); }
+        });
+        autoLockSelect.addEventListener('change', async () => {
+            if (!currentUser) return;
+            try {
+                const secs = Number(autoLockSelect.value || '0') || 0;
+                await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), {
+                    autoLockSeconds: secs,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                walletSecurity.autoLockSeconds = secs; resetInactivityTimer();
+            } catch (e) { console.error(e); showToast('Failed to update setting', 'error'); }
+        });
 
         receiptTrigger.addEventListener('click', () => receiptInput.click());
         receiptInput.addEventListener('change', () => {
@@ -513,6 +748,7 @@
         async function sendJCoins() {
             try {
                 if (!currentUser || !currentProfile?.walletUnlocked) { showToast('Wallet locked or not signed in.', 'error'); return; }
+                const ok = await verifyPinFlow(); if (!ok) return;
                 const targetUid = (sendTargetUid.value || '').trim();
                 const amount = Math.floor(Number(sendAmountInput.value || 0));
                 const note = (sendNoteInput.value || '').trim();
@@ -612,6 +848,7 @@
         async function payRequestNow() {
             try {
                 if (!currentUser || !currentProfile?.walletUnlocked) { showToast('Wallet locked or not signed in.', 'error'); return; }
+                const ok = await verifyPinFlow(); if (!ok) return;
                 if (!payRequestContext?.id || !payRequestContext?.requesterId) { showToast('Invalid request.', 'error'); return; }
                 if (currentUser.uid === payRequestContext.requesterId) { showToast('Cannot pay your own request.', 'warning'); return; }
                 const amount = Math.floor(Number(payRequestContext.amount || 0));
