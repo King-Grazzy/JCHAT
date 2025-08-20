@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JCHAT - My Wallet</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        :root {
+            --pink: #ff2e92; --blue: #00d5ff; --gold: #ffd700;
+            --bgA: #0b0f1c; --bgB: #111827; --glass: rgba(255,255,255,0.06);
+            --text: #e8eefc; --muted: rgba(232,238,252,0.7); --border: rgba(255,255,255,0.12);
+            --glow: 0 0 20px rgba(0,213,255,0.25), 0 0 28px rgba(255,46,146,0.12);
+        }
+        body {
+            margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--text);
+            background: radial-gradient(1000px 700px at -10% -20%, rgba(0,213,255,0.18), transparent 60%),
+                        radial-gradient(1000px 700px at 110% 120%, rgba(255,46,146,0.16), transparent 60%),
+                        linear-gradient(135deg, var(--bgA), var(--bgB));
+            min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px;
+        }
+        .container { width: 100%; max-width: 1200px; }
+        .header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 16px; padding: 16px; border: 1px solid var(--border); background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02)); border-radius: 16px; backdrop-filter: blur(10px); box-shadow: var(--glow); }
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .logo { font-family: Poppins, sans-serif; font-weight: 800; letter-spacing: -0.02em; font-size: 1.1rem; }
+        .logo .grad { background: linear-gradient(90deg, var(--blue), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .badge { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; border:1px solid var(--border); background: rgba(255,255,255,0.04); font-weight:700; font-size:.8rem; }
+        .nav-actions { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
+        .back { color: var(--text); text-decoration: none; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); }
+
+        .grid { display:grid; grid-template-columns: 1.2fr 0.8fr; gap:16px; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+        .card { border: 1px solid var(--border); background: rgba(255,255,255,0.04); border-radius: 16px; padding: 18px; box-shadow: var(--glow); }
+        .glass { background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03)); backdrop-filter: blur(12px); }
+        h1, h2, h3 { font-family: Poppins, sans-serif; margin: 0 0 10px; }
+        h1 { font-size: 1.6rem; letter-spacing:-0.01em; }
+        .muted { color: var(--muted); font-size: 0.95rem; }
+        .row { display:flex; align-items:center; gap:10px; }
+        .wrap { flex-wrap: wrap; }
+        .btn { border: 1px solid var(--border); background: linear-gradient(90deg, rgba(0,213,255,0.12), rgba(255,46,146,0.12)); color: var(--text); padding: 10px 12px; border-radius: 12px; cursor: pointer; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; }
+        .btn.primary { background: linear-gradient(90deg, var(--blue), var(--pink)); border-color: transparent; }
+        .btn.block { width: 100%; justify-content: center; }
+        .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; background: rgba(255,255,255,0.06); font-weight: 800; }
+        .kv { display:flex; align-items:center; justify-content: space-between; gap: 8px; padding:8px 0; }
+        .divider { height:1px; background: var(--border); margin:10px 0; }
+
+        .file-input-wrapper { display:flex; align-items:center; gap:8px; border:1px dashed var(--border); padding:10px 12px; border-radius:12px; cursor:pointer; background: rgba(255,255,255,0.03); }
+        .file-input-wrapper i { color: var(--pink); }
+        .file-name { font-size:.85rem; color:var(--muted); }
+        .receipt-preview { width:100%; max-height:160px; object-fit:contain; margin-top:8px; border:1px solid var(--border); border-radius:12px; display:none; }
+        .progress { width: 100%; height: 6px; border-radius:999px; background: rgba(255,255,255,0.08); overflow:hidden; display:none; }
+        .progress > div { height:100%; width:0%; background: linear-gradient(90deg, var(--blue), var(--pink)); transition: width .1s linear; }
+
+        .empty { color: var(--muted); text-align:center; padding: 12px 8px; border: 1px dashed var(--border); border-radius: 10px; }
+
+        .auth-overlay { position: fixed; inset: 0; background: rgba(5,8,15,0.8); display: none; place-items: center; z-index: 30; }
+        .auth-card { width: 92%; max-width: 560px; border:1px solid var(--border); border-radius: 16px; padding: 18px; background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); backdrop-filter: blur(14px); box-shadow: var(--glow); text-align:center; }
+        .auth-card h3 { margin:0 0 8px; font-family:Poppins,sans-serif; }
+        .auth-card p { color: var(--muted); margin: 4px 0 12px; }
+
+        .msg { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); padding: 10px 16px; border-radius: 12px; color: #fff; display: none; z-index: 40; }
+        .msg.show { display: block; }
+        .msg.success { background: #16a34a; }
+        .msg.error { background: #dc2626; }
+        .msg.info { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header glass">
+            <div class="brand">
+                <div class="logo"><span class="grad">JCHAT</span> Wallet</div>
+                <span class="badge"><i class="fas fa-circle" style="color:var(--blue);"></i> <span id="authState">Signing in…</span></span>
+            </div>
+            <div class="nav-actions">
+                <a class="back" href="/Home.html"><i class="fas fa-home"></i> Home</a>
+                <a class="back" href="/Profile.html"><i class="fas fa-user"></i> Profile</a>
+                <a class="back" href="/JCoin.html"><i class="fas fa-coins"></i> JCoin Store</a>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card glass">
+                <h1>Overview</h1>
+                <div class="kv"><div class="muted">Username</div><div id="username">—</div></div>
+                <div class="kv"><div class="muted">Wallet Status</div><div id="walletStatus">—</div></div>
+                <div class="kv"><div class="muted">JCoins</div><div><strong id="jBalance">0</strong> J</div></div>
+                <div class="kv"><div class="muted">Gas</div><div><strong id="gBalance">0</strong></div></div>
+                <div class="divider"></div>
+                <div class="row wrap" style="margin-top:6px; gap:8px;">
+                    <a class="btn" href="/JCoin.html"><i class="fas fa-plus-circle"></i> Buy JCoins</a>
+                    <button id="requestUnlockBtn" class="btn"><i class="fas fa-unlock"></i> Request Unlock</button>
+                </div>
+                <p class="muted" style="margin-top:10px;">Keep your payment receipts handy. A developer verifies and unlocks/credits accordingly.</p>
+            </div>
+
+            <div class="card glass">
+                <h2>Recent Transactions</h2>
+                <div id="txList" style="margin-top:8px; display:grid; gap:8px;"></div>
+                <div id="txEmpty" class="empty" style="display:none;">No transactions yet.</div>
+            </div>
+        </div>
+
+        <div id="paymentCard" class="card glass" style="margin-top:16px; display:none;">
+            <h2 id="paymentTitle">Payment</h2>
+            <p id="paymentCaption" class="muted">—</p>
+            <div class="divider"></div>
+            <div class="row wrap" style="gap:10px;">
+                <div class="chip"><i class="fas fa-university"></i> OPay: <strong id="opayAcct">8111609765</strong></div>
+                <div class="chip"><i class="fas fa-user"></i> Name: <strong>ELECHI JOSHUA</strong></div>
+            </div>
+            <div class="row wrap" style="gap:10px; margin-top:8px;">
+                <div class="chip"><i class="fas fa-university"></i> Keystone: <strong id="keystoneAcct">6042862356</strong></div>
+                <div class="chip"><i class="fas fa-user"></i> Name: <strong>ELECHI OSOUNDU JOSHUA</strong></div>
+            </div>
+            <div class="row wrap" style="gap:8px; margin-top:8px;">
+                <button class="btn" id="copyOpay"><i class="fas fa-copy"></i> Copy OPay</button>
+                <button class="btn" id="copyKeystone"><i class="fas fa-copy"></i> Copy Keystone</button>
+            </div>
+
+            <div class="divider"></div>
+            <div class="row wrap" style="gap:10px;">
+                <div class="chip"><i class="fas fa-tag"></i> Amount: ₦<strong id="payAmount">0</strong></div>
+                <div class="chip" id="premiumChip" style="display:none;"><i class="fas fa-gem"></i> Tier: <strong id="premiumTier">—</strong></div>
+            </div>
+
+            <div style="margin-top:10px;">
+                <label class="muted" for="receiptInput">Upload Receipt (optional)</label>
+                <div class="file-input-wrapper" id="receiptTrigger">
+                    <i class="fas fa-upload"></i>
+                    <span class="file-name" id="receiptFileName">No file chosen</span>
+                </div>
+                <input type="file" id="receiptInput" accept="image/*,.pdf" />
+                <div class="progress" id="uploadProgress"><div></div></div>
+                <img id="receiptPreview" class="receipt-preview" />
+            </div>
+
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+                <button id="submitPaymentBtn" class="btn primary"><i class="fas fa-paper-plane"></i> Submit Payment</button>
+                <a id="openJCoinBtn" href="/JCoin.html" class="btn"><i class="fas fa-coins"></i> Open JCoin Store</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card glass">
+            <h3>Sign In Required</h3>
+            <p>Please sign in to manage your wallet.</p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <a href="/Login.html" class="btn primary"><i class="fas fa-right-to-bracket"></i> Go to Login</a>
+                <a href="/Home.html" class="btn"><i class="fas fa-home"></i> Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="msg info">Info</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, runTransaction, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebasestorage.app",
+            messagingSenderId: "328479683167",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const authState = document.getElementById('authState');
+        const toast = document.getElementById('toast');
+        const authOverlay = document.getElementById('authOverlay');
+
+        const usernameEl = document.getElementById('username');
+        const walletStatusEl = document.getElementById('walletStatus');
+        const jBalanceEl = document.getElementById('jBalance');
+        const gBalanceEl = document.getElementById('gBalance');
+        const requestUnlockBtn = document.getElementById('requestUnlockBtn');
+        const txList = document.getElementById('txList');
+        const txEmpty = document.getElementById('txEmpty');
+
+        const paymentCard = document.getElementById('paymentCard');
+        const paymentTitle = document.getElementById('paymentTitle');
+        const paymentCaption = document.getElementById('paymentCaption');
+        const payAmount = document.getElementById('payAmount');
+        const premiumChip = document.getElementById('premiumChip');
+        const premiumTierEl = document.getElementById('premiumTier');
+        const submitPaymentBtn = document.getElementById('submitPaymentBtn');
+        const openJCoinBtn = document.getElementById('openJCoinBtn');
+
+        const receiptTrigger = document.getElementById('receiptTrigger');
+        const receiptInput = document.getElementById('receiptInput');
+        const receiptFileName = document.getElementById('receiptFileName');
+        const receiptPreview = document.getElementById('receiptPreview');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const uploadBar = uploadProgress.querySelector('div');
+
+        const copyOpay = document.getElementById('copyOpay');
+        const copyKeystone = document.getElementById('copyKeystone');
+
+        let currentUser = null;
+        let currentProfile = null;
+        let paymentContext = null; // { type: 'unlock'|'premium', amount: number, tier?: string }
+
+        function showToast(message, type = 'info') {
+            toast.textContent = message; toast.className = `msg show ${type}`;
+            setTimeout(() => { toast.className = 'msg'; }, 2500);
+        }
+
+        function getParams() {
+            const u = new URL(window.location.href);
+            const p = Object.fromEntries(u.searchParams.entries());
+            return p;
+        }
+
+        async function ensureAuthenticated() {
+            try {
+                if (auth.currentUser) return;
+                authState.textContent = 'Signing in…';
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error('Auth error', e);
+                authState.textContent = 'Sign-in required';
+                const code = (e && e.code) ? String(e.code) : '';
+                if (code.includes('admin-restricted-operation') || code.includes('operation-not-allowed')) {
+                    authOverlay.style.display = 'grid';
+                } else {
+                    setTimeout(() => { if (!auth.currentUser) ensureAuthenticated(); }, 1200);
+                }
+            }
+        }
+
+        async function loadProfile() {
+            if (!currentUser) return;
+            const profRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
+            const snap = await getDoc(profRef);
+            if (snap.exists()) {
+                currentProfile = snap.data();
+            } else {
+                currentProfile = { jCoins: 0, gas: 0, walletUnlocked: false };
+                await setDoc(profRef, { ...currentProfile, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
+            }
+        }
+
+        function renderOverview() {
+            const name = currentUser?.displayName || currentUser?.email || currentProfile?.username || 'User';
+            usernameEl.textContent = name;
+            jBalanceEl.textContent = String(currentProfile?.jCoins ?? 0);
+            gBalanceEl.textContent = String(currentProfile?.gas ?? 0);
+            const unlocked = !!currentProfile?.walletUnlocked;
+            walletStatusEl.innerHTML = unlocked ? '<span class="chip" style="border-color:rgba(16,185,129,.4)"><i class="fas fa-unlock"></i> Unlocked</span>' : '<span class="chip" style="border-color:rgba(220,38,38,.4)"><i class="fas fa-lock"></i> Locked</span>';
+            requestUnlockBtn.style.display = unlocked ? 'none' : '';
+        }
+
+        async function renderTransactions() {
+            txList.innerHTML = '';
+            txEmpty.style.display = 'none';
+            try {
+                const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), orderBy('timestamp', 'desc'), limit(20));
+                const snap = await getDocs(q);
+                if (snap.empty) { txEmpty.style.display = ''; return; }
+                for (const d of snap.docs) {
+                    const t = d.data();
+                    const row = document.createElement('div');
+                    row.className = 'row';
+                    row.style.justifyContent = 'space-between';
+                    row.style.border = '1px solid var(--border)';
+                    row.style.borderRadius = '10px';
+                    row.style.padding = '8px 10px';
+                    const left = document.createElement('div');
+                    left.className = 'row wrap';
+                    left.style.gap = '8px';
+                    const typeChip = document.createElement('div');
+                    typeChip.className = 'chip';
+                    typeChip.innerHTML = `<i class="fas fa-receipt"></i> ${t.type || 'activity'}`;
+                    const desc = document.createElement('div');
+                    desc.className = 'muted';
+                    desc.textContent = t.description || '';
+                    left.appendChild(typeChip); left.appendChild(desc);
+                    const right = document.createElement('div');
+                    right.className = 'row';
+                    right.style.gap = '8px';
+                    if (typeof t.amount === 'number') {
+                        const amt = document.createElement('div');
+                        amt.innerHTML = `<strong>${t.amount}</strong>`;
+                        right.appendChild(amt);
+                    }
+                    const ts = document.createElement('div');
+                    ts.className = 'muted';
+                    ts.textContent = t.timestamp?.toDate ? new Date(t.timestamp.toDate()).toLocaleString() : new Date().toLocaleString();
+                    right.appendChild(ts);
+                    row.appendChild(left); row.appendChild(right);
+                    txList.appendChild(row);
+                }
+            } catch (e) {
+                console.error('tx load error', e);
+                txEmpty.style.display = '';
+            }
+        }
+
+        function setupPaymentContextFromParams() {
+            const p = getParams();
+            if (p.unlock === '1') {
+                const amt = Number(p.amount || 0) || 0;
+                paymentContext = { type: 'unlock', amount: amt };
+            } else if (p.premium) {
+                const tier = String(p.premium);
+                const amt = Number(p.amount || 0) || 0;
+                paymentContext = { type: 'premium', tier, amount: amt };
+            } else {
+                paymentContext = null;
+            }
+        }
+
+        function renderPaymentCard() {
+            if (!paymentContext) { paymentCard.style.display = 'none'; return; }
+            paymentCard.style.display = '';
+            payAmount.textContent = String(paymentContext.amount || 0);
+            premiumChip.style.display = paymentContext.type === 'premium' ? '' : 'none';
+            if (paymentContext.type === 'unlock') {
+                paymentTitle.textContent = 'Wallet Unlock Payment';
+                paymentCaption.textContent = 'Transfer the amount shown to any of the accounts below and upload your receipt. A developer will unlock your wallet after verification.';
+            } else {
+                paymentTitle.textContent = 'Premium Subscription Payment';
+                paymentCaption.textContent = 'Complete your premium upgrade by paying the amount below, then upload your receipt. A developer will activate your premium after verification.';
+                premiumTierEl.textContent = String(paymentContext.tier || 'premium');
+            }
+        }
+
+        receiptTrigger.addEventListener('click', () => receiptInput.click());
+        receiptInput.addEventListener('change', () => {
+            const f = receiptInput.files?.[0];
+            if (!f) { receiptFileName.textContent = 'No file chosen'; receiptPreview.style.display = 'none'; return; }
+            receiptFileName.textContent = f.name;
+            if (f.type.startsWith('image/')) { receiptPreview.src = URL.createObjectURL(f); receiptPreview.style.display = ''; } else { receiptPreview.style.display = 'none'; }
+        });
+
+        copyOpay.addEventListener('click', () => { navigator.clipboard.writeText('8111609765'); showToast('OPay account copied', 'success'); });
+        copyKeystone.addEventListener('click', () => { navigator.clipboard.writeText('6042862356'); showToast('Keystone account copied', 'success'); });
+
+        async function uploadReceiptIfAny() {
+            const f = receiptInput.files?.[0];
+            if (!f) return null;
+            try {
+                uploadProgress.style.display = '';
+                uploadBar.style.width = '0%';
+                const url = 'https://api.cloudinary.com/v1_1/dxld01rcp/auto/upload';
+                const fd = new FormData();
+                fd.append('file', f);
+                fd.append('upload_preset', 'Storage_preset');
+                const res = await new Promise((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', url);
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable) {
+                            const pct = Math.round((e.loaded / e.total) * 100);
+                            uploadBar.style.width = pct + '%';
+                        }
+                    };
+                    xhr.onload = () => resolve(xhr);
+                    xhr.onerror = () => reject(new Error('Upload failed'));
+                    xhr.send(fd);
+                });
+                if (res.status < 200 || res.status >= 300) throw new Error('Upload failed');
+                const data = JSON.parse(res.responseText);
+                uploadBar.style.width = '100%';
+                return data.secure_url || null;
+            } catch (e) { console.error('Receipt upload error', e); return null; }
+            finally { setTimeout(() => { uploadProgress.style.display = 'none'; }, 600); }
+        }
+
+        async function submitPayment() {
+            if (!paymentContext) { showToast('Nothing to submit.', 'error'); return; }
+            if (!currentUser) { showToast('Please sign in first', 'error'); return; }
+            try {
+                submitPaymentBtn.disabled = true;
+                const proofUrl = await uploadReceiptIfAny();
+
+                if (paymentContext.type === 'unlock') {
+                    // Create central request and a user transaction log
+                    const req = {
+                        userId: currentUser.uid,
+                        username: currentUser.displayName || currentUser.email || 'Unknown User',
+                        amountNaira: Number(paymentContext.amount || 0),
+                        type: 'wallet_unlock',
+                        status: 'pending',
+                        ...(proofUrl ? { paymentProof: proofUrl } : {}),
+                        timestamp: serverTimestamp()
+                    };
+                    await addDoc(collection(db, 'artifacts', appId, 'wallet_unlock_requests'), req);
+                    await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), {
+                        type: 'wallet_unlock_request',
+                        amount: Number(paymentContext.amount || 0),
+                        description: 'User submitted wallet unlock payment',
+                        timestamp: serverTimestamp()
+                    });
+                    showToast('Unlock payment submitted. Await verification.', 'success');
+                } else if (paymentContext.type === 'premium') {
+                    const req = {
+                        userId: currentUser.uid,
+                        username: currentUser.displayName || currentUser.email || 'Unknown User',
+                        tier: String(paymentContext.tier || 'premium'),
+                        amountNaira: Number(paymentContext.amount || 0),
+                        type: 'premium_upgrade',
+                        status: 'pending',
+                        ...(proofUrl ? { paymentProof: proofUrl } : {}),
+                        timestamp: serverTimestamp()
+                    };
+                    await addDoc(collection(db, 'artifacts', appId, 'premium_payments'), req);
+                    await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), {
+                        type: 'premium_payment',
+                        amount: Number(paymentContext.amount || 0),
+                        description: `User paid for premium tier: ${String(paymentContext.tier || 'premium')}`,
+                        timestamp: serverTimestamp()
+                    });
+                    showToast('Premium payment submitted. Await activation.', 'success');
+                }
+            } catch (e) {
+                console.error('submit payment error', e);
+                showToast(e?.message || 'Failed to submit', 'error');
+            } finally {
+                submitPaymentBtn.disabled = false;
+                renderTransactions();
+            }
+        }
+
+        submitPaymentBtn.addEventListener('click', submitPayment);
+
+        requestUnlockBtn.addEventListener('click', () => {
+            if (!currentUser) { showToast('Please sign in first', 'error'); return; }
+            // Default unlock fee if not provided in URL
+            if (!paymentContext || paymentContext.type !== 'unlock') {
+                paymentContext = { type: 'unlock', amount: 5000 };
+                renderPaymentCard();
+                window.history.replaceState({}, '', '/Wallet.html?unlock=1&amount=5000');
+            } else {
+                renderPaymentCard();
+            }
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                authState.textContent = 'Signed in';
+                authOverlay.style.display = 'none';
+                await loadProfile();
+                renderOverview();
+                await renderTransactions();
+            } else {
+                authState.textContent = 'Guest';
+            }
+        });
+
+        // Theme application (keeps parity with Home/Profile saved setting)
+        (function applySavedTheme() {
+            const themes = ['theme-light-mode', 'theme-dark-mode', 'theme-glass-mode', 'theme-sunset-mode'];
+            function applyTheme(themeName) { document.body.classList.remove(...themes); document.body.classList.add(themeName); }
+            const savedTheme = localStorage.getItem('jchat-theme');
+            if (savedTheme && themes.includes(savedTheme)) { applyTheme(savedTheme); } else { applyTheme('theme-dark-mode'); }
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'jchat-theme') {
+                    const newTheme = event.newValue || 'theme-dark-mode';
+                    if (themes.includes(newTheme)) { applyTheme(newTheme); }
+                }
+            });
+        })();
+
+        // Init
+        setupPaymentContextFromParams();
+        renderPaymentCard();
+        ensureAuthenticated();
+    </script>
+</body>
+</html>
+
