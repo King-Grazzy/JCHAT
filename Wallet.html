@@ -83,6 +83,30 @@
             color: transparent;
         }
 
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .username {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-status {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
         .user-avatar {
             width: 40px;
             height: 40px;
@@ -94,6 +118,8 @@
             color: white;
             font-weight: 600;
             font-size: 16px;
+            overflow: hidden;
+            position: relative;
         }
 
         /* Balance Cards */
@@ -338,6 +364,199 @@
             padding: 0;
         }
 
+        /* Settings Section */
+        .settings-section {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .close-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .close-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .settings-group {
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-light);
+        }
+
+        .settings-group-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .settings-group-title i {
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-info label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .setting-description {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .setting-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-switch {
+            appearance: none;
+            width: 50px;
+            height: 26px;
+            background: var(--border);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch:checked {
+            background: var(--primary);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch:checked::before {
+            transform: translateX(24px);
+        }
+
+        .setting-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .setting-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn.secondary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+            border: 1px solid var(--danger);
+            color: white;
+        }
+
+        .btn.danger:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        #pinSettings {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        #pinSettings .setting-control {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        #pinSettings input {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        #pinSettings input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
         .search-box {
             position: relative;
             flex: 1;
@@ -523,7 +742,16 @@
         <div class="container">
             <div class="header-content">
                 <div class="logo">JCHAT Wallet</div>
-                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-profile">
+                    <div class="user-info">
+                        <span class="username" id="headerUsername">User</span>
+                        <span class="user-status" id="userStatus">Online</span>
+                    </div>
+                    <div class="user-avatar" id="userAvatar">
+                        <img id="profileImage" src="" alt="Profile" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <span id="avatarInitial">U</span>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
@@ -598,6 +826,170 @@
                     </div>
                     <div class="action-label">Settings</div>
                 </a>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section class="settings-section" id="settingsSection" style="display: none;">
+            <div class="settings-header">
+                <h2 class="section-title">Wallet Settings</h2>
+                <button id="closeSettingsBtn" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="settings-content">
+                <!-- Security Settings -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Security Settings
+                    </h3>
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="pinToggle">Enable PIN Protection</label>
+                            <span class="setting-description">Require PIN for sensitive operations</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="checkbox" id="pinToggle" class="toggle-switch">
+                            <button id="setPinBtn" class="btn secondary" style="display: none;">Set PIN</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item" id="pinSettings" style="display: none;">
+                        <div class="setting-info">
+                            <label>PIN Configuration</label>
+                            <span class="setting-description">Set or change your wallet PIN</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="password" id="pinInput" placeholder="Enter PIN" maxlength="4" inputmode="numeric">
+                            <input type="password" id="pinConfirm" placeholder="Confirm PIN" maxlength="4" inputmode="numeric">
+                            <button id="savePinBtn" class="btn primary">Save PIN</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Settings -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">
+                        <i class="fas fa-user-secret"></i>
+                        Privacy Settings
+                    </h3>
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="balanceBlur">Blur Balance Amounts</label>
+                            <span class="setting-description">Hide balance amounts for privacy</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="checkbox" id="balanceBlur" class="toggle-switch">
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="autoLock">Auto-lock Wallet</label>
+                            <span class="setting-description">Lock wallet after inactivity</span>
+                        </div>
+                        <div class="setting-control">
+                            <select id="autoLockSelect" class="setting-select">
+                                <option value="0">Never</option>
+                                <option value="300">5 minutes</option>
+                                <option value="600">10 minutes</option>
+                                <option value="1800">30 minutes</option>
+                                <option value="3600">1 hour</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Display Settings -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">
+                        <i class="fas fa-palette"></i>
+                        Display Settings
+                    </h3>
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="themeSelect">Theme</label>
+                            <span class="setting-description">Choose your preferred color scheme</span>
+                        </div>
+                        <div class="setting-control">
+                            <select id="themeSelect" class="setting-select">
+                                <option value="default">Default</option>
+                                <option value="dark">Dark Mode</option>
+                                <option value="light">Light Mode</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="currencySelect">Currency Display</label>
+                            <span class="setting-description">Choose how to display amounts</span>
+                        </div>
+                        <div class="setting-control">
+                            <select id="currencySelect" class="setting-select">
+                                <option value="jcoins">JCoins</option>
+                                <option value="usd">USD</option>
+                                <option value="eur">EUR</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">
+                        <i class="fas fa-bell"></i>
+                        Notification Settings
+                    </h3>
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="txNotifications">Transaction Notifications</label>
+                            <span class="setting-description">Get notified about transactions</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="checkbox" id="txNotifications" class="toggle-switch" checked>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="budgetAlerts">Budget Alerts</label>
+                            <span class="setting-description">Get warned when approaching limits</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="checkbox" id="budgetAlerts" class="toggle-switch" checked>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">
+                        <i class="fas fa-database"></i>
+                        Data Management
+                    </h3>
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label>Export Data</label>
+                            <span class="setting-description">Download your transaction history</span>
+                        </div>
+                        <div class="setting-control">
+                            <button id="exportDataBtn" class="btn secondary">Export CSV</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label>Clear Data</label>
+                            <span class="setting-description">Remove all local data (cannot be undone)</span>
+                        </div>
+                        <div class="setting-control">
+                            <button id="clearDataBtn" class="btn danger">Clear All Data</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -750,7 +1142,27 @@
 
         function renderOverview() {
             const name = currentUser?.displayName || currentUser?.email || currentProfile?.username || 'User';
-            userAvatar.textContent = name.charAt(0).toUpperCase();
+            
+            // Update header username and status
+            const headerUsername = document.getElementById('headerUsername');
+            const userStatus = document.getElementById('userStatus');
+            if (headerUsername) headerUsername.textContent = name;
+            if (userStatus) userStatus.textContent = 'Online';
+            
+            // Update profile picture or fallback to initials
+            const profileImage = document.getElementById('profileImage');
+            const avatarInitial = document.getElementById('avatarInitial');
+            
+            if (currentProfile?.profilePicture) {
+                profileImage.src = currentProfile.profilePicture;
+                profileImage.style.display = 'block';
+                avatarInitial.style.display = 'none';
+            } else {
+                profileImage.style.display = 'none';
+                avatarInitial.style.display = 'block';
+                avatarInitial.textContent = name.charAt(0).toUpperCase();
+            }
+            
             totalBalance.textContent = `${currentProfile?.jCoins ?? 0} JCoins`;
         }
 
@@ -846,8 +1258,237 @@
         // Toggle button functionality
         document.getElementById('txToggleBtn')?.addEventListener('click', toggleTransactions);
 
+        // Settings functionality
+        let walletSettings = {
+            pinEnabled: false,
+            pinHash: null,
+            balanceBlur: false,
+            autoLock: 0,
+            theme: 'default',
+            currency: 'jcoins',
+            txNotifications: true,
+            budgetAlerts: true
+        };
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const saved = localStorage.getItem('jchat-wallet-settings');
+            if (saved) {
+                walletSettings = { ...walletSettings, ...JSON.parse(saved) };
+            }
+            applySettings();
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            localStorage.setItem('jchat-wallet-settings', JSON.stringify(walletSettings));
+        }
+
+        // Apply settings to UI
+        function applySettings() {
+            // Apply PIN toggle
+            const pinToggle = document.getElementById('pinToggle');
+            if (pinToggle) {
+                pinToggle.checked = walletSettings.pinEnabled;
+                const pinSettings = document.getElementById('pinSettings');
+                const setPinBtn = document.getElementById('setPinBtn');
+                if (pinSettings && setPinBtn) {
+                    pinSettings.style.display = walletSettings.pinEnabled ? 'block' : 'none';
+                    setPinBtn.style.display = walletSettings.pinEnabled ? 'none' : 'block';
+                }
+            }
+
+            // Apply balance blur
+            const balanceBlur = document.getElementById('balanceBlur');
+            if (balanceBlur) {
+                balanceBlur.checked = walletSettings.balanceBlur;
+                applyBalanceBlur();
+            }
+
+            // Apply auto-lock
+            const autoLockSelect = document.getElementById('autoLockSelect');
+            if (autoLockSelect) {
+                autoLockSelect.value = walletSettings.autoLock;
+            }
+
+            // Apply theme
+            const themeSelect = document.getElementById('themeSelect');
+            if (themeSelect) {
+                themeSelect.value = walletSettings.theme;
+            }
+
+            // Apply currency
+            const currencySelect = document.getElementById('currencySelect');
+            if (currencySelect) {
+                currencySelect.value = walletSettings.currency;
+            }
+
+            // Apply notifications
+            const txNotifications = document.getElementById('txNotifications');
+            if (txNotifications) {
+                txNotifications.checked = walletSettings.txNotifications;
+            }
+
+            const budgetAlerts = document.getElementById('budgetAlerts');
+            if (budgetAlerts) {
+                budgetAlerts.checked = walletSettings.budgetAlerts;
+            }
+        }
+
+        // Apply balance blur effect
+        function applyBalanceBlur() {
+            const balanceElements = document.querySelectorAll('#totalBalance, .stat-value');
+            balanceElements.forEach(el => {
+                if (walletSettings.balanceBlur) {
+                    el.style.filter = 'blur(4px)';
+                    el.style.userSelect = 'none';
+                } else {
+                    el.style.filter = 'none';
+                    el.style.userSelect = 'auto';
+                }
+            });
+        }
+
+        // Show settings
+        function showSettings() {
+            const settingsSection = document.getElementById('settingsSection');
+            if (settingsSection) {
+                settingsSection.style.display = 'block';
+                loadSettings();
+            }
+        }
+
+        // Hide settings
+        function hideSettings() {
+            const settingsSection = document.getElementById('settingsSection');
+            if (settingsSection) {
+                settingsSection.style.display = 'none';
+            }
+        }
+
+        // Export data as CSV
+        function exportData() {
+            // This would export transaction data as CSV
+            showToast('Export functionality coming soon!', 'info');
+        }
+
+        // Clear all data
+        function clearData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                localStorage.clear();
+                showToast('All data cleared', 'success');
+                location.reload();
+            }
+        }
+
         // Initialize
         ensureAuthenticated();
+
+        // Settings event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Settings button click
+            document.getElementById('settingsBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSettings();
+            });
+
+            // Close settings button
+            document.getElementById('closeSettingsBtn')?.addEventListener('click', hideSettings);
+
+            // PIN toggle
+            document.getElementById('pinToggle')?.addEventListener('change', function() {
+                walletSettings.pinEnabled = this.checked;
+                const pinSettings = document.getElementById('pinSettings');
+                const setPinBtn = document.getElementById('setPinBtn');
+                if (pinSettings && setPinBtn) {
+                    pinSettings.style.display = walletSettings.pinEnabled ? 'block' : 'none';
+                    setPinBtn.style.display = walletSettings.pinEnabled ? 'none' : 'block';
+                }
+                saveSettings();
+            });
+
+            // Set PIN button
+            document.getElementById('setPinBtn')?.addEventListener('click', function() {
+                document.getElementById('pinToggle').checked = true;
+                walletSettings.pinEnabled = true;
+                const pinSettings = document.getElementById('pinSettings');
+                const setPinBtn = document.getElementById('setPinBtn');
+                if (pinSettings && setPinBtn) {
+                    pinSettings.style.display = 'block';
+                    setPinBtn.style.display = 'none';
+                }
+                saveSettings();
+            });
+
+            // Save PIN button
+            document.getElementById('savePinBtn')?.addEventListener('click', function() {
+                const pinInput = document.getElementById('pinInput');
+                const pinConfirm = document.getElementById('pinConfirm');
+                
+                if (pinInput.value.length < 4) {
+                    showToast('PIN must be at least 4 digits', 'error');
+                    return;
+                }
+                
+                if (pinInput.value !== pinConfirm.value) {
+                    showToast('PINs do not match', 'error');
+                    return;
+                }
+                
+                // Simple hash for demo (in production, use proper encryption)
+                walletSettings.pinHash = btoa(pinInput.value);
+                saveSettings();
+                showToast('PIN saved successfully', 'success');
+                
+                pinInput.value = '';
+                pinConfirm.value = '';
+            });
+
+            // Balance blur toggle
+            document.getElementById('balanceBlur')?.addEventListener('change', function() {
+                walletSettings.balanceBlur = this.checked;
+                applyBalanceBlur();
+                saveSettings();
+            });
+
+            // Auto-lock select
+            document.getElementById('autoLockSelect')?.addEventListener('change', function() {
+                walletSettings.autoLock = parseInt(this.value);
+                saveSettings();
+            });
+
+            // Theme select
+            document.getElementById('themeSelect')?.addEventListener('change', function() {
+                walletSettings.theme = this.value;
+                saveSettings();
+                // Apply theme (you can add theme switching logic here)
+                showToast(`Theme changed to ${this.value}`, 'info');
+            });
+
+            // Currency select
+            document.getElementById('currencySelect')?.addEventListener('change', function() {
+                walletSettings.currency = this.value;
+                saveSettings();
+                showToast(`Currency changed to ${this.value}`, 'info');
+            });
+
+            // Notification toggles
+            document.getElementById('txNotifications')?.addEventListener('change', function() {
+                walletSettings.txNotifications = this.checked;
+                saveSettings();
+            });
+
+            document.getElementById('budgetAlerts')?.addEventListener('change', function() {
+                walletSettings.budgetAlerts = this.checked;
+                saveSettings();
+            });
+
+            // Export data button
+            document.getElementById('exportDataBtn')?.addEventListener('click', exportData);
+
+            // Clear data button
+            document.getElementById('clearDataBtn')?.addEventListener('click', clearData);
+        });
     </script>
 </body>
 </html>
