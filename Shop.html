@@ -197,6 +197,11 @@
             <div>Total:</div>
             <div id="summaryTotal">₦0</div>
           </div>
+          <div class="row" style="gap:8px; align-items:center; margin-top:8px;">
+            <input id="couponInput" type="text" placeholder="Enter coupon (e.g., WELCOME10)" style="flex:1; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;" />
+            <button id="applyCouponBtn" class="btn"><i class="fas fa-badge-percent"></i> Apply</button>
+          </div>
+          <div id="couponMessage" class="muted" style="min-height:18px"></div>
           <div class="row">
             <div><strong>Order ID:</strong> <span id="orderId"></span></div>
             <button id="copyOrderId" class="copy"><i class="fas fa-copy"></i></button>
@@ -492,6 +497,13 @@
     const summarySubtotalEl = document.getElementById('summarySubtotal');
     const summaryDiscountEl = document.getElementById('summaryDiscount');
     const summaryTotalEl = document.getElementById('summaryTotal');
+    const couponInput = document.getElementById('couponInput');
+    const applyCouponBtn = document.getElementById('applyCouponBtn');
+    const couponMessage = document.getElementById('couponMessage');
+
+    // Coupon state
+    let appliedCouponCode = null;
+    let appliedCouponPercent = 0; // 0, 5, 10 etc.
     const copyOrderIdBtn = document.getElementById('copyOrderId');
     const copyOpay = document.getElementById('copyOpay');
     const copyKeystone = document.getElementById('copyKeystone');
@@ -551,12 +563,21 @@
       return Array.from(document.querySelectorAll('.theme input[type="checkbox"]:checked')).map(i => i.value);
     }
     
-    function calcDiscount(totalNgn, qty) {
-      // Bulk discount tiers: 2+:5%, 3-4:10%, 5+:15%
-      if (qty >= 5) return Math.round(totalNgn * 0.15);
-      if (qty >= 3) return Math.round(totalNgn * 0.10);
-      if (qty >= 2) return Math.round(totalNgn * 0.05);
+    function calcBulkPercent(qty) {
+      // New tiers: Any 2 = 10%, 3-4 = 15%, 5+ = 25%, All 11 = 35%
+      if (qty === 11) return 35;
+      if (qty >= 5) return 25;
+      if (qty >= 3) return 15;
+      if (qty >= 2) return 10;
       return 0;
+    }
+
+    function validateCoupon(code) {
+      const c = (code || '').trim().toUpperCase();
+      if (!c) return { ok: false, percent: 0, msg: 'Enter a coupon code' };
+      if (c === 'WELCOME10') return { ok: true, percent: 10, msg: 'WELCOME10 applied: 10% off' };
+      if (c === 'PAYDAY5') return { ok: true, percent: 5, msg: 'PAYDAY5 applied: 5% off' };
+      return { ok: false, percent: 0, msg: 'Invalid coupon' };
     }
 
     function updateSummary() {
@@ -568,16 +589,21 @@
       const freeThemes = selectedThemes.filter(t => t.isFree || t.price === 0);
       
       const subtotalNgn = premiumThemes.reduce((sum, t) => sum + t.price, 0);
-      const discountNgn = calcDiscount(subtotalNgn, premiumThemes.length);
-      const totalNgn = Math.max(0, subtotalNgn - discountNgn);
+      const bulkPercent = calcBulkPercent(premiumThemes.length);
+      const bulkDiscountNgn = Math.round(subtotalNgn * (bulkPercent / 100));
+      const couponPercent = appliedCouponPercent || 0;
+      const couponDiscountNgn = Math.round(subtotalNgn * (couponPercent / 100));
+      const totalDiscountNgn = Math.min(subtotalNgn, bulkDiscountNgn + couponDiscountNgn);
+      const totalNgn = Math.max(0, subtotalNgn - totalDiscountNgn);
       const totalInUserCurrency = convertPrice(totalNgn, userCurrency.code);
       
       // Display summary with free vs premium breakdown
       if (premiumThemes.length > 0) {
         summaryAmount.textContent = `${userCurrency.symbol}${totalInUserCurrency}`;
         summaryCount.textContent = `${premiumThemes.length} premium theme(s)`;
+        const totalPercent = subtotalNgn > 0 ? Math.round((totalDiscountNgn / subtotalNgn) * 100) : 0;
         summarySubtotalEl.textContent = `₦${subtotalNgn.toLocaleString()}`;
-        summaryDiscountEl.textContent = `₦${discountNgn.toLocaleString()}`;
+        summaryDiscountEl.textContent = `₦${totalDiscountNgn.toLocaleString()} (${totalPercent}%)`;
         summaryTotalEl.textContent = `₦${totalNgn.toLocaleString()}`;
       } else {
         summaryAmount.textContent = 'FREE';
@@ -586,6 +612,24 @@
         summaryDiscountEl.textContent = '₦0';
         summaryTotalEl.textContent = '₦0';
       }
+    // Apply coupon
+    if (applyCouponBtn) {
+      applyCouponBtn.addEventListener('click', () => {
+        const { ok, percent, msg } = validateCoupon(couponInput?.value);
+        if (ok) {
+          appliedCouponCode = (couponInput?.value || '').trim().toUpperCase();
+          appliedCouponPercent = percent;
+          couponMessage.textContent = msg;
+          couponMessage.style.color = '#86efac';
+        } else {
+          appliedCouponCode = null;
+          appliedCouponPercent = 0;
+          couponMessage.textContent = msg;
+          couponMessage.style.color = '#ffb4b4';
+        }
+        updateSummary();
+      });
+    }
       
       if (!orderIdEl.textContent) orderIdEl.textContent = generateOrderId();
     }
@@ -739,8 +783,11 @@
           nairaAmount: totalNgn,
           userCurrencyAmount: totalInUserCurrency,
           userCurrencyCode: userCurrency.code,
-          discountNgn: discountNgn,
           subtotalNgn: subtotalNgn,
+          bulkDiscountPercent: bulkPercent,
+          couponCode: appliedCouponCode,
+          couponPercent: couponPercent,
+          totalDiscountNgn: totalDiscountNgn,
           jcoinAmount: 0,
           status: 'pending',
           timestamp: serverTimestamp(),
