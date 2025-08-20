@@ -70,6 +70,40 @@
         .msg.error { background: #dc2626; }
         .msg.info { background: #2563eb; }
     </style>
+    <style id="walletPremiumStyles">
+        .chip-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));cursor:pointer;font-weight:800;position:relative;overflow:hidden;transition:transform .15s ease,box-shadow .2s ease}
+        .chip-btn:hover{transform:translateY(-2px);box-shadow:var(--glow)}
+        .chip-btn:active{transform:translateY(0)}
+        .chip-btn i{opacity:.9}
+        .ripple{position:absolute;inset:0;pointer-events:none}
+        .ripple::after{content:'';position:absolute;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.25);transform:scale(0);opacity:0}
+        .chip-btn:active .ripple::after{animation:ripple .5s ease-out}
+        @keyframes ripple{to{transform:scale(18);opacity:0}}
+        .skeleton{position:relative;overflow:hidden;background:linear-gradient(90deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02),rgba(255,255,255,0.06));animation:shimmer 1.2s infinite}
+        .skeleton.item{height:56px;border-radius:12px;border:1px solid var(--border)}
+        @keyframes shimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
+        .blurred{filter:blur(6px)}
+        .tx-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:6px 0 8px}
+        .seg{display:inline-flex;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+        .seg button{background:transparent;color:var(--text);padding:8px 12px;border:none;cursor:pointer;font-weight:700}
+        .seg button.active{background:linear-gradient(90deg,rgba(0,213,255,0.15),rgba(255,46,146,0.12))}
+        .tx-search{flex:1;min-width:180px;display:flex}
+        .tx-search input{width:100%;padding:8px 10px;border:1px solid var(--border);background:rgba(255,255,255,0.03);color:var(--text);border-radius:10px}
+        .tx-card{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--border);border-radius:12px;padding:10px;background:rgba(255,255,255,0.03);transition:transform .15s ease, box-shadow .2s ease}
+        .tx-card:hover{transform:translateY(-1px);box-shadow:var(--glow)}
+        .tx-left{display:flex;align-items:center;gap:10px}
+        .avatar{width:34px;height:34px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;background:linear-gradient(135deg,var(--blue),var(--pink));color:#0d0f13}
+        .tx-meta{display:flex;flex-direction:column}
+        .tx-title{font-weight:700;font-size:.95rem}
+        .tx-note{color:var(--muted);font-size:.8rem}
+        .tx-right{text-align:right;display:flex;flex-direction:column;gap:2px;align-items:flex-end}
+        .amt-pos{color:#22c55e;font-weight:800}
+        .amt-neg{color:#ef4444;font-weight:800}
+        .badge{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;border:1px solid var(--border);font-size:.72rem;opacity:.9}
+        .badge.neu{background:rgba(255,255,255,0.04)}
+        .badge.ok{background:rgba(34,197,94,0.1);border-color:rgba(34,197,94,0.3)}
+        .badge.warn{background:rgba(239,68,68,0.08);border-color:rgba(239,68,68,0.25)}
+    </style>
 </head>
 <body>
     <div class="container">
@@ -102,6 +136,15 @@
 
             <div class="card glass">
                 <h2>Recent Transactions</h2>
+                <div class="tx-toolbar" id="txToolbar">
+                    <div class="seg">
+                        <button data-f="all" class="active">All</button>
+                        <button data-f="in">In</button>
+                        <button data-f="out">Out</button>
+                        <button data-f="req">Requests</button>
+                    </div>
+                    <div class="tx-search"><input id="txSearchInput" type="text" placeholder="Search notes or user..." /></div>
+                </div>
                 <div id="txList" style="margin-top:8px; display:grid; gap:8px;"></div>
                 <div id="txEmpty" class="empty" style="display:none;">No transactions yet.</div>
             </div>
@@ -337,6 +380,9 @@
         let inactivityTimer = null;
         const SECURITY_DEFAULTS = { walletRequirePin: false, privacyBlur: false, autoLockSeconds: 0 };
         let walletSecurity = { ...SECURITY_DEFAULTS, walletPinHash: null, walletPinSalt: null };
+        let txFilter = 'all';
+        let txSearchTerm = '';
+        let overviewChart = null;
 
         function showToast(message, type = 'info') {
             toast.textContent = message; toast.className = `msg show ${type}`;
@@ -403,42 +449,50 @@
             txList.innerHTML = '';
             txEmpty.style.display = 'none';
             try {
-                const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), orderBy('timestamp', 'desc'), limit(20));
+                const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), orderBy('timestamp', 'desc'), limit(50));
                 const snap = await getDocs(q);
                 if (snap.empty) { txEmpty.style.display = ''; return; }
+                const inSeries = []; const outSeries = [];
+                let idx = 0;
                 for (const d of snap.docs) {
                     const t = d.data();
-                    const row = document.createElement('div');
-                    row.className = 'row';
-                    row.style.justifyContent = 'space-between';
-                    row.style.border = '1px solid var(--border)';
-                    row.style.borderRadius = '10px';
-                    row.style.padding = '8px 10px';
-                    const left = document.createElement('div');
-                    left.className = 'row wrap';
-                    left.style.gap = '8px';
-                    const typeChip = document.createElement('div');
-                    typeChip.className = 'chip';
-                    typeChip.innerHTML = `<i class="fas fa-receipt"></i> ${t.type || 'activity'}`;
-                    const desc = document.createElement('div');
-                    desc.className = 'muted';
-                    desc.textContent = t.description || '';
-                    left.appendChild(typeChip); left.appendChild(desc);
-                    const right = document.createElement('div');
-                    right.className = 'row';
-                    right.style.gap = '8px';
-                    if (typeof t.amount === 'number') {
-                        const amt = document.createElement('div');
-                        amt.innerHTML = `<strong>${t.amount}</strong>`;
-                        right.appendChild(amt);
-                    }
-                    const ts = document.createElement('div');
-                    ts.className = 'muted';
-                    ts.textContent = t.timestamp?.toDate ? new Date(t.timestamp.toDate()).toLocaleString() : new Date().toLocaleString();
-                    right.appendChild(ts);
-                    row.appendChild(left); row.appendChild(right);
-                    txList.appendChild(row);
+                    const type = (t.type || '').toString();
+                    const isIn = ['p2p_transfer_in','p2p_request_pay_in'].includes(type);
+                    const isOut = ['p2p_transfer_out','p2p_request_pay_out','premium_payment'].includes(type);
+                    const isReq = type.includes('request');
+                    const noteStr = ((t.note || t.description || '').toString()).toLowerCase();
+                    const cp = (t.counterpartyId || '').toString().toLowerCase();
+                    if (txFilter === 'in' && !isIn) continue;
+                    if (txFilter === 'out' && !isOut) continue;
+                    if (txFilter === 'req' && !isReq) continue;
+                    if (txSearchTerm && !(noteStr.includes(txSearchTerm) || cp.includes(txSearchTerm) || type.includes(txSearchTerm))) continue;
+
+                    const card = document.createElement('div');
+                    card.className = 'tx-card';
+                    const tsDate = t.timestamp?.toDate ? new Date(t.timestamp.toDate()) : new Date();
+                    const amtNum = typeof t.amount === 'number' ? t.amount : null;
+                    const amtStr = amtNum !== null ? (isIn ? `+${amtNum}` : isOut ? `-${amtNum}` : `${amtNum}`) : '';
+                    const amtCls = isIn ? 'amt-pos' : isOut ? 'amt-neg' : '';
+                    const badgeCls = isReq ? 'warn' : (isIn ? 'ok' : 'neu');
+                    const title = type.replace(/_/g,' ');
+                    const cpLabel = (t.counterpartyId ? ` • ${t.counterpartyId}` : '');
+                    card.innerHTML = `
+                        <div class="tx-left">
+                            <div class="avatar">${(t.counterpartyId||'U').toString().slice(0,1).toUpperCase()}</div>
+                            <div class="tx-meta">
+                                <div class="tx-title">${title}<span class="badge ${badgeCls}" style="margin-left:8px;">${isIn?'IN':isOut?'OUT':isReq?'REQ':'INFO'}</span></div>
+                                <div class="tx-note">${(t.note || t.description || '—')}${cpLabel}</div>
+                            </div>
+                        </div>
+                        <div class="tx-right">
+                            <div class="${amtCls}">${amtStr}</div>
+                            <div class="ts">${tsDate.toLocaleString()}</div>
+                        </div>
+                    `;
+                    txList.appendChild(card);
+                    if (idx < 12) { inSeries.push(isIn ? (amtNum||0) : 0); outSeries.push(isOut ? (amtNum||0) : 0); idx++; }
                 }
+                try { renderOverviewChart(inSeries.reverse(), outSeries.reverse()); } catch {}
             } catch (e) {
                 console.error('tx load error', e);
                 txEmpty.style.display = '';
@@ -936,6 +990,16 @@
         createPayRequestBtn?.addEventListener('click', createPaymentRequest);
         payRequestNowBtn?.addEventListener('click', payRequestNow);
         cancelPayRequestBtn?.addEventListener('click', () => { payRequestCard.style.display = 'none'; });
+        // Transactions toolbar events
+        document.getElementById('txToolbar')?.querySelectorAll('button[data-f]')?.forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.getElementById('txToolbar').querySelectorAll('button[data-f]')?.forEach(b=>b.classList.remove('active'));
+                btn.classList.add('active');
+                txFilter = btn.dataset.f || 'all';
+                renderTransactions();
+            });
+        });
+        document.getElementById('txSearchInput')?.addEventListener('input', (e) => { txSearchTerm = (e.target.value||'').toLowerCase(); renderTransactions(); });
     </script>
 </body>
 </html>
