@@ -107,6 +107,41 @@
             </div>
         </div>
 
+        <div id="actionsCard" class="card glass" style="margin-top:16px; display:none;">
+            <h2>Wallet Actions</h2>
+            <div class="divider"></div>
+            <div class="row wrap" style="gap:16px;">
+                <div style="flex:1; min-width:260px;">
+                    <h3 style="margin:0 0 8px;">Send JCoins</h3>
+                    <div class="form" style="display:grid; gap:8px;">
+                        <input id="sendTargetUid" type="text" placeholder="Recipient User ID (UID)" />
+                        <input id="sendAmount" type="number" min="1" step="1" placeholder="Amount (J)" />
+                        <input id="sendNote" type="text" placeholder="Note (optional)" />
+                        <button id="sendJCoinsBtn" class="btn primary"><i class="fas fa-paper-plane"></i> Send</button>
+                    </div>
+                </div>
+                <div style="flex:1; min-width:260px;">
+                    <h3 style="margin:0 0 8px;">Request JCoins</h3>
+                    <div class="form" style="display:grid; gap:8px;">
+                        <input id="requestAmount" type="number" min="1" step="1" placeholder="Amount (J)" />
+                        <input id="requestNote" type="text" placeholder="Note (optional)" />
+                        <button id="createPayRequestBtn" class="btn"><i class="fas fa-link"></i> Create Request</button>
+                        <div id="payRequestShare" class="muted" style="display:none; word-break:break-all;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="payRequestCard" class="card glass" style="margin-top:16px; display:none;">
+            <h2>Pay Request</h2>
+            <div id="payReqDetails" class="muted">Loading…</div>
+            <div class="divider"></div>
+            <div class="row wrap" style="gap:8px;">
+                <button id="payRequestNowBtn" class="btn primary"><i class="fas fa-check"></i> Pay Now</button>
+                <button id="cancelPayRequestBtn" class="btn"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+
         <div id="paymentCard" class="card glass" style="margin-top:16px; display:none;">
             <h2 id="paymentTitle">Payment</h2>
             <p id="paymentCaption" class="muted">—</p>
@@ -202,6 +237,23 @@
         const submitPaymentBtn = document.getElementById('submitPaymentBtn');
         const openJCoinBtn = document.getElementById('openJCoinBtn');
 
+        // Actions
+        const actionsCard = document.getElementById('actionsCard');
+        const sendTargetUid = document.getElementById('sendTargetUid');
+        const sendAmountInput = document.getElementById('sendAmount');
+        const sendNoteInput = document.getElementById('sendNote');
+        const sendJCoinsBtn = document.getElementById('sendJCoinsBtn');
+        const requestAmountInput = document.getElementById('requestAmount');
+        const requestNoteInput = document.getElementById('requestNote');
+        const createPayRequestBtn = document.getElementById('createPayRequestBtn');
+        const payRequestShare = document.getElementById('payRequestShare');
+
+        // Pay Request Viewer
+        const payRequestCard = document.getElementById('payRequestCard');
+        const payReqDetails = document.getElementById('payReqDetails');
+        const payRequestNowBtn = document.getElementById('payRequestNowBtn');
+        const cancelPayRequestBtn = document.getElementById('cancelPayRequestBtn');
+
         const receiptTrigger = document.getElementById('receiptTrigger');
         const receiptInput = document.getElementById('receiptInput');
         const receiptFileName = document.getElementById('receiptFileName');
@@ -216,6 +268,7 @@
         let currentProfile = null;
         let paymentContext = null; // { type: 'unlock'|'premium', amount: number, tier?: string }
         let overlayTimer = null;
+        let payRequestContext = null; // { id, requesterId, amount, note }
 
         function showToast(message, type = 'info') {
             toast.textContent = message; toast.className = `msg show ${type}`;
@@ -260,6 +313,7 @@
             const unlocked = !!currentProfile?.walletUnlocked;
             walletStatusEl.innerHTML = unlocked ? '<span class="chip" style="border-color:rgba(16,185,129,.4)"><i class="fas fa-unlock"></i> Unlocked</span>' : '<span class="chip" style="border-color:rgba(220,38,38,.4)"><i class="fas fa-lock"></i> Locked</span>';
             requestUnlockBtn.style.display = unlocked ? 'none' : '';
+            actionsCard.style.display = unlocked ? '' : 'none';
         }
 
         async function renderTransactions() {
@@ -319,6 +373,12 @@
                 paymentContext = { type: 'premium', tier, amount: amt };
             } else {
                 paymentContext = null;
+            }
+            // Payment request viewer
+            if (p.payreq) {
+                payRequestContext = { id: String(p.payreq) };
+            } else {
+                payRequestContext = null;
             }
         }
 
@@ -449,6 +509,154 @@
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         });
 
+        // --- Send JCoins (client Firestore transaction; no Cloud Functions) ---
+        async function sendJCoins() {
+            try {
+                if (!currentUser || !currentProfile?.walletUnlocked) { showToast('Wallet locked or not signed in.', 'error'); return; }
+                const targetUid = (sendTargetUid.value || '').trim();
+                const amount = Math.floor(Number(sendAmountInput.value || 0));
+                const note = (sendNoteInput.value || '').trim();
+                if (!targetUid) { showToast('Enter recipient user ID.', 'warning'); return; }
+                if (targetUid === currentUser.uid) { showToast('Cannot send to yourself.', 'warning'); return; }
+                if (!amount || amount <= 0) { showToast('Enter a valid amount.', 'warning'); return; }
+
+                sendJCoinsBtn.disabled = true;
+                await runTransaction(db, async (tx) => {
+                    const senderRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
+                    const recipientRef = doc(db, 'artifacts', appId, 'users', targetUid, 'profiles', 'user_profile');
+                    const senderSnap = await tx.get(senderRef);
+                    if (!senderSnap.exists()) { throw new Error('Sender profile not found.'); }
+                    const senderCoins = Number(senderSnap.data().jCoins || 0);
+                    if (senderCoins < amount) { throw new Error('Insufficient JCoins.'); }
+                    const recipientSnap = await tx.get(recipientRef);
+                    const recipientCoins = recipientSnap.exists() ? Number(recipientSnap.data().jCoins || 0) : 0;
+
+                    tx.update(senderRef, { jCoins: senderCoins - amount, updatedAt: serverTimestamp() });
+                    if (recipientSnap.exists()) {
+                        tx.update(recipientRef, { jCoins: recipientCoins + amount, updatedAt: serverTimestamp() });
+                    } else {
+                        tx.set(recipientRef, { jCoins: recipientCoins + amount, gas: 0, level: 1, currentXp: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
+                    }
+
+                    const senderTxCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions');
+                    const recipientTxCol = collection(db, 'artifacts', appId, 'users', targetUid, 'transactions');
+                    tx.set(doc(senderTxCol), { type: 'p2p_transfer_out', amount, note, counterpartyId: targetUid, timestamp: serverTimestamp() });
+                    tx.set(doc(recipientTxCol), { type: 'p2p_transfer_in', amount, note, counterpartyId: currentUser.uid, timestamp: serverTimestamp() });
+                });
+
+                showToast('JCoins sent!', 'success');
+                // Update local snapshot values
+                try { await loadProfile(); renderOverview(); await renderTransactions(); } catch {}
+                sendAmountInput.value = ''; sendTargetUid.value = ''; sendNoteInput.value = '';
+            } catch (e) {
+                console.error('send jcoins error', e);
+                showToast(e?.message || 'Send failed', 'error');
+            } finally {
+                sendJCoinsBtn.disabled = false;
+            }
+        }
+
+        // --- Create Payment Request ---
+        async function createPaymentRequest() {
+            try {
+                if (!currentUser || !currentProfile?.walletUnlocked) { showToast('Wallet locked or not signed in.', 'error'); return; }
+                const amount = Math.floor(Number(requestAmountInput.value || 0));
+                const note = (requestNoteInput.value || '').trim();
+                if (!amount || amount <= 0) { showToast('Enter a valid amount.', 'warning'); return; }
+                createPayRequestBtn.disabled = true;
+                const ref = await addDoc(collection(db, 'artifacts', appId, 'payment_requests'), {
+                    requesterId: currentUser.uid,
+                    amount,
+                    note,
+                    status: 'pending',
+                    timestamp: serverTimestamp()
+                });
+                const link = `${location.origin}/Wallet.html?payreq=${ref.id}`;
+                payRequestShare.style.display = '';
+                payRequestShare.innerHTML = `<i class="fas fa-link"></i> Share this link: <span>${link}</span>`;
+                navigator.clipboard?.writeText(link).catch(()=>{});
+                showToast('Payment request created and link copied.', 'success');
+                requestAmountInput.value = ''; requestNoteInput.value = '';
+            } catch (e) {
+                console.error('create request', e);
+                showToast(e?.message || 'Failed to create request', 'error');
+            } finally {
+                createPayRequestBtn.disabled = false;
+            }
+        }
+
+        async function loadPayRequest() {
+            try {
+                if (!payRequestContext?.id) return;
+                payRequestCard.style.display = '';
+                payReqDetails.textContent = 'Loading…';
+                const prRef = doc(db, 'artifacts', appId, 'payment_requests', payRequestContext.id);
+                const snap = await getDoc(prRef);
+                if (!snap.exists()) { payReqDetails.textContent = 'Request not found.'; payRequestNowBtn.disabled = true; return; }
+                const d = snap.data();
+                payRequestContext = { ...payRequestContext, requesterId: d.requesterId, amount: d.amount, note: d.note, status: d.status };
+                const youAreRequester = currentUser && currentUser.uid === d.requesterId;
+                payReqDetails.innerHTML = `
+                    <div><strong>From:</strong> ${d.requesterId}</div>
+                    <div><strong>Amount:</strong> ${d.amount} J</div>
+                    <div><strong>Note:</strong> ${d.note || '—'}</div>
+                    <div><strong>Status:</strong> ${d.status}</div>
+                `;
+                payRequestNowBtn.style.display = youAreRequester ? 'none' : '';
+            } catch (e) {
+                console.error('load payreq', e);
+                payReqDetails.textContent = 'Failed to load request.';
+            }
+        }
+
+        async function payRequestNow() {
+            try {
+                if (!currentUser || !currentProfile?.walletUnlocked) { showToast('Wallet locked or not signed in.', 'error'); return; }
+                if (!payRequestContext?.id || !payRequestContext?.requesterId) { showToast('Invalid request.', 'error'); return; }
+                if (currentUser.uid === payRequestContext.requesterId) { showToast('Cannot pay your own request.', 'warning'); return; }
+                const amount = Math.floor(Number(payRequestContext.amount || 0));
+                if (!amount || amount <= 0) { showToast('Invalid amount.', 'error'); return; }
+                payRequestNowBtn.disabled = true;
+                const reqRef = doc(db, 'artifacts', appId, 'payment_requests', payRequestContext.id);
+                await runTransaction(db, async (tx) => {
+                    const reqSnap = await tx.get(reqRef);
+                    if (!reqSnap.exists()) { throw new Error('Request not found'); }
+                    const req = reqSnap.data();
+                    if (req.status === 'paid') { return; }
+                    if (req.status === 'rejected') { throw new Error('Request rejected'); }
+
+                    const payerRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
+                    const payeeRef = doc(db, 'artifacts', appId, 'users', req.requesterId, 'profiles', 'user_profile');
+                    const payerSnap = await tx.get(payerRef);
+                    if (!payerSnap.exists()) { throw new Error('Payer profile not found'); }
+                    const payerCoins = Number(payerSnap.data().jCoins || 0);
+                    if (payerCoins < amount) { throw new Error('Insufficient JCoins.'); }
+                    const payeeSnap = await tx.get(payeeRef);
+                    const payeeCoins = payeeSnap.exists() ? Number(payeeSnap.data().jCoins || 0) : 0;
+
+                    tx.update(payerRef, { jCoins: payerCoins - amount, updatedAt: serverTimestamp() });
+                    if (payeeSnap.exists()) {
+                        tx.update(payeeRef, { jCoins: payeeCoins + amount, updatedAt: serverTimestamp() });
+                    } else {
+                        tx.set(payeeRef, { jCoins: payeeCoins + amount, gas: 0, level: 1, currentXp: 0, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
+                    }
+                    const payerTxCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions');
+                    const payeeTxCol = collection(db, 'artifacts', appId, 'users', req.requesterId, 'transactions');
+                    tx.set(doc(payerTxCol), { type: 'p2p_request_pay_out', amount, note: req.note || '', counterpartyId: req.requesterId, paymentRequestId: reqRef.id, timestamp: serverTimestamp() });
+                    tx.set(doc(payeeTxCol), { type: 'p2p_request_pay_in', amount, note: req.note || '', counterpartyId: currentUser.uid, paymentRequestId: reqRef.id, timestamp: serverTimestamp() });
+                    tx.update(reqRef, { status: 'paid', payerId: currentUser.uid, paidAt: serverTimestamp() });
+                });
+
+                showToast('Payment completed!', 'success');
+                try { await loadProfile(); renderOverview(); await renderTransactions(); } catch {}
+            } catch (e) {
+                console.error('pay request', e);
+                showToast(e?.message || 'Payment failed', 'error');
+            } finally {
+                payRequestNowBtn.disabled = false;
+            }
+        }
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
@@ -458,6 +666,7 @@
                 await loadProfile();
                 renderOverview();
                 await renderTransactions();
+                if (payRequestContext?.id) { await loadPayRequest(); }
             } else {
                 authState.textContent = 'Guest';
                 if (overlayTimer) { try { clearTimeout(overlayTimer); } catch {} }
@@ -482,7 +691,14 @@
         // Init
         setupPaymentContextFromParams();
         renderPaymentCard();
+        if (payRequestContext?.id) { payRequestCard.style.display = ''; }
         ensureAuthenticated();
+
+        // Bind action listeners
+        sendJCoinsBtn?.addEventListener('click', sendJCoins);
+        createPayRequestBtn?.addEventListener('click', createPaymentRequest);
+        payRequestNowBtn?.addEventListener('click', payRequestNow);
+        cancelPayRequestBtn?.addEventListener('click', () => { payRequestCard.style.display = 'none'; });
     </script>
 </body>
 </html>
