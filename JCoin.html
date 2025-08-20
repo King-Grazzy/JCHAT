@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JCHAT - Buy JCoins</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        :root {
+            --pink: #ff2e92; --blue: #00d5ff; --bg: #0d0f13; --card: rgba(255,255,255,0.03);
+            --text: #f5f7fa; --muted: rgba(255,255,255,0.65); --border: rgba(255,255,255,0.08);
+        }
+        body {
+            margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color: var(--text);
+            background: radial-gradient(1200px 800px at -10% -20%, rgba(0,213,255,0.12), transparent 60%),
+                        radial-gradient(1200px 800px at 110% 120%, rgba(255,46,146,0.12), transparent 60%), var(--bg);
+            min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px;
+        }
+        .container { width: 100%; max-width: 1100px; }
+        .header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 16px; padding: 12px 16px; border: 1px solid var(--border); background: var(--card); border-radius: 14px; backdrop-filter: blur(8px); }
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .logo { font-family: Poppins, sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+        .logo .grad { background: linear-gradient(90deg, var(--blue), var(--pink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .back { color: var(--text); text-decoration: none; border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; display: inline-flex; align-items: center; gap: 8px; }
+
+        .grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 16px; }
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+        .card { border: 1px solid var(--border); background: var(--card); border-radius: 14px; padding: 16px; }
+        h1, h2 { font-family: Poppins, sans-serif; margin: 0 0 10px; }
+        h1 { font-size: 1.6rem; }
+        .muted { color: var(--muted); font-size: 0.95rem; }
+        .row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0 6px; }
+        .btn { border: 1px solid var(--border); background: linear-gradient(90deg, rgba(0,213,255,0.12), rgba(255,46,146,0.12)); color: var(--text); padding: 10px 12px; border-radius: 10px; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+        .btn.primary { background: linear-gradient(90deg, var(--blue), var(--pink)); border-color: transparent; }
+        .btn.block { width: 100%; justify-content: center; }
+        .chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; background: rgba(255,255,255,0.06); font-weight: 800; }
+
+        .form { display: grid; gap: 10px; }
+        label { font-weight: 700; }
+        input[type="number"], select, input[type="text"] { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); color: var(--text); }
+        input[type="file"] { display: none; }
+        .file-input-wrapper { display:flex; align-items:center; gap:8px; border:1px dashed var(--border); padding:8px 10px; border-radius:10px; cursor:pointer; }
+        .file-input-wrapper i { color: var(--pink); }
+        .file-name { font-size:.85rem; color:var(--muted); }
+        .receipt-preview { width:100%; max-height:160px; object-fit:contain; margin-top:8px; border:1px solid var(--border); border-radius:10px; display:none; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border-bottom: 1px solid var(--border); padding: 8px 10px; text-align: left; }
+        th { color: var(--muted); font-weight: 700; font-size: .85rem; }
+
+        .msg { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); padding: 10px 16px; border-radius: 10px; color: #fff; display: none; }
+        .msg.show { display: block; }
+        .msg.success { background: #16a34a; }
+        .msg.error { background: #dc2626; }
+        .msg.info { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="brand">
+                <div class="logo"><span class="grad">JCHAT</span> JCoin Store</div>
+                <div id="authState" class="muted">Signing in…</div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <a class="back" href="/Home.html"><i class="fas fa-home"></i> Home</a>
+                <a class="back" href="/Wallet.html"><i class="fas fa-wallet"></i> Wallet</a>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h1>Buy JCoins</h1>
+                <div class="muted">Choose a package or enter a custom amount. Transfer to the bank details below and upload your receipt (optional).</div>
+                <div class="actions">
+                    <button class="btn" data-pack="200">200 J</button>
+                    <button class="btn" data-pack="500">500 J</button>
+                    <button class="btn" data-pack="1000">1,000 J</button>
+                    <button class="btn" data-pack="2000">2,000 J</button>
+                    <button class="btn" data-pack="5000">5,000 J</button>
+                    <button class="btn" data-pack="10000">10,000 J</button>
+                </div>
+                <div class="form">
+                    <div>
+                        <label for="jcoinsInput">Custom JCoins</label>
+                        <input id="jcoinsInput" type="number" min="1" step="1" placeholder="e.g. 750" />
+                    </div>
+                    <div>
+                        <label>Bank Transfer (NGN)</label>
+                        <div class="row" style="gap:10px; flex-wrap:wrap;">
+                            <div class="chip"><i class="fas fa-university"></i> OPay: <strong id="opayAcct">8111609765</strong></div>
+                            <div class="chip"><i class="fas fa-user"></i> Name: <strong>ELECHI JOSHUA</strong></div>
+                        </div>
+                        <div class="row" style="gap:10px; margin-top:8px; flex-wrap:wrap;">
+                            <div class="chip"><i class="fas fa-university"></i> Keystone: <strong id="keystoneAcct">6042862356</strong></div>
+                            <div class="chip"><i class="fas fa-user"></i> Name: <strong>ELECHI OSOUNDU JOSHUA</strong></div>
+                        </div>
+                        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn" id="copyOpay"><i class="fas fa-copy"></i> Copy OPay</button>
+                            <button class="btn" id="copyKeystone"><i class="fas fa-copy"></i> Copy Keystone</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="receiptInput">Upload Receipt (optional)</label>
+                        <div class="file-input-wrapper" id="receiptTrigger">
+                            <i class="fas fa-upload"></i>
+                            <span class="file-name" id="receiptFileName">No file chosen</span>
+                        </div>
+                        <input type="file" id="receiptInput" accept="image/*,.pdf" />
+                        <img id="receiptPreview" class="receipt-preview" />
+                    </div>
+                    <button id="submitBtn" class="btn primary"><i class="fas fa-shopping-cart"></i> Submit Request</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Summary</h2>
+                <div class="row"><div class="muted">Order ID</div><div id="orderId">—</div></div>
+                <div class="row"><div class="muted">Selected JCoins</div><div><strong id="summaryJ">0</strong> J</div></div>
+                <div class="row"><div class="muted">Rate</div><div>₦<strong id="rate">—</strong> / J</div></div>
+                <div class="row" style="font-weight:800;"><div>Total (NGN)</div><div>₦<strong id="total">0</strong></div></div>
+                <div class="muted" style="margin-top:10px;">After the developer approves, your JCoins will be credited immediately.</div>
+                <div style="margin-top:12px;"><button id="toWalletBtn" class="btn"><i class="fas fa-wallet"></i> Go to Wallet</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="msg info">Info</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebasestorage.app",
+            messagingSenderId: "328479683167",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const authState = document.getElementById('authState');
+        const toast = document.getElementById('toast');
+        const submitBtn = document.getElementById('submitBtn');
+        const jcoinsInput = document.getElementById('jcoinsInput');
+        const packButtons = Array.from(document.querySelectorAll('[data-pack]'));
+        const orderIdEl = document.getElementById('orderId');
+        const summaryJ = document.getElementById('summaryJ');
+        const rateEl = document.getElementById('rate');
+        const totalEl = document.getElementById('total');
+        const receiptTrigger = document.getElementById('receiptTrigger');
+        const receiptInput = document.getElementById('receiptInput');
+        const receiptFileName = document.getElementById('receiptFileName');
+        const receiptPreview = document.getElementById('receiptPreview');
+        const toWalletBtn = document.getElementById('toWalletBtn');
+        const copyOpay = document.getElementById('copyOpay');
+        const copyKeystone = document.getElementById('copyKeystone');
+
+        let currentUser = null;
+        let selectedJ = 0;
+        let rate = 0;
+        let orderId = genOrderId();
+        orderIdEl.textContent = orderId;
+
+        function showToast(message, type = 'info') {
+            toast.textContent = message; toast.className = `msg show ${type}`;
+            setTimeout(() => { toast.className = 'msg'; }, 2500);
+        }
+        function genOrderId() { return 'ORD-' + Math.random().toString(36).slice(2, 8).toUpperCase(); }
+
+        async function ensureAuthenticated() {
+            try {
+                if (auth.currentUser) return;
+                authState.textContent = 'Signing in…';
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error('Auth error', e);
+                authState.textContent = 'Auth failed (retrying)';
+                setTimeout(ensureAuthenticated, 1500);
+            }
+        }
+
+        async function fetchRate() {
+            try {
+                const ref = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
+                const snap = await getDoc(ref);
+                rate = snap.exists() ? (snap.data().jcoinNairaRate || 0) : 0;
+            } catch { rate = 0; }
+            rateEl.textContent = rate ? String(rate) : '—';
+            computeTotal();
+        }
+
+        function computeTotal() {
+            const amount = Number(jcoinsInput.value || 0) || selectedJ || 0;
+            summaryJ.textContent = String(amount);
+            const total = Math.max(0, Math.round(amount * (Number(rate) || 0)));
+            totalEl.textContent = String(total);
+        }
+
+        function bindUI() {
+            packButtons.forEach(btn => btn.addEventListener('click', () => {
+                selectedJ = Number(btn.getAttribute('data-pack')) || 0;
+                jcoinsInput.value = '';
+                computeTotal();
+            }));
+            jcoinsInput.addEventListener('input', () => { selectedJ = 0; computeTotal(); });
+            receiptTrigger.addEventListener('click', () => receiptInput.click());
+            receiptInput.addEventListener('change', () => {
+                const f = receiptInput.files?.[0];
+                if (!f) { receiptFileName.textContent = 'No file chosen'; receiptPreview.style.display = 'none'; return; }
+                receiptFileName.textContent = f.name;
+                if (f.type.startsWith('image/')) { receiptPreview.src = URL.createObjectURL(f); receiptPreview.style.display = ''; } else { receiptPreview.style.display = 'none'; }
+            });
+            copyOpay.addEventListener('click', () => { navigator.clipboard.writeText('8111609765'); showToast('OPay account copied', 'success'); });
+            copyKeystone.addEventListener('click', () => { navigator.clipboard.writeText('6042862356'); showToast('Keystone account copied', 'success'); });
+            toWalletBtn.addEventListener('click', () => { window.location.href = '/Wallet.html'; });
+        }
+
+        async function uploadReceiptIfAny() {
+            const f = receiptInput.files?.[0];
+            if (!f) return null;
+            try {
+                const fd = new FormData();
+                fd.append('file', f);
+                fd.append('upload_preset', 'Storage_preset');
+                const resp = await fetch('https://api.cloudinary.com/v1_1/dxld01rcp/auto/upload', { method: 'POST', body: fd });
+                if (!resp.ok) throw new Error('Upload failed');
+                const data = await resp.json();
+                return data.secure_url || null;
+            } catch (e) { console.error('Receipt upload error', e); return null; }
+        }
+
+        async function submitRequest() {
+            try {
+                submitBtn.disabled = true;
+                const amount = Number(jcoinsInput.value || 0) || selectedJ || 0;
+                if (!amount || amount <= 0) { showToast('Enter or select a JCoin amount', 'error'); return; }
+                if (!currentUser) { showToast('Please sign in first', 'error'); return; }
+                const proofUrl = await uploadReceiptIfAny();
+                const reqRef = doc(collection(db, 'artifacts', appId, 'coin_requests'));
+                const payload = {
+                    requestId: orderId,
+                    requesterId: currentUser.uid,
+                    requestedCoins: amount,
+                    amountNaira: Math.round(amount * (Number(rate) || 0)),
+                    rateAtRequest: Number(rate) || 0,
+                    status: 'Pending',
+                    timestamp: serverTimestamp(),
+                    ...(proofUrl ? { paymentProof: proofUrl } : {})
+                };
+                await setDoc(reqRef, payload);
+                showToast('Request submitted. Await developer approval.', 'success');
+                // Reset for next
+                orderId = genOrderId(); orderIdEl.textContent = orderId;
+                jcoinsInput.value = ''; selectedJ = 0; computeTotal();
+                receiptInput.value = ''; receiptFileName.textContent = 'No file chosen'; receiptPreview.style.display = 'none';
+            } catch (e) {
+                console.error('Submit error', e);
+                showToast(e?.message || 'Failed to submit request', 'error');
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        submitBtn.addEventListener('click', submitRequest);
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                authState.textContent = 'Signed in';
+                // Ensure profile exists and jCoins field initialized
+                try {
+                    const profRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profiles', 'user_profile');
+                    const snap = await getDoc(profRef);
+                    if (!snap.exists()) {
+                        await setDoc(profRef, { jCoins: 0, level: 1, currentXp: 0, xpToNextLevel: 100, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
+                    } else if (snap.exists() && typeof (snap.data().jCoins) === 'undefined') {
+                        await setDoc(profRef, { jCoins: 0, updatedAt: serverTimestamp() }, { merge: true });
+                    }
+                } catch (e) { /* non-blocking */ }
+            } else {
+                authState.textContent = 'Guest';
+            }
+        });
+
+        // Init
+        bindUI();
+        computeTotal();
+        fetchRate();
+        ensureAuthenticated();
+    </script>
+</body>
+</html>
