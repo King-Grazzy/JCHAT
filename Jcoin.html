@@ -598,10 +598,12 @@
                             <div class="info-item">
                                 <div class="label">OPay</div>
                                 <div class="value"><span id="acctOpay">8111609765</span></div>
+                                <div class="muted" style="margin-top:6px">Account Name: <strong>ELECHI JOSHUA</strong></div>
                             </div>
                             <div class="info-item">
                                 <div class="label">Keystone</div>
                                 <div class="value"><span id="acctKeystone">6042862356</span></div>
+                                <div class="muted" style="margin-top:6px">Account Name: <strong>ELECHI OSOUNDU JOSHUA</strong></div>
                             </div>
                         </div>
                     </div>
@@ -666,6 +668,16 @@
         let currentUser = null;
         let currentUserProfileData = null;
         let orderId = null;
+
+        async function handleLogout() {
+            try {
+                await signOut(auth);
+                showMessage('Logged out successfully', 'success');
+                setTimeout(() => { window.location.href = '/Login.html'; }, 800);
+            } catch (e) {
+                showMessage('Failed to log out', 'error');
+            }
+        }
 
         function showMessage(text, type='info') {
             showMessageBox(text, type);
