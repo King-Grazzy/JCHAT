@@ -809,6 +809,44 @@
             background: rgba(255, 0, 0, 0.1) !important;
         }
 
+        /* Currency selector styling */
+        .currency-selector {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            margin: 10px;
+        }
+
+        .currency-selector select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: white;
+            font-size: 0.9rem;
+            padding: 8px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .currency-selector select:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .currency-selector select:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.2);
+        }
+
+        .currency-selector label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: block;
+            font-weight: 500;
+        }
+
         body {
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
@@ -3866,74 +3904,159 @@
 
         // Currency configuration
         const CURRENCIES = {
-            USD: { symbol: '$', name: 'US Dollar' },
-            EUR: { symbol: '€', name: 'Euro' },
-            GBP: { symbol: '£', name: 'British Pound' },
-            CAD: { symbol: 'C$', name: 'Canadian Dollar' },
-            AUD: { symbol: 'A$', name: 'Australian Dollar' },
-            JPY: { symbol: '¥', name: 'Japanese Yen' },
-            INR: { symbol: '₹', name: 'Indian Rupee' },
-            BRL: { symbol: 'R$', name: 'Brazilian Real' },
-            MXN: { symbol: 'Mex$', name: 'Mexican Peso' },
-            KRW: { symbol: '₩', name: 'South Korean Won' }
+            'US': { code: 'USD', symbol: '$', name: 'US Dollar' },
+            'GB': { code: 'GBP', symbol: '£', name: 'British Pound' },
+            'EU': { code: 'EUR', symbol: '€', name: 'Euro' },
+            'CA': { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
+            'AU': { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+            'IN': { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+            'JP': { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+            'KR': { code: 'KRW', symbol: '₩', name: 'South Korean Won' },
+            'BR': { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' },
+            'MX': { code: 'MXN', symbol: '$', name: 'Mexican Peso' },
+            'NG': { code: 'NGN', symbol: '₦', name: 'Nigerian Naira' }
         };
 
-        let userCurrency = 'USD';
-        let exchangeRates = {};
+        // Default to USD since all prices are in USD
+        let userCurrency = CURRENCIES['US'];
+        let exchangeRates = { USD: 1 };
+        let isRatesLoading = false;
 
-        // Detect user's currency based on location
+        // Currency detection and exchange rate management
         async function detectUserCurrency() {
             try {
+                // Try to get user's country from IP
                 const response = await fetch('https://ipapi.co/json/');
                 const data = await response.json();
-                if (data.currency && CURRENCIES[data.currency]) {
-                    userCurrency = data.currency;
+                
+                if (data.country_code && CURRENCIES[data.country_code]) {
+                    userCurrency = CURRENCIES[data.country_code];
+                    console.log(`Currency detected: ${userCurrency.name} (${userCurrency.code})`);
+                }
+                
+                // Store user's currency preference
+                localStorage.setItem('jchat-user-currency', userCurrency.code);
+                
+                // Fetch exchange rates
+                await fetchExchangeRates();
+                
+            } catch (error) {
+                console.log('Currency detection failed, using USD as default:', error);
+                // Fallback to stored preference or USD
+                const storedCurrency = localStorage.getItem('jchat-user-currency');
+                if (storedCurrency) {
+                    const currencyEntry = Object.values(CURRENCIES).find(c => c.code === storedCurrency);
+                    if (currencyEntry) userCurrency = currencyEntry;
+                }
+                
+                // Still try to fetch exchange rates even if detection failed
+                await fetchExchangeRates();
+            }
+        }
+
+        async function fetchExchangeRates() {
+            if (isRatesLoading) return;
+            isRatesLoading = true;
+            
+            try {
+                // Use a free exchange rate API
+                const response = await fetch(`https://api.exchangerate-api.com/v4/latest/USD`);
+                const data = await response.json();
+                
+                if (data.rates) {
+                    exchangeRates = data.rates;
+                    console.log('Exchange rates updated successfully');
+                    // Update theme picker prices if it's open
+                    if (document.querySelector('.theme-picker')) {
+                        updateThemePickerPrices();
+                    }
                 }
             } catch (error) {
-                console.log('Could not detect user currency, using USD as default');
+                console.error('Failed to fetch exchange rates:', error);
+                // Fallback to approximate rates
+                exchangeRates = {
+                    USD: 1, EUR: 0.92, GBP: 0.79, CAD: 1.35,
+                    AUD: 1.52, INR: 83.12, JPY: 149.85, KRW: 1337.50,
+                    BRL: 4.95, MXN: 16.67, NGN: 1580.00
+                };
+            } finally {
+                isRatesLoading = false;
             }
         }
 
-        // Fetch exchange rates
-        async function fetchExchangeRates() {
-            try {
-                const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-                const data = await response.json();
-                exchangeRates = data.rates;
-            } catch (error) {
-                console.log('Could not fetch exchange rates');
+        // Convert price from USD to user's currency
+        function convertPrice(priceUSD, targetCurrency = userCurrency.code) {
+            if (targetCurrency === 'USD') return priceUSD;
+            const rate = exchangeRates[targetCurrency] || 1;
+            const converted = priceUSD * rate;
+            
+            // Round to 2 decimal places for most currencies, 0 for JPY/KRW
+            if (targetCurrency === 'JPY' || targetCurrency === 'KRW') {
+                return Math.round(converted);
             }
-        }
-
-        // Convert price to user's currency
-        function convertPrice(priceUSD) {
-            if (userCurrency === 'USD') return priceUSD;
-            if (exchangeRates[userCurrency]) {
-                return priceUSD * exchangeRates[userCurrency];
-            }
-            return priceUSD;
+            return Math.round(converted * 100) / 100;
         }
 
         // Format price in user's currency
-        function formatPrice(price) {
-            const currency = CURRENCIES[userCurrency];
+        function formatPrice(price, currency = userCurrency) {
             if (!currency) return `$${price}`;
             
-            if (userCurrency === 'USD') return `$${price}`;
-            if (userCurrency === 'EUR') return `€${price}`;
-            if (userCurrency === 'GBP') return `£${price}`;
-            if (userCurrency === 'CAD') return `C$${price}`;
-            if (userCurrency === 'AUD') return `A$${price}`;
-            if (userCurrency === 'JPY') return `¥${price}`;
-            if (userCurrency === 'INR') return `₹${price}`;
-            if (userCurrency === 'BRL') return `R$${price}`;
-            if (userCurrency === 'MXN') return `Mex$${price}`;
-            if (userCurrency === 'KRW') return `₩${price}`;
+            // Special formatting for different currencies
+            if (currency.code === 'JPY' || currency.code === 'KRW') {
+                return `${currency.symbol}${Math.round(price)}`;
+            }
             
-            return `${currency.symbol}${price}`;
+            return `${currency.symbol}${price.toFixed(2)}`;
         }
 
-                // Initialize theme switcher
+                // Update theme picker prices with current currency
+        function updateThemePickerPrices() {
+            const priceElements = document.querySelectorAll('.theme-picker-btn[data-locked="true"] .price-display');
+            priceElements.forEach(el => {
+                const theme = el.closest('.theme-picker-btn').getAttribute('data-theme');
+                const themeInfo = themeCatalog[theme];
+                if (themeInfo && !themeInfo.isFree) {
+                    const convertedPrice = convertPrice(themeInfo.price);
+                    el.textContent = ` (${formatPrice(convertedPrice)})`;
+                }
+            });
+        }
+
+        // Add currency selector to theme picker
+        function addCurrencySelector() {
+            const picker = document.querySelector('.theme-picker');
+            if (!picker || picker.querySelector('.currency-selector')) return;
+            
+            const currencyDiv = document.createElement('div');
+            currencyDiv.className = 'currency-selector';
+            currencyDiv.innerHTML = `
+                <div style="padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px;">
+                    <label style="color: rgba(255,255,255,0.8); font-size: 0.9rem; margin-bottom: 5px; display: block;">Currency:</label>
+                    <select id="currencySelect" style="width: 100%; padding: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; font-size: 0.9rem;">
+                        ${Object.entries(CURRENCIES).map(([code, currency]) => 
+                            `<option value="${currency.code}" ${currency.code === userCurrency.code ? 'selected' : ''}>
+                                ${currency.symbol} ${currency.code} - ${currency.name}
+                            </option>`
+                        ).join('')}
+                    </select>
+                </div>
+            `;
+            
+            picker.insertBefore(currencyDiv, picker.firstChild);
+            
+            // Handle currency change
+            document.getElementById('currencySelect').addEventListener('change', (e) => {
+                const newCurrencyCode = e.target.value;
+                const newCurrency = Object.values(CURRENCIES).find(c => c.code === newCurrencyCode);
+                if (newCurrency) {
+                    userCurrency = newCurrency;
+                    localStorage.setItem('jchat-user-currency', newCurrency.code);
+                    updateThemePickerPrices();
+                }
+            });
+        }
+
+        // Initialize theme switcher
         async function initializeThemeSwitcher() {
             // Detect user currency and fetch exchange rates
             await detectUserCurrency();
@@ -4059,6 +4182,9 @@
             const picker = ensureThemePicker();
             picker.innerHTML = '';
             
+            // Add currency selector at the top
+            addCurrencySelector();
+            
             themeSwitcherThemes.forEach(theme => {
                 const themeInfo = themeCatalog[theme];
                 const isLocked = isThemeLocked(theme);
@@ -4074,7 +4200,10 @@
                 let statusText = '';
                 if (isCurrent) statusText = ' (Current)';
                 else if (isOwned) statusText = ' (Owned)';
-                else statusText = ` (${formatPrice(convertPrice(themeInfo.price))})`;
+                else {
+                    const convertedPrice = convertPrice(themeInfo.price);
+                    statusText = ` (${formatPrice(convertedPrice)})`;
+                }
                 
                 button.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: center;">
