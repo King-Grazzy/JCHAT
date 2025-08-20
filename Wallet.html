@@ -288,6 +288,56 @@
             margin-bottom: 20px;
         }
 
+        .transactions-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .tx-toggle-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tx-toggle-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tx-toggle-btn.hidden {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .tx-toggle-btn.hidden i {
+            transform: rotate(180deg);
+        }
+
+        .tx-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .tx-content.hidden {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+        }
+
         .search-box {
             position: relative;
             flex: 1;
@@ -555,22 +605,30 @@
         <section class="transactions-section">
             <div class="transactions-header">
                 <h2 class="section-title">Recent Transactions</h2>
-                <div class="search-box">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" id="txSearchInput" placeholder="Search transactions...">
+                <div class="transactions-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="txSearchInput" placeholder="Search transactions...">
+                    </div>
+                    <button id="txToggleBtn" class="tx-toggle-btn" title="Toggle transactions visibility">
+                        <i class="fas fa-eye-slash"></i>
+                        <span>Hide</span>
+                    </button>
                 </div>
             </div>
             
-            <div id="txList">
-                <!-- Transactions will be rendered here -->
-            </div>
-            
-            <div id="txEmpty" class="empty-state hidden">
-                <div class="empty-icon">
-                    <i class="fas fa-receipt"></i>
+            <div id="txContent" class="tx-content">
+                <div id="txList">
+                    <!-- Transactions will be rendered here -->
                 </div>
-                <div class="empty-title">No transactions yet</div>
-                <div class="empty-description">Your transaction history will appear here once you start using your wallet.</div>
+                
+                <div id="txEmpty" class="empty-state hidden">
+                    <div class="empty-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="empty-title">No transactions yet</div>
+                    <div class="empty-description">Your transaction history will appear here once you start using your wallet.</div>
+                </div>
             </div>
         </section>
     </div>
@@ -625,6 +683,7 @@
         let currentUser = null;
         let currentProfile = null;
         let txSearchTerm = ''; // Transaction search term for filtering
+        let transactionsVisible = true; // Track transactions visibility state
 
         // Functions
         function showToast(message, type = 'info') {
@@ -640,6 +699,30 @@
             const u = new URL(window.location.href);
             const p = Object.fromEntries(u.searchParams.entries());
             return p;
+        }
+
+        // Toggle transactions visibility
+        function toggleTransactions() {
+            const txContent = document.getElementById('txContent');
+            const txToggleBtn = document.getElementById('txToggleBtn');
+            const toggleIcon = txToggleBtn.querySelector('i');
+            const toggleText = txToggleBtn.querySelector('span');
+            
+            if (transactionsVisible) {
+                // Hide transactions
+                txContent.classList.add('hidden');
+                txToggleBtn.classList.add('hidden');
+                toggleIcon.className = 'fas fa-eye-slash';
+                toggleText.textContent = 'Show';
+                transactionsVisible = false;
+            } else {
+                // Show transactions
+                txContent.classList.remove('hidden');
+                txToggleBtn.classList.remove('hidden');
+                toggleIcon.className = 'fas fa-eye';
+                toggleText.textContent = 'Hide';
+                transactionsVisible = true;
+            }
         }
 
         async function ensureAuthenticated() {
@@ -759,6 +842,9 @@
             txSearchTerm = (e.target.value || '').toLowerCase();
             renderTransactions();
         });
+
+        // Toggle button functionality
+        document.getElementById('txToggleBtn')?.addEventListener('click', toggleTransactions);
 
         // Initialize
         ensureAuthenticated();
