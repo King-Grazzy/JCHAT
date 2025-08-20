@@ -185,6 +185,18 @@
             <div class="chip"><i class="fas fa-tag"></i> <span id="summaryAmount">₦0</span></div>
             <div class="chip"><i class="fas fa-palette"></i> <span id="summaryCount">0 themes</span></div>
           </div>
+          <div class="row" style="justify-content:space-between">
+            <div class="muted">Subtotal:</div>
+            <div id="summarySubtotal">₦0</div>
+          </div>
+          <div class="row" style="justify-content:space-between">
+            <div class="muted">Discount:</div>
+            <div id="summaryDiscount">₦0</div>
+          </div>
+          <div class="row" style="justify-content:space-between; font-weight:800">
+            <div>Total:</div>
+            <div id="summaryTotal">₦0</div>
+          </div>
           <div class="row">
             <div><strong>Order ID:</strong> <span id="orderId"></span></div>
             <button id="copyOrderId" class="copy"><i class="fas fa-copy"></i></button>
@@ -477,6 +489,9 @@
     const summaryAmount = document.getElementById('summaryAmount');
     const summaryCount = document.getElementById('summaryCount');
     const orderIdEl = document.getElementById('orderId');
+    const summarySubtotalEl = document.getElementById('summarySubtotal');
+    const summaryDiscountEl = document.getElementById('summaryDiscount');
+    const summaryTotalEl = document.getElementById('summaryTotal');
     const copyOrderIdBtn = document.getElementById('copyOrderId');
     const copyOpay = document.getElementById('copyOpay');
     const copyKeystone = document.getElementById('copyKeystone');
@@ -536,6 +551,14 @@
       return Array.from(document.querySelectorAll('.theme input[type="checkbox"]:checked')).map(i => i.value);
     }
     
+    function calcDiscount(totalNgn, qty) {
+      // Bulk discount tiers: 2+:5%, 3-4:10%, 5+:15%
+      if (qty >= 5) return Math.round(totalNgn * 0.15);
+      if (qty >= 3) return Math.round(totalNgn * 0.10);
+      if (qty >= 2) return Math.round(totalNgn * 0.05);
+      return 0;
+    }
+
     function updateSummary() {
       const selectedIds = getSelectedThemeIds();
       const selectedThemes = THEMES.filter(t => selectedIds.includes(t.id.toString()));
@@ -544,16 +567,24 @@
       const premiumThemes = selectedThemes.filter(t => !t.isFree && t.price > 0);
       const freeThemes = selectedThemes.filter(t => t.isFree || t.price === 0);
       
-      const totalInUSD = premiumThemes.reduce((sum, t) => sum + t.price, 0);
-      const totalInUserCurrency = convertPrice(totalInUSD, userCurrency.code);
+      const subtotalNgn = premiumThemes.reduce((sum, t) => sum + t.price, 0);
+      const discountNgn = calcDiscount(subtotalNgn, premiumThemes.length);
+      const totalNgn = Math.max(0, subtotalNgn - discountNgn);
+      const totalInUserCurrency = convertPrice(totalNgn, userCurrency.code);
       
       // Display summary with free vs premium breakdown
       if (premiumThemes.length > 0) {
         summaryAmount.textContent = `${userCurrency.symbol}${totalInUserCurrency}`;
         summaryCount.textContent = `${premiumThemes.length} premium theme(s)`;
+        summarySubtotalEl.textContent = `₦${subtotalNgn.toLocaleString()}`;
+        summaryDiscountEl.textContent = `₦${discountNgn.toLocaleString()}`;
+        summaryTotalEl.textContent = `₦${totalNgn.toLocaleString()}`;
       } else {
         summaryAmount.textContent = 'FREE';
         summaryCount.textContent = `${freeThemes.length} free theme(s)`;
+        summarySubtotalEl.textContent = '₦0';
+        summaryDiscountEl.textContent = '₦0';
+        summaryTotalEl.textContent = '₦0';
       }
       
       if (!orderIdEl.textContent) orderIdEl.textContent = generateOrderId();
@@ -660,8 +691,10 @@
         return;
       }
       
-      const totalInUSD = premiumThemes.reduce((sum, t) => sum + t.price, 0);
-      const totalInUserCurrency = convertPrice(totalInUSD, userCurrency.code);
+      const subtotalNgn = premiumThemes.reduce((sum, t) => sum + t.price, 0);
+      const discountNgn = calcDiscount(subtotalNgn, premiumThemes.length);
+      const totalNgn = Math.max(0, subtotalNgn - discountNgn);
+      const totalInUserCurrency = convertPrice(totalNgn, userCurrency.code);
       
       let uploadedReceiptUrl = null;
       if (selectedReceiptFile) {
@@ -703,9 +736,11 @@
           userId: currentUser.uid,
           userName: currentUser.displayName || 'Anonymous',
           paymentMethod: 'bank_transfer',
-          nairaAmount: totalInNaira,
+          nairaAmount: totalNgn,
           userCurrencyAmount: totalInUserCurrency,
           userCurrencyCode: userCurrency.code,
+          discountNgn: discountNgn,
+          subtotalNgn: subtotalNgn,
           jcoinAmount: 0,
           status: 'pending',
           timestamp: serverTimestamp(),
