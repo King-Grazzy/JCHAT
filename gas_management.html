@@ -1831,6 +1831,29 @@
                 </div>
             </div>
 
+            <div class="admin-section" id="walletUnlockRequestsSection">
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+                    <h2 style="margin:0;"><i class="fas fa-unlock"></i> Wallet Unlock Requests</h2>
+                    <button class="toggle-btn" aria-controls="walletUnlockRequestsContent" aria-expanded="true" data-section="walletUnlockRequestsSection">Hide</button>
+                </div>
+                <div id="walletUnlockRequestsContent">
+                    <h2><i class="fas fa-unlock"></i> Wallet Unlock Requests</h2>
+                    <div class="input-group orders-toolbar">
+                        <label for="walletUnlockStatusFilter" style="margin:0;">Filter:</label>
+                        <select id="walletUnlockStatusFilter">
+                            <option value="pending" selected>Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="all">All</option>
+                        </select>
+                        <input id="walletUnlockUserSearch" type="text" placeholder="Filter by User ID" style="flex:1;">
+                        <button id="walletUnlockSearchBtn" class="admin-button secondary"><span class="button-text">Search</span></button>
+                    </div>
+                    <div id="walletUnlockList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; width:100%;"></div>
+                    <p id="noWalletUnlockMessage" style="display:none; color:var(--text-light); text-align:center;">No wallet unlock requests to display.</p>
+                </div>
+            </div>
+
             <div class="admin-section" id="stickersCategoryUnlockSection">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
                     <h2 style="margin:0;"><i class="fas fa-face-smile"></i> Stickers Category Unlock</h2>
@@ -2050,6 +2073,15 @@
         const shopPaymentsList = document.getElementById('shopPaymentsList');
         const noShopPaymentsMessage = document.getElementById('noShopPaymentsMessage');
         let unsubscribeShopPaymentsListener = null;
+
+        // Wallet unlock requests elements
+        const walletUnlockRequestsSection = document.getElementById('walletUnlockRequestsSection');
+        const walletUnlockStatusFilter = document.getElementById('walletUnlockStatusFilter');
+        const walletUnlockUserSearch = document.getElementById('walletUnlockUserSearch');
+        const walletUnlockSearchBtn = document.getElementById('walletUnlockSearchBtn');
+        const walletUnlockList = document.getElementById('walletUnlockList');
+        const noWalletUnlockMessage = document.getElementById('noWalletUnlockMessage');
+        let unsubscribeWalletUnlockListener = null;
 
         // --- Global State Variables ---
         let currentUser = null;
@@ -4536,6 +4568,184 @@
 
         shopPaymentsStatusFilter?.addEventListener('change', subscribeShopPayments);
         shopPaymentsSearchBtn?.addEventListener('click', () => { subscribeShopPayments(); });
+
+        function renderWalletUnlockCard(requestId, req) {
+            const card = document.createElement('div');
+            card.className = 'management-card';
+            const ts = req.timestamp ? new Date(req.timestamp.toDate()).toLocaleString() : 'N/A';
+            const rUrl = req.paymentProof || req.receiptUrl || null;
+            const isPdf = rUrl && /\.pdf(\?|$)/i.test(rUrl);
+            const receipt = rUrl
+                ? (isPdf
+                    ? `<div style="margin-top:6px;padding:8px;border:1px solid var(--border-light);border-radius:10px;display:flex;align-items:center;gap:8px;font-size:12px;">
+                         <i class=\"fas fa-file-pdf\" style=\"color:#e11d48\"></i>
+                         <span>PDF receipt</span>
+                         <a href=\"${rUrl}\" target=\"_blank\" class=\"admin-button secondary\" style=\"margin-left:auto;text-decoration:none;\"><i class=\"fas fa-external-link-alt\"></i> Open</a>
+                       </div>`
+                    : `<img src="${rUrl}" alt="Receipt" style="width:100%;max-height:180px;object-fit:contain;border-radius:10px;border:1px solid var(--border-light);margin-top:6px;"/>`)
+                : '<div style="color:var(--text-light);">No receipt</div>';
+            card.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                    <div style="font-weight:700;">Wallet Unlock</div>
+                    <span style="opacity:.8;font-size:.85rem;">${req.status || 'pending'}</span>
+                </div>
+                <div style="margin-top:6px;color:var(--text-light);font-size:.9rem;">
+                    <div><strong>Request ID:</strong> ${requestId}</div>
+                    <div><strong>User:</strong> ${req.userId || 'N/A'}</div>
+                    <div><strong>Amount:</strong> ₦${(req.amountNaira||0).toLocaleString()}</div>
+                    <div><strong>When:</strong> ${ts}</div>
+                </div>
+                ${receipt}
+                <div class="order-actions" style="margin-top:10px;">
+                    <button class="admin-button" data-wu-action="approve" data-request-id="${requestId}"><span class="button-text">Approve & Unlock</span></button>
+                    <button class="admin-button secondary" data-wu-action="reject" data-request-id="${requestId}"><span class="button-text">Reject</span></button>
+                    ${rUrl ? `<a href="${rUrl}" target="_blank" class="admin-button secondary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-download"></i> Receipt</a>` : ''}
+                    ${req.userId ? `<button class="admin-button secondary" data-wu-action="lock" data-user-id="${req.userId}"><span class="button-text">Lock Wallet</span></button>` : ''}
+                </div>
+            `;
+            return card;
+        }
+
+        function subscribeWalletUnlockRequests() {
+            if (unsubscribeWalletUnlockListener) { unsubscribeWalletUnlockListener(); unsubscribeWalletUnlockListener = null; }
+            let qRef = collection(db, 'artifacts', appId, 'wallet_unlock_requests');
+            const status = walletUnlockStatusFilter?.value || 'pending';
+            const userQ = (walletUnlockUserSearch?.value || '').trim();
+            const constraints = [];
+            if (status !== 'all') { constraints.push(where('status', '==', status)); }
+            if (userQ) { constraints.push(where('userId', '==', userQ)); }
+            if (constraints.length > 0) { qRef = query(qRef, ...constraints); }
+            unsubscribeWalletUnlockListener = onSnapshot(qRef, (snap) => {
+                walletUnlockList.innerHTML = '';
+                if (snap.empty) {
+                    noWalletUnlockMessage.style.display = 'block';
+                } else {
+                    noWalletUnlockMessage.style.display = 'none';
+                    snap.forEach(docSnap => {
+                        const card = renderWalletUnlockCard(docSnap.id, docSnap.data());
+                        walletUnlockList.appendChild(card);
+                    });
+                }
+            }, (err) => {
+                console.error('JCHAT_ERROR: wallet unlock listener', err);
+                noWalletUnlockMessage.style.display = 'block';
+            });
+        }
+
+        walletUnlockStatusFilter?.addEventListener('change', subscribeWalletUnlockRequests);
+        walletUnlockSearchBtn?.addEventListener('click', () => { subscribeWalletUnlockRequests(); });
+
+        async function approveWalletUnlock(requestId, buttonEl) {
+            try {
+                if (!requestId) { showMessageBox('Invalid request.', 'error'); return; }
+                toggleButtonLoading(buttonEl, true);
+
+                const reqRef = doc(db, 'artifacts', appId, 'wallet_unlock_requests', requestId);
+                await runTransaction(db, async (tx) => {
+                    const reqSnap = await tx.get(reqRef);
+                    if (!reqSnap.exists()) { throw new Error('Request not found'); }
+                    const req = reqSnap.data();
+                    if (req.status === 'approved') { return; }
+                    if (req.status === 'rejected') { throw new Error('Request already rejected'); }
+                    const userId = req.userId;
+                    if (!userId) { throw new Error('Missing userId'); }
+
+                    const userProfileRef = doc(db, 'artifacts', appId, 'users', userId, 'profiles', 'user_profile');
+                    const userTxCol = collection(db, 'artifacts', appId, 'users', userId, 'transactions');
+
+                    tx.update(userProfileRef, { walletUnlocked: true, updatedAt: serverTimestamp() });
+                    tx.set(doc(userTxCol), {
+                        type: 'admin_wallet_unlock',
+                        amount: 0,
+                        description: 'Admin unlocked wallet (payment verified)',
+                        timestamp: serverTimestamp()
+                    });
+                    tx.update(reqRef, { status: 'approved', processedBy: ADMIN_UID, processedAt: serverTimestamp() });
+                });
+
+                showMessageBox('Wallet unlocked and request approved.', 'success');
+                playNotificationSound('success');
+            } catch (e) {
+                console.error('JCHAT_ERROR: approve wallet unlock', e);
+                showMessageBox(e?.message || 'Failed to approve request', 'error');
+                playNotificationSound('error');
+            } finally {
+                toggleButtonLoading(buttonEl, false);
+            }
+        }
+
+        async function rejectWalletUnlock(requestId, buttonEl) {
+            try {
+                if (!requestId) { showMessageBox('Invalid request.', 'error'); return; }
+                toggleButtonLoading(buttonEl, true);
+
+                const reqRef = doc(db, 'artifacts', appId, 'wallet_unlock_requests', requestId);
+                await runTransaction(db, async (tx) => {
+                    const reqSnap = await tx.get(reqRef);
+                    if (!reqSnap.exists()) { throw new Error('Request not found'); }
+                    const req = reqSnap.data();
+                    if (req.status === 'approved') { throw new Error('Request already approved'); }
+                    if (req.status === 'rejected') { return; }
+                    tx.update(reqRef, { status: 'rejected', processedBy: ADMIN_UID, processedAt: serverTimestamp() });
+                });
+
+                showMessageBox('Request rejected.', 'success');
+                playNotificationSound('success');
+            } catch (e) {
+                console.error('JCHAT_ERROR: reject wallet unlock', e);
+                showMessageBox(e?.message || 'Failed to reject request', 'error');
+                playNotificationSound('error');
+            } finally {
+                toggleButtonLoading(buttonEl, false);
+            }
+        }
+
+        async function lockUserWalletFromCard(userId, buttonEl) {
+            try {
+                if (!userId) { showMessageBox('Missing user.', 'error'); return; }
+                toggleButtonLoading(buttonEl, true);
+                const userProfileRef = doc(db, 'artifacts', appId, 'users', userId, 'profiles', 'user_profile');
+                const userTxCol = collection(db, 'artifacts', appId, 'users', userId, 'transactions');
+                await runTransaction(db, async (tx) => {
+                    tx.update(userProfileRef, { walletUnlocked: false, updatedAt: serverTimestamp() });
+                    tx.set(doc(userTxCol), {
+                        type: 'admin_wallet_lock',
+                        amount: 0,
+                        description: 'Admin locked wallet',
+                        timestamp: serverTimestamp()
+                    });
+                });
+                showMessageBox('Wallet locked for user.', 'success');
+                playNotificationSound('success');
+            } catch (e) {
+                console.error('JCHAT_ERROR: lock wallet', e);
+                showMessageBox(e?.message || 'Failed to lock wallet', 'error');
+                playNotificationSound('error');
+            } finally {
+                toggleButtonLoading(buttonEl, false);
+            }
+        }
+
+        walletUnlockRequestsSection?.addEventListener('click', (ev) => {
+            const btn = ev.target.closest('button.admin-button');
+            if (!btn) return;
+            const action = btn.dataset.wuAction;
+            if (action === 'approve') {
+                const id = btn.dataset.requestId;
+                approveWalletUnlock(id, btn);
+            } else if (action === 'reject') {
+                const id = btn.dataset.requestId;
+                rejectWalletUnlock(id, btn);
+            } else if (action === 'lock') {
+                const uid = btn.dataset.userId;
+                lockUserWalletFromCard(uid, btn);
+            }
+        });
+
+        if (walletUnlockList) {
+            // Load wallet unlock requests initially
+            try { subscribeWalletUnlockRequests(); } catch {}
+        }
 
         async function approveShopPayment(requestId, buttonEl) {
             try {
