@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JCHAT - JCoin Code Generator (Admin)</title>
+    <title>JCHAT - JCoin Store</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -563,58 +563,58 @@
     <main>
         <div class="content-wrapper">
             <div class="generator-card">
-                <h2>JCoin Code Generator (Admin)</h2>
-
-                <!-- User ID Verification Section -->
-                <div class="form-group">
-                    <label for="targetUserId">Enter User ID (Recipient to Verify)</label>
-                    <input type="text" id="targetUserId" placeholder="Paste user ID here (e.g., 123abcDEF456)">
-                    <button type="button" class="action-button" id="verifyUserButton" style="margin-top: 10px;">
-                        <i class="fas fa-search"></i> Verify User & Balance
-                    </button>
-                </div>
-
-                <div class="info-section" id="targetUserInfo" style="display: none;">
+                <h2>Buy JCoins</h2>
+                <div class="info-section">
                     <div class="info-item">
-                        <div class="label">Recipient Username</div>
-                        <div class="value" id="recipientUsername">N/A</div>
+                        <div class="label">Your JCoins</div>
+                        <div class="value" id="currentJCoins">0</div>
                     </div>
                     <div class="info-item">
-                        <div class="label">Recipient JCoins</div>
-                        <div class="value" id="recipientJCoins">0</div>
+                        <div class="label">Rate (₦ per J)</div>
+                        <div class="value" id="nairaPerJ">0</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Order ID</div>
+                        <div class="value" id="orderIdValue">—</div>
                     </div>
                 </div>
 
-                <!-- JCoin Code Generation Section -->
-                <form id="generateCodeForm">
+                <form id="buyJcoinsForm">
                     <div class="form-group">
-                        <label for="jcoinAmount">Select JCoin Amount to Generate</label>
-                        <select id="jcoinAmount" required>
-                            <option value="">-- Select Amount --</option>
-                            <option value="200">₦200 (200 JCoins)</option>
-                            <option value="500">₦500 (500 JCoins)</option>
-                            <option value="1000">₦1,000 (1,000 JCoins)</option>
-                            <option value="2000">₦2,000 (2,000 JCoins)</option>
-                            <option value="5000">₦5,000 (5,000 JCoins)</option>
-                            <option value="10000">₦10,000 (10,000 JCoins)</option>
-                            <option value="20000">₦20,000 (20,000 JCoins)</option>
-                            <option value="50000">₦50,000 (50,000 JCoins)</option>
-                            <option value="100000">₦100,000 (100,000 JCoins)</option>
+                        <label for="jcoinBuyAmount">JCoins to buy</label>
+                        <select id="jcoinBuyAmount" required>
+                            <option value="">-- Select --</option>
+                            <option value="200">200</option>
+                            <option value="500">500</option>
+                            <option value="1000">1,000</option>
+                            <option value="2000">2,000</option>
+                            <option value="5000">5,000</option>
+                            <option value="10000">10,000</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="senderId">Optional: Sender ID (e.g., your ID or another user's ID)</label>
-                        <input type="text" id="senderId" placeholder="Leave empty for no sender, or enter an ID">
+                        <label>Pay via Bank Transfer (NGN)</label>
+                        <div class="info-section" style="gap:12px;">
+                            <div class="info-item">
+                                <div class="label">OPay</div>
+                                <div class="value"><span id="acctOpay">8111609765</span></div>
+                            </div>
+                            <div class="info-item">
+                                <div class="label">Keystone</div>
+                                <div class="value"><span id="acctKeystone">6042862356</span></div>
+                            </div>
+                        </div>
                     </div>
-                    <button type="submit" class="action-button" id="generateCodeButton">
-                        <i class="fas fa-plus-circle"></i> Generate JCoin Code
+                    <div class="form-group">
+                        <label for="receiptInput">Receipt (optional)</label>
+                        <input type="file" id="receiptInput" accept="image/*,.pdf">
+                    </div>
+                    <button type="submit" class="action-button" id="submitBuyBtn">
+                        <i class="fas fa-shopping-cart"></i> Submit Request
                     </button>
                 </form>
 
-                <div class="generated-code-display" id="generatedCodeDisplay">
-                    <span>Generated Code: <strong id="generatedCodeValue"></strong></span>
-                    <button id="copyCodeButton" title="Copy to Clipboard"><i class="fas fa-copy"></i></button>
-                </div>
+                <div class="generated-code-display" id="buyResult" style="display:none;"></div>
             </div>
         </div>
     </main>
@@ -623,13 +623,12 @@
     <div id="messageBox"></div>
 
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { userCurrency, setUserCurrencyFromProfile, inferCountryCodeFromProfileOrLocale } from "./currency.js";
+        import { getAuth, onAuthStateChanged, signOut, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+        import { userCurrency, setUserCurrencyFromProfile } from "./currency.js";
 
-        // --- Firebase & Canvas Environment Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
             authDomain: "jchat-1.firebaseapp.com",
@@ -641,19 +640,12 @@
         };
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const cloudinaryConfig = { cloudName: "dxld01rcp", uploadPreset: "Storage_preset" };
 
-        // Cloudinary Configuration (needed for header profile pic)
-        const cloudinaryConfig = {
-            cloudName: "dxld01rcp", // Replace with your actual Cloudinary Cloud Name
-            uploadPreset: "Storage_preset" // Replace with your actual unsigned upload preset
-        };
-
-        // Initialize Firebase services
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- DOM Elements ---
         const headerProfilePic = document.getElementById('headerProfilePic');
         const headerAvatarIcon = document.getElementById('headerAvatarIcon');
         const headerDisplayName = document.getElementById('headerDisplayName');
@@ -661,465 +653,141 @@
         const messageBox = document.getElementById('messageBox');
         const backButton = document.getElementById('backButton');
 
-        // Generator Panel Elements
-        const targetUserIdInput = document.getElementById('targetUserId');
-        const verifyUserButton = document.getElementById('verifyUserButton');
-        const targetUserInfoDiv = document.getElementById('targetUserInfo');
-        const recipientUsernameDisplay = document.getElementById('recipientUsername');
-        const recipientJCoinsDisplay = document.getElementById('recipientJCoins');
-        const generateCodeForm = document.getElementById('generateCodeForm');
-        const jcoinAmountSelect = document.getElementById('jcoinAmount');
-        const senderIdInput = document.getElementById('senderId'); // New sender ID input
-        const generateCodeButton = document.getElementById('generateCodeButton');
-        const generatedCodeDisplay = document.getElementById('generatedCodeDisplay');
-        const generatedCodeValue = document.getElementById('generatedCodeValue');
-        const copyCodeButton = document.getElementById('copyCodeButton');
+        // Store elements
+        const currentJCoinsEl = document.getElementById('currentJCoins');
+        const nairaPerJEl = document.getElementById('nairaPerJ');
+        const orderIdValueEl = document.getElementById('orderIdValue');
+        const buyForm = document.getElementById('buyJcoinsForm');
+        const jcoinBuyAmountSelect = document.getElementById('jcoinBuyAmount');
+        const receiptInput = document.getElementById('receiptInput');
+        const submitBuyBtn = document.getElementById('submitBuyBtn');
+        const buyResult = document.getElementById('buyResult');
 
-        // --- Global State ---
-        let currentUser = null; // The currently authenticated user (Firebase Auth object)
-        let currentUserProfileData = null; // The private profile data of the currently authenticated user (Firestore)
-        let recipientUserData = null; // Data for the verified recipient user (for display only)
+        let currentUser = null;
+        let currentUserProfileData = null;
+        let orderId = null;
 
-        // --- Utility Functions ---
-
-        /**
-         * Displays a temporary message box with a given message and type.
-         * @param {string} message - The message to display.
-         * @param {string} type - The type of message ('success', 'error', 'info').
-         * @param {boolean} [isPersistent=false] - If true, message stays until explicitly cleared or replaced.
-         */
-        function showMessageBox(message, type, isPersistent = false) {
-            if (messageBox.timeoutId) {
-                clearTimeout(messageBox.timeoutId);
-                messageBox.timeoutId = null;
-            }
-
-            messageBox.textContent = message;
-            messageBox.className = '';
-            messageBox.classList.add(type);
-
-            if (type === 'info' && isPersistent) {
-                messageBox.classList.add('loading-pulse');
-            } else {
-                messageBox.classList.remove('loading-pulse');
-            }
-
-            messageBox.style.display = 'block';
-            messageBox.style.opacity = '1';
-
-            if (!isPersistent) {
-                messageBox.timeoutId = setTimeout(() => {
-                    messageBox.style.opacity = '0';
-                    messageBox.addEventListener('transitionend', function handler() {
-                        messageBox.style.display = 'none';
-                        messageBox.removeEventListener('transitionend', handler);
-                        messageBox.classList.remove('loading-pulse');
-                    }, { once: true });
-                }, 3000);
-            }
+        function showMessage(text, type='info') {
+            showMessageBox(text, type);
         }
 
-        /**
-         * Constructs a Cloudinary URL for an image/video.
-         * @param {string} urlOrPublicId - The full Cloudinary URL or the public ID of the image on Cloudinary.
-         * @param {string} transformations - Optional Cloudinary transformations.
-         * @returns {string|null} The full Cloudinary URL or null if urlOrPublicId is not provided.
-         */
-        function getCloudinaryImageUrl(urlOrPublicId, transformations = "w_auto,f_auto,q_auto") {
-            if (!urlOrPublicId) return null;
-            if (urlOrPublicId.startsWith('http://') || urlOrPublicId.startsWith('https://')) {
-                return urlOrPublicId;
-            }
-            return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${transformations}/${urlOrPublicId}`;
+        function generateOrderId() {
+            return 'ORD-' + Math.random().toString(36).slice(2, 8).toUpperCase();
         }
 
-        /**
-         * Displays the profile picture or a default icon.
-         * @param {HTMLElement} imgElement - The <img> element to update.
-         * @param {HTMLElement} iconElement - The <i> element to display if no image.
-         * @param {string|null} profilePicId - The Cloudinary public ID or URL, or null.
-         * @param {string} usernameInitial - Initial for placeholder.
-         * @param {string} transformations - Cloudinary transformations.
-         */
-        function displayProfilePicture(imgElement, iconElement, profilePicId, usernameInitial, transformations) {
-            if (profilePicId) {
-                const imageUrl = getCloudinaryImageUrl(profilePicId, transformations);
-                imgElement.src = imageUrl;
-                imgElement.style.display = 'block';
-                iconElement.style.display = 'none';
-                imgElement.onerror = () => {
-                    console.error(`Failed to load profile picture: ${profilePicId}. Using placeholder.`);
-                    imgElement.src = `https://placehold.co/120x120/CCCCCC/000000?text=${usernameInitial}`;
-                    imgElement.style.display = 'block';
-                    iconElement.style.display = 'none';
-                };
-            } else {
-                imgElement.src = '';
-                imgElement.style.display = 'none';
-                iconElement.style.display = 'block';
-            }
+        async function uploadReceipt(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', cloudinaryConfig.uploadPreset);
+            const resp = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/auto/upload`, { method: 'POST', body: formData });
+            if (!resp.ok) throw new Error('Receipt upload failed');
+            const data = await resp.json();
+            return data.secure_url;
         }
 
-        /**
-         * Handles user logout.
-         */
-        async function handleLogout() {
+        async function getUserProfile(userId) {
+            const ref = doc(db, "artifacts", appId, "users", userId, "profiles", "user_profile");
+            const snap = await getDoc(ref);
+            if (!snap.exists()) {
+                const base = { jCoins: 0, level: 1, currentXp: 0, xpToNextLevel: 100, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+                await setDoc(ref, base, { merge: true });
+                return base;
+            }
+            return snap.data();
+        }
+
+        async function submitBuyRequest(e) {
+            e.preventDefault();
+            if (!currentUser) { showMessage('Please log in.', 'error'); return; }
+            const amountJ = parseInt(jcoinBuyAmountSelect.value, 10);
+            if (!amountJ || amountJ <= 0) { showMessage('Select a valid amount.', 'error'); return; }
+            submitBuyBtn.disabled = true;
+            showMessage('Submitting request…', 'info');
+
+            let receiptUrl = null;
             try {
-                await signOut(auth);
-                showMessageBox("Logged out successfully!", 'success');
-                setTimeout(() => {
-                    window.location.href = '/login.html';
-                }, 1000);
-            } catch (error) {
-                console.error("Error logging out:", error);
-                showMessageBox("Failed to log out. Please try again.", 'error');
-            }
-        }
-
-        /**
-         * Fetches and displays the current user's profile data for the header.
-         * This function also handles initial profile creation if it doesn't exist.
-         * @param {firebase.User} user - The authenticated Firebase user object.
-         */
-        async function fetchAndDisplayHeaderProfile(user) {
-            try {
-                const privateProfileDocRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
-                const privateDocSnap = await getDoc(privateProfileDocRef);
-
-                let profileData = null;
-
-                if (privateDocSnap.exists()) {
-                    profileData = privateDocSnap.data();
-                } else {
-                    // If private profile doesn't exist, create a basic one
-                    profileData = {
-                        username: user.displayName || "JCHAT User",
-                        email: user.email || "", // Ensure email is always stored
-                        fullName: "",
-                        profilePicId: user.photoURL || null,
-                        bio: "",
-                        location: "",
-                        country: "",
-                        state: "",
-                        school: "",
-                        work: "",
-                        hobbies: "",
-                        feelings: "",
-                        bestSong: "",
-                        bestMovie: "",
-                        phoneNumber: "",
-                        friendsCount: 0,
-                        followersCount: 0,
-                        followingCount: 0,
-                        totalPosts: 0,
-                        createdAt: serverTimestamp(),
-                        updatedAt: serverTimestamp(),
-                        inspirationType: "motivational",
-                        // Initialize lastFieldUpdateTimestamps map
-                        lastFieldUpdateTimestamps: {
-                            profilePicId: null,
-                            fullName: null,
-                            username: null,
-                            bio: null,
-                            location: null,
-                            country: null,
-                            state: null,
-                            school: null,
-                            work: null,
-                            hobbies: null,
-                            feelings: null,
-                            bestSong: null,
-                            bestMovie: null,
-                            phoneNumber: null,
-                            inspirationType: null
-                        },
-                        lastEmailUpdateTimestamp: null, // Initial email update timestamp
-                        visibility: { // Default visibility settings: core public, all additional fields private
-                            displayName: true,
-                            profilePic: true,
-                            friendsCount: true,
-                            followersCount: true,
-                            followingCount: true,
-                            totalPosts: true,
-                            email: true, // Email is always public by default for new users
-                            // All other additional fields default to false (private) for new users
-                            fullName: false,
-                            bio: false,
-                            location: false,
-                            country: false,
-                            state: false,
-                            school: false,
-                            work: false,
-                            hobbies: false,
-                            feelings: false,
-                            bestSong: false,
-                            bestMovie: false,
-                            phoneNumber: false,
-                            inspirationType: false,
-                            lastOnline: false,
-                            allowFriendRequests: true, // These are operational settings, not display fields
-                            allowMessages: true,     // These are operational settings, not display fields
-                        },
-                    };
-                    await setDoc(privateProfileDocRef, profileData);
-
-                    // Also create/update public profile
-                    const publicProfileDocRef = doc(db, "artifacts", appId, "public", "data", "users", user.uid);
-                    await setDoc(publicProfileDocRef, {
-                        username: profileData.username,
-                        fullName: profileData.fullName,
-                        profilePicId: profileData.profilePicId,
-                        email: profileData.email, // Always include email in public profile
-                        bio: profileData.bio,
-                        location: profileData.location,
-                        country: profileData.country,
-                        state: profileData.state,
-                        school: profileData.school,
-                        work: profileData.work,
-                        hobbies: profileData.hobbies,
-                        feelings: profileData.feelings,
-                        bestSong: profileData.bestSong,
-                        bestMovie: profileData.bestMovie,
-                        phoneNumber: profileData.phoneNumber,
-                        friendsCount: profileData.friendsCount,
-                        followersCount: profileData.followersCount,
-                        followingCount: profileData.followingCount,
-                        totalPosts: profileData.totalPosts,
-                        createdAt: profileData.createdAt,
-                        updatedAt: profileData.updatedAt,
-                        inspirationType: profileData.inspirationType,
-                        visibility: profileData.visibility,
-                    });
+                if (receiptInput.files && receiptInput.files[0]) {
+                    receiptUrl = await uploadReceipt(receiptInput.files[0]);
                 }
-
-                currentUserProfileData = profileData; // Store the full private profile data
-                // Update header profile link (always show current user's header info)
-                displayProfilePicture(headerProfilePic, headerAvatarIcon, profileData?.profilePicId, (profileData.username || "J").charAt(0).toUpperCase(), "w_70,h_70,c_fill,g_face,r_max");
-                headerDisplayName.textContent = profileData.username || "JCHAT User";
-
-                // Update profile link to include user ID
-                document.getElementById('profileLink').href = `/profile.html?userId=${user.uid}`;
-
-            } catch (error) {
-                console.error("Error fetching or creating profile for header:", error);
-                // Fallback to Firebase Auth data if Firestore fetch fails for header
-                displayProfilePicture(headerProfilePic, headerAvatarIcon, user.photoURL, (user.displayName || "J").charAt(0).toUpperCase(), "w_70,h_70,c_fill,g_face,r_max");
-                headerDisplayName.textContent = user.displayName || "JCHAT User";
-                showMessageBox(`Error loading header profile: ${error.message}`, 'error');
-            }
-        }
-
-        /**
-         * Fetches user progress from Firestore. If it doesn't exist, initializes it.
-         * @param {string} userId - The ID of the user whose progress to fetch.
-         * @returns {Promise<object>} The user's progress data.
-         */
-        async function getUserProgressFromFirestore(userId) {
-            const userProgressDocRef = doc(db, "artifacts", appId, "users", userId, "user_progress", "progress_document");
-            const docSnap = await getDoc(userProgressDocRef);
-
-            if (docSnap.exists()) {
-                return docSnap.data();
-            } else {
-                const defaultProgress = {
-                    jCoins: 0,
-                    level: 1,
-                    xp: 0,
-                    lastLogin: serverTimestamp()
-                };
-                await setDoc(userProgressDocRef, defaultProgress);
-                return defaultProgress;
-            }
-        }
-
-        /**
-         * Verifies a target user's ID and fetches their JCoin balance and username.
-         * This is for admin to view recipient's balance before generating a code.
-         */
-        async function verifyUserAndBalance() {
-            const targetUserId = targetUserIdInput.value.trim();
-            if (!targetUserId) {
-                showMessageBox("Please enter a User ID to verify.", "error");
-                return;
-            }
-
-            showMessageBox("Verifying user...", "info", true);
-            verifyUserButton.disabled = true;
+            } catch (_) {}
 
             try {
-                // Fetch public profile for username
-                const publicProfileDocRef = doc(db, "artifacts", appId, "public", "data", "users", targetUserId);
-                const publicDocSnap = await getDoc(publicProfileDocRef);
-
-                if (!publicDocSnap.exists()) {
-                    showMessageBox("User not found.", "error");
-                    targetUserInfoDiv.style.display = 'none';
-                    recipientUserData = null;
-                    return;
-                }
-
-                const publicProfileData = publicDocSnap.data();
-                const recipientUsername = publicProfileData.username || "Unknown User";
-
-                // Fetch user progress for JCoins
-                const recipientProgress = await getUserProgressFromFirestore(targetUserId);
-
-                recipientUserData = {
-                    userId: targetUserId,
-                    username: recipientUsername,
-                    jCoins: recipientProgress.jCoins
+                const reqId = orderId || generateOrderId();
+                const ref = doc(collection(db, 'artifacts', appId, 'coin_requests'));
+                const payload = {
+                    requestId: reqId,
+                    requesterId: currentUser.uid,
+                    requestedCoins: amountJ,
+                    status: 'Pending',
+                    timestamp: serverTimestamp(),
+                    ...(receiptUrl ? { paymentProof: receiptUrl } : {})
                 };
-
-                recipientUsernameDisplay.textContent = recipientUsername;
-                recipientJCoinsDisplay.textContent = recipientProgress.jCoins;
-                targetUserInfoDiv.style.display = 'flex'; // Show the info section
-
-                showMessageBox(`User "${recipientUsername}" verified.`, "success");
-
-            } catch (error) {
-                console.error("Error verifying user:", error);
-                showMessageBox(`Error verifying user: ${error.message}`, "error");
-                targetUserInfoDiv.style.display = 'none';
-                recipientUserData = null;
+                await setDoc(ref, payload);
+                orderId = generateOrderId();
+                orderIdValueEl.textContent = orderId;
+                buyResult.style.display = 'flex';
+                buyResult.textContent = `Request submitted. Developer will approve and your JCoins will be credited immediately.`;
+                showMessage('Request submitted. Await approval.', 'success');
+                buyForm.reset();
+            } catch (err) {
+                showMessage(err?.message || 'Failed to submit request', 'error');
             } finally {
-                verifyUserButton.disabled = false;
+                submitBuyBtn.disabled = false;
             }
         }
 
-        /**
-         * Generates a unique JCoin code and stores it in Firestore as unused.
-         */
-        async function handleGenerateCode(event) {
-            event.preventDefault();
-
-            if (!currentUser) {
-                showMessageBox("Please log in to generate JCoins.", "error");
-                return;
-            }
-
-            const jcoinAmount = parseInt(jcoinAmountSelect.value, 10);
-            const senderId = senderIdInput.value.trim() || null; // Get optional sender ID
-
-            if (isNaN(jcoinAmount) || jcoinAmount <= 0) {
-                showMessageBox("Please select a valid JCoin amount.", "error");
-                return;
-            }
-
-            generateCodeButton.disabled = true;
-            showMessageBox("Generating JCoin code...", "info", true);
-            generatedCodeDisplay.style.display = 'none'; // Hide previous code
-
-            try {
-                // Generate a unique code
-                const generatedCode = `JCOIN-${crypto.randomUUID().substring(0, 8).toUpperCase()}`;
-                const codeDocRef = doc(db, "artifacts", appId, "public", "data", "jcoin_codes", generatedCode);
-
-                // Store the generated code as unused in Firestore
-                await setDoc(codeDocRef, {
-                    code: generatedCode,
-                    value: jcoinAmount,
-                    generatedBy: currentUser.uid,
-                    senderId: senderId, // Store the optional sender ID
-                    generatedAt: serverTimestamp(),
-                    status: "unused",
-                    usedBy: null,
-                    usedAt: null
-                });
-
-                generatedCodeValue.textContent = generatedCode;
-                generatedCodeDisplay.style.display = 'flex'; // Show the generated code
-
-                showMessageBox(`JCoin code generated successfully! Share this code: ${generatedCode}`, "success", true);
-                generateCodeForm.reset(); // Clear form
-                targetUserInfoDiv.style.display = 'none'; // Hide recipient info after generation
-                recipientUserData = null; // Clear recipient data
-
-            } catch (error) {
-                console.error("Error during JCoin code generation:", error);
-                showMessageBox(`Code generation failed: ${error.message}`, "error");
-            } finally {
-                generateCodeButton.disabled = false;
-            }
-        }
-
-        /**
-         * Copies the generated code to the clipboard.
-         */
-        function copyGeneratedCode() {
-            const codeToCopy = generatedCodeValue.textContent;
-            if (codeToCopy) {
-                // Use document.execCommand('copy') for better compatibility in iframes
-                const textArea = document.createElement("textarea");
-                textArea.value = codeToCopy;
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    showMessageBox("Code copied to clipboard!", "success");
-                } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                    showMessageBox("Failed to copy code. Please copy manually.", "error");
-                }
-                document.body.removeChild(textArea);
-            }
-        }
-
-
-        // --- Event Listeners ---
-
-        // Authentication state listener
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 try {
                     await fetchAndDisplayHeaderProfile(user);
-                    // Infer currency and adjust labels if needed
-                    setUserCurrencyFromProfile(currentUserProfileData || {});
-                    if (userCurrency.code !== 'NGN' && jcoinAmountSelect) {
-                        // Update select option labels to remove ₦ prefix but keep NGN notion
-                        Array.from(jcoinAmountSelect.options).forEach(opt => {
-                            if (!opt.value) return;
-                            const num = Number(opt.value).toLocaleString();
-                            opt.textContent = `${num} (NGN) (${num} JCoins)`;
-                        });
-                    }
+                    const prof = await getUserProfile(user.uid);
+                    currentUserProfileData = prof;
+                    currentJCoinsEl.textContent = String(prof?.jCoins || 0);
+                    try {
+                        const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
+                        const s = await getDoc(settingsRef);
+                        const rate = s.exists() ? (s.data().jcoinNairaRate || 0) : 0;
+                        nairaPerJEl.textContent = String(rate);
+                    } catch (_) { nairaPerJEl.textContent = '—'; }
+                    setUserCurrencyFromProfile(prof || {});
+                    orderId = generateOrderId();
+                    orderIdValueEl.textContent = orderId;
                 } catch (error) {
-                    displayProfilePicture(headerProfilePic, headerAvatarIcon, user.photoURL, (user.displayName || "J").charAt(0).toUpperCase(), "w_70,h_70,c_fill,g_face,r_max");
-                    headerDisplayName.textContent = user.displayName || "JCHAT User";
-                    showMessageBox(`Error loading header profile: ${error.message}`, 'error');
+                    displayProfilePicture(headerProfilePic, headerAvatarIcon, user.photoURL, (user.displayName || 'J').charAt(0).toUpperCase(), 'w_70,h_70,c_fill,g_face,r_max');
+                    headerDisplayName.textContent = user.displayName || 'JCHAT User';
+                    showMessage(`Error loading header profile: ${error.message}`, 'error');
                 }
             } else {
                 currentUser = null;
-                headerDisplayName.textContent = "Guest";
+                headerDisplayName.textContent = 'Guest';
                 headerAvatarIcon.style.display = 'block';
                 headerProfilePic.style.display = 'none';
+                // Anonymous sign-in for access
+                try {
+                    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (_) {}
             }
         });
 
-        // Logout button
         logoutButton.addEventListener('click', handleLogout);
+        buyForm.addEventListener('submit', submitBuyRequest);
 
-        // Verify User button
-        verifyUserButton.addEventListener('click', verifyUserAndBalance);
-
-        // Generate Code form submission
-        generateCodeForm.addEventListener('submit', handleGenerateCode);
-
-        // Copy Code button
-        copyCodeButton.addEventListener('click', copyGeneratedCode);
-
-        // Apply theme on load (consistent with other pages)
         document.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('jchat-theme');
             if (savedTheme && ['theme-light-mode', 'theme-dark-mode'].includes(savedTheme)) {
                 document.body.classList.remove('theme-light-mode', 'theme-dark-mode');
                 document.body.classList.add(savedTheme);
             } else {
-                document.body.classList.add('theme-dark-mode'); // Default
+                document.body.classList.add('theme-dark-mode');
             }
         });
 
-        // Listen for theme changes from other tabs/windows (consistent with other pages)
         window.addEventListener('storage', (event) => {
             if (event.key === 'jchat-theme') {
                 const newTheme = event.newValue || 'theme-dark-mode';
@@ -1130,10 +798,9 @@
             }
         });
 
-        // Smart Back Button Event Listener
         if (backButton) {
             backButton.addEventListener('click', () => {
-                window.history.back(); // Go back to the previous page (likely profile.html)
+                window.history.back();
             });
         }
 
