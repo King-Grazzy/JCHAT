@@ -215,6 +215,7 @@
         let currentUser = null;
         let currentProfile = null;
         let paymentContext = null; // { type: 'unlock'|'premium', amount: number, tier?: string }
+        let overlayTimer = null;
 
         function showToast(message, type = 'info') {
             toast.textContent = message; toast.className = `msg show ${type}`;
@@ -230,21 +231,12 @@
         async function ensureAuthenticated() {
             try {
                 if (auth.currentUser) return;
-                authState.textContent = 'Signing in…';
+                authState.textContent = 'Checking session…';
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
                 }
             } catch (e) {
                 console.error('Auth error', e);
-                authState.textContent = 'Sign-in required';
-                const code = (e && e.code) ? String(e.code) : '';
-                if (code.includes('admin-restricted-operation') || code.includes('operation-not-allowed')) {
-                    authOverlay.style.display = 'grid';
-                } else {
-                    setTimeout(() => { if (!auth.currentUser) ensureAuthenticated(); }, 1200);
-                }
             }
         }
 
@@ -461,12 +453,15 @@
             if (user) {
                 currentUser = user;
                 authState.textContent = 'Signed in';
+                if (overlayTimer) { try { clearTimeout(overlayTimer); } catch {} overlayTimer = null; }
                 authOverlay.style.display = 'none';
                 await loadProfile();
                 renderOverview();
                 await renderTransactions();
             } else {
                 authState.textContent = 'Guest';
+                if (overlayTimer) { try { clearTimeout(overlayTimer); } catch {} }
+                overlayTimer = setTimeout(() => { if (!auth.currentUser) authOverlay.style.display = 'grid'; }, 1500);
             }
         });
 
