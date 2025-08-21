@@ -1492,6 +1492,16 @@
                             <button id="clearDataBtn" class="btn danger">Clear All Data</button>
                         </div>
                     </div>
+
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label>Clear Transactions</label>
+                            <span class="setting-description">Delete all your wallet transactions from the cloud</span>
+                        </div>
+                        <div class="setting-control">
+                            <button id="clearTransactionsBtn" class="btn danger">Clear Transactions</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1546,7 +1556,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, runTransaction, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, runTransaction, query, orderBy, limit, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
@@ -1946,6 +1956,34 @@
                 localStorage.clear();
                 showToast('All data cleared', 'success');
                 location.reload();
+            }
+        }
+
+        // Clear all transactions from Firestore (batched)
+        async function clearAllTransactions() {
+            if (!currentUser) { showToast('You must be signed in', 'error'); return; }
+            const sure = confirm('Delete ALL your wallet transactions? This cannot be undone.');
+            if (!sure) return;
+            try {
+                const txCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions');
+                // Fetch in batches (e.g., 200 each)
+                let deleted = 0;
+                while (true) {
+                    const qSnap = await getDocs(query(txCol, orderBy('timestamp','desc'), limit(200)));
+                    if (qSnap.empty) break;
+                    const batch = writeBatch(db);
+                    qSnap.forEach(docSnap => batch.delete(docSnap.ref));
+                    await batch.commit();
+                    deleted += qSnap.size;
+                    if (qSnap.size < 200) break;
+                }
+                showToast(`Deleted ${deleted} transactions`, 'success');
+                // Refresh UI
+                await renderTransactions();
+                updateStats(0,0,0);
+            } catch (e) {
+                console.error('Clear transactions error:', e);
+                showToast('Failed to clear transactions', 'error');
             }
         }
 
@@ -2449,6 +2487,9 @@
 
             // Clear data button
             document.getElementById('clearDataBtn')?.addEventListener('click', clearData);
+
+            // Clear transactions button
+            document.getElementById('clearTransactionsBtn')?.addEventListener('click', clearAllTransactions);
         });
     </script>
 </body>
