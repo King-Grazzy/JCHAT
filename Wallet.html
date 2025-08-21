@@ -1804,18 +1804,48 @@
             localStorage.setItem('jchat-wallet-settings', JSON.stringify(walletSettings));
         }
 
+        // Capture and apply theme variables for real dark mode
+        const THEME_VARS = ['--bg-primary','--bg-secondary','--bg-tertiary','--text-primary','--text-secondary','--text-muted','--border','--border-light','--primary','--primary-dark','--secondary'];
+        const defaultThemeVars = {};
+        (function captureDefaultVars(){
+            const cs = getComputedStyle(document.documentElement);
+            THEME_VARS.forEach(v=>{ defaultThemeVars[v] = cs.getPropertyValue(v).trim(); });
+        })();
+        function applyVarMap(map){
+            const root = document.documentElement;
+            Object.entries(map).forEach(([k,v])=>{ root.style.setProperty(k, v); });
+        }
+        function resetToDefaultVars(){ applyVarMap(defaultThemeVars); }
+
         function setTheme(name) {
             const root = document.documentElement;
             if (name === 'gemini') {
+                resetToDefaultVars();
                 root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #ff7ac6 0%, #6aa7ff 100%)');
                 document.body.style.background = 'linear-gradient(180deg, rgba(255,122,198,0.12) 0%, rgba(106,167,255,0.12) 100%)';
             } else if (name === 'dark') {
+                // Real dark mode: set a comprehensive dark palette
+                applyVarMap({
+                    '--bg-primary': '#0b1220',
+                    '--bg-secondary': '#0a0f1a',
+                    '--bg-tertiary': '#111827',
+                    '--text-primary': '#e5e7eb',
+                    '--text-secondary': '#cbd5e1',
+                    '--text-muted': '#94a3b8',
+                    '--border': '#1f2937',
+                    '--border-light': '#374151',
+                    '--primary': '#6aa7ff',
+                    '--primary-dark': '#3a7bff',
+                    '--secondary': '#ff7ac6'
+                });
                 root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #0ea5e9 0%, #a855f7 100%)');
                 document.body.style.background = 'linear-gradient(180deg, rgba(14,165,233,0.08) 0%, rgba(168,85,247,0.08) 100%)';
             } else if (name === 'light') {
+                resetToDefaultVars();
                 root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
                 document.body.style.background = 'var(--bg-secondary)';
             } else {
+                resetToDefaultVars();
                 root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
                 document.body.style.background = 'var(--bg-secondary)';
             }
