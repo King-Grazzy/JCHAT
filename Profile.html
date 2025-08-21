@@ -3406,7 +3406,7 @@
                         </button>
                     </p>
                     
-                    <p id="profileLocation" class="profile-info-item" style="display: none;"><i class="fas fa-map-marker-alt"></i> <span id="locationText"></span></p>
+                    <!-- profileLocation removed per request -->
                     <p id="profileEmail" class="profile-info-item" style="display: none;"><i class="fas fa-envelope"></i> <span id="emailText"></span></p>
                     
                     <!-- New Profile Information Fields -->
@@ -3419,10 +3419,8 @@
                     <p id="profileLanguage" class="profile-info-item" style="display: none;"><i class="fas fa-language"></i> <span id="languageText"></span></p>
                     <p id="profileTimezone" class="profile-info-item" style="display: none;"><i class="fas fa-clock"></i> <span id="timezoneText"></span></p>
                     
-                    <p id="profileSchool" class="profile-info-item" style="display: none;"><i class="fas fa-graduation-cap"></i> <span id="schoolText"></span></p>
-                    <p id="profileWork" class="profile-info-item" style="display: none;"><i class="fas fa-briefcase"></i> <span id="workText"></span></p>
-                    <p id="profileWebsite" class="profile-info-item" style="display: none;"><i class="fas fa-globe"></i> <a id="websiteLink" href="#" target="_blank" rel="noopener noreferrer" class="gradient-text"></a></p>
-                    <p id="profileSocialLinks" class="profile-info-item" style="display: none;"><i class="fas fa-share-alt"></i> <span id="socialLinksText"></span></p>
+                    <!-- profileSchool removed per request -->
+                    <!-- profileWork, profileWebsite, profileSocialLinks removed per request -->
 
                     <!-- NEW: Level Info Display -->
                     <div class="profile-level-info">
@@ -3781,15 +3779,14 @@
         const editProfilePicOverlay = document.getElementById('editProfilePicOverlay');
 
         const profileUsername = document.getElementById('profileUsername'); // H2 element for username
-        const profileBio = document.getElementById('profileBio');
+        // profileBio removed per request
         
         // NEW: User ID elements
         const profileUserId = document.getElementById('profileUserId'); // P element container
         const userIdText = document.getElementById('userIdText'); // Span for User ID text
         const copyUserIdBtn = document.getElementById('copyUserIdBtn'); // Copy button
         
-        const profileLocation = document.getElementById('profileLocation'); // P element container
-        const locationText = document.getElementById('locationText'); // Span inside profileLocation
+        // profileLocation and locationText removed per request
         const profileEmail = document.getElementById('profileEmail'); // P element container
         const emailText = document.getElementById('emailText'); // Span inside profileEmail
 
@@ -3830,14 +3827,7 @@
         }
 
         // NEW: User Info Display Elements
-        const profileSchool = document.getElementById('profileSchool');
-        const schoolText = document.getElementById('schoolText');
-        const profileWork = document.getElementById('profileWork');
-        const workText = document.getElementById('workText');
-        const profileWebsite = document.getElementById('profileWebsite');
-        const websiteLink = document.getElementById('websiteLink');
-        const profileSocialLinks = document.getElementById('profileSocialLinks');
-        const socialLinksText = document.getElementById('socialLinksText');
+        // All profile info elements removed per request
 
         const statPosts = document.getElementById('statPosts');
         const statFriends = document.getElementById('statFriends');
@@ -3862,18 +3852,7 @@
         const dailyBonusCountdown = document.getElementById('dailyBonusCountdown'); // NEW
         const reportUserButton = document.getElementById('reportUserButton'); // NEW
 
-        // Inline Edit Fields
-        const displayNameInput = document.getElementById('displayName'); // Input for display name
-        const bioTextarea = document.getElementById('bio');
-        const locationInput = document.getElementById('locationInput'); // Input for location
-        // NEW: Inputs for additional user info
-        const schoolInput = document.getElementById('schoolInput');
-        const workInput = document.getElementById('workInput');
-        const interestsInput = document.getElementById('interestsInput');
-        const websiteInput = document.getElementById('websiteInput');
-        const socialLinksInput = document.getElementById('socialLinksInput');
-
-        const saveProfileChanges = document.getElementById('saveProfileChanges'); // Renamed from saveProfileChangesButton
+        // Inline Edit Fields - Removed per request
 
                     // Cover image wiring
             const profileCoverWrapper = document.getElementById('profileCoverWrapper');
@@ -4640,103 +4619,7 @@
             }
         }
 
-        /**
-         * Handles saving profile changes (display name, bio, location, school, work, interests, website, social links).
-         */
-        async function handleSaveProfileChanges() {
-            if (!currentUser || !isAuthReady || displayedUserId !== currentUser.uid) {
-                showMessageBox("You can only edit your own profile.", 'warning');
-                return;
-            }
-
-            toggleButtonLoading(saveProfileChanges, true);
-            showMessageBox("Saving profile...", 'loading', true);
-
-            const newDisplayName = displayNameInput.value.trim();
-            const newBio = bioTextarea.value.trim();
-            const newLocation = locationInput.value.trim();
-            const newSchool = schoolInput.value.trim(); // NEW
-            const newWork = workInput.value.trim();     // NEW
-            const newInterests = interestsInput.value.trim(); // NEW
-            const newWebsite = websiteInput.value.trim();   // NEW
-            const newSocialLinks = socialLinksInput.value.trim(); // NEW
-
-            if (!newDisplayName) {
-                showMessageBox("Display name cannot be empty.", 'error');
-                toggleButtonLoading(saveProfileChanges, false);
-                return;
-            }
-
-            try {
-                // Update Firebase Auth display name
-                if (currentUser.displayName !== newDisplayName) {
-                    await updateProfile(currentUser, {
-                        displayName: newDisplayName
-                    });
-                    console.log("JCHAT_DEBUG: Firebase Auth displayName updated.");
-                }
-
-                // Update Firestore private profile
-                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
-                await updateDoc(privateProfileDocRef, {
-                    username: newDisplayName, // Update username field in Firestore
-                    bio: newBio,
-                    location: newLocation,
-                    school: newSchool, // NEW
-                    work: newWork,     // NEW
-                    interests: newInterests, // NEW
-                    website: newWebsite,   // NEW
-                    socialLinks: newSocialLinks, // NEW
-                    updatedAt: serverTimestamp()
-                });
-                console.log("JCHAT_DEBUG: Firestore private profile updated.");
-
-                // Update Firestore public profile
-                const publicProfileDocRef = doc(db, "artifacts", appId, "public", "data", "users", currentUser.uid);
-                await updateDoc(publicProfileDocRef, {
-                    username: newDisplayName,
-                    bio: newBio,
-                    location: newLocation,
-                    school: newSchool, // NEW
-                    work: newWork,     // NEW
-                    interests: newInterests, // NEW
-                    website: newWebsite,   // NEW
-                    socialLinks: newSocialLinks, // NEW
-                    updatedAt: serverTimestamp()
-                });
-                console.log("JCHAT_DEBUG: Firestore public profile updated.");
-
-                // Update header UI immediately
-                if (headerDisplayName) headerDisplayName.textContent = newDisplayName; // Null check
-                if (profileUsername) profileUsername.textContent = newDisplayName; // Null check
-                if (profileBio) profileBio.textContent = newBio || "No bio provided yet."; // Null check
-
-                // Update display for new fields
-                if (newLocation) { if (locationText) locationText.textContent = newLocation; if (profileLocation) profileLocation.style.display = 'block'; } else { if (profileLocation) profileLocation.style.display = 'none'; }
-                if (newSchool) { if (schoolText) schoolText.textContent = newSchool; if (profileSchool) profileSchool.style.display = 'block'; } else { if (profileSchool) profileSchool.style.display = 'none'; }
-                if (newWork) { if (workText) workText.textContent = newWork; if (profileWork) profileWork.style.display = 'block'; } else { if (profileWork) profileWork.style.display = 'none'; }
-                if (newWebsite) { if (websiteLink) { websiteLink.href = newWebsite; websiteLink.textContent = newWebsite.replace(/^(https?:\/\/)?(www\.)?/, ''); } if (profileWebsite) profileWebsite.style.display = 'block'; } else { if (profileWebsite) profileWebsite.style.display = 'none'; }
-                if (newSocialLinks) { if (socialLinksText) socialLinksText.textContent = newSocialLinks; if (profileSocialLinks) profileSocialLinks.style.display = 'block'; } else { if (profileSocialLinks) profileSocialLinks.style.display = 'none'; }
-
-                showMessageBox("Profile saved successfully!", 'success');
-
-                // NEW: Update profile completion progress after saving
-                updateProfileCompletion();
-
-                // Refresh currentUserProfileData
-                const updatedProfileSnap = await getDoc(privateProfileDocRef);
-                if (updatedProfileSnap.exists()) {
-                    currentUserProfileData = updatedProfileSnap.data();
-                    displayedUserProfileData = currentUserProfileData; // Ensure consistency
-                }
-
-            } catch (error) {
-                console.error("JCHAT_ERROR: Error saving profile changes:", error);
-                showMessageBox(`Failed to save profile: ${error.message}`, 'error');
-            } finally {
-                toggleButtonLoading(saveProfileChanges, false);
-            }
-        }
+        // handleSaveProfileChanges function removed per request
 
         /**
          * Handles copying the User ID to clipboard.
@@ -7032,14 +6915,11 @@
             
             showMessageBox("Loading profile...", 'loading', true);
             if (profileUsername) profileUsername.textContent = "Loading...";
-            if (profileBio) profileBio.textContent = "Loading...";
+            // profileBio reference removed per request
             if (profileUserId) profileUserId.style.display = 'none'; // NEW: Hide User ID during loading
-            if (profileLocation) profileLocation.style.display = 'none';
+            // profileLocation reference removed per request
             if (profileEmail) profileEmail.style.display = 'none';
-            if (profileSchool) profileSchool.style.display = 'none'; // NEW
-            if (profileWork) profileWork.style.display = 'none';   // NEW
-            if (profileWebsite) profileWebsite.style.display = 'none'; // NEW
-            if (profileSocialLinks) profileSocialLinks.style.display = 'none'; // NEW
+            // All profile info element references removed per request
 
             if (statPosts) statPosts.textContent = "0";
             if (statFriends) statFriends.textContent = "0";
@@ -7079,7 +6959,7 @@
             if (profilePicUploadInput) profilePicUploadInput.addEventListener('change', handleProfilePicChange); // Null check
 
             // Profile Edit
-            if (saveProfileChanges) saveProfileChanges.addEventListener('click', handleSaveProfileChanges); // Null check
+            // saveProfileChanges event listener removed per request
 
             // NEW: User ID Copy Button
             if (copyUserIdBtn) copyUserIdBtn.addEventListener('click', handleCopyUserId); // Null check
