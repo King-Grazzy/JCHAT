@@ -212,20 +212,15 @@
     document.addEventListener('scroll', scheduleAvoid, true);
     // Ghost pass-through when mouse pointer is over badge and clickable exists beneath
     document.addEventListener('pointermove', onPointerMove, { passive: true });
-    // Touch-driven visibility: hidden by default; show while user is actively swiping/scrolling
+    // Visibility: hidden by default; show only while actively scrolling
     const showBadge = ()=>{ if (badgeEl) badgeEl.style.display = 'flex'; };
     const hideBadge = ()=>{ if (badgeEl) badgeEl.style.display = 'none'; };
-    let touchActive = false; let hideTimer = null;
-    const onTouchStart = ()=>{ touchActive = true; showBadge(); if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; } };
-    const onTouchMove = ()=>{ if (!touchActive) showBadge(); };
-    const onTouchEnd = ()=>{ touchActive = false; if (hideTimer) clearTimeout(hideTimer); hideTimer = setTimeout(hideBadge, 200); };
-    window.addEventListener('touchstart', onTouchStart, { passive: true });
-    window.addEventListener('touchmove', onTouchMove, { passive: true });
-    window.addEventListener('touchend', onTouchEnd, { passive: true });
-    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
-    // Pointer (covers stylus/trackpads)
-    window.addEventListener('pointerdown', (e)=>{ if (e.pointerType !== 'mouse') onTouchStart(); }, { passive: true });
-    window.addEventListener('pointerup', (e)=>{ if (e.pointerType !== 'mouse') onTouchEnd(); }, { passive: true });
+    let hideTimer = null; let lastScrollAt = 0;
+    const onAnyScroll = ()=>{ lastScrollAt = performance.now(); showBadge(); if (hideTimer) clearTimeout(hideTimer); hideTimer = setTimeout(()=>{ if (performance.now() - lastScrollAt >= 200) hideBadge(); }, 220); };
+    window.addEventListener('scroll', onAnyScroll, { passive: true });           // window scroll
+    document.addEventListener('scroll', onAnyScroll, true);                      // nested containers
+    window.addEventListener('wheel', onAnyScroll, { passive: true });            // desktop wheel
+    window.addEventListener('touchmove', onAnyScroll, { passive: true });        // mobile touch scroll
   };
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
