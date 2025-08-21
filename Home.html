@@ -947,8 +947,8 @@
             background: var(--header-background);
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .announcement-content { height: 100%; display: flex; align-items: center; gap: 12px; padding: 0 16px; }
-                 .announcement-icon { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; box-shadow: 0 0 12px rgba(255,46,146,0.6), 0 0 12px rgba(0,213,255,0.6); }
+        .announcement-content { height: 100%; display: flex; align-items: center; gap: 12px; padding: 0 16px; overflow:hidden; }
+        .announcement-icon { flex:0 0 auto; width: 28px; height: 28px; border-radius: 6px; object-fit: cover; box-shadow: 0 0 8px rgba(255,46,146,0.4), 0 0 8px rgba(0,213,255,0.4); }
         .announcement-ticker { position: relative; overflow: hidden; flex: 1; height: 100%; }
         .announcement-track { white-space: nowrap; display: inline-block; will-change: transform; padding-left: 100%; animation: jchat-scroll-left var(--ann-duration, 30s) linear infinite; background-image: linear-gradient(90deg, var(--pink), var(--blue)); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
         @keyframes jchat-scroll-left {
@@ -3250,7 +3250,7 @@
     <!-- Announcement Header (Developer announcements) -->
     <div id="announcementHeader" class="announcement-header" role="region" aria-label="Developer Announcement">
         <div class="announcement-content">
-            <img src="/icon.png" alt="Announcement" class="announcement-icon" loading="lazy" decoding="async">
+            <img src="/icon.png" alt="Announcement" class="announcement-icon" loading="eager" fetchpriority="high" decoding="sync" referrerpolicy="no-referrer">
             <div class="announcement-ticker">
                 <div id="announcementTrack" class="announcement-track"></div>
             </div>
