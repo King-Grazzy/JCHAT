@@ -191,8 +191,9 @@
   }
 
   function ensureBadge(){
-    if (document.getElementById('securityBadge')) { badgeEl = document.getElementById('securityBadge'); return; }
+    if (document.getElementById('securityBadge')) { badgeEl = document.getElementById('securityBadge'); badgeEl.style.display = 'none'; return; }
     const badge = el('div', { id:'securityBadge', class:'security-badge', title:'Security Center' }, '<div class="icon"><i class="fas fa-shield-alt"></i></div><div class="label">Protected</div>');
+    badge.style.display = 'none';
     badge.addEventListener('click', ()=>{
       renderModal();
       const m = document.getElementById('wsModal'); if (m) m.style.display='flex';
@@ -212,17 +213,19 @@
     // Ghost pass-through when mouse pointer is over badge and clickable exists beneath
     document.addEventListener('pointermove', onPointerMove, { passive: true });
     // Touch-driven visibility: hidden by default; show while user is actively swiping/scrolling
-    if (badgeEl) badgeEl.style.display = 'none';
     const showBadge = ()=>{ if (badgeEl) badgeEl.style.display = 'flex'; };
     const hideBadge = ()=>{ if (badgeEl) badgeEl.style.display = 'none'; };
     let touchActive = false; let hideTimer = null;
     const onTouchStart = ()=>{ touchActive = true; showBadge(); if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; } };
     const onTouchMove = ()=>{ if (!touchActive) showBadge(); };
-    const onTouchEnd = ()=>{ touchActive = false; if (hideTimer) clearTimeout(hideTimer); hideTimer = setTimeout(hideBadge, 250); };
+    const onTouchEnd = ()=>{ touchActive = false; if (hideTimer) clearTimeout(hideTimer); hideTimer = setTimeout(hideBadge, 200); };
     window.addEventListener('touchstart', onTouchStart, { passive: true });
     window.addEventListener('touchmove', onTouchMove, { passive: true });
     window.addEventListener('touchend', onTouchEnd, { passive: true });
     window.addEventListener('touchcancel', onTouchEnd, { passive: true });
+    // Pointer (covers stylus/trackpads)
+    window.addEventListener('pointerdown', (e)=>{ if (e.pointerType !== 'mouse') onTouchStart(); }, { passive: true });
+    window.addEventListener('pointerup', (e)=>{ if (e.pointerType !== 'mouse') onTouchEnd(); }, { passive: true });
   };
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
