@@ -662,13 +662,14 @@
 
         // Show payment instructions
         function showPaymentInstructions(planType, planDetails) {
+            const opay = (window.BANK_DETAILS?.opay) || { bank: 'OPay', accountNumber: '8111609765', accountName: 'Elechi Joshua' };
             const message = `
                 To complete your ${planDetails.name} subscription:
                 
                 1. Transfer ₦${planDetails.price} to:
-                   Bank: Opay
-                   Account: 8111609765
-                   Name: Elechi Joshua
+                   Bank: ${opay.bank}
+                   Account: ${opay.accountNumber}
+                   Name: ${opay.accountName}
                 
                 2. Send payment proof to WhatsApp: 08111609765
                 
