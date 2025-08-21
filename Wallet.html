@@ -1401,6 +1401,7 @@
                         </div>
                         <div class="setting-control">
                             <select id="themeSelect" class="setting-select">
+                                <option value="gemini" selected>Gemini (Pink–Blue)</option>
                                 <option value="default">Default</option>
                                 <option value="dark">Dark Mode</option>
                                 <option value="light">Light Mode</option>
@@ -1750,7 +1751,7 @@
             pinHash: null,
             balanceBlur: false,
             autoLock: 0,
-            theme: 'default',
+            theme: 'gemini',
             currency: 'jcoins',
             txNotifications: true,
             budgetAlerts: true
@@ -1768,6 +1769,23 @@
         // Save settings to localStorage
         function saveSettings() {
             localStorage.setItem('jchat-wallet-settings', JSON.stringify(walletSettings));
+        }
+
+        function setTheme(name) {
+            const root = document.documentElement;
+            if (name === 'gemini') {
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #ff7ac6 0%, #6aa7ff 100%)');
+                document.body.style.background = 'linear-gradient(180deg, rgba(255,122,198,0.12) 0%, rgba(106,167,255,0.12) 100%)';
+            } else if (name === 'dark') {
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #374151 0%, #111827 100%)');
+                document.body.style.background = '#0f172a';
+            } else if (name === 'light') {
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
+                document.body.style.background = 'var(--bg-secondary)';
+            } else {
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
+                document.body.style.background = 'var(--bg-secondary)';
+            }
         }
 
         // Apply settings to UI
@@ -1802,6 +1820,7 @@
             if (themeSelect) {
                 themeSelect.value = walletSettings.theme;
             }
+            setTheme(walletSettings.theme);
 
             // Apply currency
             const currencySelect = document.getElementById('currencySelect');
@@ -2340,7 +2359,7 @@
             document.getElementById('themeSelect')?.addEventListener('change', function() {
                 walletSettings.theme = this.value;
                 saveSettings();
-                // Apply theme (you can add theme switching logic here)
+                setTheme(this.value);
                 showToast(`Theme changed to ${this.value}`, 'info');
             });
 
