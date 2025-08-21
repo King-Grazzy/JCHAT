@@ -630,6 +630,11 @@
             flex: 1;
         }
 
+        /* Clear transactions status */
+        #clearTxStatus {
+            min-height: 18px;
+        }
+
         /* Form Styles */
         .form-group {
             margin-bottom: 20px;
@@ -1331,6 +1336,26 @@
             </div>
         </div>
 
+        <!-- Clear Transactions Modal -->
+        <div id="clearTxModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Delete All Transactions?</h3>
+                    <button class="close-btn" id="closeClearTxModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom:12px;color:var(--text-secondary);">This will permanently remove all your wallet transactions. This action cannot be undone.</p>
+                    <div id="clearTxStatus" class="form-help">Ready</div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="cancelClearTx">Cancel</button>
+                    <button class="btn danger" id="confirmClearTx">Delete All</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Settings Section -->
         <section class="settings-section" id="settingsSection" style="display: none;">
             <div class="settings-header">
@@ -1960,29 +1985,46 @@
         }
 
         // Clear all transactions from Firestore (batched)
+        function showClearTxModal() {
+            const m = document.getElementById('clearTxModal'); if (m) m.style.display = 'flex';
+            const s = document.getElementById('clearTxStatus'); if (s) s.textContent = 'Ready';
+        }
+        function hideClearTxModal() {
+            const m = document.getElementById('clearTxModal'); if (m) m.style.display = 'none';
+        }
+
         async function clearAllTransactions() {
             if (!currentUser) { showToast('You must be signed in', 'error'); return; }
-            const sure = confirm('Delete ALL your wallet transactions? This cannot be undone.');
-            if (!sure) return;
+            showClearTxModal();
+        }
+
+        async function confirmClearTransactions() {
+            const statusEl = document.getElementById('clearTxStatus');
             try {
                 const txCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions');
-                // Fetch in batches (e.g., 200 each)
                 let deleted = 0;
+                // Loop with small yields to avoid long-task warnings
                 while (true) {
+                    statusEl.textContent = 'Fetching next batch...';
                     const qSnap = await getDocs(query(txCol, orderBy('timestamp','desc'), limit(200)));
                     if (qSnap.empty) break;
+                    statusEl.textContent = `Deleting ${qSnap.size} transactions...`;
                     const batch = writeBatch(db);
                     qSnap.forEach(docSnap => batch.delete(docSnap.ref));
                     await batch.commit();
                     deleted += qSnap.size;
+                    statusEl.textContent = `Deleted ${deleted}. Continuing...`;
+                    await new Promise(r => setTimeout(r, 50)); // yield to browser
                     if (qSnap.size < 200) break;
                 }
+                statusEl.textContent = `Done. Deleted ${deleted} transactions.`;
                 showToast(`Deleted ${deleted} transactions`, 'success');
-                // Refresh UI
                 await renderTransactions();
                 updateStats(0,0,0);
+                setTimeout(hideClearTxModal, 700);
             } catch (e) {
                 console.error('Clear transactions error:', e);
+                statusEl.textContent = 'Error deleting transactions.';
                 showToast('Failed to clear transactions', 'error');
             }
         }
@@ -2488,8 +2530,11 @@
             // Clear data button
             document.getElementById('clearDataBtn')?.addEventListener('click', clearData);
 
-            // Clear transactions button
+            // Clear transactions button + modal controls
             document.getElementById('clearTransactionsBtn')?.addEventListener('click', clearAllTransactions);
+            document.getElementById('confirmClearTx')?.addEventListener('click', confirmClearTransactions);
+            document.getElementById('cancelClearTx')?.addEventListener('click', hideClearTxModal);
+            document.getElementById('closeClearTxModal')?.addEventListener('click', hideClearTxModal);
         });
     </script>
 </body>
