@@ -616,8 +616,64 @@
             }
         }
 
+        // Confirmation modal utilities
+        function showConfirmationModal(title, message, confirmText = 'Proceed', cancelText = 'Cancel') {
+            return new Promise((resolve) => {
+                let modal = document.getElementById('confirmationModal');
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'confirmationModal';
+                    modal.className = 'modal-overlay';
+                    modal.innerHTML = `
+                        <div class="modal-content">
+                            <h3 id="confirmationTitle">Confirm Action</h3>
+                            <p id="confirmationMessage">Are you sure?</p>
+                            <div class="button-group">
+                                <button id="confirmCancelButton" class="modal-button cancel-button" aria-label="Cancel">Cancel</button>
+                                <button id="confirmProceedButton" class="modal-button confirm-button" aria-label="Proceed">Proceed</button>
+                            </div>
+                        </div>`;
+                    document.body.appendChild(modal);
+                }
+                const titleEl = modal.querySelector('#confirmationTitle');
+                const msgEl = modal.querySelector('#confirmationMessage');
+                const cancelBtn = modal.querySelector('#confirmCancelButton');
+                const proceedBtn = modal.querySelector('#confirmProceedButton');
+                if (titleEl) titleEl.textContent = title || 'Confirm Action';
+                if (msgEl) msgEl.textContent = message || 'Are you sure?';
+                if (cancelBtn) cancelBtn.textContent = cancelText;
+                if (proceedBtn) proceedBtn.textContent = confirmText;
+                modal.style.display = 'flex';
+                const onCancel = () => { cleanup(); resolve(false); };
+                const onProceed = () => { cleanup(); resolve(true); };
+                function cleanup() {
+                    modal.style.display = 'none';
+                    cancelBtn.removeEventListener('click', onCancel);
+                    proceedBtn.removeEventListener('click', onProceed);
+                    modal.removeEventListener('click', onOutside);
+                }
+                function onOutside(e) { if (e.target === modal) onCancel(); }
+                cancelBtn.addEventListener('click', onCancel);
+                proceedBtn.addEventListener('click', onProceed);
+                modal.addEventListener('click', onOutside);
+            });
+        }
+
+        // Basic modal styles (scoped)
+        const confirmationStyles = document.createElement('style');
+        confirmationStyles.textContent = `
+            #confirmationModal.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
+            #confirmationModal .modal-content { background: var(--header-background); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 1.5rem; max-width: 420px; width: calc(100% - 32px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+            #confirmationModal h3 { margin: 0 0 .5rem; font-family: 'Poppins', sans-serif; }
+            #confirmationModal p { margin: 0 0 1rem; color: var(--text-light); }
+            #confirmationModal .button-group { display: flex; gap: .75rem; justify-content: center; }
+            #confirmationModal .modal-button { padding: .6rem 1rem; border-radius: 10px; border: 1px solid var(--border-light); cursor: pointer; background: var(--card-background); color: var(--white); }
+            #confirmationModal .confirm-button { background: var(--button-background); box-shadow: var(--button-shadow); border: none; }
+        `;
+        document.head.appendChild(confirmationStyles);
+
         // Subscribe to a premium plan
-        function subscribeToPlan(planType) {
+        async function subscribeToPlan(planType) {
             if (!currentUser) {
                 showMessage('Please log in to subscribe', 'error');
                 return;
@@ -629,11 +685,13 @@
                 return;
             }
 
-            // Show confirmation dialog
-            if (confirm(`Subscribe to ${planDetails.name} for ₦${planDetails.price}/month?\n\nThis will redirect you to complete your payment.`)) {
-                // Redirect to payment page or show payment modal
-                processSubscription(planType);
-            }
+            const ok = await showConfirmationModal(
+                'Subscribe',
+                `Subscribe to ${planDetails.name} for ₦${planDetails.price}/month? This will redirect you to complete your payment.`,
+                'Subscribe',
+                'Cancel'
+            );
+            if (ok) processSubscription(planType);
         }
 
         // Get plan details

@@ -8361,14 +8361,14 @@
                 console.error('Friend picker load failed', e);
             }
         }
-        function openPostComposerWithPrefill() {
+        async function openPostComposerWithPrefill() {
             if (!isAuthReady || !currentUser) { showMessageBox('Please log in to post.', 'warning'); return; }
             if (!currentSystemSettings.enablePostCreation && currentUser.uid !== ADMIN_UID) { showMessageBox('Post creation is disabled by administrators.', 'warning'); return; }
             if (postCreationSection && postContentInput) {
                 const text = `${inspirationQuoteElement ? inspirationQuoteElement.textContent : ''} ${inspirationAuthorElement ? inspirationAuthorElement.textContent : ''}`.trim();
                 postCreationSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 postContentInput.value = text;
-                const addImg = confirm('Add an image to this post?');
+                const addImg = await showConfirmationModal('Add Image', 'Add an image to this post?');
                 if (addImg && postMediaUpload) postMediaUpload.click();
                 closeShareInspirationModal();
                 showMessageBox('Composer prefilled. You can edit and post now.', 'info');
