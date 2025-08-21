@@ -1745,6 +1745,24 @@
         .profile-action-button.accept:hover { background: linear-gradient(90deg, #218838, #28a745); }
         .profile-action-button.unfriend { background: #dc3545; }
         .profile-action-button.unfriend:hover { background: #c82333; }
+        
+        /* Wallet button states - Red when locked, Green when unlocked */
+        #walletLink.wallet-locked {
+            background: linear-gradient(90deg, #dc3545, #c82333) !important;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4) !important;
+        }
+        #walletLink.wallet-locked:hover {
+            background: linear-gradient(90deg, #c82333, #dc3545) !important;
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.6) !important;
+        }
+        #walletLink.wallet-unlocked {
+            background: linear-gradient(90deg, #28a745, #218838) !important;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4) !important;
+        }
+        #walletLink.wallet-unlocked:hover {
+            background: linear-gradient(90deg, #218838, #28a745) !important;
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6) !important;
+        }
 
         /* Icons within action buttons */
         .profile-action-button i {
@@ -7761,14 +7779,16 @@
                         if (walletLink && walletLockedMessage) { // Null check
                             walletLink.style.display = 'inline-flex';
                             if (displayedUserProfileData.walletUnlocked) {
-                                walletLink.classList.remove('disabled-link');
+                                walletLink.classList.remove('disabled-link', 'wallet-locked');
+                                walletLink.classList.add('wallet-unlocked');
                                 walletLockedMessage.style.display = 'none';
                                 if (walletLink.querySelector('.padlock-icon')) { // Null check for inner icon
                                     walletLink.querySelector('.padlock-icon').classList.remove('fa-lock');
                                     walletLink.querySelector('.padlock-icon').classList.add('fa-unlock-alt');
                                 }
                             } else {
-                                walletLink.classList.add('disabled-link');
+                                walletLink.classList.add('disabled-link', 'wallet-locked');
+                                walletLink.classList.remove('wallet-unlocked');
                                 walletLockedMessage.style.display = 'block';
                                 if (walletLink.querySelector('.padlock-icon')) { // Null check for inner icon
                                     walletLink.querySelector('.padlock-icon').classList.add('fa-lock');
