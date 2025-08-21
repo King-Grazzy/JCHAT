@@ -1567,6 +1567,7 @@
     </style>
 <style id="header-overflow-fix">/*header-overflow-fix*/header .header-content-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;justify-content:flex-end}#profileLink{display:inline-flex;align-items:center;column-gap:8px;row-gap:2px;flex-wrap:wrap;max-width:100%;min-width:0}#profileLink #headerDisplayName{white-space:normal;word-break:break-word;line-break:anywhere;overflow:visible;text-overflow:clip;max-width:100%;flex:1 1 auto}#headerProfilePic,#headerAvatarIcon{flex:0 0 auto}@media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:6px}}</style></head>
 <body class="theme-dark-mode">
+    <style>.security-badge{display:none!important}</style>
 
     <header>
         <div class="header-content-wrapper">
@@ -1577,6 +1578,9 @@
                 </ul>
             </nav>
             <div class="user-profile-header">
+                <a href="#" id="securityHeaderBtn" aria-label="Security Center" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(10px)">
+                    <i class="fas fa-shield-alt" style="font-size:1.2rem;background-image:linear-gradient(90deg, var(--blue), var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent"></i>
+                </a>
                 <!-- Admin Icon Link (visible only to admin) -->
                 <a href="/coin_management.html" id="adminIconLink" aria-label="Admin Dashboard" style="display: none;">
                     <i class="fas fa-user-cog"></i>
@@ -1599,6 +1603,19 @@
             </div>
         </div>
     </header>
+    <script>
+      // Open wallet-security modal from header button if available
+      (function(){
+        function openSecurity(){
+          var m = document.getElementById('wsModal');
+          if (m) { m.style.display = 'flex'; return; }
+          // Fallback: navigate to settings
+          window.location.href = '/Settings.html#security';
+        }
+        var btn = document.getElementById('securityHeaderBtn');
+        if (btn) btn.addEventListener('click', function(e){ e.preventDefault(); openSecurity(); });
+      })();
+    </script>
 
     <main>
         <div class="chat-container">
