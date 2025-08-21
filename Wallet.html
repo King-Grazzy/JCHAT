@@ -1,0 +1,23 @@
+        document.addEventListener('DOMContentLoaded', function() {
+            // Home-like header hooks
+            const themeBtn = document.getElementById('themeSwitcherBtn');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    const current = (typeof walletSettings !== 'undefined' && walletSettings?.theme) ? walletSettings.theme : 'gemini';
+                    const next = current === 'gemini' ? 'dark' : current === 'dark' ? 'light' : current === 'light' ? 'default' : 'gemini';
+                    if (typeof walletSettings !== 'undefined') walletSettings.theme = next;
+                    if (typeof saveSettings === 'function') saveSettings();
+                    if (typeof setTheme === 'function') setTheme(next);
+                    const themeSelect = document.getElementById('themeSelect');
+                    if (themeSelect) themeSelect.value = next;
+                    if (typeof showToast === 'function') showToast(`Theme changed to ${next}`, 'info');
+                });
+            }
+
+            const sidebarBtn = document.getElementById('sidebarToggleFab');
+            if (sidebarBtn) {
+                sidebarBtn.addEventListener('click', () => {
+                    window.location.href = '/Home.html';
+                });
+            }
+        });
