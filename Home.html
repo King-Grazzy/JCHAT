@@ -7311,6 +7311,13 @@
                         });
                         annEl.style.display = 'block';
                         document.body.classList.add('has-announcement');
+                        const placeAnnouncement = ()=>{
+                            const header = document.querySelector('header');
+                            const h = header ? header.getBoundingClientRect().height : 55;
+                            annEl.style.top = `${Math.max(0, Math.round(h))}px`;
+                        };
+                        placeAnnouncement();
+                        window.addEventListener('resize', placeAnnouncement, { passive:true });
                     } else {
                         annEl.style.display = 'none';
                         document.body.classList.remove('has-announcement');
