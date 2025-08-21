@@ -229,7 +229,7 @@
             overflow-x: auto; /* Allow horizontal scroll when needed */
             overflow-y: auto; /* Allow vertical scroll when needed */
             -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
-            scroll-snap-type: y proximity; /* Enable scroll snapping for better control */
+            /* Removed scroll-snap on html to prevent sticky scroll issues */
         }
 
         body {
@@ -3037,7 +3037,7 @@
             .content-wrapper {
                 padding: 15px;
                 -webkit-overflow-scrolling: touch; /* Ensure touch scrolling on mobile */
-                scroll-snap-type: y proximity; /* Enable scroll snapping on mobile */
+                /* Removed scroll-snap on content wrapper */
             }
             
             .profile-section,
@@ -3049,7 +3049,7 @@
                 padding: 1.5rem;
                 margin: 15px auto;
                 -webkit-overflow-scrolling: touch; /* Ensure touch scrolling on mobile */
-                scroll-snap-type: y proximity; /* Enable scroll snapping on mobile */
+                /* Removed scroll-snap on sections */
             }
 
             /* Mobile-specific touch improvements */
@@ -3070,7 +3070,7 @@
         /* Additional touch improvements for very small screens */
         @media (max-width: 480px) {
             .content-wrapper {
-                scroll-snap-type: y mandatory; /* Force scroll snapping on very small screens */
+                /* Removed mandatory scroll-snap on very small screens */
             }
             
             .profile-section,
@@ -3078,7 +3078,7 @@
             .recent-activity-section,
             .customization-section,
             .wallet-guide-section {
-                scroll-snap-type: y mandatory; /* Force scroll snapping on very small screens */
+                /* Removed mandatory scroll-snap on very small screens */
             }
 
             /* Very small screen tiny toggle */
