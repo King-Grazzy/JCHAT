@@ -2392,7 +2392,6 @@
             border-color: var(--blue);
             box-shadow: 0 0 0 3px rgba(0, 213, 255, 0.2);
         }
-
         .sub-section button {
             background: var(--button-background); /* Consistent button style */
             color: var(--white);
@@ -3503,9 +3502,8 @@
                 </div>
 
                 <!-- Tabs removed per request -->
-                <div id="tabPanelAbout">
-                <!-- Inline Profile Details and Account Settings -->
-                <div class="profile-details-section">
+                <!-- About section removed per request -->
+                                  <!-- Entire profile details and settings removed per request -->
                     <label for="displayName">Display Name</label>
                     <input type="text" id="displayName" placeholder="Enter your display name">
 
@@ -3873,7 +3871,6 @@
                     <p class="no-activity-message">No recent activity.</p>
                 </ul>
             </div>
-
             <!-- NEW: Wallet User Guide Section -->
             <div class="wallet-guide-section">
                 <h3>Wallet User Guide</h3>
@@ -4662,7 +4659,6 @@
             // Assume it's a public ID if not a full URL
             return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${transformations}/${urlOrPublicId}`;
         }
-
         /**
          * Displays the profile picture or a default icon.
          * @param {HTMLElement} imgElement - The <img> element to update.
@@ -5461,7 +5457,6 @@
                     console.log('Unknown action:', action);
             }
         }
-
         /**
          * Initializes tiny toggle functionality.
          */
@@ -7004,7 +6999,6 @@
                 noFriendsElement.textContent = 'Failed to load friends. Please try again.';
             }
         }
-
         /**
          * Renders friends list in the modal (exactly like Chat.html)
          */
@@ -7905,6 +7899,7 @@
                     if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
                     if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
                     if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
+                    if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'none';
                     if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
                     if (toggleFriendRequests) toggleFriendRequests.closest('.privacy-toggle-group').style.display = 'none';
                     if (toggleMessages) toggleMessages.closest('.privacy-toggle-group').style.display = 'none';
