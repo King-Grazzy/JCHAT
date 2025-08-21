@@ -211,6 +211,18 @@
     document.addEventListener('scroll', scheduleAvoid, true);
     // Ghost pass-through when mouse pointer is over badge and clickable exists beneath
     document.addEventListener('pointermove', onPointerMove, { passive: true });
+    // Touch-driven visibility: hidden by default; show while user is actively swiping/scrolling
+    if (badgeEl) badgeEl.style.display = 'none';
+    const showBadge = ()=>{ if (badgeEl) badgeEl.style.display = 'flex'; };
+    const hideBadge = ()=>{ if (badgeEl) badgeEl.style.display = 'none'; };
+    let touchActive = false; let hideTimer = null;
+    const onTouchStart = ()=>{ touchActive = true; showBadge(); if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; } };
+    const onTouchMove = ()=>{ if (!touchActive) showBadge(); };
+    const onTouchEnd = ()=>{ touchActive = false; if (hideTimer) clearTimeout(hideTimer); hideTimer = setTimeout(hideBadge, 250); };
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
   };
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
