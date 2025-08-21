@@ -9,3 +9,6 @@ JCHAT is a full-featured chat application with private and group messaging, user
 - Admin dashboards and content moderation  
 - Premium themes and subscriptions  
 - Deployable on Netlify or other web hosts
+
+## Assets
+- Shared assets live under `/assets`.

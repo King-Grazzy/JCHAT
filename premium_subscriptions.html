@@ -59,6 +59,9 @@
             color: var(--white);
         }
 
+        /* Header security logo sizing */
+        .logo img { display:inline-block; vertical-align:middle; }
+
         .header {
             width: 100%;
             background: var(--header-background);
@@ -413,7 +416,10 @@
 <body>
     <header class="header">
         <div class="header-content">
-            <a href="/home.html" class="logo">JCHAT</a>
+            <a href="/home.html" class="logo" style="display:flex;align-items:center;gap:10px">
+                <img src="/assets/jchat-security-logo.svg" alt="JCHAT Security" style="height:24px;width:auto" onerror="this.style.display='none'">
+                <span>JCHAT</span>
+            </a>
             <nav class="nav">
                 <ul>
                     <li><a href="/home.html">Home</a></li>

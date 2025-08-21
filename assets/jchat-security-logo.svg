@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="64" viewBox="0 0 256 64" role="img" aria-label="JCHAT Security">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ff7ac6"/>
+      <stop offset="100%" stop-color="#6aa7ff"/>
+    </linearGradient>
+  </defs>
+  <rect rx="12" ry="12" x="1" y="1" width="254" height="62" fill="#0b1220" stroke="#2a3350"/>
+  <g transform="translate(14,14)">
+    <g transform="translate(0,0)">
+      <path d="M16 0 L32 6 L32 20 C32 30 25 38 16 44 C7 38 0 30 0 20 L0 6 Z" fill="url(#g)"/>
+      <path d="M8 12 h16 v3 H8z M8 20 h16 v3 H8z" fill="#0b1220" opacity="0.9"/>
+    </g>
+    <g transform="translate(44,4)">
+      <text x="0" y="18" font-family="Poppins, Inter, Arial, sans-serif" font-weight="800" font-size="20" fill="url(#g)">JCHAT</text>
+      <g transform="translate(82,-2)">
+        <path d="M16 4 l10 6 v10 c0 8 -6 12 -10 14 c-4 -2 -10 -6 -10 -14 V10z" fill="none" stroke="url(#g)" stroke-width="2"/>
+        <path d="M12 18 a4 4 0 1 0 8 0 a4 4 0 1 0 -8 0" fill="url(#g)"/>
+      </g>
+      <text x="104" y="18" font-family="Inter, Arial, sans-serif" font-weight="700" font-size="16" fill="#b6c3ff">Security</text>
+    </g>
+  </g>
+</svg>

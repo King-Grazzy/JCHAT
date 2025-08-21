@@ -41,6 +41,9 @@
             --danger: #ef4444;
         }
 
+        /* Header security logo sizing */
+        .logo img { display:inline-block; vertical-align:middle; }
+
         * {
             margin: 0;
             padding: 0;
@@ -1057,7 +1060,10 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <div class="logo">JCHAT Wallet</div>
+                <div class="logo" style="display:flex;align-items:center;gap:10px">
+                    <img src="/assets/jchat-security-logo.svg" alt="JCHAT Security" style="height:28px;width:auto" onerror="this.style.display='none'">
+                    <span>JCHAT Wallet</span>
+                </div>
                 <div class="user-profile">
                     <div class="user-info">
                         <span class="username" id="headerUsername">User</span>
