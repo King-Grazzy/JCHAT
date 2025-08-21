@@ -3502,16 +3502,7 @@
                     <!-- Removed Add Friend and Message buttons as requested -->
                 </div>
 
-                <!-- Tabs: About, Posts, Media, Saved, Activity -->
-                <div id="profileTabs" style="display:flex;gap:8px;margin:14px 0;flex-wrap:wrap;">
-                    <button class="profile-action-button secondary" data-tab="about">About</button>
-                    <button class="profile-action-button secondary" data-tab="posts">Posts</button>
-                    <button class="profile-action-button secondary" data-tab="media">Media</button>
-                    <button class="profile-action-button secondary" data-tab="highlights">Highlights</button>
-                    <button class="profile-action-button secondary" data-tab="saved">Saved</button>
-                    <button class="profile-action-button secondary" data-tab="activity">Activity</button>
-                </div>
-                <!-- About Panel -->
+                <!-- Tabs removed per request -->
                 <div id="tabPanelAbout">
                 <!-- Inline Profile Details and Account Settings -->
                 <div class="profile-details-section">
@@ -3807,51 +3798,7 @@
                 </div>
                 </div> <!-- End Tab About -->
 
-                <!-- Posts Panel -->
-                <div id="tabPanelPosts" style="display:none;">
-                    <div class="posts-feed-section" id="userPostsFeed" style="display:block;">
-                        <h3>Posts by <span id="postsFeedUsername"></span></h3>
-                        <p style="text-align: center; color: var(--text-light);" id="loadingUserPostsMessage">Loading posts...</p>
-                        <div id="userPostsList" style="display:flex;flex-direction:column;gap:10px;"></div>
-                    </div>
-                </div>
-
-                <!-- Media Panel -->
-                <div id="tabPanelMedia" style="display:none;">
-                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-                        <label>Filter:</label>
-                        <select id="mediaFilterSelect" class="profile-action-button secondary" style="padding:6px 10px;">
-                            <option value="all">All</option>
-                            <option value="image">Images</option>
-                            <option value="video">Videos</option>
-                        </select>
-                    </div>
-                    <div id="userMediaGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;"></div>
-                </div>
-
-                <!-- Highlights Panel -->
-                <div id="tabPanelHighlights" style="display:none;">
-                    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-                        <button id="addHighlightBtn" class="profile-action-button"><i class="fas fa-plus"></i> New Highlight</button>
-                    </div>
-                    <div id="highlightsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;"></div>
-                </div>
-
-                <!-- Saved Panel -->
-                <div id="tabPanelSaved" style="display:none;">
-                    <div id="savedPostsList" style="display:flex;flex-direction:column;gap:8px;"></div>
-                    <div id="savedInspirationsList" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;"></div>
-                </div>
-
-                <!-- Activity Panel -->
-                <div id="tabPanelActivity" style="display:none;">
-                    <div class="recent-activity-section" id="recentActivitySection" style="display:block;">
-                        <h3>Recent Activity</h3>
-                        <ul class="activity-list" id="recentActivityList">
-                            <p class="no-activity-message">No recent activity.</p>
-                        </ul>
-                    </div>
-                </div>
+                <!-- Removed additional panels per request: Posts, Media, Highlights, Saved, Activity -->
 
                     <!-- Toggle for Account Settings (Email/Password) -->
                     <button id="toggleAccountSettingsButton" class="profile-action-button secondary" style="margin-top: 2rem;">
@@ -4208,14 +4155,8 @@
             const editCoverOverlay = document.getElementById('editCoverOverlay');
 
             // Tabs wiring
-            const tabsContainer = document.getElementById('profileTabs');
+            const tabsContainer = null;
             const tabPanelAbout = document.getElementById('tabPanelAbout');
-            const tabPanelPosts = document.getElementById('tabPanelPosts');
-            const tabPanelMedia = document.getElementById('tabPanelMedia');
-            const tabPanelSaved = document.getElementById('tabPanelSaved');
-            const tabPanelActivity = document.getElementById('tabPanelActivity');
-            const tabPanelHighlights = document.getElementById('tabPanelHighlights');
-            const userPostsList = document.getElementById('userPostsList');
             const userMediaGrid = document.getElementById('userMediaGrid');
             const mediaFilterSelect = document.getElementById('mediaFilterSelect');
             const savedPostsList = document.getElementById('savedPostsList');
@@ -4292,20 +4233,9 @@
             const recentActivityList = document.getElementById('recentActivityList');
             const noActivityMessage = document.getElementById('noActivityMessage');
 
-            // Tabs behavior
-            if (tabsContainer) {
-                if (tabsContainer) tabsContainer.addEventListener('click', (e) => {
-                    const btn = e.target.closest('button[data-tab]');
-                    if (!btn) return;
-                    const tab = btn.getAttribute('data-tab');
-                    [tabPanelAbout, tabPanelPosts, tabPanelMedia, tabPanelSaved, tabPanelActivity, tabPanelHighlights].forEach(p => p && (p.style.display = 'none'));
-                    if (tab === 'about') tabPanelAbout.style.display = 'block';
-                    if (tab === 'posts') { tabPanelPosts.style.display = 'block'; ensureUserPostsLoaded(); }
-                    if (tab === 'media') { tabPanelMedia.style.display = 'block'; ensureUserMediaLoaded(); }
-                    if (tab === 'highlights') { tabPanelHighlights.style.display = 'block'; ensureHighlightsLoaded(); }
-                    if (tab === 'saved') { tabPanelSaved.style.display = 'block'; ensureSavedLoaded(); }
-                    if (tab === 'activity') { tabPanelActivity.style.display = 'block'; ensureActivityLoaded(); }
-                });
+            // Tabs removed; always show About
+            if (tabPanelAbout) {
+                tabPanelAbout.style.display = 'block';
             }
 
             async function ensureUserPostsLoaded() {
