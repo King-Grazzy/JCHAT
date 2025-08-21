@@ -3368,7 +3368,7 @@
                          <!-- NEW: Loading spinner for profile pic -->
                     </div>
                     <h2 id="profileUsername" class="profile-name">Loading...</h2>
-                    <p id="profileBio" class="profile-bio">No bio provided yet.</p>
+
                     
                     <!-- NEW: Profile Completion Progress Bar -->
                     <div class="profile-completion-section">
@@ -3504,294 +3504,24 @@
                 <!-- Tabs removed per request -->
                 <!-- About section removed per request -->
                                   <!-- Entire profile details and settings removed per request -->
-                    <label for="displayName">Display Name</label>
-                    <input type="text" id="displayName" placeholder="Enter your display name">
 
-                    <label for="bio">Bio</label>
-                    <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
 
-                    <label for="locationInput">Location</label>
-                    <input type="text" id="locationInput" placeholder="e.g., Lagos, Nigeria">
 
-                    <label for="schoolInput">School/University</label>
-                    <input type="text" id="schoolInput" placeholder="e.g., University of Lagos">
 
-                    <label for="workInput">Work/Occupation</label>
-                    <input type="text" id="workInput" placeholder="e.g., Software Engineer at Google">
 
-                    <label for="interestsInput">Interests</label>
-                    <textarea id="interestsInput" placeholder="e.g., Reading, Hiking, Coding, Photography (comma-separated)"></textarea>
 
-                    <label for="websiteInput">Website/Portfolio</label>
-                    <input type="url" id="websiteInput" placeholder="e.g., https://yourwebsite.com">
 
-                    <label for="socialLinksInput">Social Media Links</label>
-                    <textarea id="socialLinksInput" placeholder="e.g., LinkedIn: profile_url, Twitter: handle (comma-separated)"></textarea>
 
-                    <button id="saveProfileChanges" class="profile-action-button">
-                        <span class="button-text">Save Profile</span>
-                        
-                    </button>
 
-                    <!-- NEW: Privacy Settings Toggles -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2rem;">
-                        <h3 style="text-align:center;margin:0;">Privacy Settings</h3>
-                        <button id="togglePrivacySettingsBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
-                    </div>
-                    <div id="privacySettingsSection" class="profile-details-section" style="display:none;">
-                        <div class="privacy-toggle-group">
-                        <label for="toggleEmailVisibility">Show Email Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleEmailVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleLocationVisibility">Show Location Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleLocationVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleUserIdVisibility">Show User ID Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleUserIdVisibility" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleOnlineStatusVisibility">Show Online Status</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleOnlineStatusVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                     <div class="privacy-toggle-group">
-                        <label for="toggleFriendRequests">Allow Friend Requests</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleFriendRequests">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleMessages">Allow Direct Messages</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleMessages">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleSchoolVisibility">Show School Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleSchoolVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleWorkVisibility">Show Work Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleWorkVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleInterestsVisibility">Show Interests Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleInterestsVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleWebsiteVisibility">Show Website Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleWebsiteVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleSocialLinksVisibility">Show Social Links Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleSocialLinksVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <button id="savePrivacySettingsButton" class="profile-action-button secondary">
-                        <span class="button-text">Save Privacy Settings</span>
-                        
-                    </button>
-                    </div> <!-- End Privacy Settings Section -->
 
-                    <!-- NEW: Profile Customization Section -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2rem;">
-                        <h3 style="text-align:center;margin:0;">Profile Customization</h3>
-                        <button id="toggleCustomizationBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
-                    </div>
-                    <div id="customizationSection" class="profile-details-section" style="display:none;">
-                        <div class="customization-option">
-                        <label for="profileFrameSelect">Profile Picture Frame:</label>
-                        <select id="profileFrameSelect">
-                            <option value="default">Default</option>
-                            <option value="gradient">Gradient Frame (Unlocked at Level 25)</option>
-                            <option value="diamond">Diamond Frame (Unlocked at Level 200)</option>
-                            <!-- Add more options as you define them based on unlockedBenefits -->
-                        </select>
-                    </div>
-                    <div class="customization-option">
-                        <label for="chatBubbleStyleSelect">Chat Bubble Style:</label>
-                        <select id="chatBubbleStyleSelect">
-                            <option value="default">Default</option>
-                            <option value="basic">Basic Style (Unlocked at Level 15)</option>
-                            <option value="rounded">Rounded Style (Unlocked at Level 40)</option>
-                            <!-- Add more options -->
-                        </select>
-                    </div>
-                    <div class="customization-option">
-                        <label for="profileThemeSelect">Profile Theme:</label>
-                        <select id="profileThemeSelect">
-                            <option value="default">Default</option>
-                            <option value="solid">Solid Color (Unlocked at Level 65)</option>
-                            <option value="animated1">Animated 1 (Unlocked at Level 150)</option>
-                            <!-- Add more options -->
-                        </select>
-                    </div>
 
-                    <!-- NEW: Theme Presets -->
-                    <div class="theme-presets-section">
-                        <label>Quick Theme Presets:</label>
-                        <div class="theme-preset-grid">
-                            <div class="theme-preset" data-theme="professional">
-                                <div class="preset-preview professional-preview"></div>
-                                <span>Professional</span>
-                            </div>
-                            <div class="theme-preset" data-theme="creative">
-                                <div class="preset-preview creative-preview"></div>
-                                <span>Creative</span>
-                            </div>
-                            <div class="theme-preset" data-theme="minimal">
-                                <div class="preset-preview minimal-preview"></div>
-                                <span>Minimal</span>
-                            </div>
-                            <div class="theme-preset" data-theme="vibrant">
-                                <div class="preset-preview vibrant-preview"></div>
-                                <span>Vibrant</span>
-                            </div>
-                        </div>
-                    </div>
-                    <button id="saveCustomizationButton" class="profile-action-button">
-                        <span class="button-text">Save Customization</span>
-                        
-                    </button>
-                    </div> <!-- End Customization Section -->
 
-                    <!-- Identity & Availability -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Identity & Availability</h3>
-                        <button id="toggleIdentityAvailabilityBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
-                    </div>
-                    <div id="identityAvailabilitySection" class="profile-details-section" style="display:none;">
-                        <label for="handleInput">Handle</label>
-                        <input type="text" id="handleInput" placeholder="e.g., @yourhandle">
-                        <label for="pronounsInput">Pronouns</label>
-                        <input type="text" id="pronounsInput" placeholder="e.g., she/her, he/him, they/them">
-                        <label for="languagesInput">Languages</label>
-                        <input type="text" id="languagesInput" placeholder="e.g., English, Spanish">
-                        <label for="timeZoneInput">Time Zone</label>
-                        <input type="text" id="timeZoneInput" placeholder="e.g., GMT+1, Africa/Lagos">
-                        <label for="statusStateSelect">Status</label>
-                        <select id="statusStateSelect">
-                            <option value="available">Available</option>
-                            <option value="busy">Busy</option>
-                            <option value="away">Away</option>
-                        </select>
-                        <label for="statusTextInput">Status Message</label>
-                        <input type="text" id="statusTextInput" placeholder="e.g., Heads down coding">
-                        <label for="schedulingLinkInput">Scheduling Link</label>
-                        <input type="url" id="schedulingLinkInput" placeholder="e.g., https://cal.com/yourname">
-                    </div>
 
-                    <!-- Skills & Endorsements -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Skills & Endorsements</h3>
-                        <button id="toggleSkillsBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
-                    </div>
-                    <div id="skillsSection" class="profile-details-section" style="display:none;">
-                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                            <input type="text" id="newSkillInput" placeholder="Add skill (owner only)" style="flex:1;">
-                            <button id="addSkillBtn" class="profile-action-button"><i class="fas fa-plus"></i> Add Skill</button>
-                        </div>
-                        <div id="skillsList" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
-                    </div>
 
-                    <!-- Featured Badges -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Featured Badges</h3>
-                        <button id="toggleBadgesBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
-                    </div>
-                    <div id="badgesSection" class="profile-details-section" style="display:none;">
-                        <p style="opacity:0.8;margin:0 0 8px;">Choose up to 3 to feature on your profile.</p>
-                        <div id="featuredBadgesChooser" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
-                        <div id="featuredBadgesDisplay" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
-                    </div> <!-- End Badges Section -->
 
-                    <!-- Profile Insights -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Profile Insights</h3>
-                        <button id="toggleInsightsBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
-                    </div>
-                    <div id="insightsSection" class="profile-details-section" style="display:none;">
-                        <label style="display:flex;align-items:center;gap:8px;">
-                            <input type="checkbox" id="analyticsOptInToggle">
-                            Enable profile view analytics (owner only)
-                        </label>
-                        <p id="profileViewsLine" style="margin-top:8px;">Views: <strong id="profileViewsCount">0</strong></p>
-                    </div> <!-- End Insights Section -->
 
-                    <!-- Verified Links & QR -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Share Profile</h3>
-                        <button id="toggleShareBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
-                    </div>
-                    <div id="shareSection" class="profile-details-section" style="align-items:center;display:none;">
-                        <div id="profileShareUrl" style="opacity:0.9;word-break:break-all;margin-bottom:8px;"></div>
-                        <img id="profileQrImg" alt="QR" style="width:160px;height:160px;border-radius:8px;border:1px solid var(--border-light);display:none;"/>
-                    </div> <!-- End Share Section -->
 
-                    <!-- Safety Manager -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Safety</h3>
-                        <button id="toggleSafetyBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
-                    </div>
-                    <div id="safetySection" class="profile-details-section" style="display:none;">
-                        <button id="openSafetyManagerBtn" class="profile-action-button secondary"><i class="fas fa-shield-alt"></i> Safety Manager</button>
-                    </div> <!-- End Safety Section -->
 
-                    <!-- Pinned Post -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Pinned Post</h3>
-                        <button id="togglePinnedPostBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
-                    </div>
-                    <div id="pinnedPostSection" style="display:none;">
-                        <div id="pinnedPostArea" style="border:1px solid var(--border-light);border-radius:10px;padding:10px;background:rgba(255,255,255,0.03);"></div>
-                    </div>
 
                 </div>
                 </div> <!-- End Tab About -->
