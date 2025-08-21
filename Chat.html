@@ -1571,20 +1571,7 @@
 
     <header>
         <div class="header-content-wrapper">
-            <div class="header-left" style="display:flex;align-items:center;gap:10px;">
-                <a href="/Home.html" class="logo" style="display:flex;align-items:center;gap:10px"><img src="assets/security.png" alt="JCHAT Security" style="height:24px;width:auto" onerror="this.style.display='none'"><span>JCHAT</span></a>
-                <div class="notification-icon-wrapper">
-                    <a href="notifications.html" aria-label="Notifications">
-                        <i class="fas fa-bell"></i>
-                        <span id="notificationCount" class="notification-badge" style="display: none;">0</span>
-                    </a>
-                </div>
-                <a href="Profile.html" id="profileLink">
-                    <img id="headerProfilePic" src="" alt="Profile Picture" style="display: none;">
-                    <i id="headerAvatarIcon" class="fas fa-user-circle"></i>
-                    <span id="headerDisplayName">Loading...</span>
-                </a>
-            </div>
+            <a href="/Home.html" class="logo" style="display:flex;align-items:center;gap:10px"><img src="assets/security.png" alt="JCHAT Security" style="height:24px;width:auto" onerror="this.style.display='none'"><span>JCHAT</span></a>
             <nav>
                 <ul>
                     <!-- Removed Home and Profile links from header navigation -->
@@ -1597,6 +1584,17 @@
                 <!-- Admin Icon Link (visible only to admin) -->
                 <a href="/coin_management.html" id="adminIconLink" aria-label="Admin Dashboard" style="display: none;">
                     <i class="fas fa-user-cog"></i>
+                </a>
+                <div class="notification-icon-wrapper">
+                    <a href="notifications.html" aria-label="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <span id="notificationCount" class="notification-badge" style="display: none;">0</span>
+                    </a>
+                </div>
+                <a href="Profile.html" id="profileLink">
+                    <img id="headerProfilePic" src="" alt="Profile Picture" style="display: none;">
+                    <i id="headerAvatarIcon" class="fas fa-user-circle"></i>
+                    <span id="headerDisplayName">Loading...</span>
                 </a>
                 <!-- Sound Toggle -->
                 <div class="sound-toggle">
