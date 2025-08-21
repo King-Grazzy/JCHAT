@@ -3400,6 +3400,88 @@
                 <div class="scroll-row" id="savedWidget"></div>
             </div>
 
+            <!-- Security Center Section -->
+            <div class="security-center-section" id="securityCenterSection" style="margin:12px 0;">
+                <div class="section-title"><i class="fas fa-shield-alt"></i> Security Center</div>
+                <div class="engage-card">
+                    <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;">
+                        <li style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                            <span>HTTPS Connection</span>
+                            <span id="secHttpsStatus" style="display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Checking...</span>
+                        </li>
+                        <li style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                            <span>Secure Context</span>
+                            <span id="secSecureStatus" style="display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Checking...</span>
+                        </li>
+                        <li style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                            <span>Service Worker</span>
+                            <span id="secSwStatus" style="display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Checking...</span>
+                        </li>
+                        <li style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                            <span>Notifications API</span>
+                            <span id="secNotifStatus" style="display:inline-flex;align-items:center;gap:6px;"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Checking...</span>
+                        </li>
+                    </ul>
+                    <p style="margin:10px 0 0;color:var(--text-light);">Your PIN and sensitive preferences are stored locally. Use a strong PIN and keep your device secure.</p>
+                    <div class="button-group" style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+                        <a id="openSecuritySettingsBtn" href="/Settings.html#security" class="post-control-button" style="text-decoration:none;">Open Security Settings</a>
+                        <button id="closeSecuritySectionBtn" class="post-control-button" type="button">Close</button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+            (function(){
+                function setStatus(el, ok, label){
+                    if(!el) return;
+                    var icon = ok ? '<i class="fas fa-check" style="color:#22c55e"></i>' : '<i class="fas fa-exclamation-triangle" style="color:#eab308"></i>';
+                    el.innerHTML = icon + ' ' + label;
+                }
+
+                function updateSecurityStatuses(){
+                    var isLocal = ['localhost','127.0.0.1','::1'].indexOf(location.hostname) !== -1;
+                    var httpsOk = (location.protocol === 'https:') || isLocal;
+                    setStatus(document.getElementById('secHttpsStatus'), httpsOk, httpsOk ? 'OK' : 'Use HTTPS');
+
+                    var secureOk = window.isSecureContext === true;
+                    setStatus(document.getElementById('secSecureStatus'), secureOk, secureOk ? 'OK' : 'Not secure');
+
+                    var swSupported = ('serviceWorker' in navigator);
+                    var swActive = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+                    var swOk = swActive || swSupported;
+                    var swLabel = swActive ? 'Active' : (swSupported ? 'Available' : 'Unavailable');
+                    setStatus(document.getElementById('secSwStatus'), swOk, swLabel);
+
+                    var notifOk = false; var notifLabel = 'Unsupported';
+                    if (typeof Notification !== 'undefined'){
+                        notifLabel = Notification.permission.charAt(0).toUpperCase() + Notification.permission.slice(1);
+                        notifOk = (Notification.permission === 'granted' || Notification.permission === 'default');
+                    }
+                    setStatus(document.getElementById('secNotifStatus'), notifOk, notifLabel);
+                }
+
+                function attachEvents(){
+                    var closeBtn = document.getElementById('closeSecuritySectionBtn');
+                    if (closeBtn) closeBtn.addEventListener('click', function(){
+                        var sec = document.getElementById('securityCenterSection');
+                        if (sec) sec.style.display = 'none';
+                    });
+
+                    if ('serviceWorker' in navigator){
+                        navigator.serviceWorker.addEventListener('controllerchange', updateSecurityStatuses);
+                    }
+                    window.addEventListener('focus', updateSecurityStatuses);
+                    document.addEventListener('visibilitychange', function(){ if(!document.hidden) updateSecurityStatuses(); });
+                }
+
+                if (document.readyState === 'loading'){
+                    document.addEventListener('DOMContentLoaded', function(){ updateSecurityStatuses(); attachEvents(); });
+                } else {
+                    updateSecurityStatuses(); attachEvents();
+                }
+            })();
+            </script>
+
             <!-- Post Creation Section -->
             <div class="post-creation-section" id="postCreationSection">
                 <h3>Create New Post</h3>
