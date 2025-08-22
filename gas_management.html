@@ -683,7 +683,7 @@
             margin-top: 0; /* Override default margin */
         }
 
-        /* Toggle Button specific style */
+        /* Toggle Switch specific style */
         .toggle-switch {
             position: relative;
             display: inline-block;
@@ -1387,14 +1387,11 @@
 
     <main>
         <div class="content-wrapper">
-            <div style="display:flex; gap:8px; align-items:center; margin: 8px 0 12px;">
-                <button id="expandAllBtn" class="btn" style="padding:8px 10px; border-radius:10px; border:1px solid var(--border-color); background: rgba(255,255,255,0.06); color: var(--text-color-primary);"><i class="fas fa-expand"></i> Expand All</button>
-                <button id="collapseAllBtn" class="btn" style="padding:8px 10px; border-radius:10px; border:1px solid var(--border-color); background: rgba(255,255,255,0.06); color: var(--text-color-primary);"><i class="fas fa-compress"></i> Collapse All</button>
-            </div>
+            <!-- Expand/Collapse buttons removed - all sections are always visible -->
             <div class="admin-section" id="adminDashboardSection">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
                     <h2 style="margin:0;">Admin Dashboard</h2>
-                    <button class="toggle-btn" aria-controls="adminDashboardContent" aria-expanded="true" data-section="adminDashboardSection">Hide</button>
+                    <!-- Admin Dashboard Section - Always Visible -->
                 </div>
                 <div id="adminDashboardContent">
                     <h2>Admin Dashboard</h2>
@@ -1506,6 +1503,11 @@
                                 <div class="input-group">
                                     <label for="announcementDurationInput">Display Duration (minutes):</label>
                                     <input type="number" id="announcementDurationInput" min="1" max="60" placeholder="5">
+                                </div>
+                                <div class="input-group">
+                                    <button id="testAnnouncementBtn" class="admin-button" style="margin-top: 10px;">
+                                        <span class="button-text">Test Announcement</span>
+                                    </button>
                                 </div>
                                 <div class="input-group">
                                     <label>Preview:</label>
@@ -1791,7 +1793,7 @@
             <div class="admin-section" id="featureOrdersSection">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
                     <h2 style="margin:0;">Feature Orders</h2>
-                    <button class="toggle-btn" aria-controls="featureOrdersContent" aria-expanded="true" data-section="featureOrdersSection">Hide</button>
+                    <!-- Feature Orders Section - Always Visible -->
                 </div>
                 <div id="featureOrdersContent">
                     <h2>Feature Orders</h2>
@@ -1812,7 +1814,7 @@
             <div class="admin-section" id="shopPaymentsSection">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
                     <h2 style="margin:0;">Shop Payment Requests</h2>
-                    <button class="toggle-btn" aria-controls="shopPaymentsContent" aria-expanded="true" data-section="shopPaymentsSection">Hide</button>
+                    <!-- Shop Payments Section - Always Visible -->
                 </div>
                 <div id="shopPaymentsContent">
                     <h2>Shop Payment Requests</h2>
@@ -1835,7 +1837,7 @@
             <div class="admin-section" id="walletUnlockRequestsSection">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
                     <h2 style="margin:0;"><i class="fas fa-unlock"></i> Wallet Unlock Requests</h2>
-                    <button class="toggle-btn" aria-controls="walletUnlockRequestsContent" aria-expanded="true" data-section="walletUnlockRequestsSection">Hide</button>
+                    <!-- Wallet Unlock Requests Section - Always Visible -->
                 </div>
                 <div id="walletUnlockRequestsContent">
                     <h2><i class="fas fa-unlock"></i> Wallet Unlock Requests</h2>
@@ -1858,7 +1860,7 @@
             <div class="admin-section" id="stickersCategoryUnlockSection">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
                     <h2 style="margin:0;"><i class="fas fa-face-smile"></i> Stickers Category Unlock</h2>
-                    <button class="toggle-btn" aria-controls="stickersCategoryUnlockContent" aria-expanded="true" data-section="stickersCategoryUnlockSection">Hide</button>
+                    <!-- Stickers Category Unlock Section - Always Visible -->
                 </div>
                 <div id="stickersCategoryUnlockContent">
                     <h2><i class="fas fa-face-smile"></i> Stickers Category Unlock</h2>
@@ -5094,6 +5096,13 @@
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
             console.log("JCHAT_DEBUG: DOMContentLoaded fired.");
+            
+            // Add event listener for test announcement button
+            const testAnnouncementBtn = document.getElementById('testAnnouncementBtn');
+            if (testAnnouncementBtn) {
+                testAnnouncementBtn.addEventListener('click', testAnnouncement);
+            }
+            
             // Apply theme on load
             const savedTheme = localStorage.getItem('jchat-theme');
             const themes = ['theme-light-mode', 'theme-dark-mode', 'theme-glass-mode', 'theme-sunset-mode'];
@@ -5389,6 +5398,39 @@
             const rtl = Math.min(30, Math.max(10, width / 60));
             track.style.animation = `ticker-rtl ${rtl}s linear infinite`;
         }
+
+        // Test announcement functionality
+        function testAnnouncement() {
+            const announcementText = document.getElementById('announcementTextInput')?.value?.trim();
+            const duration = parseInt(document.getElementById('announcementDurationInput')?.value || '5');
+            
+            if (!announcementText) {
+                showMessageBox('Please enter announcement text first!', 'warning');
+                return;
+            }
+
+            // Create a test announcement that will appear immediately
+            const testSettings = {
+                announcementEnabled: true,
+                announcementText: announcementText,
+                announcementDurationMs: duration * 60000,
+                announcementStartTime: null, // No start time = immediate
+                announcementEndTime: null,   // No end time = no expiration
+                updatedAt: serverTimestamp()
+            };
+
+            // Save test announcement to Firestore
+            setDoc(SYSTEM_SETTINGS_DOC_REF, testSettings, { merge: true })
+                .then(() => {
+                    showMessageBox('Test announcement sent! Check Home.html to see it.', 'success');
+                    console.log('JCHAT_DEBUG: Test announcement saved:', testSettings);
+                })
+                .catch((error) => {
+                    console.error('JCHAT_ERROR: Failed to save test announcement:', error);
+                    showMessageBox(`Failed to send test announcement: ${error.message}`, 'error');
+                });
+        }
+
         document.addEventListener('input', (e)=>{
             if (e.target && (e.target.id === 'announcementTextInput')) updateAnnouncementPreview();
         });
@@ -5402,58 +5444,13 @@
         function setExpanded(id, expanded) {
             try { localStorage.setItem(STORAGE_KEY_PREFIX + id, expanded ? 'expanded' : 'collapsed'); } catch { /* ignore */ }
         }
-        function toggleSection(sectionId, force) {
-            const section = document.getElementById(sectionId);
-            if (!section) return;
-            const btn = section.querySelector('.toggle-btn');
-            const contentId = btn?.getAttribute('aria-controls');
-            const content = contentId ? document.getElementById(contentId) : null;
-            const expanded = typeof force === 'boolean' ? force : btn?.getAttribute('aria-expanded') !== 'true';
-            if (btn) btn.setAttribute('aria-expanded', String(expanded));
-            if (content) {
-                if (expanded) { content.removeAttribute('hidden'); } else { content.setAttribute('hidden', ''); }
-            }
-            setExpanded(sectionId, expanded);
-        }
-        function initToggles() {
-            document.querySelectorAll('.admin-section .toggle-btn').forEach((btn) => {
-                const sectionId = btn.getAttribute('data-section');
-                const expanded = isExpanded(sectionId);
-                btn.setAttribute('aria-expanded', String(expanded));
-                const contentId = btn.getAttribute('aria-controls');
-                const content = document.getElementById(contentId);
-                if (!expanded && content) content.setAttribute('hidden', '');
-                btn.textContent = expanded ? 'Hide' : 'Show';
-                btn.addEventListener('click', () => {
-                    const isNowExpanded = btn.getAttribute('aria-expanded') !== 'true';
-                    btn.textContent = isNowExpanded ? 'Hide' : 'Show';
-                    toggleSection(sectionId, isNowExpanded);
-                });
-            });
-            const expandAllBtn = document.getElementById('expandAllBtn');
-            const collapseAllBtn = document.getElementById('collapseAllBtn');
-            expandAllBtn?.addEventListener('click', () => {
-                document.querySelectorAll('.admin-section .toggle-btn').forEach(btn => {
-                    const sectionId = btn.getAttribute('data-section');
-                    btn.textContent = 'Hide';
-                    toggleSection(sectionId, true);
-                });
-            });
-            collapseAllBtn?.addEventListener('click', () => {
-                document.querySelectorAll('.admin-section .toggle-btn').forEach(btn => {
-                    const sectionId = btn.getAttribute('data-section');
-                    btn.textContent = 'Show';
-                    toggleSection(sectionId, false);
-                });
-            });
-        }
+        // Toggle functionality removed - all sections are now always visible
 
         onAuthStateChanged(auth, async (user) => {
             console.log("JCHAT_DEBUG: onAuthStateChanged triggered. User:", user ? user.uid : "null");
             if (user) {
                 currentUser = user;
-                // init toggles after DOM is ready
-                initToggles();
+                // All sections are now always visible
                 // Check if the user is the ADMIN_UID
                 if (currentUser.uid === ADMIN_UID) {
                     await fetchAndDisplayHeaderProfile(user);

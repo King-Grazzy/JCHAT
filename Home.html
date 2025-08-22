@@ -3382,6 +3382,10 @@
             <div class="announcement-ticker">
                 <div id="announcementTrack" class="announcement-track"></div>
             </div>
+            <!-- Debug button for testing announcements -->
+            <button id="testAnnouncementBtn" onclick="testAnnouncementManually()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255, 46, 146, 0.8); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; display: none;">
+                Test
+            </button>
         </div>
     </div>
 
@@ -7406,7 +7410,7 @@
                 toggleInteractiveElements(true, isCurrentUserAdmin); // Enable all interactions initially, pass isAdmin.
             }
 
-            // Developer Announcement Header toggle
+            // Developer Announcement Header toggle - Enhanced with better debugging
             try {
                 const annEl = document.getElementById('announcementHeader');
                 const trackEl = document.getElementById('announcementTrack');
@@ -7418,8 +7422,8 @@
                     const endOk = !settings.announcementEndTime || (settings.announcementEndTime.toDate ? settings.announcementEndTime.toDate() >= now : true);
                     const shouldShow = enabled && !!text && startOk && endOk;
                     
-                    // Debug logging for announcement system
-                    console.log('JCHAT_DEBUG: Announcement system debug:', {
+                    // Enhanced debug logging for announcement system
+                    console.log('JCHAT_DEBUG: Enhanced announcement system debug:', {
                         enabled,
                         announcementText: settings.announcementText,
                         globalAnnouncement: settings.globalAnnouncement,
@@ -7428,9 +7432,19 @@
                         endTime: settings.announcementEndTime,
                         startOk,
                         endOk,
-                        shouldShow
+                        shouldShow,
+                        fullSettings: settings
                     });
+
+                    // Clear any existing countdown
+                    const existingCountdown = annEl.querySelector('.announcement-countdown');
+                    if (existingCountdown) {
+                        existingCountdown.remove();
+                    }
+
                     if (shouldShow) {
+                        console.log('JCHAT_DEBUG: Showing announcement:', text);
+                        
                         // Show countdown before announcement appears
                         const countdownEl = document.createElement('div');
                         countdownEl.className = 'announcement-countdown';
@@ -7468,16 +7482,43 @@
                                 });
                                 
                                 document.body.classList.add('has-announcement');
+                                console.log('JCHAT_DEBUG: Announcement displayed successfully');
+                                
+                                // Hide test button when announcement is shown
+                                const testBtn = document.getElementById('testAnnouncementBtn');
+                                if (testBtn) {
+                                    testBtn.style.display = 'none';
+                                }
                             }
                         }, 1000);
                     } else {
+                        console.log('JCHAT_DEBUG: Hiding announcement. Reason:', {
+                            enabled: enabled,
+                            hasText: !!text,
+                            startOk: startOk,
+                            endOk: endOk
+                        });
                         annEl.style.display = 'none';
                         document.body.classList.remove('has-announcement');
                         trackEl.textContent = '';
                         trackEl.style.animation = '';
+                        
+                        // Show test button for debugging
+                        const testBtn = document.getElementById('testAnnouncementBtn');
+                        if (testBtn) {
+                            testBtn.style.display = 'block';
+                        }
                     }
+                } else {
+                    console.warn('JCHAT_WARN: Announcement elements not found:', {
+                        announcementHeader: !!document.getElementById('announcementHeader'),
+                        announcementTrack: !!document.getElementById('announcementTrack')
+                    });
                 }
-            } catch (e) { console.warn('JCHAT_WARN: Announcement toggle failed', e); }
+            } catch (e) { 
+                console.error('JCHAT_ERROR: Announcement system error:', e);
+                console.error('JCHAT_ERROR: Stack trace:', e.stack);
+            }
 
             // Now, apply individual feature toggles.
             // These will refine the state set by the maintenance mode logic above.
@@ -9337,6 +9378,44 @@
                 updateNotificationBadge(unreadNotificationCount);
             } catch (error) {
                 console.log('JCHAT_DEBUG: Could not load notifications from storage:', error);
+            }
+        }
+
+        // Manual announcement test function for debugging
+        function testAnnouncementManually() {
+            console.log('JCHAT_DEBUG: Manual announcement test triggered');
+            console.log('JCHAT_DEBUG: Current system settings:', currentSystemSettings);
+            
+            // Force show announcement for testing
+            const annEl = document.getElementById('announcementHeader');
+            const trackEl = document.getElementById('announcementTrack');
+            
+            if (annEl && trackEl) {
+                const testText = 'TEST ANNOUNCEMENT - This is a manual test from Home.html';
+                const countdownEl = document.createElement('div');
+                countdownEl.className = 'announcement-countdown';
+                countdownEl.innerHTML = `
+                    <i class="fas fa-clock"></i>
+                    <span>Test Announcement in <span id="announcementCountdown">3</span> seconds</span>
+                `;
+                annEl.appendChild(countdownEl);
+                annEl.style.display = 'block';
+                
+                let countdown = 3;
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    const countdownSpan = document.getElementById('announcementCountdown');
+                    if (countdownSpan) countdownSpan.textContent = countdown;
+                    
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        countdownEl.remove();
+                        
+                        trackEl.textContent = testText;
+                        document.body.classList.add('has-announcement');
+                        console.log('JCHAT_DEBUG: Manual test announcement displayed');
+                    }
+                }, 1000);
             }
         }
 
