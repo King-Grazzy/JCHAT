@@ -13,9 +13,6 @@
     <meta name="apple-mobile-web-app-title" content="JCHAT">
     
     <!-- Security Meta Tags -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    
     <meta name="referrer" content="strict-origin-when-cross-origin">
     
     <!-- SEO Meta Tags -->
@@ -467,7 +464,6 @@
             --delete-button-color: #ef4444;
             --warning-color: #f59e0b;
         }
-
         /* Elegant Theme - Premium Luxury with Golden Shimmer */
         body.theme-elegant-mode {
             background: linear-gradient(135deg, #92400e, #b45309, #d97706, #f59e0b) !important;
@@ -968,7 +964,6 @@
             position: relative;
             margin-right: 15px;
         }
-
         .notification-icon-wrapper a {
             text-decoration: none;
             color: inherit;
@@ -1459,7 +1454,6 @@
             -webkit-text-fill-color: transparent;
             color: transparent; /* Fallback */
         }
-
         /* Main Content Area */
         main {
             flex-grow: 1;
@@ -1959,7 +1953,6 @@
             border-top: 1px solid var(--border-light);
             padding-top: 1rem;
         }
-
         .comments-list {
             display: flex;
             flex-direction: column;
@@ -2457,7 +2450,6 @@
             color: var(--text-light);
             font-size: 0.9rem;
         }
-
         /* Ad-free Experience */
         .ad-free {
             display: none !important;
@@ -3262,9 +3254,9 @@
                 
                 <!-- Profile Link with Picture and Name -->
                 <a href="./Profile.html" id="profileLink" aria-label="View Profile" style="display:flex;align-items:center;gap:8px;">
-                    <img id="headerProfilePic" src="" alt="Profile Picture" loading="lazy" decoding="async" style="display:none;width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid var(--border-light); box-shadow: 0 0 10px rgba(255,46,146,0.6), 0 0 10px rgba(0,213,255,0.6);">
+                    <img id="headerProfilePic" src="" alt="Profile Picture" loading="lazy" decoding="async" style="display:none;border-radius:50%;object-fit:cover;border:1px solid var(--border-light); box-shadow: 0 0 10px rgba(255,46,146,0.6), 0 0 10px rgba(0,213,255,0.6);">
                     <i id="headerAvatarIcon" class="fas fa-user-circle" role="img" aria-label="User Avatar" style="font-size:36px; box-shadow: 0 0 10px rgba(255,46,146,0.6), 0 0 10px rgba(0,213,255,0.6); border-radius:50%;"></i>
-                    <span id="headerDisplayName">Loading...</span>
+                    <span id="headerDisplayName" style="display:inline-block; white-space:nowrap; max-width:260px; overflow:hidden; text-overflow:ellipsis;">Loading...</span>
                     <span id="headerPremiumBadge" class="premium-badge" style="display: none;"></span>
                 </a>
             </div>
@@ -3675,7 +3667,6 @@
             <button id="endCallBtn" class="end-call-btn" style="display: none;" aria-label="End Call"><i class="fas fa-phone-slash"></i></button>
         </div>
     </div>
-
     <!-- Sidebar Navigation -->
     <aside id="sidebarNav" class="sidebar-hidden" role="navigation" aria-label="Main Navigation">
         <div class="sidebar-header">
@@ -4176,7 +4167,6 @@
                 showMessageBox(`Theme changed to ${themeName}`, 'success'); 
             }
         }
-
         // Theme picker functionality
         let themePickerEl = null;
 
@@ -6554,7 +6544,6 @@
                 showMessageBox("Media removed.", "info");
             });
         }
-
         /**
          * Saves the changes made to an edited post.
          * Handles new media upload, updates Firestore, and shows messages.
@@ -6862,7 +6851,6 @@
                 if (loadingPostsMessage) loadingPostsMessage.style.display = 'none';
                 return;
             }
-
             try {
                 const postsCollectionRef = collection(db, "artifacts", appId, "public", "data", "posts");
                 const q = query(postsCollectionRef, orderBy("timestamp", "desc")); // Order posts by timestamp descending.
@@ -7263,7 +7251,6 @@
                 showMessageBox(`Failed to load system settings: ${error.message}`, 'error', true);
             }
         }
-
         /**
          * Applies the fetched system settings to various UI elements and features.
          * Controls visibility and interactivity based on admin toggles and maintenance mode.
@@ -8238,7 +8225,6 @@
                 }
             }
         });
-
         // Cleanup resources before the page unloads.
         window.addEventListener('beforeunload', async () => {
             // Detach all Firestore listeners before the page unloads.
@@ -8728,7 +8714,6 @@
                 }
             }
         }
-
         // Notification permission prompt (deferred)
         async function requestNotificationPermissionIfNeeded() {
             try {
@@ -9218,7 +9203,6 @@
                 });
             }
         }
-
         // Check Premium Status
         async function checkPremiumStatus() {
             if (!currentUser) return;
@@ -9711,7 +9695,6 @@
         if (currentUser) {
             initializePremiumFeatures();
         }
-
         // Listen for auth state changes
         onAuthStateChanged(auth, (user) => {
             if (user) {
