@@ -3382,9 +3382,16 @@
             <div class="announcement-ticker">
                 <div id="announcementTrack" class="announcement-track"></div>
             </div>
-            <!-- Debug button for testing announcements -->
+            <!-- Status indicator -->
+            <div id="announcementStatus" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: rgba(255, 255, 255, 0.7); display: none;">
+                System Ready
+            </div>
+            <!-- Debug buttons for testing announcements -->
             <button id="testAnnouncementBtn" onclick="testAnnouncementManually()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255, 46, 146, 0.8); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; display: none;">
                 Test
+            </button>
+            <button id="refreshAnnouncementBtn" onclick="forceRefreshAnnouncement()" style="position: absolute; right: 70px; top: 50%; transform: translateY(-50%); background: rgba(0, 213, 255, 0.8); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; display: none;">
+                Refresh
             </button>
         </div>
     </div>
@@ -7410,7 +7417,7 @@
                 toggleInteractiveElements(true, isCurrentUserAdmin); // Enable all interactions initially, pass isAdmin.
             }
 
-            // Developer Announcement Header toggle - Enhanced with better debugging
+            // Developer Announcement Header toggle - Enhanced with better debugging and immediate display
             try {
                 const annEl = document.getElementById('announcementHeader');
                 const trackEl = document.getElementById('announcementTrack');
@@ -7433,6 +7440,8 @@
                         startOk,
                         endOk,
                         shouldShow,
+                        developerUID: settings.developerUID,
+                        lastModified: settings.lastModified,
                         fullSettings: settings
                     });
 
@@ -7484,10 +7493,19 @@
                                 document.body.classList.add('has-announcement');
                                 console.log('JCHAT_DEBUG: Announcement displayed successfully');
                                 
-                                // Hide test button when announcement is shown
+                                // Hide debug buttons and update status when announcement is shown
                                 const testBtn = document.getElementById('testAnnouncementBtn');
+                                const refreshBtn = document.getElementById('refreshAnnouncementBtn');
+                                const statusEl = document.getElementById('announcementStatus');
                                 if (testBtn) {
                                     testBtn.style.display = 'none';
+                                }
+                                if (refreshBtn) {
+                                    refreshBtn.style.display = 'none';
+                                }
+                                if (statusEl) {
+                                    statusEl.style.display = 'block';
+                                    statusEl.textContent = 'Announcement Active';
                                 }
                             }
                         }, 1000);
@@ -7503,10 +7521,19 @@
                         trackEl.textContent = '';
                         trackEl.style.animation = '';
                         
-                        // Show test button for debugging
+                        // Show debug buttons and status for debugging
                         const testBtn = document.getElementById('testAnnouncementBtn');
+                        const refreshBtn = document.getElementById('refreshAnnouncementBtn');
+                        const statusEl = document.getElementById('announcementStatus');
                         if (testBtn) {
                             testBtn.style.display = 'block';
+                        }
+                        if (refreshBtn) {
+                            refreshBtn.style.display = 'block';
+                        }
+                        if (statusEl) {
+                            statusEl.style.display = 'block';
+                            statusEl.textContent = 'System Ready - No Active Announcement';
                         }
                     }
                 } else {
@@ -9418,6 +9445,45 @@
                 }, 1000);
             }
         }
+
+        // Force refresh announcement system
+        function forceRefreshAnnouncement() {
+            console.log('JCHAT_DEBUG: Force refreshing announcement system');
+            if (currentSystemSettings) {
+                console.log('JCHAT_DEBUG: Re-applying system settings for announcement refresh');
+                applySystemSettings(currentSystemSettings);
+            } else {
+                console.log('JCHAT_DEBUG: No system settings available, fetching fresh data');
+                fetchSystemSettings().then(() => {
+                    if (currentSystemSettings) {
+                        applySystemSettings(currentSystemSettings);
+                    }
+                });
+            }
+        }
+
+        // Check announcement system status
+        function checkAnnouncementStatus() {
+            console.log('JCHAT_DEBUG: === ANNOUNCEMENT SYSTEM STATUS ===');
+            console.log('JCHAT_DEBUG: Current system settings:', currentSystemSettings);
+            console.log('JCHAT_DEBUG: Announcement header element:', document.getElementById('announcementHeader'));
+            console.log('JCHAT_DEBUG: Announcement track element:', document.getElementById('announcementTrack'));
+            console.log('JCHAT_DEBUG: Current user:', currentUser);
+            console.log('JCHAT_DEBUG: Is auth ready:', isAuthReady);
+            
+            if (currentSystemSettings) {
+                console.log('JCHAT_DEBUG: Announcement enabled:', currentSystemSettings.announcementEnabled);
+                console.log('JCHAT_DEBUG: Announcement text:', currentSystemSettings.announcementText);
+                console.log('JCHAT_DEBUG: Announcement duration:', currentSystemSettings.announcementDurationMs);
+                console.log('JCHAT_DEBUG: Developer UID:', currentSystemSettings.developerUID);
+            }
+            console.log('JCHAT_DEBUG: === END STATUS ===');
+        }
+
+        // Make functions globally accessible for console debugging
+        window.testAnnouncementManually = testAnnouncementManually;
+        window.forceRefreshAnnouncement = forceRefreshAnnouncement;
+        window.checkAnnouncementStatus = checkAnnouncementStatus;
 
         // Smart Scroll logic
         const smartScrollBtn = document.getElementById('smartScrollBtn');

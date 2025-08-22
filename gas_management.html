@@ -3963,7 +3963,10 @@
                     announcementEnabled: !!document.getElementById('announcementEnabledToggle')?.checked,
                     announcementText: (document.getElementById('announcementTextInput')?.value || '').trim(),
                     announcementDurationMs: Math.max(60000, parseInt(document.getElementById('announcementDurationInput')?.value || '5') * 60000),
-                    updatedAt: serverTimestamp()
+                    updatedAt: serverTimestamp(),
+                    // Add developer UID for tracking
+                    developerUID: currentUser?.uid || 'unknown',
+                    lastModified: serverTimestamp()
                 };
 
                 // Basic validation
@@ -5399,7 +5402,7 @@
             track.style.animation = `ticker-rtl ${rtl}s linear infinite`;
         }
 
-        // Test announcement functionality
+        // Test announcement functionality - Enhanced for immediate testing
         function testAnnouncement() {
             const announcementText = document.getElementById('announcementTextInput')?.value?.trim();
             const duration = parseInt(document.getElementById('announcementDurationInput')?.value || '5');
@@ -5416,14 +5419,29 @@
                 announcementDurationMs: duration * 60000,
                 announcementStartTime: null, // No start time = immediate
                 announcementEndTime: null,   // No end time = no expiration
-                updatedAt: serverTimestamp()
+                updatedAt: serverTimestamp(),
+                // Add developer UID for tracking
+                developerUID: currentUser?.uid || 'unknown',
+                lastModified: serverTimestamp()
             };
+
+            console.log('JCHAT_DEBUG: Sending test announcement:', testSettings);
 
             // Save test announcement to Firestore
             setDoc(SYSTEM_SETTINGS_DOC_REF, testSettings, { merge: true })
                 .then(() => {
                     showMessageBox('Test announcement sent! Check Home.html to see it.', 'success');
-                    console.log('JCHAT_DEBUG: Test announcement saved:', testSettings);
+                    console.log('JCHAT_DEBUG: Test announcement saved successfully to Firestore');
+                    
+                    // Also update the current settings object for immediate testing
+                    if (currentSystemSettings) {
+                        currentSystemSettings.announcementEnabled = true;
+                        currentSystemSettings.announcementText = announcementText;
+                        currentSystemSettings.announcementDurationMs = duration * 60000;
+                        currentSystemSettings.announcementStartTime = null;
+                        currentSystemSettings.announcementEndTime = null;
+                        console.log('JCHAT_DEBUG: Updated local settings for immediate testing');
+                    }
                 })
                 .catch((error) => {
                     console.error('JCHAT_ERROR: Failed to save test announcement:', error);
