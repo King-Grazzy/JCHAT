@@ -398,6 +398,209 @@
             padding: 0 30px;
         }
 
+        /* Crop Modal Styles */
+        .crop-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .crop-modal-content {
+            background: var(--card-background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 0;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .crop-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .crop-modal-header h3 {
+            margin: 0;
+            color: var(--text-color-primary);
+            font-size: 1.3rem;
+        }
+
+        .close-crop-modal-btn {
+            background: none;
+            border: none;
+            color: var(--text-color-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-crop-modal-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color-primary);
+        }
+
+        .crop-container {
+            padding: 1.5rem;
+        }
+
+        .crop-area {
+            width: 600px;
+            height: 300px;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .crop-controls {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .crop-zoom-controls,
+        .crop-rotation-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .crop-controls label {
+            color: var(--text-color-primary);
+            font-weight: 500;
+            min-width: 60px;
+        }
+
+        .crop-controls input[type="range"] {
+            width: 120px;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .crop-controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .crop-controls span {
+            color: var(--text-color-secondary);
+            font-size: 0.9rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .crop-modal-actions {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            justify-content: flex-end;
+        }
+
+        .crop-action-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .crop-action-btn.primary {
+            background: var(--button-background);
+            color: white;
+            box-shadow: var(--button-shadow);
+        }
+
+        .crop-action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 213, 255, 0.4), 0 6px 20px rgba(255, 46, 146, 0.4);
+        }
+
+        .crop-action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-color-primary);
+        }
+
+        .crop-action-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* User ID Styling with Pink and Blue */
+        .user-id-container {
+            display: flex !important;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.1), rgba(0, 213, 255, 0.1));
+            border: 1px solid rgba(255, 46, 146, 0.3);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+        }
+
+        .user-id-label {
+            color: var(--text-color-secondary);
+            font-weight: 500;
+        }
+
+        .user-id-text {
+            background: linear-gradient(135deg, #ff2e92, #00d5ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.1), rgba(0, 213, 255, 0.1));
+            border: 1px solid rgba(255, 46, 146, 0.2);
+        }
+
+        .copy-user-id-btn {
+            background: linear-gradient(135deg, #ff2e92, #00d5ff);
+            border: none;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: auto;
+        }
+
+        .copy-user-id-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(255, 46, 146, 0.4), 0 4px 12px rgba(0, 213, 255, 0.4);
+        }
+
         .logo {
             font-family: 'Poppins', sans-serif;
             font-size: 1.8rem;
@@ -3319,6 +3522,39 @@
                     <img id="profileCoverImg" alt="Cover" style="width:100%;height:100%;object-fit:cover;display:none;">
                     <input type="file" id="profileCoverUploadInput" accept="image/*" style="display:none;">
                     <label for="profileCoverUploadInput" id="editCoverOverlay" style="position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,0.5);padding:6px 10px;border-radius:8px;cursor:pointer;display:none;"><i class="fas fa-camera"></i> Edit Cover</label>
+                    
+                    <!-- Cover Image Crop Modal -->
+                    <div id="coverCropModal" class="crop-modal" style="display: none;">
+                        <div class="crop-modal-content">
+                            <div class="crop-modal-header">
+                                <h3>Crop Cover Image</h3>
+                                <button id="closeCoverCropModal" class="close-crop-modal-btn">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            <div class="crop-container">
+                                <div id="coverCropArea" class="crop-area">
+                                    <img id="coverCropPreview" alt="Crop Preview" style="max-width: 100%; max-height: 100%;">
+                                </div>
+                                <div class="crop-controls">
+                                    <div class="crop-zoom-controls">
+                                        <label for="coverCropZoom">Zoom:</label>
+                                        <input type="range" id="coverCropZoom" min="0.5" max="3" step="0.1" value="1">
+                                        <span id="coverCropZoomValue">100%</span>
+                                    </div>
+                                    <div class="crop-rotation-controls">
+                                        <label for="coverCropRotation">Rotation:</label>
+                                        <input type="range" id="coverCropRotation" min="-180" max="180" step="15" value="0">
+                                        <span id="coverCropRotationValue">0°</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="crop-modal-actions">
+                                <button id="resetCoverCrop" class="crop-action-btn secondary">Reset</button>
+                                <button id="applyCoverCrop" class="crop-action-btn primary">Apply & Upload</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="profile-header-area">
@@ -4302,8 +4538,15 @@
                 let imageNaturalHeight = 0;
                 let cropState = { x: 0, y: 0, w: 0, h: 0, zoom: 1 };
 
-                // New: Auto-crop (center-crop) cover to 16:5 and upload immediately
-                async function autoCropAndUploadCover(file) {
+                // Cover image crop and upload functionality
+                let coverCropData = {
+                    file: null,
+                    image: null,
+                    zoom: 1,
+                    rotation: 0
+                };
+
+                async function showCoverCropModal(file) {
                     try {
                         const dataUrl = await new Promise((resolve, reject) => {
                             const reader = new FileReader();
@@ -4311,11 +4554,61 @@
                             reader.onerror = reject;
                             reader.readAsDataURL(file);
                         });
+
                         const img = new Image();
                         await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = dataUrl; });
-                        const targetW = 1600, targetH = 500; // 16:5
-                        const srcW = img.naturalWidth, srcH = img.naturalHeight;
-                        const srcAspect = srcW / srcH, outAspect = targetW / targetH;
+
+                        coverCropData.file = file;
+                        coverCropData.image = img;
+
+                        // Show the crop modal
+                        const modal = document.getElementById('coverCropModal');
+                        const preview = document.getElementById('coverCropPreview');
+                        
+                        if (modal && preview) {
+                            preview.src = dataUrl;
+                            modal.style.display = 'flex';
+                            
+                            // Reset controls
+                            document.getElementById('coverCropZoom').value = 1;
+                            document.getElementById('coverCropRotation').value = 0;
+                            document.getElementById('coverCropZoomValue').textContent = '100%';
+                            document.getElementById('coverCropRotationValue').textContent = '0°';
+                            
+                            coverCropData.zoom = 1;
+                            coverCropData.rotation = 0;
+                        }
+                    } catch (e) {
+                        console.error('Error showing crop modal:', e);
+                        showMessageBox('Failed to load image for cropping.', 'error');
+                    }
+                }
+
+                async function applyCoverCrop() {
+                    try {
+                        if (!coverCropData.file || !coverCropData.image) {
+                            showMessageBox('No image to crop.', 'error');
+                            return;
+                        }
+
+                        const targetW = 1600, targetH = 500; // 16:5 aspect ratio
+                        const canvas = document.createElement('canvas');
+                        canvas.width = targetW;
+                        canvas.height = targetH;
+                        const ctx = canvas.getContext('2d');
+
+                        // Apply zoom and rotation
+                        ctx.save();
+                        ctx.translate(targetW / 2, targetH / 2);
+                        ctx.rotate((coverCropData.rotation * Math.PI) / 180);
+                        ctx.scale(coverCropData.zoom, coverCropData.zoom);
+
+                        // Calculate dimensions to maintain aspect ratio
+                        const srcW = coverCropData.image.naturalWidth;
+                        const srcH = coverCropData.image.naturalHeight;
+                        const srcAspect = srcW / srcH;
+                        const outAspect = targetW / targetH;
+                        
                         let drawW, drawH;
                         if (srcAspect > outAspect) { // too wide
                             drawH = targetH;
@@ -4324,34 +4617,70 @@
                             drawW = targetW;
                             drawH = Math.round(drawW / srcAspect);
                         }
-                        const canvas = document.createElement('canvas');
-                        canvas.width = targetW; canvas.height = targetH;
-                        const ctx = canvas.getContext('2d');
+
                         const dx = Math.round((targetW - drawW) / 2);
                         const dy = Math.round((targetH - drawH) / 2);
-                        ctx.drawImage(img, dx, dy, drawW, drawH);
+                        
+                        ctx.drawImage(coverCropData.image, dx, dy, drawW, drawH);
+                        ctx.restore();
+
+                        // Convert to blob and upload
                         const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.9));
-                        if (!blob) throw new Error('Auto-crop failed');
+                        if (!blob) throw new Error('Crop failed');
+                        
                         const url = await uploadMediaToCloudinary(blob);
                         if (!url) throw new Error('Upload failed');
+                        
                         const coverUrl = getCloudinaryImageUrl(url, `w_${targetW},h_${targetH},c_fill,q_auto`);
                         const previewEl = document.getElementById('profileCoverImg');
-                        if (previewEl) { previewEl.src = coverUrl; previewEl.style.display = 'block'; }
-                        if (currentUser && displayedUserId === currentUser.uid) {
-                            await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), { coverPicId: url, updatedAt: serverTimestamp() });
-                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid), { coverPicId: url, updatedAt: serverTimestamp() });
+                        if (previewEl) { 
+                            previewEl.src = coverUrl; 
+                            previewEl.style.display = 'block'; 
                         }
-                        showMessageBox('Cover updated!', 'success');
+                        
+                        if (currentUser && displayedUserId === currentUser.uid) {
+                            await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), { 
+                                coverPicId: url, 
+                                updatedAt: serverTimestamp() 
+                            });
+                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid), { 
+                                coverPicId: url, 
+                                updatedAt: serverTimestamp() 
+                            });
+                        }
+                        
+                        // Close modal and show success message
+                        document.getElementById('coverCropModal').style.display = 'none';
+                        showMessageBox('Cover updated successfully!', 'success');
+                        
+                        // Clear crop data
+                        coverCropData = { file: null, image: null, zoom: 1, rotation: 0 };
+                        
                     } catch (e) {
+                        console.error('Error applying crop:', e);
                         showMessageBox('Failed to update cover.', 'error');
+                    }
+                }
+
+                function resetCoverCrop() {
+                    coverCropData.zoom = 1;
+                    coverCropData.rotation = 0;
+                    
+                    document.getElementById('coverCropZoom').value = 1;
+                    document.getElementById('coverCropRotation').value = 0;
+                    document.getElementById('coverCropZoomValue').textContent = '100%';
+                    document.getElementById('coverCropRotationValue').textContent = '0°';
+                    
+                    const preview = document.getElementById('coverCropPreview');
+                    if (preview && coverCropData.image) {
+                        preview.style.transform = 'scale(1) rotate(0deg)';
                     }
                 }
 
                 if (profileCoverUploadInput) profileCoverUploadInput.addEventListener('change', async (ev) => {
                     const file = ev.target.files?.[0];
                     if (!file) return;
-                    // Use auto-crop immediate upload instead of manual modal
-                    await autoCropAndUploadCover(file);
+                    await showCoverCropModal(file);
                 });
             }
 
@@ -7701,6 +8030,73 @@
 
             // Profile Picture Upload
             if (profilePicUploadInput) profilePicUploadInput.addEventListener('change', handleProfilePicChange); // Null check
+
+            // Cover Crop Modal Event Listeners
+            const closeCoverCropModal = document.getElementById('closeCoverCropModal');
+            const resetCoverCropBtn = document.getElementById('resetCoverCrop');
+            const applyCoverCropBtn = document.getElementById('applyCoverCrop');
+            const coverCropZoom = document.getElementById('coverCropZoom');
+            const coverCropRotation = document.getElementById('coverCropRotation');
+
+            if (closeCoverCropModal) {
+                closeCoverCropModal.addEventListener('click', () => {
+                    document.getElementById('coverCropModal').style.display = 'none';
+                });
+            }
+
+            // Close modal when clicking outside
+            const coverCropModal = document.getElementById('coverCropModal');
+            if (coverCropModal) {
+                coverCropModal.addEventListener('click', (e) => {
+                    if (e.target === coverCropModal) {
+                        coverCropModal.style.display = 'none';
+                    }
+                });
+            }
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    const modal = document.getElementById('coverCropModal');
+                    if (modal && modal.style.display === 'flex') {
+                        modal.style.display = 'none';
+                    }
+                }
+            });
+
+            if (resetCoverCropBtn) {
+                resetCoverCropBtn.addEventListener('click', resetCoverCrop);
+            }
+
+            if (applyCoverCropBtn) {
+                applyCoverCropBtn.addEventListener('click', applyCoverCrop);
+            }
+
+            if (coverCropZoom) {
+                coverCropZoom.addEventListener('input', (e) => {
+                    const zoom = parseFloat(e.target.value);
+                    coverCropData.zoom = zoom;
+                    document.getElementById('coverCropZoomValue').textContent = `${Math.round(zoom * 100)}%`;
+                    
+                    const preview = document.getElementById('coverCropPreview');
+                    if (preview) {
+                        preview.style.transform = `scale(${zoom}) rotate(${coverCropData.rotation}deg)`;
+                    }
+                });
+            }
+
+            if (coverCropRotation) {
+                coverCropRotation.addEventListener('input', (e) => {
+                    const rotation = parseInt(e.target.value);
+                    coverCropData.rotation = rotation;
+                    document.getElementById('coverCropRotationValue').textContent = `${rotation}°`;
+                    
+                    const preview = document.getElementById('coverCropPreview');
+                    if (preview) {
+                        preview.style.transform = `scale(${coverCropData.zoom}) rotate(${rotation}deg)`;
+                    }
+                });
+            }
 
             // Profile Edit
             if (saveProfileChanges) saveProfileChanges.addEventListener('click', handleSaveProfileChanges); // Null check
