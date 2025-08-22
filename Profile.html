@@ -797,7 +797,6 @@
             overflow: visible; /* Allow content to overflow for proper display */
             scroll-margin-top: 20px; /* Better scroll snapping */
         }
-
         .profile-section::before {
             content: '';
             position: absolute;
@@ -815,7 +814,8 @@
 
         /* Cover Photo Styles */
         #profileCoverWrapper {
-            width: 100% !important;
+            width: calc(100vw - 16px) !important;
+            max-width: none !important;
             height: 200px !important;
             border-radius: var(--radius) var(--radius) 0 0 !important;
             overflow: hidden !important;
@@ -824,6 +824,8 @@
             background: linear-gradient(135deg, var(--blue), var(--pink)) !important;
             border: 1px solid var(--glass-blue) !important;
             transition: all 0.3s ease;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
         }
 
         #profileCoverImg {
@@ -1593,7 +1595,6 @@
                 transform: scale(1.2);
             }
         }
-
         /* NEW: Level Display and Progress Bar Styles */
         .level-link-wrapper {
             text-decoration: none; /* Remove underline from the link */
@@ -2391,7 +2392,6 @@
                 transform: translateY(0);
             }
         }
-
         /* Recent Activity Section */
         .activity-list {
             list-style: none;
@@ -3778,12 +3778,6 @@
 
         // Inline Edit Fields - Removed per request
 
-                    // Cover image wiring
-            const profileCoverWrapper = document.getElementById('profileCoverWrapper');
-            const profileCoverImg = document.getElementById('profileCoverImg');
-            const profileCoverUploadInput = document.getElementById('profileCoverUploadInput');
-            const editCoverOverlay = document.getElementById('editCoverOverlay');
-
             // Tabs wiring
             const tabsContainer = null;
             const tabPanelAbout = document.getElementById('tabPanelAbout');
@@ -4625,8 +4619,6 @@
             }
         }
 
-        // handleSaveProfileChanges function removed per request
-
         /**
          * Handles copying the User ID to clipboard.
          */
@@ -4672,32 +4664,6 @@
             }
         }
 
-        /**
-         * Handles saving privacy settings.
-         */
-        async function handleSavePrivacySettings() {
-            if (!currentUser || !isAuthReady || displayedUserId !== currentUser.uid) {
-                showMessageBox("You can only edit your own privacy settings.", 'warning');
-                return;
-            }
-
-            showMessageBox("Privacy settings functionality has been simplified.", 'info');
-            // Privacy settings functionality removed per request
-        }
-        /**
-         * Handles saving customization settings.
-         */
-        async function handleSaveCustomization() {
-            if (!currentUser || !isAuthReady || displayedUserId !== currentUser.uid) {
-                showMessageBox("You can only customize your own profile.", 'warning');
-                return;
-            }
-
-            showMessageBox("Customization functionality has been simplified.", 'info');
-            // Customization functionality removed per request
-        }
-
-        // Toggle functions removed per request - sections no longer exist
         /**
          * Calculates and updates the profile completion percentage.
          */
@@ -5059,7 +5025,6 @@
                     profileSection.style.removeProperty('--accent-color-dark');
             }
         }
-
         /**
          * Smart Profile Notifications System
          */
@@ -5846,7 +5811,6 @@
                 showMessageBox("Failed to load system settings.", 'error');
             }
         }
-
         /**
          * Shows the JCoin request modal.
          */
