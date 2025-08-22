@@ -1579,9 +1579,7 @@
                 </ul>
             </nav>
             <div class="user-profile-header">
-                <a href="#" id="securityHeaderBtn" aria-label="Security Center" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));border:1px solid rgba(255,255,255,0.2);backdrop-filter:blur(10px)">
-                    <i class="fas fa-shield-alt" style="font-size:1.2rem;background-image:linear-gradient(90deg, var(--blue), var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent"></i>
-                </a>
+
                 <!-- Admin Icon Link (visible only to admin) -->
                 <a href="/coin_management.html" id="adminIconLink" aria-label="Admin Dashboard" style="display: none;">
                     <i class="fas fa-user-cog"></i>
@@ -1613,8 +1611,7 @@
           // Fallback: navigate to settings
           window.location.href = '/Settings.html#security';
         }
-        var btn = document.getElementById('securityHeaderBtn');
-        if (btn) btn.addEventListener('click', function(e){ e.preventDefault(); openSecurity(); });
+        
       })();
     </script>
 
@@ -6328,6 +6325,6 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
         </div>
     </div>
 
-	<script src="/wallet-security.js"></script>
+	
 </body>
 </html>

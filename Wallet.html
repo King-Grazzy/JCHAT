@@ -1075,10 +1075,7 @@
                         <span id="avatarInitial">U</span>
                     </div>
                 </div>
-                <button id="headerSecurityBtn" class="balance-btn" title="Security Center" style="margin-left:12px;display:inline-flex;align-items:center;gap:6px;">
-                    <i class="fas fa-shield-alt"></i>
-                    <span class="hide-on-mobile">Security</span>
-                </button>
+
             </div>
         </div>
     </header>
@@ -2574,18 +2571,10 @@
             document.getElementById('cancelClearTx')?.addEventListener('click', hideClearTxModal);
             document.getElementById('closeClearTxModal')?.addEventListener('click', hideClearTxModal);
 
-            // Header security button -> open Security Center modal
-            const headerSec = document.getElementById('headerSecurityBtn');
-            if (headerSec) {
-                headerSec.addEventListener('click', () => {
-                    const modal = document.getElementById('wsModal');
-                    if (modal) { modal.style.display = 'flex'; }
-                    else { window.location.hash = '#security'; }
-                });
-            }
+
         });
     </script>
-  <script src="/wallet-security.js"></script>
+  
 </body>
 </html>
 
