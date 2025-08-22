@@ -266,82 +266,127 @@
             justify-content: center;
         }
 
-        /* Tiny Plus Toggle in Header */
-        .tiny-toggle {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--blue), var(--pink));
-            border: none;
-            color: white;
-            font-size: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(0, 213, 255, 0.3);
-            margin-left: 15px;
+        /* Clean Profile Section Headers */
+        .profile-section-header {
+            margin: 2rem 0 1rem 0;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-light);
         }
 
-        .tiny-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(0, 213, 255, 0.4);
+        .profile-section-header h3 {
+            margin: 0;
+            color: var(--text-color-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
         }
 
-        .tiny-toggle.active {
-            transform: rotate(45deg);
-            background: linear-gradient(135deg, var(--pink), var(--blue));
-        }
-
-        .tiny-toggle:active {
-            transform: scale(0.95);
-        }
-
-        /* Tiny Dropdown */
-        .tiny-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 20px;
-            background: rgba(26, 26, 46, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-light);
+        /* Enhanced Profile Details Sections */
+        .profile-details-section {
+            background: var(--card-background-color);
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 8px;
-            min-width: 160px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.2s ease;
-            z-index: 1001;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .tiny-dropdown.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+        .profile-details-section label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-color-primary);
+            font-weight: 500;
         }
 
-        .tiny-dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            color: var(--white);
-            text-decoration: none;
-            font-size: 0.85rem;
+        .profile-details-section input,
+        .profile-details-section select,
+        .profile-details-section textarea {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            transition: all 0.2s ease;
+            background: var(--input-background);
+            color: var(--text-color-primary);
+            font-size: 0.9rem;
         }
 
-        .tiny-dropdown-item:hover {
+        .profile-details-section input:focus,
+        .profile-details-section select:focus,
+        .profile-details-section textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.2);
+        }
+
+        /* Enhanced Profile Layout */
+        .profile-section {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .profile-header-area {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-pic-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-color);
+            box-shadow: 0 4px 20px rgba(0, 213, 255, 0.3);
+        }
+
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+            color: var(--text-color-primary);
+        }
+
+        .profile-bio {
+            font-size: 1.1rem;
+            color: var(--text-color-secondary);
+            margin: 0.5rem 0 1.5rem 0;
+            line-height: 1.5;
+        }
+
+        /* Profile Action Buttons */
+        .profile-action-button {
+            background: var(--button-background);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--button-shadow);
+        }
+
+        .profile-action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 213, 255, 0.4), 0 6px 20px rgba(255, 46, 146, 0.4);
+        }
+
+        .profile-action-button.secondary {
             background: rgba(255, 255, 255, 0.1);
-            color: var(--blue);
+            border: 1px solid var(--border-color);
+            box-shadow: none;
         }
 
-        .tiny-dropdown-item i {
-            width: 14px;
-            font-size: 12px;
+        .profile-action-button.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
         }
 
         header .header-content-wrapper {
@@ -3040,12 +3085,7 @@
 
 
 
-            /* Mobile-optimized tiny toggle */
-            .tiny-toggle {
-                width: 28px;
-                height: 28px;
-                font-size: 12px;
-            }
+
         }
 
         /* Additional touch improvements for very small screens */
@@ -3062,12 +3102,7 @@
                 scroll-snap-type: y mandatory; /* Force scroll snapping on very small screens */
             }
 
-            /* Very small screen tiny toggle */
-            .tiny-toggle {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-            }
+
         }
         /* Responsive Adjustments (from Home.html / privacy_settings.html) */
         @media (max-width: 600px) {
@@ -3272,60 +3307,7 @@
                     <i id="headerAvatarIcon" class="fas fa-user-circle"></i>
                     <span id="headerDisplayName">Loading...</span>
                 </a>
-                <!-- Tiny Plus Toggle -->
-                <button class="tiny-toggle" id="tinyToggle" onclick="toggleTinyMenu()">
-                    <i class="fas fa-plus"></i>
-                </button>
-                <div class="tiny-dropdown" id="tinyDropdown">
-                    <a href="/Home.html" class="tiny-dropdown-item">
-                        <i class="fas fa-home"></i>
-                        Home
-                    </a>
-                    <a href="/Chat.html" class="tiny-dropdown-item">
-                        <i class="fas fa-comments"></i>
-                        Chat
-                    </a>
-                    <a href="/Profile.html" class="tiny-dropdown-item">
-                        <i class="fas fa-user"></i>
-                        Profile
-                    </a>
-                    <a href="/Settings.html" class="tiny-dropdown-item">
-                        <i class="fas fa-cog"></i>
-                        Settings
-                    </a>
-                    <a href="/Wallet.html" class="tiny-dropdown-item">
-                        <i class="fas fa-wallet"></i>
-                        Wallet
-                    </a>
-                    <a href="/Find_Friends.html" class="tiny-dropdown-item">
-                        <i class="fas fa-users"></i>
-                        Find Friends
-                    </a>
-                    <a href="/Groups.html" class="tiny-dropdown-item">
-                        <i class="fas fa-layer-group"></i>
-                        Groups
-                    </a>
-                    <a href="/JCoin.html" class="tiny-dropdown-item">
-                        <i class="fas fa-coins"></i>
-                        JCoins
-                    </a>
-                    <div class="tiny-dropdown-item" data-action="edit-profile">
-                        <i class="fas fa-edit"></i>
-                        Edit Profile
-                    </div>
-                    <div class="tiny-dropdown-item" data-action="share-profile">
-                        <i class="fas fa-share-alt"></i>
-                        Share Profile
-                    </div>
-                    <div class="tiny-dropdown-item" data-action="download-qr">
-                        <i class="fas fa-qrcode"></i>
-                        Download QR
-                    </div>
-                    <div class="tiny-dropdown-item" data-action="profile-settings">
-                        <i class="fas fa-cog"></i>
-                        Profile Settings
-                    </div>
-                </div>
+
             </div>
         </div>
     </header>
@@ -3525,80 +3507,68 @@
                         
                     </button>
 
-                    <!-- NEW: Privacy Settings Toggles -->
-
-                    <!-- NEW: Profile Customization Section -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2rem;">
-                        <h3 style="text-align:center;margin:0;">Profile Customization</h3>
-                        <button id="toggleCustomizationBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
+                    <!-- Profile Customization Section -->
+                    <div class="profile-section-header">
+                        <h3>Profile Customization</h3>
                     </div>
-                    <div id="customizationSection" class="profile-details-section" style="display:none;">
+                    <div class="profile-details-section">
                         <div class="customization-option">
-                        <label for="profileFrameSelect">Profile Picture Frame:</label>
-                        <select id="profileFrameSelect">
-                            <option value="default">Default</option>
-                            <option value="gradient">Gradient Frame (Unlocked at Level 25)</option>
-                            <option value="diamond">Diamond Frame (Unlocked at Level 200)</option>
-                            <!-- Add more options as you define them based on unlockedBenefits -->
-                        </select>
-                    </div>
-                    <div class="customization-option">
-                        <label for="chatBubbleStyleSelect">Chat Bubble Style:</label>
-                        <select id="chatBubbleStyleSelect">
-                            <option value="default">Default</option>
-                            <option value="basic">Basic Style (Unlocked at Level 15)</option>
-                            <option value="rounded">Rounded Style (Unlocked at Level 40)</option>
-                            <!-- Add more options -->
-                        </select>
-                    </div>
-                    <div class="customization-option">
-                        <label for="profileThemeSelect">Profile Theme:</label>
-                        <select id="profileThemeSelect">
-                            <option value="default">Default</option>
-                            <option value="solid">Solid Color (Unlocked at Level 65)</option>
-                            <option value="animated1">Animated 1 (Unlocked at Level 150)</option>
-                            <!-- Add more options -->
-                        </select>
-                    </div>
+                            <label for="profileFrameSelect">Profile Picture Frame:</label>
+                            <select id="profileFrameSelect">
+                                <option value="default">Default</option>
+                                <option value="gradient">Gradient Frame (Unlocked at Level 25)</option>
+                                <option value="diamond">Diamond Frame (Unlocked at Level 200)</option>
+                            </select>
+                        </div>
+                        <div class="customization-option">
+                            <label for="chatBubbleStyleSelect">Chat Bubble Style:</label>
+                            <select id="chatBubbleStyleSelect">
+                                <option value="default">Default</option>
+                                <option value="basic">Basic Style (Unlocked at Level 15)</option>
+                                <option value="rounded">Rounded Style (Unlocked at Level 40)</option>
+                            </select>
+                        </div>
+                        <div class="customization-option">
+                            <label for="profileThemeSelect">Profile Theme:</label>
+                            <select id="profileThemeSelect">
+                                <option value="default">Default</option>
+                                <option value="solid">Solid Color (Unlocked at Level 65)</option>
+                                <option value="animated1">Animated 1 (Unlocked at Level 150)</option>
+                            </select>
+                        </div>
 
-                    <!-- NEW: Theme Presets -->
-                    <div class="theme-presets-section">
-                        <label>Quick Theme Presets:</label>
-                        <div class="theme-preset-grid">
-                            <div class="theme-preset" data-theme="professional">
-                                <div class="preset-preview professional-preview"></div>
-                                <span>Professional</span>
-                            </div>
-                            <div class="theme-preset" data-theme="creative">
-                                <div class="preset-preview creative-preview"></div>
-                                <span>Creative</span>
-                            </div>
-                            <div class="theme-preset" data-theme="minimal">
-                                <div class="preset-preview minimal-preview"></div>
-                                <span>Minimal</span>
-                            </div>
-                            <div class="theme-preset" data-theme="vibrant">
-                                <div class="preset-preview vibrant-preview"></div>
-                                <span>Vibrant</span>
+                        <!-- Theme Presets -->
+                        <div class="theme-presets-section">
+                            <label>Quick Theme Presets:</label>
+                            <div class="theme-preset-grid">
+                                <div class="theme-preset" data-theme="professional">
+                                    <div class="preset-preview professional-preview"></div>
+                                    <span>Professional</span>
+                                </div>
+                                <div class="theme-preset" data-theme="creative">
+                                    <div class="preset-preview creative-preview"></div>
+                                    <span>Creative</span>
+                                </div>
+                                <div class="theme-preset" data-theme="minimal">
+                                    <div class="preset-preview minimal-preview"></div>
+                                    <span>Minimal</span>
+                                </div>
+                                <div class="theme-preset" data-theme="vibrant">
+                                    <div class="preset-preview vibrant-preview"></div>
+                                    <span>Vibrant</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <button id="saveCustomizationButton" class="profile-action-button">
-                        <span class="button-text">Save Customization</span>
-                        
-                    </button>
-                    </div> <!-- End Customization Section -->
-
-                    <!-- Identity & Availability -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Identity & Availability</h3>
-                        <button id="toggleIdentityAvailabilityBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
+                        <button id="saveCustomizationButton" class="profile-action-button">
+                            <span class="button-text">Save Customization</span>
                         </button>
                     </div>
-                    <div id="identityAvailabilitySection" class="profile-details-section" style="display:none;">
+
+                    <!-- Identity & Availability -->
+                    <div class="profile-section-header">
+                        <h3>Identity & Availability</h3>
+                    </div>
+                    <div class="profile-details-section">
                         <label for="handleInput">Handle</label>
                         <input type="text" id="handleInput" placeholder="e.g., @yourhandle">
                         <label for="pronounsInput">Pronouns</label>
@@ -3620,13 +3590,10 @@
                     </div>
 
                     <!-- Skills & Endorsements -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Skills & Endorsements</h3>
-                        <button id="toggleSkillsBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
+                    <div class="profile-section-header">
+                        <h3>Skills & Endorsements</h3>
                     </div>
-                    <div id="skillsSection" class="profile-details-section" style="display:none;">
+                    <div class="profile-details-section">
                         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                             <input type="text" id="newSkillInput" placeholder="Add skill (owner only)" style="flex:1;">
                             <button id="addSkillBtn" class="profile-action-button"><i class="fas fa-plus"></i> Add Skill</button>
@@ -3635,57 +3602,47 @@
                     </div>
 
                     <!-- Featured Badges -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Featured Badges</h3>
-                        <button id="toggleBadgesBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
+                    <div class="profile-section-header">
+                        <h3>Featured Badges</h3>
                     </div>
-                    <div id="badgesSection" class="profile-details-section" style="display:none;">
+                    <div class="profile-details-section">
                         <p style="opacity:0.8;margin:0 0 8px;">Choose up to 3 to feature on your profile.</p>
                         <div id="featuredBadgesChooser" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
                         <div id="featuredBadgesDisplay" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
-                    </div> <!-- End Badges Section -->
+                    </div>
 
                     <!-- Profile Insights -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Profile Insights</h3>
-                        <button id="toggleInsightsBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
+                    <div class="profile-section-header">
+                        <h3>Profile Insights</h3>
+                    </div>
+                    <div class="profile-details-section">
+                        <div id="insightsSection">
+                            <!-- Insights content will be populated dynamically -->
+                        </div>
                     </div>
 
-                    <!-- Verified Links & QR -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Share Profile</h3>
-                        <button id="toggleShareBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
+                    <!-- Share Profile -->
+                    <div class="profile-section-header">
+                        <h3>Share Profile</h3>
                     </div>
-                    <div id="shareSection" class="profile-details-section" style="align-items:center;display:none;">
+                    <div class="profile-details-section">
                         <div id="profileShareUrl" style="opacity:0.9;word-break:break-all;margin-bottom:8px;"></div>
                         <img id="profileQrImg" alt="QR" style="width:160px;height:160px;border-radius:8px;border:1px solid var(--border-light);display:none;"/>
-                    </div> <!-- End Share Section -->
+                    </div>
 
                     <!-- Safety Manager -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Safety</h3>
-                        <button id="toggleSafetyBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
+                    <div class="profile-section-header">
+                        <h3>Safety</h3>
                     </div>
-                    <div id="safetySection" class="profile-details-section" style="display:none;">
+                    <div class="profile-details-section">
                         <button id="openSafetyManagerBtn" class="profile-action-button secondary"><i class="fas fa-shield-alt"></i> Safety Manager</button>
-                    </div> <!-- End Safety Section -->
+                    </div>
 
                     <!-- Pinned Post -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
-                        <h3 style="text-align:center;margin:0;">Pinned Post</h3>
-                        <button id="togglePinnedPostBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
+                    <div class="profile-section-header">
+                        <h3>Pinned Post</h3>
                     </div>
-                    <div id="pinnedPostSection" style="display:none;">
+                    <div class="profile-details-section">
                         <div id="pinnedPostArea" style="border:1px solid var(--border-light);border-radius:10px;padding:10px;background:rgba(255,255,255,0.03);"></div>
                     </div>
 
@@ -3981,9 +3938,8 @@
         const headerNavLinkProfile = document.getElementById('profileLink'); // Corrected ID to match HTML
         const adminIconLink = document.getElementById('adminIconLink');
         
-        // Tiny Toggle Elements
-        const tinyToggle = document.getElementById('tinyToggle');
-        const tinyDropdown = document.getElementById('tinyDropdown');
+
+
 
         const profilePicWrapper = document.getElementById('profilePicWrapper'); // New wrapper for owner check
         const profilePagePic = document.getElementById('profilePagePic');
@@ -5133,187 +5089,26 @@
             }
         }
 
-        /**
-         * Toggles the visibility of the Identity & Availability section.
-         */
-        function toggleIdentityAvailability() {
-            const section = document.getElementById('identityAvailabilitySection');
-            const button = document.getElementById('toggleIdentityAvailabilityBtn');
-            const icon = button.querySelector('i');
-            const text = button.textContent.trim();
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Privacy Settings section.
-         */
-        function togglePrivacySettings() {
-            const section = document.getElementById('privacySettingsSection');
-            const button = document.getElementById('togglePrivacySettingsBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Profile Customization section.
-         */
-        function toggleCustomization() {
-            const section = document.getElementById('customizationSection');
-            const button = document.getElementById('toggleCustomizationBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Skills & Endorsements section.
-         */
-        function toggleSkills() {
-            const section = document.getElementById('skillsSection');
-            const button = document.getElementById('toggleSkillsBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Featured Badges section.
-         */
-        function toggleBadges() {
-            const section = document.getElementById('badgesSection');
-            const button = document.getElementById('toggleBadgesBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Profile Insights section.
-         */
-        function toggleInsights() {
-            const section = document.getElementById('insightsSection');
-            const button = document.getElementById('toggleInsightsBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Share Profile section.
-         */
-        function toggleShare() {
-            const section = document.getElementById('shareSection');
-            const button = document.getElementById('toggleShareBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Safety section.
-         */
-        function toggleSafety() {
-            const section = document.getElementById('safetySection');
-            const button = document.getElementById('toggleSafetyBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Pinned Post section.
-         */
-        function togglePinnedPost() {
-            const section = document.getElementById('pinnedPostSection');
-            const button = document.getElementById('togglePinnedPostBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
+
+
+
         /**
          * Calculates and updates the profile completion percentage.
          */
@@ -5417,110 +5212,8 @@
             }
         }
 
-        /**
-         * Initializes tiny toggle functionality.
-         */
-                        function initializeTinyToggle() {/* removed */ return;
-            console.log('JCHAT_DEBUG: Initializing tiny toggle...');
-            console.log('JCHAT_DEBUG: tinyToggle element found:', !!tinyToggle);
-            console.log('JCHAT_DEBUG: tinyDropdown element found:', !!tinyDropdown);
-            
-            if (tinyToggle && tinyDropdown) {
-                console.log('JCHAT_DEBUG: Tiny toggle initialized successfully');
-                
-                // Add event listeners for quick action items in tiny dropdown
-                const actionItems = tinyDropdown.querySelectorAll('[data-action]');
-                actionItems.forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        const action = item.dataset.action;
-                        console.log('JCHAT_DEBUG: Quick action clicked from tiny dropdown:', action);
-                        handleQuickAction(action);
-                        
-                        // Close dropdown after action
-                        const tinyDropdownEl = document.getElementById('tinyDropdown');
-                        const tinyToggleEl = document.getElementById('tinyToggle');
-                        if (tinyDropdownEl && tinyToggleEl) {
-                            tinyDropdownEl.classList.remove('show');
-                            tinyToggleEl.classList.remove('active');
-                        }
-                    });
-                });
-                
-                // Close dropdown when clicking outside
-                document.addEventListener('click', (e) => {
-                    const tinyToggleEl = document.getElementById('tinyToggle');
-                    const tinyDropdownEl = document.getElementById('tinyDropdown');
-                    
-                    if (tinyToggleEl && tinyDropdownEl && 
-                        !tinyToggleEl.contains(e.target) && !tinyDropdownEl.contains(e.target)) {
-                        if (tinyDropdownEl.classList.contains('show')) {
-                            console.log('JCHAT_DEBUG: Closing tiny dropdown - clicked outside');
-                            tinyDropdownEl.classList.remove('show');
-                            tinyToggleEl.classList.remove('active');
-                        }
-                    }
-                });
 
-                // Close dropdown with Escape key
-                document.addEventListener('keydown', (e) => {
-                    if (e.key === 'Escape') {
-                        const tinyDropdownEl = document.getElementById('tinyDropdown');
-                        const tinyToggleEl = document.getElementById('tinyToggle');
-                        
-                        if (tinyDropdownEl && tinyDropdownEl.classList.contains('show')) {
-                            tinyDropdownEl.classList.remove('show');
-                            if (tinyToggleEl) tinyToggleEl.classList.remove('active');
-                            console.log('JCHAT_DEBUG: Tiny dropdown closed via Escape key');
-                        }
-                    }
-                });
 
-                console.log('JCHAT_DEBUG: Tiny toggle elements:', { tinyToggle, tinyDropdown });
-            } else {
-                console.error('JCHAT_ERROR: Tiny toggle elements not found');
-                console.log('JCHAT_DEBUG: Tiny toggle element:', tinyToggle);
-                console.log('JCHAT_DEBUG: Tiny dropdown element:', tinyDropdown);
-            }
-        }
-
-        /**
-         * Toggles the tiny menu dropdown.
-         */
-        function toggleTinyMenu() {
-            console.log('JCHAT_DEBUG: toggleTinyMenu called');
-            
-            const tinyDropdownEl = document.getElementById('tinyDropdown');
-            const tinyToggleEl = document.getElementById('tinyToggle');
-            
-            console.log('JCHAT_DEBUG: tinyDropdown element:', tinyDropdownEl);
-            console.log('JCHAT_DEBUG: tinyToggle element:', tinyToggleEl);
-            
-            if (tinyDropdownEl && tinyToggleEl) {
-                const isVisible = tinyDropdownEl.classList.contains('show');
-                console.log('JCHAT_DEBUG: Dropdown currently visible:', isVisible);
-                
-                if (isVisible) {
-                    tinyDropdownEl.classList.remove('show');
-                    tinyToggleEl.classList.remove('active');
-                    console.log('JCHAT_DEBUG: Tiny dropdown closed');
-                } else {
-                    tinyDropdownEl.classList.add('show');
-                    tinyToggleEl.classList.add('active');
-                    console.log('JCHAT_DEBUG: Tiny dropdown opened');
-                }
-                
-                // Double-check the classes were applied
-                console.log('JCHAT_DEBUG: Dropdown classes after toggle:', tinyDropdownEl.classList.toString());
-                console.log('JCHAT_DEBUG: Toggle classes after toggle:', tinyToggleEl.classList.toString());
-            } else {
-                console.error('JCHAT_ERROR: tinyDropdown or tinyToggle not found in toggleTinyMenu');
-            }
-        }
-
-        // Make toggleTinyMenu globally accessible
-        window.toggleTinyMenu = toggleTinyMenu;
 
         /**
          * Initializes touch gestures for mobile devices.
@@ -5567,10 +5260,8 @@
                                 completionSection.scrollIntoView({ behavior: 'smooth' });
                             }
                         } else {
-                            // Swipe down - could trigger tiny menu
-                            if (window.toggleTinyMenu) {
-                                window.toggleTinyMenu();
-                            }
+                            // Swipe down - could trigger profile actions
+                            // Tiny menu functionality removed
                         }
                     }
                     
@@ -8024,76 +7715,27 @@
             if (saveCustomizationButton) saveCustomizationButton.addEventListener('click', handleSaveCustomization);
 
             // Identity & Availability Toggle
-            if (document.getElementById('toggleIdentityAvailabilityBtn')) {
-                document.getElementById('toggleIdentityAvailabilityBtn').addEventListener('click', toggleIdentityAvailability);
-            }
 
-            // Privacy Settings Toggle
-            if (document.getElementById('togglePrivacySettingsBtn')) {
-                document.getElementById('togglePrivacySettingsBtn').addEventListener('click', togglePrivacySettings);
-            }
 
-            // Profile Customization Toggle
-            if (document.getElementById('toggleCustomizationBtn')) {
-                document.getElementById('toggleCustomizationBtn').addEventListener('click', toggleCustomization);
-            }
 
-            // Skills & Endorsements Toggle
-            if (document.getElementById('toggleSkillsBtn')) {
-                document.getElementById('toggleSkillsBtn').addEventListener('click', toggleSkills);
-            }
 
-            // Featured Badges Toggle
-            if (document.getElementById('toggleBadgesBtn')) {
-                document.getElementById('toggleBadgesBtn').addEventListener('click', toggleBadges);
-            }
 
-            // Profile Insights Toggle
-            if (document.getElementById('toggleInsightsBtn')) {
-                document.getElementById('toggleInsightsBtn').addEventListener('click', toggleInsights);
-            }
 
-            // Share Profile Toggle
-            if (document.getElementById('toggleShareBtn')) {
-                document.getElementById('toggleShareBtn').addEventListener('click', toggleShare);
-            }
 
-            // Safety Toggle
-            if (document.getElementById('toggleSafetyBtn')) {
-                document.getElementById('toggleSafetyBtn').addEventListener('click', toggleSafety);
-            }
 
-            // Pinned Post Toggle
-            if (document.getElementById('togglePinnedPostBtn')) {
-                document.getElementById('togglePinnedPostBtn').addEventListener('click', togglePinnedPost);
-            }
 
-            // Initialize Tiny Toggle
-            /* initializeTinyToggle removed */
+
+
+
+
+
+
+
+
+
+
             
-            // Ensure tiny toggle is properly initialized and visible
-            setTimeout(() => {
-                const toggle = document.getElementById('tinyToggle');
-                if (toggle) {
-                    console.log('JCHAT_DEBUG: Ensuring tiny toggle is visible');
-                    toggle.style.display = 'flex';
-                    toggle.style.visibility = 'visible';
-                    toggle.style.opacity = '1';
-                    toggle.style.pointerEvents = 'auto';
-                    toggle.style.zIndex = '1000';
-                    
-                    // Force re-render
-                    toggle.offsetHeight;
-                    
-                    console.log('JCHAT_DEBUG: Quick actions toggle styles applied:', {
-                        display: toggle.style.display,
-                        visibility: toggle.style.visibility,
-                        opacity: toggle.style.opacity,
-                        pointerEvents: toggle.style.pointerEvents,
-                        zIndex: toggle.style.zIndex
-                    });
-                }
-            }, 1000);
+
 
             // Initialize Touch Gestures for Mobile
             initializeTouchGestures();
