@@ -95,31 +95,73 @@
             --theme-gold: #ffd700;
         }
 
-        /* Theme Switcher Button */
+        /* Theme Switcher Button - Enhanced for Dark/Light Mode */
         .theme-switcher-btn {
-            background: linear-gradient(45deg, rgba(0, 213, 255, 0.7), rgba(255, 46, 146, 0.7));
-
+            background: linear-gradient(45deg, rgba(0, 213, 255, 0.8), rgba(255, 46, 146, 0.8));
             color: var(--white);
-            border: none;
+            border: 2px solid transparent;
             border-radius: 50%;
-            width: 26px;
-            height: 26px;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 0.8rem;
+            font-size: 1rem;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-switcher-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, var(--accent-color), var(--pink));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 50%;
         }
 
         .theme-switcher-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 213, 255, 0.4), 0 6px 20px rgba(255, 46, 146, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .theme-switcher-btn:hover::before {
+            opacity: 0.1;
         }
 
         .theme-switcher-btn:active {
-            transform: scale(0.98);
+            transform: scale(0.95);
+        }
+
+        /* Theme-specific button styling */
+        body.theme-light-mode .theme-switcher-btn {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        body.theme-light-mode .theme-switcher-btn:hover {
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4), 0 6px 20px rgba(139, 92, 246, 0.4);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        body.theme-dark-mode .theme-switcher-btn {
+            background: linear-gradient(45deg, #00d5ff, #ff2e92);
+            box-shadow: 0 4px 15px rgba(0, 213, 255, 0.3), 0 4px 15px rgba(255, 46, 146, 0.3);
+            border-color: rgba(0, 213, 255, 0.2);
+        }
+
+        body.theme-dark-mode .theme-switcher-btn:hover {
+            box-shadow: 0 6px 20px rgba(0, 213, 255, 0.4), 0 6px 20px rgba(255, 46, 146, 0.4);
+            border-color: rgba(0, 213, 255, 0.4);
         }
 
         /* Skip link focus for accessibility */
@@ -2701,32 +2743,80 @@
             color: transparent; /* Fallback */
         }
 
-        /* Sidebar Toggle Button in Header */
+        /* Sidebar Toggle Button in Header - Enhanced to prevent auto-switching */
         #sidebarToggleFab {
             position: static; /* No longer fixed, now part of header flow */
-            width: 30px; /* Smaller */
-            height: 30px; /* Smaller */
+            width: 32px; /* Consistent with theme switcher */
+            height: 32px; /* Consistent with theme switcher */
             border-radius: 50%;
-            background: linear-gradient(45deg, rgba(0, 213, 255, 0.7), rgba(255, 46, 146, 0.7));
+            background: linear-gradient(45deg, rgba(0, 213, 255, 0.8), rgba(255, 46, 146, 0.8));
             color: var(--white);
-            border: none;
-            box-shadow: none; /* No shadow by default */
+            border: 2px solid transparent;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); /* Always visible shadow */
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem; /* Smaller icon */
+            font-size: 1rem; /* Consistent with theme switcher */
             cursor: pointer;
             z-index: 80;
-            transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-            opacity: 0.3; /* Less visible when not in use */
+            transition: all 0.3s ease;
+            opacity: 1; /* Always visible to prevent confusion */
             margin-right: 15px; /* Space from logo */
+            position: relative;
+            overflow: hidden;
+        }
+
+        #sidebarToggleFab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, var(--accent-color), var(--pink));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 50%;
         }
 
         #sidebarToggleFab:hover {
-            opacity: 1; /* Fully visible on hover */
-            transform: scale(1.05);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); /* Subtle shadow on hover */
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0, 213, 255, 0.4), 0 4px 15px rgba(255, 46, 146, 0.4);
+            border-color: rgba(255, 255, 255, 0.3);
             background: linear-gradient(45deg, var(--pink), var(--blue)); /* Reverse gradient on hover */
+        }
+
+        #sidebarToggleFab:hover::before {
+            opacity: 0.1;
+        }
+
+        #sidebarToggleFab:active {
+            transform: scale(0.95);
+        }
+
+        /* Theme-specific sidebar toggle styling */
+        body.theme-light-mode #sidebarToggleFab {
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        body.theme-light-mode #sidebarToggleFab:hover {
+            background: linear-gradient(45deg, #8b5cf6, #3b82f6);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4), 0 4px 15px rgba(139, 92, 246, 0.4);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        body.theme-dark-mode #sidebarToggleFab {
+            background: linear-gradient(45deg, #00d5ff, #ff2e92);
+            box-shadow: 0 2px 8px rgba(0, 213, 255, 0.3), 0 2px 8px rgba(255, 46, 146, 0.3);
+            border-color: rgba(0, 213, 255, 0.2);
+        }
+
+        body.theme-dark-mode #sidebarToggleFab:hover {
+            background: linear-gradient(45deg, #ff2e92, #00d5ff);
+            box-shadow: 0 4px 15px rgba(0, 213, 255, 0.4), 0 4px 15px rgba(255, 46, 146, 0.4);
+            border-color: rgba(0, 213, 255, 0.4);
         }
 
         /* NEW: Maintenance Mode Overlay */
@@ -8499,10 +8589,47 @@
             });
         }
 
-        // Sidebar toggle logic.
+        // Sidebar toggle logic - Fixed to prevent auto-switching during scroll
+        let sidebarToggleState = false; // Track sidebar state explicitly
+        let isScrolling = false; // Track if user is scrolling
+        let scrollTimeout; // Timeout for scroll detection
+
         function toggleSidebar() {
-            sidebarNav.classList.toggle('sidebar-hidden');
-            sidebarNav.classList.toggle('sidebar-visible');
+            // Only allow manual toggle, not auto-switching
+            if (isScrolling) {
+                console.log('JCHAT_DEBUG: Sidebar toggle blocked during scroll');
+                return;
+            }
+            
+            sidebarToggleState = !sidebarToggleState;
+            
+            if (sidebarToggleState) {
+                sidebarNav.classList.remove('sidebar-hidden');
+                sidebarNav.classList.add('sidebar-visible');
+            } else {
+                sidebarNav.classList.remove('sidebar-visible');
+                sidebarNav.classList.add('sidebar-hidden');
+            }
+        }
+
+        // Prevent sidebar auto-toggle during scroll
+        function handleScroll() {
+            isScrolling = true;
+            
+            // Clear existing timeout
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+            
+            // Set timeout to allow sidebar toggle after scroll stops
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 150); // 150ms delay after scroll stops
+        }
+
+        // Enhanced scroll event listener with passive option
+        if (typeof window !== 'undefined') {
+            window.addEventListener('scroll', handleScroll, { passive: true });
         }
 
         // Sidebar event listeners moved inside DOMContentLoaded event
@@ -9148,10 +9275,29 @@
             // Profile link - let it use default href behavior for now
             // Custom handler removed to prevent errors
             
-            // Initialize sidebar toggle functionality
-            if (sidebarToggleFab) sidebarToggleFab.addEventListener('click', toggleSidebar);
-            if (sidebarCloseBtn) sidebarCloseBtn.addEventListener('click', toggleSidebar);
-            if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', handleLogout);
+                    // Initialize sidebar toggle functionality with enhanced state management
+        if (sidebarToggleFab) {
+            sidebarToggleFab.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleSidebar();
+            });
+        }
+        if (sidebarCloseBtn) {
+            sidebarCloseBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleSidebar();
+            });
+        }
+        if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', handleLogout);
+
+        // Ensure sidebar starts in hidden state
+        if (sidebarNav) {
+            sidebarNav.classList.remove('sidebar-visible');
+            sidebarNav.classList.add('sidebar-hidden');
+            sidebarToggleState = false;
+        }
         });
 
         // Initialize notification system
