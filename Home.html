@@ -3266,7 +3266,7 @@
     <!-- Announcement Header (Developer announcements) -->
     <div id="announcementHeader" class="announcement-header" role="region" aria-label="Developer Announcement">
         <div class="announcement-content">
-            <img src="/assets/security.png" alt="Announcement" class="announcement-icon" loading="lazy" decoding="async">
+            <img src="/assets/mega.png" alt="Announcement" class="announcement-icon" loading="lazy" decoding="async">
             <div class="announcement-ticker">
                 <div id="announcementTrack" class="announcement-track"></div>
             </div>
@@ -7241,6 +7241,12 @@
                         maintenanceMode: false,
                         globalAnnouncement: "",
                         enableCalls: true, // NEW: Default to true for calls.
+                        // Announcement settings
+                        announcementEnabled: false,
+                        announcementText: "",
+                        announcementDurationMs: 300000, // 5 minutes in milliseconds
+                        announcementStartTime: null,
+                        announcementEndTime: null,
                     };
                     await setDoc(SYSTEM_SETTINGS_DOC_REF, currentSystemSettings); // Create the document.
                     console.log("JCHAT_DEBUG: Default system settings created.");
@@ -7293,12 +7299,25 @@
                 const annEl = document.getElementById('announcementHeader');
                 const trackEl = document.getElementById('announcementTrack');
                 if (annEl && trackEl) {
-                    const enabled = settings.announcementEnabled ?? true; // default to true if not specified
+                    const enabled = settings.announcementEnabled ?? false; // default to false if not specified
                     const text = (settings.announcementText && settings.announcementText.trim()) || (settings.globalAnnouncement || '').trim();
                     const now = new Date();
                     const startOk = !settings.announcementStartTime || (settings.announcementStartTime.toDate ? settings.announcementStartTime.toDate() <= now : true);
                     const endOk = !settings.announcementEndTime || (settings.announcementEndTime.toDate ? settings.announcementEndTime.toDate() >= now : true);
                     const shouldShow = enabled && !!text && startOk && endOk;
+                    
+                    // Debug logging for announcement system
+                    console.log('JCHAT_DEBUG: Announcement system debug:', {
+                        enabled,
+                        announcementText: settings.announcementText,
+                        globalAnnouncement: settings.globalAnnouncement,
+                        text,
+                        startTime: settings.announcementStartTime,
+                        endTime: settings.announcementEndTime,
+                        startOk,
+                        endOk,
+                        shouldShow
+                    });
                     if (shouldShow) {
                         const durationMs = Math.max(15000, parseInt(settings.announcementDurationMs || 45000));
                         const spacer = ' \u00A0\u00A0\u00A0•\u00A0\u00A0\u00A0 ';
@@ -7854,8 +7873,8 @@
                     if (docSnap.exists()) {
                         currentSystemSettings = docSnap.data();
                         console.log("JCHAT_DEBUG: Real-time system settings update:", currentSystemSettings);
-                        // Delay announcement render by 5 seconds after login to avoid late flicker
-                        setTimeout(() => applySystemSettings(currentSystemSettings), 5000);
+                        // Apply system settings immediately for faster announcement display
+                        applySystemSettings(currentSystemSettings);
                                         // Update wallet chip
                 if (homeChipsRow && walletChipAmount && jcoinRateSpan) {
                     walletChipAmount.textContent = String(currentUserProfileData?.jCoins || 0);

@@ -3877,8 +3877,12 @@
                         enableUserRegistration: true, enableFriendRequests: true, enablePublicChat: true,
                         enablePostCreation: true, enableEmailNotifications: true, maintenanceMode: false,
                         globalAnnouncement: "", enableCalls: true,
-                        announcementStartTime: null, // New default
-                        announcementEndTime: null,   // New default
+                        // Announcement settings
+                        announcementEnabled: false,
+                        announcementText: "",
+                        announcementDurationMs: 300000, // 5 minutes in milliseconds
+                        announcementStartTime: null,
+                        announcementEndTime: null,
                     };
                     await setDoc(SYSTEM_SETTINGS_DOC_REF, currentSystemSettings);
                     console.log("JCHAT_DEBUG: Default system settings created.");
