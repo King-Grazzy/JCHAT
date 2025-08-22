@@ -952,6 +952,28 @@
         }
         body.has-announcement main { margin-top: 40px; }
 
+        /* Announcement Countdown */
+        .announcement-countdown {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            height: 100%;
+            color: var(--text-color-primary);
+            font-weight: 500;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.2), rgba(0, 213, 255, 0.2));
+        }
+
+        .announcement-countdown i {
+            color: var(--accent-color);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         /* User Profile Header Styling */
         .user-profile-header {
             display: flex;
@@ -7319,21 +7341,45 @@
                         shouldShow
                     });
                     if (shouldShow) {
-                        const durationMs = Math.max(15000, parseInt(settings.announcementDurationMs || 45000));
-                        const spacer = ' \u00A0\u00A0\u00A0•\u00A0\u00A0\u00A0 ';
-                        const repeated = `${text}${spacer}${text}${spacer}${text}`;
-                        trackEl.textContent = repeated;
-                        // Compute duration based on actual width for a smooth px/sec speed
-                        requestAnimationFrame(() => {
-                            const ticker = annEl.querySelector('.announcement-ticker');
-                            const containerWidth = ticker ? ticker.offsetWidth : annEl.offsetWidth;
-                            const travel = (trackEl.scrollWidth || 600) + containerWidth; // px to travel
-                            const pxPerSec = 20; // 3x slower than previous ~60px/s
-                            const durationSec = Math.max(36, Math.round(travel / pxPerSec));
-                            trackEl.style.setProperty('--ann-duration', `${durationSec}s`);
-                        });
+                        // Show countdown before announcement appears
+                        const countdownEl = document.createElement('div');
+                        countdownEl.className = 'announcement-countdown';
+                        countdownEl.innerHTML = `
+                            <i class="fas fa-clock"></i>
+                            <span>Announcement in <span id="announcementCountdown">5</span> seconds</span>
+                        `;
+                        annEl.appendChild(countdownEl);
                         annEl.style.display = 'block';
-                        document.body.classList.add('has-announcement');
+                        
+                        let countdown = 5;
+                        const countdownInterval = setInterval(() => {
+                            countdown--;
+                            const countdownSpan = document.getElementById('announcementCountdown');
+                            if (countdownSpan) countdownSpan.textContent = countdown;
+                            
+                            if (countdown <= 0) {
+                                clearInterval(countdownInterval);
+                                countdownEl.remove();
+                                
+                                // Show the actual announcement
+                                const durationMs = Math.max(15000, parseInt(settings.announcementDurationMs || 45000));
+                                const spacer = ' \u00A0\u00A0\u00A0•\u00A0\u00A0\u00A0 ';
+                                const repeated = `${text}${spacer}${text}${spacer}${text}`;
+                                trackEl.textContent = repeated;
+                                
+                                // Compute duration based on actual width for a smooth px/sec speed
+                                requestAnimationFrame(() => {
+                                    const ticker = annEl.querySelector('.announcement-ticker');
+                                    const containerWidth = ticker ? ticker.offsetWidth : annEl.offsetWidth;
+                                    const travel = (trackEl.scrollWidth || 600) + containerWidth; // px to travel
+                                    const pxPerSec = 20; // 3x slower than previous ~60px/s
+                                    const durationSec = Math.max(36, Math.round(travel / pxPerSec));
+                                    trackEl.style.setProperty('--ann-duration', `${durationSec}s`);
+                                });
+                                
+                                document.body.classList.add('has-announcement');
+                            }
+                        }, 1000);
                     } else {
                         annEl.style.display = 'none';
                         document.body.classList.remove('has-announcement');
