@@ -87,6 +87,6 @@
     document.body.appendChild(badge);
   }
 
-  const start = ()=>{ renderModal(); ensureBadge(); };
+  const start = ()=>{ renderModal(); /* ensureBadge(); */ };
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
