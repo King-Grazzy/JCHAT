@@ -3515,127 +3515,317 @@
         </div>
     </header>
 
-    <main>
-        <div class="content-wrapper">
-                            <div class="profile-section">
-                <div id="profileCoverWrapper" style="width:100%;height:180px;border-radius:14px;overflow:hidden;position:relative;margin-bottom:12px;background:rgba(255,255,255,0.05);border:1px solid var(--border-light);">
-                    <img id="profileCoverImg" alt="Cover" style="width:100%;height:100%;object-fit:cover;display:none;">
-                    <input type="file" id="profileCoverUploadInput" accept="image/*" style="display:none;">
-                    <label for="profileCoverUploadInput" id="editCoverOverlay" style="position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,0.5);padding:6px 10px;border-radius:8px;cursor:pointer;display:none;"><i class="fas fa-camera"></i> Edit Cover</label>
-                    
-                    <!-- Cover Image Crop Modal -->
-                    <div id="coverCropModal" class="crop-modal" style="display: none;">
-                        <div class="crop-modal-content">
-                            <div class="crop-modal-header">
-                                <h3>Crop Cover Image</h3>
-                                <button id="closeCoverCropModal" class="close-crop-modal-btn">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="crop-container">
-                                <div id="coverCropArea" class="crop-area">
-                                    <img id="coverCropPreview" alt="Crop Preview" style="max-width: 100%; max-height: 100%;">
-                                </div>
-                                <div class="crop-controls">
-                                    <div class="crop-zoom-controls">
-                                        <label for="coverCropZoom">Zoom:</label>
-                                        <input type="range" id="coverCropZoom" min="0.5" max="3" step="0.1" value="1">
-                                        <span id="coverCropZoomValue">100%</span>
-                                    </div>
-                                    <div class="crop-rotation-controls">
-                                        <label for="coverCropRotation">Rotation:</label>
-                                        <input type="range" id="coverCropRotation" min="-180" max="180" step="15" value="0">
-                                        <span id="coverCropRotationValue">0°</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="crop-modal-actions">
-                                <button id="resetCoverCrop" class="crop-action-btn secondary">Reset</button>
-                                <button id="applyCoverCrop" class="crop-action-btn primary">Apply & Upload</button>
-                            </div>
-                        </div>
+    <main class="main-content">
+        <!-- Profile Header Card -->
+        <div class="profile-header-card">
+            <div class="profile-cover-section">
+                <div class="cover-image-container">
+                    <img id="profileCoverImg" src="/assets/default-cover.jpg" alt="Profile Cover" class="cover-image">
+                    <div class="cover-overlay">
+                        <label for="profileCoverUploadInput" class="cover-upload-btn">
+                            <i class="fas fa-camera"></i>
+                            <span>Change Cover</span>
+                        </label>
+                        <input type="file" id="profileCoverUploadInput" accept="image/*" style="display: none;">
                     </div>
                 </div>
-
-                <div class="profile-header-area">
-                    <div class="profile-pic-wrapper" id="profilePicWrapper">
-                        <img id="profilePagePic" src="" alt="Profile Picture" class="profile-pic" style="display: none;">
-                        <i id="profilePageAvatarIcon" class="fas fa-user-circle profile-pic-placeholder"></i>
-                        <input type="file" id="profilePicUploadInput" accept="image/*" style="display: none;">
-                        <label for="profilePicUploadInput" class="edit-profile-pic-overlay" id="editProfilePicOverlay">
-                            <i class="fas fa-camera"></i> Edit
-                        </label>
-                         <!-- NEW: Loading spinner for profile pic -->
-                    </div>
+            </div>
+            
+            <div class="profile-info-section">
+                <div class="profile-avatar-wrapper">
+                    <img id="profilePagePic" src="/assets/default-avatar.png" alt="Profile Picture" class="profile-avatar">
+                    <label for="profilePicUploadInput" class="avatar-upload-btn">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="profilePicUploadInput" accept="image/*" style="display: none;">
+                </div>
+                
+                <div class="profile-details">
                     <h2 id="profileUsername" class="profile-name">Loading...</h2>
-                    <p id="profileBio" class="profile-bio">No bio provided yet.</p>
+                    <p id="profileBio" class="profile-bio">Loading bio...</p>
                     
-                    <!-- NEW: Profile Completion Progress Bar -->
-                    <div class="profile-completion-section">
-                        <div class="completion-header">
-                            <span class="completion-label">Profile Completion</span>
-                            <span id="completionPercentage" class="completion-percentage">0%</span>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-star"></i>
+                            <span>Level <span id="userLevel">0</span></span>
                         </div>
-                        <div class="completion-progress-bar">
-                            <div id="completionProgressFill" class="completion-progress-fill"></div>
+                        <div class="stat-item">
+                            <i class="fas fa-trophy"></i>
+                            <span><span id="userXP">0</span> XP</span>
                         </div>
-                        <p class="completion-tip" id="completionTip">Complete your profile to unlock more features!</p>
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <span><span id="friendsCount">0</span> Friends</span>
+                        </div>
                     </div>
+                    
+                    <div class="profile-actions">
+                        <button id="editProfileBtn" class="action-btn primary">
+                            <i class="fas fa-edit"></i>
+                            Edit Profile
+                        </button>
+                        <button id="shareProfileBtn" class="action-btn secondary">
+                            <i class="fas fa-share"></i>
+                            Share
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- NEW: Smart Profile Notifications -->
-                    <div class="profile-notifications-section" id="profileNotificationsSection" style="display: none;">
-                        <div class="notifications-header">
-                            <i class="fas fa-bell"></i>
-                            <span>Profile Notifications</span>
-                            <button class="clear-notifications-btn" id="clearNotificationsBtn">
-                                <i class="fas fa-times"></i>
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="overview">
+                <i class="fas fa-user"></i>
+                Overview
+            </button>
+            <button class="tab-btn" data-tab="details">
+                <i class="fas fa-info-circle"></i>
+                Details
+            </button>
+            <button class="tab-btn" data-tab="customization">
+                <i class="fas fa-palette"></i>
+                Customization
+            </button>
+            <button class="tab-btn" data-tab="activity">
+                <i class="fas fa-chart-line"></i>
+                Activity
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Overview Tab -->
+            <div id="overview-tab" class="tab-panel active">
+                <div class="content-grid">
+                    <div class="info-card">
+                        <h3><i class="fas fa-id-card"></i> User Information</h3>
+                        <div class="user-id-container">
+                            <span class="user-id-label">User ID:</span>
+                            <span class="user-id-text" id="userId">Loading...</span>
+                            <button class="copy-user-id-btn" onclick="copyUserId()">
+                                <i class="fas fa-copy"></i>
                             </button>
                         </div>
-                        <div class="notifications-list" id="notificationsList">
-                            <!-- Notifications will be populated here -->
+                        <div class="info-item">
+                            <span class="label">Username:</span>
+                            <span class="value" id="username">Loading...</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Email:</span>
+                            <span class="value" id="userEmail">Loading...</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Status:</span>
+                            <span class="value" id="userStatus">Loading...</span>
                         </div>
                     </div>
-                    
-                    <!-- NEW: User ID Display -->
-                    <p id="profileUserId" class="profile-info-item user-id-container" style="display: none;">
-                        <i class="fas fa-id-card"></i> 
-                        <span class="user-id-label">User ID:</span>
-                        <span id="userIdText" class="user-id-text"></span>
-                        <button id="copyUserIdBtn" class="copy-user-id-btn" title="Copy User ID">
-                            <i class="fas fa-copy"></i>
-                        </button>
-                    </p>
-                    
-                    <p id="profileLocation" class="profile-info-item" style="display: none;"><i class="fas fa-map-marker-alt"></i> <span id="locationText"></span></p>
-                    <p id="profileEmail" class="profile-info-item" style="display: none;"><i class="fas fa-envelope"></i> <span id="emailText"></span></p>
-                    
-                    <!-- New Profile Information Fields -->
-                    <p id="profileFullName" class="profile-info-item" style="display: none;"><i class="fas fa-user"></i> <span id="fullNameText"></span></p>
-                    <p id="profileDateOfBirth" class="profile-info-item" style="display: none;"><i class="fas fa-birthday-cake"></i> <span id="dateOfBirthText"></span></p>
-                    <p id="profileGender" class="profile-info-item" style="display: none;"><i class="fas fa-venus-mars"></i> <span id="genderText"></span></p>
-                    <p id="profilePhone" class="profile-info-item" style="display: none;"><i class="fas fa-phone"></i> <span id="phoneText"></span></p>
-                    <p id="profileCountry" class="profile-info-item" style="display: none;"><i class="fas fa-flag"></i> <span id="countryText"></span></p>
-                    <p id="profileCity" class="profile-info-item" style="display: none;"><i class="fas fa-city"></i> <span id="cityText"></span></p>
-                    <p id="profileLanguage" class="profile-info-item" style="display: none;"><i class="fas fa-language"></i> <span id="languageText"></span></p>
-                    <p id="profileTimezone" class="profile-info-item" style="display: none;"><i class="fas fa-clock"></i> <span id="timezoneText"></span></p>
-                    
-                    <p id="profileSchool" class="profile-info-item" style="display: none;"><i class="fas fa-graduation-cap"></i> <span id="schoolText"></span></p>
-                    <p id="profileWork" class="profile-info-item" style="display: none;"><i class="fas fa-briefcase"></i> <span id="workText"></span></p>
-                    <p id="profileWebsite" class="profile-info-item" style="display: none;"><i class="fas fa-globe"></i> <a id="websiteLink" href="#" target="_blank" rel="noopener noreferrer" class="gradient-text"></a></p>
-                    <p id="profileSocialLinks" class="profile-info-item" style="display: none;"><i class="fas fa-share-alt"></i> <span id="socialLinksText"></span></p>
 
-                    <!-- NEW: Level Info Display -->
-                    <div class="profile-level-info">
-                        <i id="xpLevelIcon" class="fas fa-question-circle profile-level-icon"></i>
-                        <span id="xpLevelName" class="profile-level-name">Loading Level...</span>
+                    <div class="info-card">
+                        <h3><i class="fas fa-trophy"></i> Achievements</h3>
+                        <div id="achievementsContainer" class="achievements-grid">
+                            <p class="no-data">No achievements yet</p>
+                        </div>
                     </div>
-                                    <div class="progress-bar-container" id="progressBarContainer">
-                    <div id="xpProgressBarFill" class="progress-bar-fill" style="background-position: right;"></div>
-                    <div id="progressPercentage" class="progress-percentage">0%</div>
-                </div>
-                    <!-- End NEW: Level Info Display -->
 
+                    <div class="info-card">
+                        <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                        <div id="recentActivityContainer" class="activity-list">
+                            <p class="no-data">No recent activity</p>
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Details Tab -->
+            <div id="details-tab" class="tab-panel">
+                <div class="content-grid">
+                    <div class="info-card">
+                        <h3><i class="fas fa-graduation-cap"></i> Skills & Expertise</h3>
+                        <div id="skillsContainer" class="skills-grid">
+                            <p class="no-data">No skills added yet</p>
+                        </div>
+                        <button class="add-skill-btn">
+                            <i class="fas fa-plus"></i>
+                            Add Skill
+                        </button>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-medal"></i> Badges & Certifications</h3>
+                        <div id="badgesContainer" class="badges-grid">
+                            <p class="no-data">No badges earned yet</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-map-marker-alt"></i> Location & Contact</h3>
+                        <div class="info-item">
+                            <span class="label">Location:</span>
+                            <span class="value" id="userLocation">Not specified</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Website:</span>
+                            <span class="value" id="userWebsite">Not specified</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customization Tab -->
+            <div id="customization-tab" class="tab-panel">
+                <div class="content-grid">
+                    <div class="info-card">
+                        <h3><i class="fas fa-palette"></i> Theme Preferences</h3>
+                        <div class="theme-options">
+                            <button class="theme-option active" data-theme="dark">
+                                <i class="fas fa-moon"></i>
+                                Dark Mode
+                            </button>
+                            <button class="theme-option" data-theme="light">
+                                <i class="fas fa-sun"></i>
+                                Light Mode
+                            </button>
+                            <button class="theme-option" data-theme="auto">
+                                <i class="fas fa-magic"></i>
+                                Auto
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-eye"></i> Privacy Settings</h3>
+                        <div class="privacy-option">
+                            <span>Profile Visibility</span>
+                            <select id="profileVisibility">
+                                <option value="public">Public</option>
+                                <option value="friends">Friends Only</option>
+                                <option value="private">Private</option>
+                            </select>
+                        </div>
+                        <div class="privacy-option">
+                            <span>Show Online Status</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="showOnlineStatus" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-bell"></i> Notification Preferences</h3>
+                        <div class="notification-option">
+                            <span>Email Notifications</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="emailNotifications">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="notification-option">
+                            <span>Push Notifications</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="pushNotifications" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Tab -->
+            <div id="activity-tab" class="tab-panel">
+                <div class="content-grid">
+                    <div class="info-card">
+                        <h3><i class="fas fa-chart-line"></i> Activity Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-comment"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="postsCount">0</span>
+                                    <span class="stat-label">Posts</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="likesReceived">0</span>
+                                    <span class="stat-label">Likes Received</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-calendar"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="daysActive">0</span>
+                                    <span class="stat-label">Days Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-history"></i> Activity Timeline</h3>
+                        <div id="activityTimelineContainer" class="timeline">
+                            <p class="no-data">No activity to display</p>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3><i class="fas fa-target"></i> Goals & Progress</h3>
+                        <div class="progress-section">
+                            <div class="progress-item">
+                                <span>Next Level Progress</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="levelProgressBar"></div>
+                                </div>
+                                <span class="progress-text" id="levelProgressText">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cover Image Crop Modal -->
+        <div id="coverCropModal" class="crop-modal" style="display: none;">
+            <div class="crop-modal-content">
+                <div class="crop-modal-header">
+                    <h3>Crop Cover Image</h3>
+                    <button id="closeCoverCropModal" class="close-crop-modal-btn">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="crop-container">
+                    <div id="coverCropArea" class="crop-area">
+                        <img id="coverCropPreview" alt="Crop Preview" style="max-width: 100%; max-height: 100%;">
+                    </div>
+                    <div class="crop-controls">
+                        <div class="crop-zoom-controls">
+                            <label for="coverCropZoom">Zoom:</label>
+                            <input type="range" id="coverCropZoom" min="0.5" max="3" step="0.1" value="1">
+                            <span id="coverCropZoomValue">100%</span>
+                        </div>
+                        <div class="crop-rotation-controls">
+                            <label for="coverCropRotation">Rotation:</label>
+                            <input type="range" id="coverCropRotation" min="-180" max="180" step="15" value="0">
+                            <span id="coverCropRotationValue">0°</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="crop-modal-actions">
+                    <button id="resetCoverCrop" class="crop-action-btn secondary">Reset</button>
+                    <button id="applyCoverCrop" class="crop-action-btn primary">Apply & Upload</button>
+                </div>
+            </div>
+        </div>
+
+
+
 
                 <div class="profile-stats">
                     <div class="stat-item">
