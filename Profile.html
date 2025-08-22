@@ -6617,36 +6617,123 @@
          * @param {string} userIdToDisplay - The UID of the user whose profile should be displayed.
          */
         async function fetchAndDisplayUserProfile(userIdToDisplay) {
-            
-            showMessageBox("Loading profile...", 'loading', true);
-            if (profileUsername) profileUsername.textContent = "Loading...";
-            if (profileUserId) profileUserId.style.display = 'none'; // Hide User ID during loading
-            if (profileEmail) profileEmail.style.display = 'none';
+            try {
+                showMessageBox("Loading profile...", 'loading', true);
+                if (profileUsername) profileUsername.textContent = "Loading...";
+                if (profileUserId) profileUserId.style.display = 'none'; // Hide User ID during loading
+                if (profileEmail) profileEmail.style.display = 'none';
 
-            if (statPosts) statPosts.textContent = "0";
-            if (statFriends) statFriends.textContent = "0";
-            if (statFollowers) statFollowers.textContent = "0";
-            if (statFollowing) statFollowing.textContent = "0";
-            if (jCoinsSpan) jCoinsSpan.textContent = "0"; // Reset jCoins
-            if (jcoinExchangeRate) jcoinExchangeRate.style.display = 'none'; // Hide exchange rate by default
-            if (gasValue) gasValue.textContent = "0"; // Reset Gas (XP)
-            if (xpLevelIcon) xpLevelIcon.className = "fas fa-question-circle profile-level-icon"; // Reset icon
-            if (xpLevelName) xpLevelName.textContent = "Loading Level..."; // Reset level name
-            if (xpProgressBarFill) xpProgressBarFill.style.width = "0%"; // Reset progress bar
-            if (xpProgressBarFill) xpProgressBarFill.style.backgroundPosition = "right"; // Reset gradient position
-            
-            // Reset percentage display
-            const progressPercentageElement = document.getElementById('progressPercentage');
-            if (progressPercentageElement) {
-                progressPercentageElement.textContent = "0%";
-                progressPercentageElement.style.color = '#fff';
-                progressPercentageElement.style.textShadow = '0 0 3px rgba(0, 0, 0, 0.8)';
+                if (statPosts) statPosts.textContent = "0";
+                if (statFriends) statFriends.textContent = "0";
+                if (statFollowers) statFollowers.textContent = "0";
+                if (statFollowing) statFollowing.textContent = "0";
+                if (jCoinsSpan) jCoinsSpan.textContent = "0"; // Reset jCoins
+                if (jcoinExchangeRate) jcoinExchangeRate.style.display = 'none'; // Hide exchange rate by default
+                if (gasValue) gasValue.textContent = "0"; // Reset Gas (XP)
+                if (xpLevelIcon) xpLevelIcon.className = "fas fa-question-circle profile-level-icon"; // Reset icon
+                if (xpLevelName) xpLevelName.textContent = "Loading Level..."; // Reset level name
+                if (xpProgressBarFill) xpProgressBarFill.style.width = "0%"; // Reset progress bar
+                if (xpProgressBarFill) xpProgressBarFill.style.backgroundPosition = "right"; // Reset gradient position
+                
+                // Reset percentage display
+                const progressPercentageElement = document.getElementById('progressPercentage');
+                if (progressPercentageElement) {
+                    progressPercentageElement.textContent = "0%";
+                    progressPercentageElement.style.color = '#fff';
+                    progressPercentageElement.style.textShadow = '0 0 3px rgba(0, 0, 0, 0.8)';
+                }
+                if (profilePagePic) profilePagePic.style.display = 'none';
+                if (profilePageAvatarIcon) profilePageAvatarIcon.style.display = 'block';
+                
+                // Store the displayed user ID globally
+                displayedUserId = userIdToDisplay;
+                
+                // Fetch user profile data
+                const publicProfileDocRef = doc(db, "artifacts", appId, "public", "data", "users", userIdToDisplay);
+                const publicProfileSnap = await getDoc(publicProfileDocRef);
+                
+                if (publicProfileSnap.exists()) {
+                    const profileData = publicProfileSnap.data();
+                    displayedUserProfileData = profileData;
+                    
+                    // Update profile display
+                    if (profileUsername) profileUsername.textContent = profileData.username || "JCHAT User";
+                    if (profileUserId) {
+                        if (userIdText) userIdText.textContent = userIdToDisplay;
+                        profileUserId.style.display = 'block';
+                    }
+                    if (profileEmail && profileData.visibility?.emailPublic && profileData.email) {
+                        if (emailText) emailText.textContent = profileData.email;
+                        profileEmail.style.display = 'block';
+                    }
+                    
+                    // Update stats
+                    if (statPosts) statPosts.textContent = profileData.totalPosts || "0";
+                    if (statFriends) statFriends.textContent = "0"; // Will be updated by fetchAndUpdateFriendCount
+                    if (statFollowers) statFollowers.textContent = profileData.followersCount || "0";
+                    if (statFollowing) statFollowing.textContent = profileData.followingCount || "0";
+                    
+                    // Update profile picture
+                    const usernameInitial = (profileData.username || "U").charAt(0).toUpperCase();
+                    displayProfilePicture(profilePagePic, profilePageAvatarIcon, profileData.profilePicId, usernameInitial, "w_240,h_240,c_fill,g_face,r_max");
+                    
+                    // If this is the current user, fetch private data
+                    if (currentUser && userIdToDisplay === currentUser.uid) {
+                        const privateProfileDocRef = doc(db, "artifacts", appId, "users", userIdToDisplay, "profiles", "user_profile");
+                        const privateProfileSnap = await getDoc(privateProfileDocRef);
+                        
+                        if (privateProfileSnap.exists()) {
+                            const privateData = privateProfileSnap.data();
+                            currentUserProfileData = privateData;
+                            
+                            // Update JCoins and Gas
+                            if (jCoinsSpan) jCoinsSpan.textContent = (privateData.jCoins || 0).toLocaleString();
+                            if (gasValue) gasValue.textContent = (privateData.gas || 0).toLocaleString();
+                            
+                            // Update level info
+                            const levelInfo = getLevelInfo(privateData.level || 1);
+                            if (xpLevelIcon) xpLevelIcon.className = `${levelInfo.icon} profile-level-icon`;
+                            if (xpLevelName) xpLevelName.textContent = levelInfo.name;
+                            
+                            // Update progress bar
+                            const currentLevel = privateData.level || 1;
+                            const currentXP = privateData.totalGasEarned || 0;
+                            const currentLevelXP = getTotalGasRequiredToReachLevel(currentLevel);
+                            const nextLevelXP = getTotalGasRequiredToReachLevel(currentLevel + 1);
+                            const progressPercent = nextLevelXP > currentLevelXP ? 
+                                Math.round(((currentXP - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100) : 100;
+                                
+                            if (xpProgressBarFill) xpProgressBarFill.style.width = `${Math.max(0, Math.min(100, progressPercent))}%`;
+                            if (progressPercentageElement) progressPercentageElement.textContent = `${Math.max(0, Math.min(100, progressPercent))}%`;
+                            
+                            // Show JCoin exchange rate for current user
+                            if (jcoinExchangeRate) jcoinExchangeRate.style.display = 'block';
+                            
+                            // Update daily bonus UI
+                            updateDailyBonusUI();
+                            
+                            // Fetch additional data
+                            await fetchAndDisplayUnlockedRewards();
+                            await fetchAndDisplayRecentActivity();
+                        }
+                    }
+                    
+                    // Fetch friend count
+                    await fetchAndUpdateFriendCount();
+                    
+                    // Hide loading message
+                    showMessageBox("Profile loaded successfully!", 'success');
+                    
+                } else {
+                    showMessageBox("User profile not found.", 'error');
+                    if (profileUsername) profileUsername.textContent = "User Not Found";
+                }
+                
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error loading profile:", error);
+                showMessageBox(`Failed to load profile: ${error.message}`, 'error');
+                if (profileUsername) profileUsername.textContent = "Error Loading Profile";
             }
-            if (profilePagePic) profilePagePic.style.display = 'none';
-            if (profilePageAvatarIcon) profilePageAvatarIcon.style.display = 'block';
-            
-            // TODO: Add the actual profile loading logic here
-            console.log("Profile loading for user:", userIdToDisplay);
         }
 
         // --- Event Listeners (moved to DOMContentLoaded for safety) ---
@@ -6854,6 +6941,43 @@
             if (submitReportButton) submitReportButton.addEventListener('click', submitReport);
 
         }); // Close DOMContentLoaded event listener
+
+        // --- Authentication State Management ---
+        onAuthStateChanged(auth, async (user) => {
+            try {
+                if (user) {
+                    currentUser = user;
+                    isAuthReady = true;
+                    
+                    // Fetch and display header profile
+                    await fetchAndDisplayHeaderProfile(user);
+                    
+                    // Fetch notification count
+                    await fetchNotificationCount(user.uid);
+                    
+                    // Fetch system settings
+                    await fetchSystemSettings();
+                    
+                    // Determine which user profile to display
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const userIdFromUrl = urlParams.get('userId');
+                    const userIdToDisplay = userIdFromUrl || user.uid;
+                    
+                    // Load the profile
+                    await fetchAndDisplayUserProfile(userIdToDisplay);
+                    
+                } else {
+                    // User is not authenticated, redirect to login
+                    currentUser = null;
+                    isAuthReady = true;
+                    window.location.href = '/login.html';
+                }
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error in auth state change:", error);
+                showMessageBox(`Authentication error: ${error.message}`, 'error');
+                isAuthReady = true;
+            }
+        });
 
         window.addEventListener('storage', (event) => {
             if (event.key === 'jchat-theme') {
