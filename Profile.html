@@ -771,8 +771,8 @@
             border-radius: var(--radius);
             box-shadow: 0 8px 25px rgba(0, 0, 0, .3);
             padding: 2rem;
-            width: 90%;
-            max-width: 600px; /* Max width for consistency */
+            width: 95%;
+            max-width: 800px; /* Widened to align with layout */
             margin: 20px auto;
             display: flex;
             flex-direction: column;
@@ -3526,95 +3526,6 @@
                     </button>
 
                     <!-- NEW: Privacy Settings Toggles -->
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2rem;">
-                        <h3 style="text-align:center;margin:0;">Privacy Settings</h3>
-                        <button id="togglePrivacySettingsBtn" class="profile-action-button secondary" style="padding:6px 12px;font-size:0.9rem;">
-                            <i class="fas fa-eye"></i> Show
-                        </button>
-                    </div>
-                    <div id="privacySettingsSection" class="profile-details-section" style="display:none;">
-                        <div class="privacy-toggle-group">
-                        <label for="toggleEmailVisibility">Show Email Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleEmailVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleLocationVisibility">Show Location Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleLocationVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleUserIdVisibility">Show User ID Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleUserIdVisibility" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleOnlineStatusVisibility">Show Online Status</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleOnlineStatusVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                     <div class="privacy-toggle-group">
-                        <label for="toggleFriendRequests">Allow Friend Requests</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleFriendRequests">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleMessages">Allow Direct Messages</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleMessages">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleSchoolVisibility">Show School Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleSchoolVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleWorkVisibility">Show Work Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleWorkVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleInterestsVisibility">Show Interests Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleInterestsVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleWebsiteVisibility">Show Website Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleWebsiteVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <div class="privacy-toggle-group">
-                        <label for="toggleSocialLinksVisibility">Show Social Links Publicly</label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleSocialLinksVisibility">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                    <button id="savePrivacySettingsButton" class="profile-action-button secondary">
-                        <span class="button-text">Save Privacy Settings</span>
-                        
-                    </button>
-                    </div> <!-- End Privacy Settings Section -->
 
                     <!-- NEW: Profile Customization Section -->
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2rem;">
@@ -3743,13 +3654,6 @@
                             <i class="fas fa-eye"></i> Show
                         </button>
                     </div>
-                    <div id="insightsSection" class="profile-details-section" style="display:none;">
-                        <label style="display:flex;align-items:center;gap:8px;">
-                            <input type="checkbox" id="analyticsOptInToggle">
-                            Enable profile view analytics (owner only)
-                        </label>
-                        <p id="profileViewsLine" style="margin-top:8px;">Views: <strong id="profileViewsCount">0</strong></p>
-                    </div> <!-- End Insights Section -->
 
                     <!-- Verified Links & QR -->
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;">
@@ -5516,7 +5420,7 @@
         /**
          * Initializes tiny toggle functionality.
          */
-        function initializeTinyToggle() {
+                        function initializeTinyToggle() {/* removed */ return;
             console.log('JCHAT_DEBUG: Initializing tiny toggle...');
             console.log('JCHAT_DEBUG: tinyToggle element found:', !!tinyToggle);
             console.log('JCHAT_DEBUG: tinyDropdown element found:', !!tinyDropdown);
@@ -8165,7 +8069,7 @@
             }
 
             // Initialize Tiny Toggle
-            initializeTinyToggle();
+            /* initializeTinyToggle removed */
             
             // Ensure tiny toggle is properly initialized and visible
             setTimeout(() => {
