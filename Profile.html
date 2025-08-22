@@ -757,8 +757,7 @@
         .profile-section,
         .unlocked-rewards-section,
         .recent-activity-section,
-        .customization-section,
-        .wallet-guide-section {
+        .customization-section {
             touch-action: pan-y; /* Enable vertical panning */
             overscroll-behavior: contain; /* Prevent overscroll bounce */
             -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
@@ -1892,7 +1891,7 @@
         }
 
         /* NEW: Unlocked Rewards Section */
-        .unlocked-rewards-section, .recent-activity-section, .customization-section, .wallet-guide-section {
+        .unlocked-rewards-section, .recent-activity-section, .customization-section {
             background: var(--card-background);
             border: 1px solid var(--glass-blue);
             backdrop-filter: blur(10px) saturate(180%);
@@ -1903,7 +1902,7 @@
             margin-top: 20px;
             text-align: left;
         }
-        .unlocked-rewards-section h3, .friends-snippet-section h3, .recent-activity-section h3, .customization-section h3, .wallet-guide-section h3 {
+        .unlocked-rewards-section h3, .friends-snippet-section h3, .recent-activity-section h3, .customization-section h3 {
             font-family: 'Poppins', sans-serif;
             font-size: 1.4rem;
             font-weight: 700;
@@ -2820,76 +2819,7 @@
             justify-content: center; /* Center buttons in modal */
         }
 
-        /* NEW: Wallet Guide Section */
-        .wallet-guide-section {
-            padding: 2rem;
-            text-align: left;
-        }
-        .wallet-guide-section h3 {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            background-clip: text;
-            color: transparent;
-            background-image: linear-gradient(90deg, var(--blue), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center;
-        }
-        .wallet-guide-section .guide-item {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            border: 1px solid var(--border-light);
-        }
-        .wallet-guide-section .guide-item h4 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.2rem;
-            color: var(--white);
-            margin-top: 0;
-            margin-bottom: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .wallet-guide-section .guide-item h4 i {
-            background-clip: text;
-            color: transparent;
-            background-image: linear-gradient(90deg, var(--blue), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.5rem;
-        }
-        .wallet-guide-section .guide-item p {
-            font-size: 0.95rem;
-            color: var(--text-light);
-            line-height: 1.6;
-            margin-bottom: 0.5rem;
-        }
-        .wallet-guide-section .guide-item ul {
-            list-style: none;
-            padding-left: 0;
-            margin-top: 0.5rem;
-        }
-        .wallet-guide-section .guide-item ul li {
-            font-size: 0.9rem;
-            color: var(--text-color-secondary);
-            margin-bottom: 5px;
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-        }
-        .wallet-guide-section .guide-item ul li i {
-            color: var(--accent-color);
-            margin-top: 3px;
-            flex-shrink: 0;
-        }
-        .wallet-guide-section .guide-item strong {
-            color: var(--white);
-        }
-        .wallet-guide-section .guide-item .gradient-text {
-            font-weight: 600;
-        }
+
         /* Enhanced Responsive Design */
         @media (max-width: 768px) {
             .profile-section {
@@ -3169,7 +3099,7 @@
                 transform: scale(0.8); /* Scale down for mobile */
                 transform-origin: right center;
             }
-            .unlocked-rewards-section h3, .friends-snippet-section h3, .recent-activity-section h3, .customization-section h3, .wallet-guide-section h3 {
+            .unlocked-rewards-section h3, .friends-snippet-section h3, .recent-activity-section h3, .customization-section h3 {
                 font-size: 1.2rem;
             }
             .rewards-grid, .friends-grid {
@@ -3247,19 +3177,7 @@
             background-image: linear-gradient(90deg, var(--blue), var(--pink));
             filter: drop-shadow(0 1px 6px rgba(0,213,255,0.35));
         }
-        /* Need Help block heading icon and links */
-        .wallet-guide-section .guide-item h4 i {
-            background-image: linear-gradient(90deg, var(--pink), var(--blue));
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-        }
-        .wallet-guide-section .guide-item ul li a {
-            background-image: linear-gradient(90deg, var(--pink), var(--blue));
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            text-decoration: none; font-weight: 600;
-        }
-        .wallet-guide-section .guide-item ul li a:hover {
-            background-image: linear-gradient(90deg, var(--blue), var(--pink));
-        }
+
     </style>
 <style id="header-overflow-fix">/*header-overflow-fix*/header .header-content-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap}header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;justify-content:flex-end}#profileLink{display:inline-flex;align-items:center;column-gap:8px;row-gap:2px;flex-wrap:nowrap;max-width:100%;min-width:0}#profileLink #headerDisplayName{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;flex:0 1 auto}#headerProfilePic,#headerAvatarIcon{flex:0 0 auto} header{height:auto !important;min-height:60px;padding:8px 0} #headerProfilePic{width:40px !important;height:40px !important;border-radius:50%;object-fit:cover;display:block} #headerAvatarIcon{font-size:36px;line-height:1;display:inline-flex;align-items:center;justify-content:center} #profileLink #headerDisplayName{line-height:1.1;align-self:center}@media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:6px}}</style></head>
 <body class="theme-dark-mode">
@@ -3478,25 +3396,6 @@
                     <a href="/Wallet.html" id="walletLink" class="profile-action-button secondary disabled-link">
                         <i class="fas fa-lock padlock-icon"></i> My Wallet
                     </a>
-                    <p id="walletLockedMessage" class="wallet-locked-message" style="display: none;">
-                        Contact admin to unlock wallet access for just #5,000 and you have your wallet Unlocked. Jchatguide@gmail.com
-                          Wa +2349013790707 
-                          
-                </div>
-
-
-                        
-                    </p>
-                    <!-- NEW: Request JCoins Button -->
-                    <button id="requestJCoinsButton" class="profile-action-button">
-                        <i class="fas fa-coins"></i> Request JCoins
-                    </button>
-
-                    <!-- NEW: Report User Button (only visible for other users) -->
-                    <button id="reportUserButton" class="profile-action-button danger" style="display: none;">
-                        <i class="fas fa-flag"></i> Report User
-                    </button>
-
                     <!-- Removed Add Friend and Message buttons as requested -->
                 </div>
 
@@ -3526,62 +3425,6 @@
                 </div> <!-- End Tab About -->
 
                 <!-- Removed additional panels per request: Posts, Media, Highlights, Saved, Activity -->
-
-                    <!-- Toggle for Account Settings (Email/Password) -->
-                    <button id="toggleAccountSettingsButton" class="profile-action-button secondary" style="margin-top: 2rem;">
-                        <i class="fas fa-cog"></i> Manage Account Settings
-                    </button>
-
-                    <div id="accountSettingsSection" style="display: none; flex-direction: column; width: 100%;">
-                        <div class="sub-section">
-                            <h2>Account Settings</h2>
-
-                            <div class="input-group">
-                                <label for="profileEmailInput">Email Address</label>
-                                <input type="email" id="profileEmailInput" placeholder="Your email" disabled>
-                            </div>
-
-                            <form id="changeEmailForm">
-                                <div class="input-group">
-                                    <label for="newEmail">New Email</label>
-                                    <input type="email" id="newEmail" placeholder="Enter new email">
-                                </div>
-                                <div class="input-group">
-                                    <label for="currentPasswordForEmail">Current Password</label>
-                                    <input type="password" id="currentPasswordForEmail" placeholder="Enter current password">
-                                </div>
-                                <button type="submit" id="updateEmailButton">
-                                    <span class="button-text">Update Email</span>
-                                    
-                                </button>
-                            </form>
-
-                            <div class="input-group">
-                                <label for="oldPassword">Old Password</label>
-                                <input type="password" id="oldPassword" placeholder="Enter old password">
-                            </div>
-                            <div class="input-group">
-                                <label for="newPassword">New Password</label>
-                                <input type="password" id="newPassword" placeholder="Enter new password">
-                            </div>
-                            <div class="input-group">
-                                <label for="confirmNewPassword">Confirm New Password</label>
-                                <input type="password" id="confirmNewPassword" placeholder="Confirm new password">
-                            </div>
-                            <button id="changePasswordButton">
-                                <span class="button-text">Change Password</span>
-                                
-                            </button>
-
-                            <button id="logoutButtonAccount" class="profile-action-button secondary">
-                                <i class="fas fa-sign-out-alt"></i> Log Out
-                            </button>
-
-                            <p class="help-inline">Need help? <a href="#">Contact Support</a></p>
-                            <p class="help-inline">Manage your data: <a href="#">Download Data</a> | <a href="#">Delete Account</a></p>
-                        </div>
-                    </div>
-                </div>
             </div>
             <!-- NEW: Unlocked Rewards Section -->
             <div class="unlocked-rewards-section" id="unlockedRewardsSection" style="display: none;">
@@ -3600,37 +3443,7 @@
                     <p class="no-activity-message">No recent activity.</p>
                 </ul>
             </div>
-            <!-- NEW: Wallet User Guide Section -->
-            <div class="wallet-guide-section">
-                <h3>Wallet User Guide</h3>
-                
-                <!-- Bank details removed from Profile page; only visible during purchase flows (Shop/JCoin/Premium). -->
 
-                <div class="guide-item">
-                    <h4><i class="fas fa-key"></i> Transaction PIN</h4>
-                    <p>Set a 4-digit PIN to confirm transfers and withdrawals.</p>
-                </div>
-
-                <div class="guide-item">
-                    <h4><i class="fas fa-upload"></i> Submit Receipt</h4>
-                    <p>After making payment:</p>
-                    <ul>
-                        <li><i class="fas fa-check-circle"></i> Enter the amount paid in Naira</li>
-                        <li><i class="fas fa-check-circle"></i> Upload your payment receipt</li>
-                        <li><i class="fas fa-check-circle"></i> Click "Send Purchase Request"</li>
-                    </ul>
-                </div>
-
-                <div class="guide-item">
-                    <h4><i class="fas fa-headset"></i> Need Help?</h4>
-                    <ul>
-                        <li><i class="fas fa-envelope"></i> <a href="mailto:jchatguide@gmail.com" target="_blank">jchatguide@gmail.com</a></li>
-                        <li><i class="fab fa-whatsapp"></i> <a href="https://wa.me/2348111609765" target="_blank">WhatsApp +2348111609765</a></li>
-                        <li><i class="fas fa-phone"></i> <a href="tel:+2349013790707">Phone +2349013790707</a></li>
-                    </ul>
-                </div>
-            </div>
-            <!-- End NEW: Wallet User Guide Section -->
 
             <!-- User's posts feed -->
             <div class="posts-feed-section" id="userPostsFeed" style="display: none;">
@@ -3848,7 +3661,7 @@
         const profileActions = document.getElementById('profileActions');
         const walletLink = document.getElementById('walletLink'); // Wallet link
         const walletLockedMessage = document.getElementById('walletLockedMessage'); // Wallet locked message
-        const requestJCoinsButton = document.getElementById('requestJCoinsButton'); // NEW: Request JCoins Button
+        // Request JCoins Button removed per request
         const claimDailyBonusButton = document.getElementById('claimDailyBonusButton'); // NEW
         const dailyBonusCountdown = document.getElementById('dailyBonusCountdown'); // NEW
         const reportUserButton = document.getElementById('reportUserButton'); // NEW
@@ -3885,8 +3698,7 @@
         const logoutButtonAccount = document.getElementById('logoutButtonAccount'); // Logout button in account settings
 
         // NEW: Toggle for Account Settings Section
-        const toggleAccountSettingsButton = document.getElementById('toggleAccountSettingsButton');
-        const accountSettingsSection = document.getElementById('accountSettingsSection');
+        // Account Settings elements removed per request
 
         const userPostsFeed = document.getElementById('userPostsFeed');
         const postsFeedUsername = document.getElementById('postsFeedUsername');
@@ -6796,19 +6608,7 @@
             // Initialize Profile Notifications
             profileNotifications = new ProfileNotifications();
 
-            // Account Settings Toggle
-            if (toggleAccountSettingsButton) {
-                toggleAccountSettingsButton.addEventListener('click', () => {
-                    if (accountSettingsSection) {
-                        const isHidden = accountSettingsSection.style.display === 'none';
-                        accountSettingsSection.style.display = isHidden ? 'flex' : 'none'; // Use flex for column layout
-                        // Change button text/icon based on state
-                        toggleAccountSettingsButton.innerHTML = isHidden ?
-                            '<i class="fas fa-times-circle"></i> Close Settings' :
-                            '<i class="fas fa-cog"></i> Manage Account Settings';
-                    }
-                });
-            }
+            // Account Settings Toggle removed per request
 
             // NEW: Friends Button and Modal Event Listeners (exactly like Chat.html)
             const friendsStatItem = document.getElementById('friendsStatItem');
@@ -6878,8 +6678,7 @@
             if (changePasswordButton) changePasswordButton.addEventListener('click', handleChangePassword); // Null check
             if (logoutButtonAccount) logoutButtonAccount.addEventListener('click', handleLogout); // Logout button in account settings, null check
 
-            // JCoin Request Modal Event Listeners
-            if (requestJCoinsButton) requestJCoinsButton.addEventListener('click', showJCoinRequestModal); // Null check
+            // JCoin Request Modal Event Listeners removed per request
             if (cancelJCoinRequestButton) cancelJCoinRequestButton.addEventListener('click', hideJCoinRequestModal); // Null check
             if (submitJCoinRequestButton) submitJCoinRequestButton.addEventListener('click', submitJCoinRequest); // Null check
 
