@@ -304,16 +304,17 @@
             position: absolute;
             top: 100%;
             right: 20px;
-            background: rgba(26, 26, 46, 0.98);
+            background: var(--card-background);
             backdrop-filter: blur(20px);
-            border: 1px solid var(--border-light);
+            border: 1px solid var(--glass-blue);
             border-radius: 12px;
             padding: 8px;
             min-width: 160px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .4);
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1001;
         }
 
@@ -336,8 +337,20 @@
         }
 
         .tiny-dropdown-item:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--hover-background);
             color: var(--blue);
+        }
+
+        /* Theme compatibility for tiny toggle */
+        .tiny-toggle.active {
+            background: var(--blue);
+            color: white;
+            transform: rotate(45deg);
+        }
+
+        .tiny-toggle:hover {
+            background: var(--hover-background);
+            transform: scale(1.1);
         }
 
         .tiny-dropdown-item i {
@@ -798,6 +811,90 @@
         .profile-section:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 35px rgba(0, 0, 0, .4);
+        }
+
+        /* Cover Photo Styles */
+        #profileCoverWrapper {
+            width: 100% !important;
+            height: 200px !important;
+            border-radius: var(--radius) var(--radius) 0 0 !important;
+            overflow: hidden !important;
+            position: relative !important;
+            margin-bottom: 12px !important;
+            background: linear-gradient(135deg, var(--blue), var(--pink)) !important;
+            border: 1px solid var(--glass-blue) !important;
+            transition: all 0.3s ease;
+        }
+
+        #profileCoverImg {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            transition: transform 0.3s ease;
+        }
+
+        #profileCoverImg:hover {
+            transform: scale(1.02);
+        }
+
+        .cover-photo-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(0, 213, 255, 0.1), rgba(255, 46, 146, 0.1));
+            color: var(--text-light);
+            font-size: 1.1rem;
+            gap: 8px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .cover-photo-placeholder i {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #editCoverOverlay {
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            background: rgba(0, 0, 0, 0.7) !important;
+            color: white !important;
+            padding: 8px 12px !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            font-size: 0.9rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px) !important;
+            z-index: 10 !important;
+            border: none !important;
+            text-decoration: none !important;
+        }
+
+        #editCoverOverlay:hover {
+            background: rgba(0, 0, 0, 0.9) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        /* Profile content area adjustments */
+        .profile-header-area {
+            padding: 0 2rem 2rem 2rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
         }
 
         .profile-header-area { /* New wrapper for top part of profile */
@@ -3209,7 +3306,7 @@
                     <span id="headerDisplayName">Loading...</span>
                 </a>
                 <!-- Tiny Plus Toggle -->
-                <button class="tiny-toggle" id="tinyToggle" onclick="toggleTinyMenu()">
+                <button class="tiny-toggle" id="tinyToggle">
                     <i class="fas fa-plus"></i>
                 </button>
                 <div class="tiny-dropdown" id="tinyDropdown">
@@ -3269,10 +3366,16 @@
     <main>
         <div class="content-wrapper">
                             <div class="profile-section">
-                <div id="profileCoverWrapper" style="width:100%;height:180px;border-radius:14px;overflow:hidden;position:relative;margin-bottom:12px;background:rgba(255,255,255,0.05);border:1px solid var(--border-light);">
-                    <img id="profileCoverImg" alt="Cover" style="width:100%;height:100%;object-fit:cover;display:none;">
+                <div id="profileCoverWrapper">
+                    <img id="profileCoverImg" alt="Cover Photo" style="display:none;">
+                    <div class="cover-photo-placeholder" id="coverPhotoPlaceholder">
+                        <i class="fas fa-image"></i>
+                        <span>Add Cover Photo</span>
+                    </div>
                     <input type="file" id="profileCoverUploadInput" accept="image/*" style="display:none;">
-                    <label for="profileCoverUploadInput" id="editCoverOverlay" style="position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,0.5);padding:6px 10px;border-radius:8px;cursor:pointer;display:none;"><i class="fas fa-camera"></i> Edit Cover</label>
+                    <label for="profileCoverUploadInput" id="editCoverOverlay" style="display:none;">
+                        <i class="fas fa-camera"></i> Change Cover
+                    </label>
                 </div>
 
                 <div class="profile-header-area">
@@ -3591,6 +3694,13 @@
         const profilePageAvatarIcon = document.getElementById('profilePageAvatarIcon');
         const profilePicUploadInput = document.getElementById('profilePicUploadInput');
         const editProfilePicOverlay = document.getElementById('editProfilePicOverlay');
+
+        // Cover Photo Elements
+        const profileCoverWrapper = document.getElementById('profileCoverWrapper');
+        const profileCoverImg = document.getElementById('profileCoverImg');
+        const coverPhotoPlaceholder = document.getElementById('coverPhotoPlaceholder');
+        const profileCoverUploadInput = document.getElementById('profileCoverUploadInput');
+        const editCoverOverlay = document.getElementById('editCoverOverlay');
 
         const profileUsername = document.getElementById('profileUsername'); // H2 element for username
         // profileBio removed per request
@@ -4398,6 +4508,107 @@
         }
 
         /**
+         * Handles cover photo upload and change.
+         */
+        async function handleCoverPhotoChange(event) {
+            if (!currentUser || !isAuthReady || displayedUserId !== currentUser.uid) {
+                showMessageBox("You can only change your own cover photo.", 'warning');
+                return;
+            }
+
+            const file = event.target.files[0];
+            if (!file) {
+                return; // No file selected
+            }
+
+            if (!file.type.startsWith('image/')) {
+                showMessageBox("Please select an image file.", "warning");
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) { // 10MB limit for cover photos
+                showMessageBox("Image size too large. Max 10MB.", "warning");
+                return;
+            }
+
+            if (profileCoverWrapper) profileCoverWrapper.classList.add('loading');
+            showMessageBox("Uploading cover photo...", 'loading', true);
+
+            try {
+                // 1. Resize and compress image for cover photo (wider aspect ratio)
+                const resizedImageBlob = await resizeImage(file, 800, 400, 0.8);
+
+                // 2. Upload to Cloudinary
+                const newCoverPhotoUrl = await uploadMediaToCloudinary(resizedImageBlob);
+
+                if (!newCoverPhotoUrl) {
+                    throw new Error("Cloudinary upload failed.");
+                }
+
+                // 3. Update Firestore private profile
+                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
+                await updateDoc(privateProfileDocRef, {
+                    coverPhotoId: newCoverPhotoUrl,
+                    updatedAt: serverTimestamp()
+                });
+                console.log("JCHAT_DEBUG: Firestore private coverPhotoId updated.");
+
+                // 4. Update Firestore public profile
+                const publicProfileDocRef = doc(db, "artifacts", appId, "public", "data", "users", currentUser.uid);
+                await updateDoc(publicProfileDocRef, {
+                    coverPhotoId: newCoverPhotoUrl,
+                    updatedAt: serverTimestamp()
+                });
+                console.log("JCHAT_DEBUG: Firestore public coverPhotoId updated.");
+
+                // 5. Update UI immediately
+                displayCoverPhoto(newCoverPhotoUrl);
+
+                showMessageBox("Cover photo updated successfully!", 'success');
+
+                // Refresh currentUserProfileData
+                const updatedProfileSnap = await getDoc(privateProfileDocRef);
+                if (updatedProfileSnap.exists()) {
+                    currentUserProfileData = updatedProfileSnap.data();
+                    displayedUserProfileData = currentUserProfileData;
+                }
+
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error updating cover photo:", error);
+                showMessageBox(`Failed to update cover photo: ${error.message}`, 'error');
+            } finally {
+                if (profileCoverWrapper) profileCoverWrapper.classList.remove('loading');
+                // Clear file input to allow re-uploading the same file if needed
+                event.target.value = '';
+            }
+        }
+
+        /**
+         * Displays the cover photo.
+         */
+        function displayCoverPhoto(coverPhotoUrl) {
+            if (coverPhotoUrl && profileCoverImg && coverPhotoPlaceholder) {
+                const cloudinaryUrl = getCloudinaryImageUrl(coverPhotoUrl, "w_800,h_400,c_fill,g_auto");
+                profileCoverImg.src = cloudinaryUrl;
+                profileCoverImg.style.display = 'block';
+                coverPhotoPlaceholder.style.display = 'none';
+                
+                // Show edit overlay for current user
+                if (currentUser && displayedUserId === currentUser.uid && editCoverOverlay) {
+                    editCoverOverlay.style.display = 'flex';
+                }
+            } else if (coverPhotoPlaceholder) {
+                // Show placeholder
+                if (profileCoverImg) profileCoverImg.style.display = 'none';
+                coverPhotoPlaceholder.style.display = 'flex';
+                
+                // Show edit overlay for current user
+                if (currentUser && displayedUserId === currentUser.uid && editCoverOverlay) {
+                    editCoverOverlay.style.display = 'flex';
+                }
+            }
+        }
+
+        /**
          * Handles user logout.
          */
         async function handleLogout() {
@@ -4598,6 +4809,9 @@
             if (tinyToggle && tinyDropdown) {
                 console.log('JCHAT_DEBUG: Tiny toggle initialized successfully');
                 
+                // Add click event listener to toggle button
+                tinyToggle.addEventListener('click', toggleTinyMenu);
+                
                 // Add event listeners for quick action items in tiny dropdown
                 const actionItems = tinyDropdown.querySelectorAll('[data-action]');
                 actionItems.forEach(item => {
@@ -4658,7 +4872,13 @@
         /**
          * Toggles the tiny menu dropdown.
          */
-        function toggleTinyMenu() {
+        function toggleTinyMenu(event) {
+            // Prevent event propagation to avoid conflicts
+            if (event) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            
             console.log('JCHAT_DEBUG: toggleTinyMenu called');
             
             const tinyDropdownEl = document.getElementById('tinyDropdown');
@@ -4674,10 +4894,12 @@
                 if (isVisible) {
                     tinyDropdownEl.classList.remove('show');
                     tinyToggleEl.classList.remove('active');
+                    tinyToggleEl.querySelector('i').className = 'fas fa-plus';
                     console.log('JCHAT_DEBUG: Tiny dropdown closed');
                 } else {
                     tinyDropdownEl.classList.add('show');
                     tinyToggleEl.classList.add('active');
+                    tinyToggleEl.querySelector('i').className = 'fas fa-times';
                     console.log('JCHAT_DEBUG: Tiny dropdown opened');
                 }
                 
@@ -4727,21 +4949,20 @@
             profileSection.addEventListener('touchend', (e) => {
                 if (isSwiping) {
                     const deltaY = e.changedTouches[0].clientY - startY;
+                    const deltaX = Math.abs(e.changedTouches[0].clientX - startX);
                     
-                    if (Math.abs(deltaY) > 50) {
-                        // Swipe up/down detected
+                    // Only trigger actions for intentional swipes (not scrolling)
+                    // Require significant horizontal movement or very deliberate vertical swipe
+                    if (Math.abs(deltaY) > 100 && deltaX < 30) {
+                        // Swipe up/down detected with minimal horizontal movement
                         if (deltaY < 0) {
                             // Swipe up - could trigger profile completion focus
                             const completionSection = document.querySelector('.profile-completion-section');
                             if (completionSection) {
                                 completionSection.scrollIntoView({ behavior: 'smooth' });
                             }
-                        } else {
-                            // Swipe down - could trigger tiny menu
-                            if (window.toggleTinyMenu) {
-                                window.toggleTinyMenu();
-                            }
                         }
+                        // Removed automatic tiny menu trigger on swipe down to prevent accidental opening during scroll
                     }
                     
                     setTimeout(() => {
@@ -6489,6 +6710,9 @@
                     const usernameInitial = (profileData.username || "U").charAt(0).toUpperCase();
                     displayProfilePicture(profilePagePic, profilePageAvatarIcon, profileData.profilePicId, usernameInitial, "w_240,h_240,c_fill,g_face,r_max");
                     
+                    // Update cover photo
+                    displayCoverPhoto(profileData.coverPhotoId);
+                    
                     // If this is the current user, fetch private data
                     if (currentUser && userIdToDisplay === currentUser.uid) {
                         const privateProfileDocRef = doc(db, "artifacts", appId, "users", userIdToDisplay, "profiles", "user_profile");
@@ -6563,6 +6787,9 @@
 
             // Profile Picture Upload
             if (profilePicUploadInput) profilePicUploadInput.addEventListener('change', handleProfilePicChange); // Null check
+
+            // Cover Photo Upload
+            if (profileCoverUploadInput) profileCoverUploadInput.addEventListener('change', handleCoverPhotoChange);
 
             // Profile Edit
             // saveProfileChanges event listener removed per request
