@@ -22,6 +22,15 @@
   @keyframes wsPulse{0%,100%{box-shadow:0 1px 3px rgba(0,0,0,.2),0 0 10px rgba(255,122,198,.35),0 0 18px rgba(106,167,255,.35)}50%{box-shadow:0 1px 3px rgba(0,0,0,.2),0 0 16px rgba(255,122,198,.55),0 0 28px rgba(106,167,255,.55)}}
   `;
   document.head.appendChild(style);
+  const hideStyle = document.createElement('style');
+  hideStyle.textContent = '.security-badge{display:none!important}';
+  document.head.appendChild(hideStyle);
+  function removeSecurityBadges(){
+    document.querySelectorAll('.security-badge').forEach(function(el){ el.remove(); });
+  }
+  removeSecurityBadges();
+  const badgeObserver = new MutationObserver(function(){ removeSecurityBadges(); });
+  badgeObserver.observe(document.documentElement || document.body, { childList: true, subtree: true });
 
   function el(tag, attrs, html){ const e=document.createElement(tag); if(attrs) Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v)); if(html!=null) e.innerHTML=html; return e; }
 
