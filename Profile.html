@@ -4573,6 +4573,16 @@
             }
         }
 
+        // Force hide loader function - more aggressive approach
+        function forceHideLoader() {
+            if (jchatLoader) {
+                jchatLoader.classList.add('hidden');
+                jchatLoader.style.display = 'none';
+                console.log('JCHAT_DEBUG: Loader force hidden');
+                clearTimeout(loaderTimeout);
+            }
+        }
+
         // Check if loader is hidden and hide it completely
         function checkLoaderVisibility() {
             if (jchatLoader && jchatLoader.classList.contains('hidden')) {
@@ -4604,7 +4614,7 @@
             loaderTimeout = setTimeout(() => {
                 console.log('JCHAT_DEBUG: Loader auto-hide after timeout');
                 hideLoader();
-            }, 10000); // 10 seconds timeout
+            }, 5000); // Reduced to 5 seconds for faster recovery
         }
 
         // Initialize loader but don't show it automatically
@@ -4630,6 +4640,46 @@
                 hideLoader();
             }, 1000); // Give a small delay to allow any pending operations
         });
+
+        // Also hide loader when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('JCHAT_DEBUG: DOM ready, ensuring loader is hidden');
+            setTimeout(() => {
+                hideLoader();
+            }, 500);
+        });
+
+        // Multiple fallbacks to ensure loader is hidden
+        setTimeout(() => {
+            console.log('JCHAT_DEBUG: 3 second fallback - forcing loader hidden');
+            forceHideLoader();
+        }, 3000);
+
+        setTimeout(() => {
+            console.log('JCHAT_DEBUG: 8 second fallback - forcing loader hidden');
+            forceHideLoader();
+        }, 8000);
+
+        // Mutation observer to watch for loader visibility issues
+        if (jchatLoader) {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                        // If loader has been visible for more than 10 seconds, force hide it
+                        if (!jchatLoader.classList.contains('hidden')) {
+                            setTimeout(() => {
+                                if (!jchatLoader.classList.contains('hidden')) {
+                                    console.log('JCHAT_DEBUG: Mutation observer forcing loader hidden');
+                                    forceHideLoader();
+                                }
+                            }, 10000);
+                        }
+                    }
+                });
+            });
+            
+            observer.observe(jchatLoader, { attributes: true });
+        }
 
         // --- DOM Elements ---
         const headerProfilePic = document.getElementById('headerProfilePic');
@@ -8278,25 +8328,26 @@
         }
         // --- Authentication State Listener ---
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                isAuthReady = true; // Set auth ready flag
-                console.log("JCHAT_DEBUG: User authenticated in Profile Page:", user.uid);
-                
-                // Fetch system settings first as they are needed by profile display functions
-                await fetchSystemSettings();
-                // Fetch header profile next, as it sets currentUserProfileData
-                await fetchAndDisplayHeaderProfile(user); 
+            try {
+                if (user) {
+                    currentUser = user;
+                    isAuthReady = true; // Set auth ready flag
+                    console.log("JCHAT_DEBUG: User authenticated in Profile Page:", user.uid);
+                    
+                    // Fetch system settings first as they are needed by profile display functions
+                    await fetchSystemSettings();
+                    // Fetch header profile next, as it sets currentUserProfileData
+                    await fetchAndDisplayHeaderProfile(user); 
 
-                // Determine which user's profile to display
-                const urlParams = new URLSearchParams(window.location.search);
-                displayedUserId = urlParams.get('userId') || currentUser.uid; // Default to current user's ID
+                    // Determine which user's profile to display
+                    const urlParams = new URLSearchParams(window.location.search);
+                    displayedUserId = urlParams.get('userId') || currentUser.uid; // Default to current user's ID
 
-                // Fetch and display user profile after header profile is ready
-                await fetchAndDisplayUserProfile(displayedUserId);
-                fetchNotificationCount(user.uid); // Fetch notification count
+                    // Fetch and display user profile after header profile is ready
+                    await fetchAndDisplayUserProfile(displayedUserId);
+                    fetchNotificationCount(user.uid); // Fetch notification count
 
-            } else {
+                } else {
                 console.log("JCHAT_DEBUG: No user signed in.");
                 try {
                     if (initialAuthToken) {
@@ -8351,6 +8402,14 @@
                 if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
             }
+        } catch (error) {
+            console.error("JCHAT_ERROR: Error in authentication flow:", error);
+            showMessageBox(`Authentication error: ${error.message}`, 'error');
+        } finally {
+            // Always ensure loader is hidden after authentication flow
+            console.log("JCHAT_DEBUG: Authentication flow complete, ensuring loader is hidden");
+            hideLoader();
+        }
         });
         // --- Scroll Toggle Button Functionality ---
         function initializeScrollToggle() {
