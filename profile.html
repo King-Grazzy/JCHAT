@@ -8,7 +8,7 @@
     <!-- Security Meta Tags -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="DENY">
-    
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     
     <!-- SEO Meta Tags -->
@@ -1043,6 +1043,7 @@
             background: linear-gradient(90deg, var(--blue), var(--pink));
             border-radius: var(--radius) var(--radius) 0 0;
         }
+
         .profile-section:hover {
             transform: translateY(-5px);
             box-shadow: 0 12px 35px rgba(0, 0, 0, .4);
@@ -3848,6 +3849,7 @@
 
 
         }
+
         /* Responsive Adjustments (from Home.html / privacy_settings.html) */
         @media (max-width: 600px) {
             header .header-content-wrapper {
@@ -3996,38 +3998,16 @@
             }
         }
     </style>
-    <style>
-        /* Pink–Blue gradient accent for inline help links */
-        .help-inline { color: var(--text-color-secondary); }
-        .help-inline a {
-            background-image: linear-gradient(90deg, var(--pink), var(--blue));
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            text-decoration: none; font-weight: 700;
-        }
-        .help-inline a:hover {
-            background-image: linear-gradient(90deg, var(--blue), var(--pink));
-            filter: drop-shadow(0 1px 6px rgba(0,213,255,0.35));
-        }
-        /* Need Help block heading icon and links */
-        .wallet-guide-section .guide-item h4 i {
-            background-image: linear-gradient(90deg, var(--pink), var(--blue));
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-        }
-        .wallet-guide-section .guide-item ul li a {
-            background-image: linear-gradient(90deg, var(--pink), var(--blue));
-            -webkit-background-clip: text; background-clip: text; color: transparent;
-            text-decoration: none; font-weight: 600;
-        }
-        .wallet-guide-section .guide-item ul li a:hover {
-            background-image: linear-gradient(90deg, var(--blue), var(--pink));
-        }
-    </style>
 </head>
 <body class="theme-dark-mode">
 
     <header>
         <div class="header-content-wrapper">
+<<<<<<< HEAD:Profile.html
             <a href="/Home.html" class="logo" style="display:flex;align-items:center;gap:10px"><span>JCHAT</span></a>
+=======
+            <a href="/Home.html" class="logo">JCHAT</a>
+>>>>>>> 4cedfd8 (Rename Profile.html to profile.html):profile.html
             <nav>
                 <ul>
                     <!-- Removed Home and Profile links from header navigation -->
@@ -4051,7 +4031,64 @@
                     <i id="headerAvatarIcon" class="fas fa-user-circle"></i>
                     <span id="headerDisplayName">Loading...</span>
                 </a>
+<<<<<<< HEAD:Profile.html
 
+=======
+                <!-- Tiny Plus Toggle -->
+                <button class="tiny-toggle" id="tinyToggle" onclick="toggleTinyMenu()">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <div class="tiny-dropdown" id="tinyDropdown">
+                    <a href="/Home.html" class="tiny-dropdown-item">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a>
+                    <a href="/Chat.html" class="tiny-dropdown-item">
+                        <i class="fas fa-comments"></i>
+                        Chat
+                    </a>
+                    <a href="/Profile.html" class="tiny-dropdown-item">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                    <a href="/Settings.html" class="tiny-dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <a href="/Wallet.html" class="tiny-dropdown-item">
+                        <i class="fas fa-wallet"></i>
+                        Wallet
+                    </a>
+                    <a href="/Find_Friends.html" class="tiny-dropdown-item">
+                        <i class="fas fa-users"></i>
+                        Find Friends
+                    </a>
+                    <a href="/Groups.html" class="tiny-dropdown-item">
+                        <i class="fas fa-layer-group"></i>
+                        Groups
+                    </a>
+                    <a href="/Jcoin.html" class="tiny-dropdown-item">
+                        <i class="fas fa-coins"></i>
+                        JCoins
+                    </a>
+                    <div class="tiny-dropdown-item" data-action="edit-profile">
+                        <i class="fas fa-edit"></i>
+                        Edit Profile
+                    </div>
+                    <div class="tiny-dropdown-item" data-action="share-profile">
+                        <i class="fas fa-share-alt"></i>
+                        Share Profile
+                    </div>
+                    <div class="tiny-dropdown-item" data-action="download-qr">
+                        <i class="fas fa-qrcode"></i>
+                        Download QR
+                    </div>
+                    <div class="tiny-dropdown-item" data-action="profile-settings">
+                        <i class="fas fa-cog"></i>
+                        Profile Settings
+                    </div>
+                </div>
+>>>>>>> 4cedfd8 (Rename Profile.html to profile.html):profile.html
             </div>
         </div>
     </header>
@@ -4439,8 +4476,8 @@
                                 <i class="fas fa-sign-out-alt"></i> Log Out
                             </button>
 
-                            <p class="help-inline">Need help? <a href="#">Contact Support</a></p>
-                            <p class="help-inline">Manage your data: <a href="#">Download Data</a> | <a href="#">Delete Account</a></p>
+                            <p>Need help? <a href="#">Contact Support</a></p>
+                            <p>Manage your data: <a href="#">Download Data</a> | <a href="#">Delete Account</a></p>
                         </div>
                     </div>
                 </div>
@@ -4467,7 +4504,22 @@
             <div class="wallet-guide-section">
                 <h3>Wallet User Guide</h3>
                 
-                <!-- Bank details removed from Profile page; only visible during purchase flows (Shop/JCoin/Premium). -->
+                <div class="guide-item">
+                    <h4><i class="fas fa-university"></i> OPay Details</h4>
+                    <p><strong>Bank:</strong> OPay</p>
+                    <p><strong>Account Name:</strong> ELECHI JOSHUA</p>
+                    <p><strong>Account Number:</strong> 8111609765</p>
+                    <p><strong>Reference:</strong> Your JCHAT User ID</p>
+                </div>
+
+                <div class="guide-item">
+                    <h4><i class="fas fa-university"></i> Bank Transfer (Keystone Bank)</h4>
+                    <p><strong>Bank:</strong> Keystone Bank</p>
+                    <p><strong>Account Name:</strong> ELECHI OSOUNDU JOSHUA</p>
+                    <p><strong>Account Number:</strong> 6042862356</p>
+                    <p><strong>Reference:</strong> Your JCHAT User ID</p>
+                    <p style="font-size:0.9rem;color:var(--text-light);">After payment, upload your receipt below and tap "Send Purchase Request".</p>
+                </div>
 
                 <div class="guide-item">
                     <h4><i class="fas fa-key"></i> Transaction PIN</h4>
@@ -5326,6 +5378,7 @@
                 if (text) text.style.display = 'block';
             }
         }
+
         /**
          * Displays a custom confirmation modal.
          * @param {string} message - The message to display in the modal.
@@ -5922,8 +5975,23 @@
 
 
 
+<<<<<<< HEAD:Profile.html
 
 
+=======
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
+                button.classList.remove('secondary');
+                button.classList.add('primary');
+            } else {
+                section.style.display = 'none';
+                button.innerHTML = '<i class="fas fa-eye"></i> Show';
+                button.classList.remove('primary');
+                button.classList.add('secondary');
+            }
+        }
+>>>>>>> 4cedfd8 (Rename Profile.html to profile.html):profile.html
 
         /**
          * Calculates and updates the profile completion percentage.
@@ -8796,6 +8864,9 @@
         });
 
     </script>
+<<<<<<< HEAD:Profile.html
 	
+=======
+>>>>>>> 4cedfd8 (Rename Profile.html to profile.html):profile.html
 </body>
 </html>
