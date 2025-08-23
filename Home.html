@@ -971,70 +971,7 @@
             display: none; /* Hide the nav element entirely */
         }
 
-        /* Announcement Header below main header */
-        .announcement-header {
-            position: fixed;
-            top: 60px; /* add tiny spacing below first header */
-            left: 0;
-            right: 0;
-            height: 34px;
-            z-index: 11;
-            display: block; /* Always visible for testing - will be toggled by JavaScript */
-            border-bottom: 1px solid var(--border-light);
-            background: var(--header-background);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        .announcement-content { height: 100%; display: flex; align-items: center; gap: 12px; padding: 0 16px; }
-                 .announcement-icon { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; box-shadow: 0 0 12px rgba(255,46,146,0.6), 0 0 12px rgba(0,213,255,0.6); }
-        .announcement-ticker { position: relative; overflow: hidden; flex: 1; height: 100%; }
-        .announcement-track { 
-            white-space: nowrap; 
-            display: inline-block; 
-            will-change: transform; 
-            padding-left: 100%; 
-            animation: jchat-scroll-left var(--ann-duration, 30s) linear infinite; 
-            background-image: linear-gradient(90deg, var(--pink), var(--blue)); 
-            -webkit-background-clip: text; 
-            background-clip: text; 
-            color: transparent; 
-            -webkit-text-fill-color: transparent; 
-        }
-        
-        /* Default announcement track styling when no announcement is active */
-        .announcement-track:empty::before {
-            content: "Announcement System Ready - Use gas_management.html to publish announcements";
-            color: var(--text-color-primary);
-            -webkit-text-fill-color: var(--text-color-primary);
-            background-image: none;
-            background-clip: initial;
-        }
-        @keyframes jchat-scroll-left {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-        body.has-announcement main { margin-top: 40px; }
 
-        /* Announcement Countdown */
-        .announcement-countdown {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            height: 100%;
-            color: var(--text-color-primary);
-            font-weight: 500;
-            background: linear-gradient(135deg, rgba(255, 46, 146, 0.2), rgba(0, 213, 255, 0.2));
-        }
-
-        .announcement-countdown i {
-            color: var(--accent-color);
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
 
         /* User Profile Header Styling */
         .user-profile-header {
@@ -3395,26 +3332,7 @@
         </div>
     </header>
 
-    <!-- Announcement Header (Developer announcements) -->
-    <div id="announcementHeader" class="announcement-header" role="region" aria-label="Developer Announcement">
-        <div class="announcement-content">
-            <img src="/assets/mega.png" alt="Announcement" class="announcement-icon" loading="lazy" decoding="async">
-            <div class="announcement-ticker">
-                <div id="announcementTrack" class="announcement-track">Announcement System Ready - Use gas_management.html to publish announcements</div>
-            </div>
-            <!-- Status indicator -->
-            <div id="announcementStatus" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: rgba(255, 255, 255, 0.7); display: block;">
-                System Ready
-            </div>
-            <!-- Debug buttons for testing announcements -->
-            <button id="testAnnouncementBtn" onclick="testAnnouncementManually()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255, 46, 146, 0.8); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; display: block;">
-                Test
-            </button>
-            <button id="refreshAnnouncementBtn" onclick="forceRefreshAnnouncement()" style="position: absolute; right: 70px; top: 50%; transform: translateY(-50%); background: rgba(0, 213, 255, 0.8); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; display: block;">
-                Refresh
-            </button>
-        </div>
-    </div>
+
 
     <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Skip to main content</a>
 
@@ -7384,12 +7302,6 @@
                         maintenanceMode: false,
                         globalAnnouncement: "",
                         enableCalls: true, // NEW: Default to true for calls.
-                        // Announcement settings
-                        announcementEnabled: false,
-                        announcementText: "",
-                        announcementDurationMs: 300000, // 5 minutes in milliseconds
-                        announcementStartTime: null,
-                        announcementEndTime: null,
                     };
                     await setDoc(SYSTEM_SETTINGS_DOC_REF, currentSystemSettings); // Create the document.
                     console.log("JCHAT_DEBUG: Default system settings created.");
@@ -7423,7 +7335,7 @@
                     if (maintenanceOverlay) {
                         maintenanceOverlay.classList.add('active');
                         if (maintenanceAnnouncementText) {
-                            maintenanceAnnouncementText.textContent = settings.globalAnnouncement || "JCHAT is currently undergoing scheduled maintenance. We'll be back online shortly!";
+                            maintenanceAnnouncementText.textContent = "JCHAT is currently undergoing scheduled maintenance. We'll be back online shortly!";
                         }
                     }
                     toggleInteractiveElements(false, false); // Disable all interactions for regular users, pass isAdmin false.
@@ -7437,146 +7349,7 @@
                 toggleInteractiveElements(true, isCurrentUserAdmin); // Enable all interactions initially, pass isAdmin.
             }
 
-            // Developer Announcement Header toggle - Enhanced with better debugging and immediate display
-            try {
-                const annEl = document.getElementById('announcementHeader');
-                const trackEl = document.getElementById('announcementTrack');
-                if (annEl && trackEl) {
-                    const enabled = settings.announcementEnabled ?? false; // default to false if not specified
-                    const text = (settings.announcementText && settings.announcementText.trim()) || (settings.globalAnnouncement || '').trim();
-                    const now = new Date();
-                    const startOk = !settings.announcementStartTime || (settings.announcementStartTime.toDate ? settings.announcementStartTime.toDate() <= now : true);
-                    const endOk = !settings.announcementEndTime || (settings.announcementEndTime.toDate ? settings.announcementEndTime.toDate() >= now : true);
-                    const shouldShow = enabled && !!text && startOk && endOk;
-                    
-                    // Additional debugging for troubleshooting
-                    if (enabled && !!text && (!startOk || !endOk)) {
-                        console.log('JCHAT_DEBUG: Announcement blocked by time constraints:', {
-                            currentTime: now,
-                            startTime: settings.announcementStartTime,
-                            endTime: settings.announcementEndTime,
-                            startTimeFormatted: settings.announcementStartTime?.toDate ? settings.announcementStartTime.toDate().toISOString() : 'none',
-                            endTimeFormatted: settings.announcementEndTime?.toDate ? settings.announcementEndTime.toDate().toISOString() : 'none'
-                        });
-                    }
-                    
-                    // Enhanced debug logging for announcement system
-                    console.log('JCHAT_DEBUG: Enhanced announcement system debug:', {
-                        enabled,
-                        announcementText: settings.announcementText,
-                        globalAnnouncement: settings.globalAnnouncement,
-                        text,
-                        startTime: settings.announcementStartTime,
-                        endTime: settings.announcementEndTime,
-                        startOk,
-                        endOk,
-                        shouldShow,
-                        developerUID: settings.developerUID,
-                        lastModified: settings.lastModified,
-                        fullSettings: settings
-                    });
 
-                    // Clear any existing countdown
-                    const existingCountdown = annEl.querySelector('.announcement-countdown');
-                    if (existingCountdown) {
-                        existingCountdown.remove();
-                    }
-
-                    if (shouldShow) {
-                        console.log('JCHAT_DEBUG: Showing announcement:', text);
-                        
-                        // Show countdown before announcement appears
-                        const countdownEl = document.createElement('div');
-                        countdownEl.className = 'announcement-countdown';
-                        countdownEl.innerHTML = `
-                            <i class="fas fa-clock"></i>
-                            <span>Announcement in <span id="announcementCountdown">5</span> seconds</span>
-                        `;
-                        annEl.appendChild(countdownEl);
-                        annEl.style.display = 'block';
-                        
-                        let countdown = 5;
-                        const countdownInterval = setInterval(() => {
-                            countdown--;
-                            const countdownSpan = document.getElementById('announcementCountdown');
-                            if (countdownSpan) countdownSpan.textContent = countdown;
-                            
-                            if (countdown <= 0) {
-                                clearInterval(countdownInterval);
-                                countdownEl.remove();
-                                
-                                // Show the actual announcement
-                                const durationMs = Math.max(15000, parseInt(settings.announcementDurationMs || 45000));
-                                const spacer = ' \u00A0\u00A0\u00A0•\u00A0\u00A0\u00A0 ';
-                                const repeated = `${text}${spacer}${text}${spacer}${text}`;
-                                trackEl.textContent = repeated;
-                                
-                                // Compute duration based on actual width for a smooth px/sec speed
-                                requestAnimationFrame(() => {
-                                    const ticker = annEl.querySelector('.announcement-ticker');
-                                    const containerWidth = ticker ? ticker.offsetWidth : annEl.offsetWidth;
-                                    const travel = (trackEl.scrollWidth || 600) + containerWidth; // px to travel
-                                    const pxPerSec = 20; // 3x slower than previous ~60px/s
-                                    const durationSec = Math.max(36, Math.round(travel / pxPerSec));
-                                    trackEl.style.setProperty('--ann-duration', `${durationSec}s`);
-                                });
-                                
-                                document.body.classList.add('has-announcement');
-                                console.log('JCHAT_DEBUG: Announcement displayed successfully');
-                                
-                                // Hide debug buttons and update status when announcement is shown
-                                const testBtn = document.getElementById('testAnnouncementBtn');
-                                const refreshBtn = document.getElementById('refreshAnnouncementBtn');
-                                const statusEl = document.getElementById('announcementStatus');
-                                if (testBtn) {
-                                    testBtn.style.display = 'none';
-                                }
-                                if (refreshBtn) {
-                                    refreshBtn.style.display = 'none';
-                                }
-                                if (statusEl) {
-                                    statusEl.style.display = 'block';
-                                    statusEl.textContent = 'Announcement Active';
-                                }
-                            }
-                        }, 1000);
-                    } else {
-                        console.log('JCHAT_DEBUG: Hiding announcement. Reason:', {
-                            enabled: enabled,
-                            hasText: !!text,
-                            startOk: startOk,
-                            endOk: endOk
-                        });
-                        annEl.style.display = 'none';
-                        document.body.classList.remove('has-announcement');
-                        trackEl.textContent = '';
-                        trackEl.style.animation = '';
-                        
-                        // Show debug buttons and status for debugging
-                        const testBtn = document.getElementById('testAnnouncementBtn');
-                        const refreshBtn = document.getElementById('refreshAnnouncementBtn');
-                        const statusEl = document.getElementById('announcementStatus');
-                        if (testBtn) {
-                            testBtn.style.display = 'block';
-                        }
-                        if (refreshBtn) {
-                            refreshBtn.style.display = 'block';
-                        }
-                        if (statusEl) {
-                            statusEl.style.display = 'block';
-                            statusEl.textContent = 'System Ready - No Active Announcement';
-                        }
-                    }
-                } else {
-                    console.warn('JCHAT_WARN: Announcement elements not found:', {
-                        announcementHeader: !!document.getElementById('announcementHeader'),
-                        announcementTrack: !!document.getElementById('announcementTrack')
-                    });
-                }
-            } catch (e) { 
-                console.error('JCHAT_ERROR: Announcement system error:', e);
-                console.error('JCHAT_ERROR: Stack trace:', e.stack);
-            }
 
             // Now, apply individual feature toggles.
             // These will refine the state set by the maintenance mode logic above.
@@ -9439,82 +9212,7 @@
             }
         }
 
-        // Manual announcement test function for debugging
-        function testAnnouncementManually() {
-            console.log('JCHAT_DEBUG: Manual announcement test triggered');
-            console.log('JCHAT_DEBUG: Current system settings:', currentSystemSettings);
-            
-            // Force show announcement for testing
-            const annEl = document.getElementById('announcementHeader');
-            const trackEl = document.getElementById('announcementTrack');
-            
-            if (annEl && trackEl) {
-                const testText = 'TEST ANNOUNCEMENT - This is a manual test from Home.html';
-                const countdownEl = document.createElement('div');
-                countdownEl.className = 'announcement-countdown';
-                countdownEl.innerHTML = `
-                    <i class="fas fa-clock"></i>
-                    <span>Test Announcement in <span id="announcementCountdown">3</span> seconds</span>
-                `;
-                annEl.appendChild(countdownEl);
-                annEl.style.display = 'block';
-                
-                let countdown = 3;
-                const countdownInterval = setInterval(() => {
-                    countdown--;
-                    const countdownSpan = document.getElementById('announcementCountdown');
-                    if (countdownSpan) countdownSpan.textContent = countdown;
-                    
-                    if (countdown <= 0) {
-                        clearInterval(countdownInterval);
-                        countdownEl.remove();
-                        
-                        trackEl.textContent = testText;
-                        document.body.classList.add('has-announcement');
-                        console.log('JCHAT_DEBUG: Manual test announcement displayed');
-                    }
-                }, 1000);
-            }
-        }
 
-        // Force refresh announcement system
-        function forceRefreshAnnouncement() {
-            console.log('JCHAT_DEBUG: Force refreshing announcement system');
-            if (currentSystemSettings) {
-                console.log('JCHAT_DEBUG: Re-applying system settings for announcement refresh');
-                applySystemSettings(currentSystemSettings);
-            } else {
-                console.log('JCHAT_DEBUG: No system settings available, fetching fresh data');
-                fetchSystemSettings().then(() => {
-                    if (currentSystemSettings) {
-                        applySystemSettings(currentSystemSettings);
-                    }
-                });
-            }
-        }
-
-        // Check announcement system status
-        function checkAnnouncementStatus() {
-            console.log('JCHAT_DEBUG: === ANNOUNCEMENT SYSTEM STATUS ===');
-            console.log('JCHAT_DEBUG: Current system settings:', currentSystemSettings);
-            console.log('JCHAT_DEBUG: Announcement header element:', document.getElementById('announcementHeader'));
-            console.log('JCHAT_DEBUG: Announcement track element:', document.getElementById('announcementTrack'));
-            console.log('JCHAT_DEBUG: Current user:', currentUser);
-            console.log('JCHAT_DEBUG: Is auth ready:', isAuthReady);
-            
-            if (currentSystemSettings) {
-                console.log('JCHAT_DEBUG: Announcement enabled:', currentSystemSettings.announcementEnabled);
-                console.log('JCHAT_DEBUG: Announcement text:', currentSystemSettings.announcementText);
-                console.log('JCHAT_DEBUG: Announcement duration:', currentSystemSettings.announcementDurationMs);
-                console.log('JCHAT_DEBUG: Developer UID:', currentSystemSettings.developerUID);
-            }
-            console.log('JCHAT_DEBUG: === END STATUS ===');
-        }
-
-        // Make functions globally accessible for console debugging
-        window.testAnnouncementManually = testAnnouncementManually;
-        window.forceRefreshAnnouncement = forceRefreshAnnouncement;
-        window.checkAnnouncementStatus = checkAnnouncementStatus;
 
         // Smart Scroll logic
         const smartScrollBtn = document.getElementById('smartScrollBtn');

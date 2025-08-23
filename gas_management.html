@@ -1461,7 +1461,7 @@
                             </div>
 
                             <div class="management-card">
-                                <h4>Maintenance & Announcements</h4>
+                                <h4>Maintenance Settings</h4>
                                 <div class="input-group">
                                     <label for="maintenanceModeToggle">Maintenance Mode:</label>
                                     <label class="toggle-switch">
@@ -1469,53 +1469,14 @@
                                         <span class="slider"></span>
                                     </label>
                                 </div>
-                                <div class="input-group">
-                                    <label for="globalAnnouncementInput">Global Announcement Text:</label>
-                                    <textarea id="globalAnnouncementInput" placeholder="Enter global announcement text" rows="3"></textarea>
-                                </div>
-                                 <div class="input-group">
-                                    <label for="announcementStartTime">Start Time:</label>
-                                    <input type="datetime-local" id="announcementStartTime">
-                                </div>
-                                <div class="input-group">
-                                    <label for="announcementEndTime">End Time:</label>
-                                    <input type="datetime-local" id="announcementEndTime">
-                                </div>
+
                                 <div class="input-group">
                                     <label for="profanityFilterSensitivityInput">Profanity Filter Sensitivity (1-10):</label>
                                     <input type="number" id="profanityFilterSensitivityInput" min="1" max="10">
                                 </div>
                             </div>
 
-                            <div class="management-card">
-                                <h4>Admin Announcement</h4>
-                                <div class="input-group">
-                                    <label for="announcementEnabledToggle">Enable Announcement:</label>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="announcementEnabledToggle">
-                                        <span class="slider"></span>
-                                    </label>
-                                </div>
-                                <div class="input-group">
-                                    <label for="announcementTextInput">Announcement Text:</label>
-                                    <textarea id="announcementTextInput" placeholder="Type the public announcement" rows="3"></textarea>
-                                </div>
-                                <div class="input-group">
-                                    <label for="announcementDurationInput">Display Duration (minutes):</label>
-                                    <input type="number" id="announcementDurationInput" min="1" max="60" placeholder="5">
-                                </div>
-                                <div class="input-group">
-                                    <button id="testAnnouncementBtn" class="admin-button" style="margin-top: 10px;">
-                                        <span class="button-text">Test Announcement</span>
-                                    </button>
-                                </div>
-                                <div class="input-group">
-                                    <label>Preview:</label>
-                                    <div class="announcement-ticker" style="border:1px solid var(--border-light);border-radius:10px;padding:6px;overflow:hidden;">
-                                        <div class="announcement-track" id="announcementPreviewTrack"></div>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
                         <button id="saveSystemSettingsButton" class="admin-button">
                             <span class="button-text">Save System Settings</span>
@@ -1982,9 +1943,7 @@
         const enableEmailNotificationsToggle = document.getElementById('enableEmailNotificationsToggle');
         const enableCallsToggle = document.getElementById('enableCallsToggle');
         const maintenanceModeToggle = document.getElementById('maintenanceModeToggle');
-        const globalAnnouncementInput = document.getElementById('globalAnnouncementInput');
-        const announcementStartTimeInput = document.getElementById('announcementStartTime'); // New
-        const announcementEndTimeInput = document.getElementById('announcementEndTime');     // New
+
         const saveSystemSettingsButton = document.getElementById('saveSystemSettingsButton');
 
         // Admin Page Specific Elements - User Lookup & Management
@@ -3877,14 +3836,9 @@
                         jcoinNairaRate: 7.5, gasJcoinRate: 0.1, dailyBonusAmount: 50,
                         profanityFilterSensitivity: 5,
                         enableUserRegistration: true, enableFriendRequests: true, enablePublicChat: true,
-                        enablePostCreation: true, enableEmailNotifications: true, maintenanceMode: false,
-                        globalAnnouncement: "", enableCalls: true,
-                        // Announcement settings
-                        announcementEnabled: false,
-                        announcementText: "",
-                        announcementDurationMs: 300000, // 5 minutes in milliseconds
-                        announcementStartTime: null,
-                        announcementEndTime: null,
+                        enablePostCreation: true, enableEmailNotifications: true,                         maintenanceMode: false,
+                        globalAnnouncement: "", 
+                        enableCalls: true,
                     };
                     await setDoc(SYSTEM_SETTINGS_DOC_REF, currentSystemSettings);
                     console.log("JCHAT_DEBUG: Default system settings created.");
@@ -3915,22 +3869,7 @@
             if (enableCallsToggle) enableCallsToggle.checked = settings.enableCalls ?? true;
 
             if (maintenanceModeToggle) maintenanceModeToggle.checked = settings.maintenanceMode ?? false;
-            if (globalAnnouncementInput) globalAnnouncementInput.value = settings.globalAnnouncement ?? '';
-            // Admin announcement fields
-            const annEnabledToggle = document.getElementById('announcementEnabledToggle');
-            const annTextInput = document.getElementById('announcementTextInput');
-            const annDurationInput = document.getElementById('announcementDurationInput');
-            if (annEnabledToggle) annEnabledToggle.checked = settings.announcementEnabled ?? false;
-            if (annTextInput) annTextInput.value = settings.announcementText ?? '';
-            if (annDurationInput) annDurationInput.value = settings.announcementDurationMs ? Math.round((settings.announcementDurationMs)/60000) : 5;
 
-            // Set datetime-local inputs
-            if (announcementStartTimeInput) {
-                announcementStartTimeInput.value = settings.announcementStartTime?.toDate ? new Date(settings.announcementStartTime.toDate()).toISOString().slice(0, 16) : '';
-            }
-            if (announcementEndTimeInput) {
-                announcementEndTimeInput.value = settings.announcementEndTime?.toDate ? new Date(settings.announcementEndTime.toDate()).toISOString().slice(0, 16) : '';
-            }
         }
 
         /**
@@ -3948,10 +3887,6 @@
             showMessageBox("Saving system settings...", 'loading', true);
 
             try {
-                // Convert datetime-local strings to Date objects, then to Firestore Timestamps
-                const startTime = announcementStartTimeInput.value ? new Date(announcementStartTimeInput.value) : null;
-                const endTime = announcementEndTimeInput.value ? new Date(announcementEndTimeInput.value) : null;
-
                 const newSettings = {
                     jcoinNairaRate: parseFloat(jcoinNairaRateInput.value),
                     gasJcoinRate: parseFloat(gasJcoinRateInput.value),
@@ -3964,12 +3899,7 @@
                     enableEmailNotifications: enableEmailNotificationsToggle.checked,
                     enableCalls: enableCallsToggle.checked,
                     maintenanceMode: maintenanceModeToggle.checked,
-                    globalAnnouncement: globalAnnouncementInput.value.trim(),
-                    announcementStartTime: startTime ? Timestamp.fromDate(startTime) : null,
-                    announcementEndTime: endTime ? Timestamp.fromDate(endTime) : null,
-                    announcementEnabled: !!document.getElementById('announcementEnabledToggle')?.checked,
-                    announcementText: (document.getElementById('announcementTextInput')?.value || '').trim(),
-                    announcementDurationMs: Math.max(60000, parseInt(document.getElementById('announcementDurationInput')?.value || '5') * 60000),
+                    globalAnnouncement: "",
                     updatedAt: serverTimestamp(),
                     // Add developer UID for tracking
                     developerUID: currentUser?.uid || 'unknown',
@@ -3984,10 +3914,7 @@
                     showMessageBox("Please enter valid numeric values for economy/sensitivity settings.", 'warning');
                     return;
                 }
-                if (newSettings.announcementStartTime && newSettings.announcementEndTime && newSettings.announcementStartTime.toDate() >= newSettings.announcementEndTime.toDate()) {
-                    showMessageBox("Announcement End Time must be after Start Time.", 'warning');
-                    return;
-                }
+
 
                 console.log('JCHAT_DEBUG: Saving settings by admin UID:', currentUser.uid, 'New settings:', newSettings);
                 await setDoc(SYSTEM_SETTINGS_DOC_REF, newSettings, { merge: true });
@@ -4011,39 +3938,7 @@
             const isCurrentUserAdmin = currentUser && currentUser.uid === ADMIN_UID;
             const now = new Date();
 
-            // Handle scheduled global announcement
-            let currentAnnouncement = settings.globalAnnouncement || "";
-            let isAnnouncementActive = false;
 
-            if (settings.globalAnnouncement) {
-                const startTime = settings.announcementStartTime?.toDate ? new Date(settings.announcementStartTime.toDate()) : null;
-                const endTime = settings.announcementEndTime?.toDate ? new Date(settings.announcementEndTime.toDate()) : null;
-
-                if (startTime && endTime) {
-                    if (now >= startTime && now <= endTime) {
-                        isAnnouncementActive = true;
-                    } else if (now < startTime) {
-                        currentAnnouncement += ` (Scheduled for ${startTime.toLocaleString()})`;
-                    } else { // now > endTime
-                        currentAnnouncement += ` (Expired on ${endTime.toLocaleString()})`;
-                    }
-                } else if (startTime) {
-                    if (now >= startTime) {
-                        isAnnouncementActive = true;
-                    } else {
-                        currentAnnouncement += ` (Starts ${startTime.toLocaleString()})`;
-                    }
-                } else if (endTime) {
-                    if (now <= endTime) {
-                        isAnnouncementActive = true;
-                    } else {
-                        currentAnnouncement += ` (Expired on ${endTime.toLocaleString()})`;
-                    }
-                } else { // No start/end time, always active if text exists
-                    isAnnouncementActive = true;
-                }
-            }
-            if (globalAnnouncementInput) globalAnnouncementInput.value = currentAnnouncement; // Update UI with status
 
             if (settings.maintenanceMode) {
                 if (isCurrentUserAdmin) {
@@ -4056,7 +3951,7 @@
                     if (maintenanceOverlay) {
                         maintenanceOverlay.classList.add('active');
                         if (maintenanceAnnouncementText) {
-                            maintenanceAnnouncementText.textContent = currentAnnouncement || "JCHAT is currently undergoing scheduled maintenance. We'll be back online shortly!";
+                            maintenanceAnnouncementText.textContent = "JCHAT is currently undergoing scheduled maintenance. We'll be back online shortly!";
                         }
                     }
                     document.body.style.overflow = 'hidden';
@@ -5108,11 +5003,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log("JCHAT_DEBUG: DOMContentLoaded fired.");
             
-            // Add event listener for test announcement button
-            const testAnnouncementBtn = document.getElementById('testAnnouncementBtn');
-            if (testAnnouncementBtn) {
-                testAnnouncementBtn.addEventListener('click', testAnnouncement);
-            }
+
             
             // Apply theme on load
             const savedTheme = localStorage.getItem('jchat-theme');
@@ -5398,76 +5289,7 @@
             }
         });
 
-        // Preview announcement ticker
-        function updateAnnouncementPreview() {
-            const track = document.getElementById('announcementPreviewTrack');
-            const txt = (document.getElementById('announcementTextInput')?.value || '').trim();
-            if (!track) return;
-            if (!txt) { track.textContent=''; track.style.animation='none'; return; }
-            track.textContent = `   ${txt}   `;
-            const width = track.scrollWidth || 600;
-            const rtl = Math.min(30, Math.max(10, width / 60));
-            track.style.animation = `ticker-rtl ${rtl}s linear infinite`;
-        }
 
-        // Test announcement functionality - Enhanced for immediate testing
-        function testAnnouncement() {
-            const announcementText = document.getElementById('announcementTextInput')?.value?.trim();
-            const duration = parseInt(document.getElementById('announcementDurationInput')?.value || '5');
-            
-            if (!announcementText) {
-                showMessageBox('Please enter announcement text first!', 'warning');
-                return;
-            }
-
-            // Verify admin permission
-            if (!currentUser || currentUser.uid !== ADMIN_UID) {
-                showMessageBox('Only admin can publish announcements!', 'error');
-                console.error('JCHAT_ERROR: Non-admin user attempted to publish announcement:', currentUser?.uid);
-                return;
-            }
-
-            // Create a test announcement that will appear immediately
-            const testSettings = {
-                announcementEnabled: true,
-                announcementText: announcementText,
-                announcementDurationMs: duration * 60000,
-                announcementStartTime: null, // No start time = immediate
-                announcementEndTime: null,   // No end time = no expiration
-                updatedAt: serverTimestamp(),
-                // Add developer UID for tracking
-                developerUID: currentUser?.uid || 'unknown',
-                lastModified: serverTimestamp()
-            };
-
-            console.log('JCHAT_DEBUG: Sending test announcement from admin UID:', currentUser.uid, 'Settings:', testSettings);
-
-            // Save test announcement to Firestore
-            setDoc(SYSTEM_SETTINGS_DOC_REF, testSettings, { merge: true })
-                .then(() => {
-                    showMessageBox('Test announcement sent! Check Home.html to see it.', 'success');
-                    console.log('JCHAT_DEBUG: Test announcement saved successfully to Firestore');
-                    
-                    // Also update the current settings object for immediate testing
-                    if (currentSystemSettings) {
-                        currentSystemSettings.announcementEnabled = true;
-                        currentSystemSettings.announcementText = announcementText;
-                        currentSystemSettings.announcementDurationMs = duration * 60000;
-                        currentSystemSettings.announcementStartTime = null;
-                        currentSystemSettings.announcementEndTime = null;
-                        console.log('JCHAT_DEBUG: Updated local settings for immediate testing');
-                    }
-                })
-                .catch((error) => {
-                    console.error('JCHAT_ERROR: Failed to save test announcement:', error);
-                    showMessageBox(`Failed to send test announcement: ${error.message}`, 'error');
-                });
-        }
-
-        document.addEventListener('input', (e)=>{
-            if (e.target && (e.target.id === 'announcementTextInput')) updateAnnouncementPreview();
-        });
-        document.addEventListener('DOMContentLoaded', updateAnnouncementPreview);
 
         // Toggle system for sections
         const STORAGE_KEY_PREFIX = 'gm-toggle:';
