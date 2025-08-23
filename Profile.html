@@ -1745,6 +1745,112 @@
             }
         }
 
+        /* Floating Scroll Toggle Button - Pink and Blue Theme */
+        .scroll-toggle-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.4), 0 8px 25px rgba(0, 213, 255, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 9999;
+            overflow: hidden;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .scroll-toggle-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--blue), var(--pink));
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .scroll-toggle-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 15px 35px rgba(255, 46, 146, 0.5), 0 15px 35px rgba(0, 213, 255, 0.5);
+        }
+
+        .scroll-toggle-btn:hover::before {
+            opacity: 1;
+        }
+
+        .scroll-toggle-btn:active {
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .scroll-toggle-btn i {
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .scroll-toggle-btn:hover i {
+            transform: scale(1.2);
+        }
+
+        /* Scroll to Top state */
+        .scroll-toggle-btn.scroll-to-top {
+            background: linear-gradient(135deg, var(--blue), var(--pink));
+        }
+
+        .scroll-toggle-btn.scroll-to-top::before {
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+        }
+
+        /* Pulse animation for attention */
+        @keyframes scrollPulse {
+            0% {
+                box-shadow: 0 8px 25px rgba(255, 46, 146, 0.4), 0 8px 25px rgba(0, 213, 255, 0.4);
+            }
+            50% {
+                box-shadow: 0 8px 25px rgba(255, 46, 146, 0.6), 0 8px 25px rgba(0, 213, 255, 0.6);
+            }
+            100% {
+                box-shadow: 0 8px 25px rgba(255, 46, 146, 0.4), 0 8px 25px rgba(0, 213, 255, 0.4);
+            }
+        }
+
+        .scroll-toggle-btn.pulse {
+            animation: scrollPulse 2s infinite;
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 768px) {
+            .scroll-toggle-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 1.3rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .scroll-toggle-btn {
+                bottom: 15px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+        }
+
         .profile-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -4162,6 +4268,11 @@
 
     <!-- Custom Message Box (reused from Home.html) -->
     <div id="messageBox"></div>
+
+    <!-- Floating Scroll Toggle Button - Pink and Blue Theme -->
+    <div id="scrollToggleButton" class="scroll-toggle-btn" title="Scroll to Bottom">
+        <i class="fas fa-chevron-down" id="scrollToggleIcon"></i>
+    </div>
 
     <!-- Select Friend Modal (exactly like Chat.html) -->
     <div id="selectFriendModal" class="modal-overlay">
@@ -8431,6 +8542,90 @@
                 if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
             }
         });
+        // --- Scroll Toggle Button Functionality ---
+        function initializeScrollToggle() {
+            const scrollToggleBtn = document.getElementById('scrollToggleButton');
+            const scrollToggleIcon = document.getElementById('scrollToggleIcon');
+            let isAtTop = true;
+
+            if (!scrollToggleBtn || !scrollToggleIcon) return;
+
+            // Function to scroll to bottom
+            function scrollToBottom() {
+                window.scrollTo({
+                    top: document.documentElement.scrollHeight,
+                    behavior: 'smooth'
+                });
+                isAtTop = false;
+                updateScrollToggleState();
+            }
+
+            // Function to scroll to top
+            function scrollToTop() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+                isAtTop = true;
+                updateScrollToggleState();
+            }
+
+            // Function to update button state and icon
+            function updateScrollToggleState() {
+                if (isAtTop) {
+                    scrollToggleBtn.classList.remove('scroll-to-top');
+                    scrollToggleBtn.classList.add('pulse');
+                    scrollToggleIcon.className = 'fas fa-chevron-down';
+                    scrollToggleBtn.title = 'Scroll to Bottom';
+                    scrollToggleBtn.onclick = scrollToBottom;
+                } else {
+                    scrollToggleBtn.classList.add('scroll-to-top');
+                    scrollToggleBtn.classList.remove('pulse');
+                    scrollToggleIcon.className = 'fas fa-chevron-up';
+                    scrollToggleBtn.title = 'Scroll to Top';
+                    scrollToggleBtn.onclick = scrollToTop;
+                }
+            }
+
+            // Add click event listener
+            scrollToggleBtn.addEventListener('click', () => {
+                if (isAtTop) {
+                    scrollToBottom();
+                } else {
+                    scrollToTop();
+                }
+            });
+
+            // Update state on scroll
+            let scrollTimeout;
+            window.addEventListener('scroll', () => {
+                if (scrollTimeout) {
+                    clearTimeout(scrollTimeout);
+                }
+                scrollTimeout = setTimeout(() => {
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const windowHeight = window.innerHeight;
+                    const documentHeight = document.documentElement.scrollHeight;
+                    
+                    // Check if we're at top or bottom
+                    if (scrollTop < 100) {
+                        if (!isAtTop) {
+                            isAtTop = true;
+                            updateScrollToggleState();
+                        }
+                    } else if (scrollTop + windowHeight >= documentHeight - 100) {
+                        if (isAtTop) {
+                            isAtTop = false;
+                            updateScrollToggleState();
+                        }
+                    }
+                }, 100);
+            }, { passive: true });
+
+            // Initialize button state
+            updateScrollToggleState();
+        }
+
         // --- Event Listeners (moved to DOMContentLoaded for safety) ---
         document.addEventListener('DOMContentLoaded', () => {
             // Apply theme on load
@@ -8443,6 +8638,9 @@
                 document.body.classList.remove(...themes);
                 document.body.classList.add('theme-dark-mode'); // Default
             }
+
+            // Initialize Scroll Toggle Button
+            initializeScrollToggle();
 
             // Profile Picture Upload
             if (profilePicUploadInput) profilePicUploadInput.addEventListener('change', handleProfilePicChange); // Null check
