@@ -5513,40 +5513,6 @@
 
 
 
-                if (newChatBubbleStyle !== 'default' && !hasBubble) {
-                    showMessageBox(`You haven't unlocked the '${newChatBubbleStyle}' chat bubble style yet!`, 'warning');
-                    toggleButtonLoading(saveCustomizationButton, false);
-                    return;
-                }
-                if (newProfileTheme !== 'default' && !hasTheme) {
-                    showMessageBox(`You haven't unlocked the '${newProfileTheme}' profile theme yet!`, 'warning');
-                    toggleButtonLoading(saveCustomizationButton, false);
-                    return;
-                }
-
-                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
-                await updateDoc(privateProfileDocRef, {
-                    profileFrame: newProfileFrame,
-                    chatBubbleStyle: newChatBubbleStyle,
-                    profileTheme: newProfileTheme,
-                    updatedAt: serverTimestamp()
-                });
-
-                showMessageBox("Customization saved successfully!", 'success');
-                // Re-fetch current user profile data
-                const updatedProfileSnap = await getDoc(privateProfileDocRef);
-                if (updatedProfileSnap.exists()) {
-                    currentUserProfileData = updatedProfileSnap.data();
-                    displayedUserProfileData = currentUserProfileData; // Ensure consistency
-                }
-
-            } catch (error) {
-                console.error("JCHAT_ERROR: Error saving customization:", error);
-                showMessageBox(`Failed to save customization: ${error.message}`, 'error');
-            } finally {
-                toggleButtonLoading(saveCustomizationButton, false);
-            }
-        }
 
 
 
@@ -5566,59 +5532,10 @@
 
 
 
-        /**
-         * Calculates and updates the profile completion percentage.
-         */
-        function updateProfileCompletion() {
-            const profileFields = [
-                'displayName', 'bio', 'locationInput', 'schoolInput', 'workInput', 
-                'interestsInput', 'websiteInput', 'socialLinksInput', 'handleInput', 
-                'pronounsInput', 'languagesInput', 'timeZoneInput', 'statusTextInput', 
-                'schedulingLinkInput'
-            ];
 
-            let completedFields = 0;
-            let totalFields = profileFields.length;
 
-            profileFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field && field.value && field.value.trim() !== '') {
-                    completedFields++;
-                }
-            });
 
-            const completionPercentage = Math.round((completedFields / totalFields) * 100);
-            
-            // Update UI
-            const percentageElement = document.getElementById('completionPercentage');
-            const progressFill = document.getElementById('completionProgressFill');
-            const tipElement = document.getElementById('completionTip');
 
-            if (percentageElement) percentageElement.textContent = `${completionPercentage}%`;
-            if (progressFill) progressFill.style.width = `${completionPercentage}%`;
-
-            // Update tip based on completion
-            if (tipElement) {
-                if (completionPercentage === 100) {
-                    tipElement.textContent = '🎉 Profile complete! You\'ve unlocked all features!';
-                    tipElement.style.color = '#4CAF50';
-                } else if (completionPercentage >= 80) {
-                    tipElement.textContent = 'Almost there! Just a few more details to complete your profile.';
-                    tipElement.style.color = '#FFC107';
-                } else if (completionPercentage >= 60) {
-                    tipElement.textContent = 'Great progress! Keep going to unlock more features.';
-                    tipElement.style.color = '#FF9800';
-                } else if (completionPercentage >= 40) {
-                    tipElement.textContent = 'Good start! Add more details to improve your profile.';
-                    tipElement.style.color = '#FF9800';
-                } else {
-                    tipElement.textContent = 'Complete your profile to unlock more features!';
-                    tipElement.style.color = '#FF5722';
-                }
-            }
-
-            return completionPercentage;
-        }
 
 
 
@@ -8413,11 +8330,7 @@
             // NEW: User ID Copy Button
             if (copyUserIdBtn) copyUserIdBtn.addEventListener('click', handleCopyUserId); // Null check
 
-            // Privacy Settings
-            if (savePrivacySettingsButton) savePrivacySettingsButton.addEventListener('click', handleSavePrivacySettings);
 
-            // Customization Settings
-            if (saveCustomizationButton) saveCustomizationButton.addEventListener('click', handleSaveCustomization);
 
 
 
