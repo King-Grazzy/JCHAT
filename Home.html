@@ -979,7 +979,7 @@
             right: 0;
             height: 34px;
             z-index: 11;
-            display: none; /* toggled on when announcement active */
+            display: block; /* Always visible for testing - will be toggled by JavaScript */
             border-bottom: 1px solid var(--border-light);
             background: var(--header-background);
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
@@ -987,7 +987,27 @@
         .announcement-content { height: 100%; display: flex; align-items: center; gap: 12px; padding: 0 16px; }
                  .announcement-icon { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; box-shadow: 0 0 12px rgba(255,46,146,0.6), 0 0 12px rgba(0,213,255,0.6); }
         .announcement-ticker { position: relative; overflow: hidden; flex: 1; height: 100%; }
-        .announcement-track { white-space: nowrap; display: inline-block; will-change: transform; padding-left: 100%; animation: jchat-scroll-left var(--ann-duration, 30s) linear infinite; background-image: linear-gradient(90deg, var(--pink), var(--blue)); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+        .announcement-track { 
+            white-space: nowrap; 
+            display: inline-block; 
+            will-change: transform; 
+            padding-left: 100%; 
+            animation: jchat-scroll-left var(--ann-duration, 30s) linear infinite; 
+            background-image: linear-gradient(90deg, var(--pink), var(--blue)); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            color: transparent; 
+            -webkit-text-fill-color: transparent; 
+        }
+        
+        /* Default announcement track styling when no announcement is active */
+        .announcement-track:empty::before {
+            content: "Announcement System Ready - Use gas_management.html to publish announcements";
+            color: var(--text-color-primary);
+            -webkit-text-fill-color: var(--text-color-primary);
+            background-image: none;
+            background-clip: initial;
+        }
         @keyframes jchat-scroll-left {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -3380,17 +3400,17 @@
         <div class="announcement-content">
             <img src="/assets/mega.png" alt="Announcement" class="announcement-icon" loading="lazy" decoding="async">
             <div class="announcement-ticker">
-                <div id="announcementTrack" class="announcement-track"></div>
+                <div id="announcementTrack" class="announcement-track">Announcement System Ready - Use gas_management.html to publish announcements</div>
             </div>
             <!-- Status indicator -->
-            <div id="announcementStatus" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: rgba(255, 255, 255, 0.7); display: none;">
+            <div id="announcementStatus" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 10px; color: rgba(255, 255, 255, 0.7); display: block;">
                 System Ready
             </div>
             <!-- Debug buttons for testing announcements -->
-            <button id="testAnnouncementBtn" onclick="testAnnouncementManually()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255, 46, 146, 0.8); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; display: none;">
+            <button id="testAnnouncementBtn" onclick="testAnnouncementManually()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255, 46, 146, 0.8); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; display: block;">
                 Test
             </button>
-            <button id="refreshAnnouncementBtn" onclick="forceRefreshAnnouncement()" style="position: absolute; right: 70px; top: 50%; transform: translateY(-50%); background: rgba(0, 213, 255, 0.8); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; display: none;">
+            <button id="refreshAnnouncementBtn" onclick="forceRefreshAnnouncement()" style="position: absolute; right: 70px; top: 50%; transform: translateY(-50%); background: rgba(0, 213, 255, 0.8); color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; cursor: pointer; display: block;">
                 Refresh
             </button>
         </div>
