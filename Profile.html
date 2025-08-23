@@ -5502,84 +5502,13 @@
             }
         }
 
-        /**
-         * Handles saving privacy settings.
-         */
-        async function handleSavePrivacySettings() {
-            if (!currentUser || !isAuthReady || displayedUserId !== currentUser.uid) {
-                showMessageBox("You can only edit your own privacy settings.", 'warning');
-                return;
-            }
 
-            toggleButtonLoading(savePrivacySettingsButton, true);
-            showMessageBox("Saving privacy settings...", 'loading', true);
 
-            try {
-                const newVisibility = {
-                    displayName: true, // Display name is always public
-                    profilePic: true,  // Profile pic is always public
-                    emailPublic: toggleEmailVisibility.checked,
-                    location: toggleLocationVisibility.checked,
-                    userId: toggleUserIdVisibility.checked, // NEW: User ID visibility
-                    lastOnline: toggleOnlineStatusVisibility.checked, // Assuming this is handled by backend logic
-                    allowFriendRequests: toggleFriendRequests.checked,
-                    allowMessages: toggleMessages.checked,
-                    school: toggleSchoolVisibility.checked,
-                    work: toggleWorkVisibility.checked,
-                    interests: toggleInterestsVisibility.checked,
-                    website: toggleWebsiteVisibility.checked,
-                    socialLinks: toggleSocialLinksVisibility.checked
-                };
 
-                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
-                await updateDoc(privateProfileDocRef, {
-                    visibility: newVisibility,
-                    updatedAt: serverTimestamp()
-                });
 
-                const publicProfileDocRef = doc(db, "artifacts", appId, "public", "data", "users", currentUser.uid);
-                await updateDoc(publicProfileDocRef, {
-                    visibility: newVisibility, // Update public record for visibility settings
-                    updatedAt: serverTimestamp()
-                });
 
-                showMessageBox("Privacy settings saved successfully!", 'success');
 
-                // Refresh currentUserProfileData and re-render profile for immediate effect
-                const updatedProfileSnap = await getDoc(privateProfileDocRef);
-                if (updatedProfileSnap.exists()) {
-                    currentUserProfileData = updatedProfileSnap.data();
-                    displayedUserProfileData = currentUserProfileData; // Ensure consistency
-                    // Re-call fetchAndDisplayUserProfile to apply new visibility locally
-                    await fetchAndDisplayUserProfile(currentUser.uid);
-                }
 
-            } catch (error) {
-                console.error("JCHAT_ERROR: Error saving privacy settings:", error);
-                showMessageBox(`Failed to save privacy settings: ${error.message}`, 'error');
-            } finally {
-                toggleButtonLoading(savePrivacySettings, false);
-            }
-        }
-        /**
-         * Handles saving customization settings.
-         */
-        async function handleSaveCustomization() {
-            if (!currentUser || !isAuthReady || displayedUserId !== currentUser.uid) {
-                showMessageBox("You can only customize your own profile.", 'warning');
-                return;
-            }
-
-            toggleButtonLoading(saveCustomizationButton, true);
-            showMessageBox("Saving customization...", 'loading', true);
-
-            try {
-                const newProfileFrame = profileFrameSelect.value;
-                const newChatBubbleStyle = chatBubbleStyleSelect.value;
-                const newProfileTheme = profileThemeSelect.value;
-
-                // Basic validation: Check if user has unlocked these
-                const hasFrame = currentUserProfileData.unlockedBenefits.includes(`Unlock: ${newProfileFrame === 'gradient' ? 'Gradient Profile Picture Frame' : (newProfileFrame === 'diamond' ? 'Exclusive \'Diamond\' Profile Picture Frame' : '')}`);
                 const hasBubble = currentUserProfileData.unlockedBenefits.includes(`Unlock: ${newChatBubbleStyle === 'basic' ? 'Basic Chat Bubble Style' : (newChatBubbleStyle === 'rounded' ? 'New Chat Bubble Style (Set 2)' : '')}`);
                 const hasTheme = currentUserProfileData.unlockedBenefits.includes(`Unlock: ${newProfileTheme === 'solid' ? 'Basic Profile Theme (Solid Color)' : (newProfileTheme === 'animated1' ? 'Premium Profile Theme (Animated 1)' : '')}`);
 
@@ -5623,187 +5552,23 @@
             }
         }
 
-        /**
-         * Toggles the visibility of the Identity & Availability section.
-         */
-        function toggleIdentityAvailability() {
-            const section = document.getElementById('identityAvailabilitySection');
-            const button = document.getElementById('toggleIdentityAvailabilityBtn');
-            const icon = button.querySelector('i');
-            const text = button.textContent.trim();
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Privacy Settings section.
-         */
-        function togglePrivacySettings() {
-            const section = document.getElementById('privacySettingsSection');
-            const button = document.getElementById('togglePrivacySettingsBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Profile Customization section.
-         */
-        function toggleCustomization() {
-            const section = document.getElementById('customizationSection');
-            const button = document.getElementById('toggleCustomizationBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Skills & Endorsements section.
-         */
-        function toggleSkills() {
-            const section = document.getElementById('skillsSection');
-            const button = document.getElementById('toggleSkillsBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Featured Badges section.
-         */
-        function toggleBadges() {
-            const section = document.getElementById('badgesSection');
-            const button = document.getElementById('toggleBadgesBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Profile Insights section.
-         */
-        function toggleInsights() {
-            const section = document.getElementById('insightsSection');
-            const button = document.getElementById('toggleInsightsBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Share Profile section.
-         */
-        function toggleShare() {
-            const section = document.getElementById('shareSection');
-            const button = document.getElementById('toggleShareBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Safety section.
-         */
-        function toggleSafety() {
-            const section = document.getElementById('safetySection');
-            const button = document.getElementById('toggleSafetyBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
-        /**
-         * Toggles the visibility of the Pinned Post section.
-         */
-        function togglePinnedPost() {
-            const section = document.getElementById('pinnedPostSection');
-            const button = document.getElementById('togglePinnedPostBtn');
 
-            if (section.style.display === 'none') {
-                section.style.display = 'block';
-                button.innerHTML = '<i class="fas fa-eye-slash"></i> Hide';
-                button.classList.remove('secondary');
-                button.classList.add('primary');
-            } else {
-                section.style.display = 'none';
-                button.innerHTML = '<i class="fas fa-eye"></i> Show';
-                button.classList.remove('primary');
-                button.classList.add('secondary');
-            }
-        }
 
         /**
          * Calculates and updates the profile completion percentage.
@@ -8658,50 +8423,7 @@
             // Customization Settings
             if (saveCustomizationButton) saveCustomizationButton.addEventListener('click', handleSaveCustomization);
 
-            // Identity & Availability Toggle
-            if (document.getElementById('toggleIdentityAvailabilityBtn')) {
-                document.getElementById('toggleIdentityAvailabilityBtn').addEventListener('click', toggleIdentityAvailability);
-            }
 
-            // Privacy Settings Toggle
-            if (document.getElementById('togglePrivacySettingsBtn')) {
-                document.getElementById('togglePrivacySettingsBtn').addEventListener('click', togglePrivacySettings);
-            }
-
-            // Profile Customization Toggle
-            if (document.getElementById('toggleCustomizationBtn')) {
-                document.getElementById('toggleCustomizationBtn').addEventListener('click', toggleCustomization);
-            }
-
-            // Skills & Endorsements Toggle
-            if (document.getElementById('toggleSkillsBtn')) {
-                document.getElementById('toggleSkillsBtn').addEventListener('click', toggleSkills);
-            }
-
-            // Featured Badges Toggle
-            if (document.getElementById('toggleBadgesBtn')) {
-                document.getElementById('toggleBadgesBtn').addEventListener('click', toggleBadges);
-            }
-
-            // Profile Insights Toggle
-            if (document.getElementById('toggleInsightsBtn')) {
-                document.getElementById('toggleInsightsBtn').addEventListener('click', toggleInsights);
-            }
-
-            // Share Profile Toggle
-            if (document.getElementById('toggleShareBtn')) {
-                document.getElementById('toggleShareBtn').addEventListener('click', toggleShare);
-            }
-
-            // Safety Toggle
-            if (document.getElementById('toggleSafetyBtn')) {
-                document.getElementById('toggleSafetyBtn').addEventListener('click', toggleSafety);
-            }
-
-            // Pinned Post Toggle
-            if (document.getElementById('togglePinnedPostBtn')) {
-                document.getElementById('togglePinnedPostBtn').addEventListener('click', togglePinnedPost);
-            }
 
             // Initialize Tiny Toggle
             initializeTinyToggle();
