@@ -5843,8 +5843,63 @@
             }
         }
 
+        /**
+         * Closes the tiny menu dropdown.
+         */
+        function closeTinyMenu() {
+            const tinyDropdownEl = document.getElementById('tinyDropdown');
+            const tinyToggleEl = document.getElementById('tinyToggle');
+            
+            if (tinyDropdownEl && tinyToggleEl) {
+                tinyDropdownEl.classList.remove('show');
+                tinyToggleEl.classList.remove('active');
+                console.log('JCHAT_DEBUG: Tiny dropdown closed by closeTinyMenu');
+            }
+        }
+
         // Make toggleTinyMenu globally accessible
         window.toggleTinyMenu = toggleTinyMenu;
+        window.closeTinyMenu = closeTinyMenu;
+
+        // Add scroll event listener to close dropdown when scrolling
+        let scrollTimeout;
+        window.addEventListener('scroll', () => {
+            // Clear existing timeout
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+            
+            // Set a small delay to avoid closing immediately on every scroll event
+            scrollTimeout = setTimeout(() => {
+                closeTinyMenu();
+            }, 100);
+        }, { passive: true });
+
+        // Add click outside handler to close dropdown
+        document.addEventListener('click', (event) => {
+            const tinyToggle = document.getElementById('tinyToggle');
+            const tinyDropdown = document.getElementById('tinyDropdown');
+            
+            if (tinyToggle && tinyDropdown && tinyDropdown.classList.contains('show')) {
+                // Check if click is outside both the toggle button and dropdown
+                if (!tinyToggle.contains(event.target) && !tinyDropdown.contains(event.target)) {
+                    closeTinyMenu();
+                }
+            }
+        });
+
+        // Add touch outside handler for mobile devices
+        document.addEventListener('touchend', (event) => {
+            const tinyToggle = document.getElementById('tinyToggle');
+            const tinyDropdown = document.getElementById('tinyDropdown');
+            
+            if (tinyToggle && tinyDropdown && tinyDropdown.classList.contains('show')) {
+                // Check if touch is outside both the toggle button and dropdown
+                if (!tinyToggle.contains(event.target) && !tinyDropdown.contains(event.target)) {
+                    closeTinyMenu();
+                }
+            }
+        }, { passive: true });
 
         /**
          * Initializes touch gestures for mobile devices.
@@ -5891,10 +5946,8 @@
                                 completionSection.scrollIntoView({ behavior: 'smooth' });
                             }
                         } else {
-                            // Swipe down - could trigger tiny menu
-                            if (window.toggleTinyMenu) {
-                                window.toggleTinyMenu();
-                            }
+                            // Swipe down - removed auto-trigger to prevent unwanted opening
+                            // The tiny menu should only open on explicit user clicks
                         }
                     }
                     
