@@ -813,6 +813,36 @@
             font-size: 1.2rem;
         }
 
+        /* Form help text and status */
+        .form-help-text {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+
+        .form-status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-status.success {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .form-status.error {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
         /* Responsive design for all devices */
         @media (max-width: 1200px) {
             .user-dropdown {
