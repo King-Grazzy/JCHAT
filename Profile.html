@@ -4612,6 +4612,25 @@
         setLoaderTimeout();
         // updateLoaderMessage(); // Only update when loader is visible
 
+        // Global error handler to ensure loader is hidden on any unhandled errors
+        window.addEventListener('error', (event) => {
+            console.error('JCHAT_ERROR: Global error caught:', event.error);
+            hideLoader();
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('JCHAT_ERROR: Unhandled promise rejection:', event.reason);
+            hideLoader();
+        });
+
+        // Ensure loader is hidden when page is fully loaded
+        window.addEventListener('load', () => {
+            console.log('JCHAT_DEBUG: Page fully loaded, ensuring loader is hidden');
+            setTimeout(() => {
+                hideLoader();
+            }, 1000); // Give a small delay to allow any pending operations
+        });
+
         // --- DOM Elements ---
         const headerProfilePic = document.getElementById('headerProfilePic');
         const headerAvatarIcon = document.getElementById('headerAvatarIcon');
@@ -8273,15 +8292,9 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 displayedUserId = urlParams.get('userId') || currentUser.uid; // Default to current user's ID
 
-                // Only fetch and display user profile if auth is ready and currentUserProfileData is set
-                // This prevents race conditions where profile data might not be available yet.
-                if (isAuthReady && currentUserProfileData) {
-                    await fetchAndDisplayUserProfile(displayedUserId);
-                    fetchNotificationCount(user.uid); // Fetch notification count
-                } else {
-                    console.warn("JCHAT_WARN: Authentication not fully ready or currentUserProfileData missing. Skipping profile display for now.");
-
-                }
+                // Fetch and display user profile after header profile is ready
+                await fetchAndDisplayUserProfile(displayedUserId);
+                fetchNotificationCount(user.uid); // Fetch notification count
 
             } else {
                 console.log("JCHAT_DEBUG: No user signed in.");
