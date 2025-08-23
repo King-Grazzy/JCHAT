@@ -4543,6 +4543,9 @@
         // Show loader function
         function showLoader(message = 'Loading your profile') {
             if (jchatLoader) {
+                // Clear any existing timeout
+                clearTimeout(loaderTimeout);
+                
                 const subtext = jchatLoader.querySelector('.loader-subtext');
                 if (subtext) {
                     const dotsHtml = `<span class="loader-dots">
@@ -4554,6 +4557,9 @@
                 }
                 jchatLoader.classList.remove('hidden');
                 console.log('JCHAT_DEBUG: Loader shown');
+                
+                // Set new timeout for this loader session
+                setLoaderTimeout();
             }
         }
 
@@ -4562,6 +4568,8 @@
             if (jchatLoader) {
                 jchatLoader.classList.add('hidden');
                 console.log('JCHAT_DEBUG: Loader hidden');
+                // Clear any ongoing loader operations
+                clearTimeout(loaderTimeout);
             }
         }
 
@@ -4599,10 +4607,10 @@
             }, 10000); // 10 seconds timeout
         }
 
-        // Initialize loader on page load
-        showLoader();
+        // Initialize loader but don't show it automatically
+        // showLoader(); // Only show when actually loading
         setLoaderTimeout();
-        updateLoaderMessage();
+        // updateLoaderMessage(); // Only update when loader is visible
 
         // --- DOM Elements ---
         const headerProfilePic = document.getElementById('headerProfilePic');
@@ -7610,6 +7618,7 @@
          */
         async function fetchAndDisplayUserProfile(userIdToDisplay) {
             
+            showLoader("Loading profile...");
             showMessageBox("Loading profile...", 'loading', true);
             if (profileUsername) profileUsername.textContent = "Loading...";
             if (profileBio) profileBio.textContent = "Loading...";
@@ -8168,6 +8177,7 @@
                     if (profileUsername) profileUsername.textContent = "User Not Found"; // Null check
                     if (profileBio) profileBio.textContent = "This user profile does not exist or is unavailable."; // Null check
                     showMessageBox("User profile not found.", 'error');
+                    hideLoader(); // Hide loader when profile not found
                     // Hide inline edit fields and account settings
                     const profileDetailsSection = displayNameInput ? displayNameInput.closest('.profile-details-section') : null; // Null check
                     if (profileDetailsSection) {
@@ -8242,6 +8252,9 @@
                         messageBox.classList.remove('loading-pulse');
                     }, { once: true });
                 }
+                
+                // Ensure loader is always hidden as a fallback
+                hideLoader();
             }
         }
         // --- Authentication State Listener ---
