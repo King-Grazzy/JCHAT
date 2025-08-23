@@ -921,6 +921,70 @@
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
 
+        /* Quick Actions Section Styles */
+        .quick-actions-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .quick-actions-title {
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .quick-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--white);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 46, 146, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.2);
+        }
+
+        .quick-action-btn i {
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .quick-action-btn span {
+            color: var(--text-light);
+            font-size: 0.7rem;
+            text-align: center;
+        }
+
         /* Simple slideDown animation for user dropdown */
         .user-dropdown.show {
             animation: simpleSlideDown 0.3s ease-out;
@@ -1168,6 +1232,24 @@
                 font-size: 0.8rem;
             }
 
+            .quick-actions-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .quick-action-btn {
+                padding: 10px 6px;
+                font-size: 0.75rem;
+            }
+
+            .quick-action-btn i {
+                font-size: 1rem;
+            }
+
+            .quick-action-btn span {
+                font-size: 0.65rem;
+            }
+
             .user-toggle {
                 width: 35px;
                 height: 35px;
@@ -1238,6 +1320,24 @@
                 padding: 6px 10px;
                 font-size: 0.75rem;
             }
+
+            .quick-actions-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .quick-action-btn {
+                padding: 8px 4px;
+                font-size: 0.7rem;
+            }
+
+            .quick-action-btn i {
+                font-size: 0.9rem;
+            }
+
+            .quick-action-btn span {
+                font-size: 0.6rem;
+            }
         }
 
         @media (max-width: 360px) {
@@ -1279,6 +1379,19 @@
             .dropdown-action-btn {
                 padding: 5px 8px;
                 font-size: 0.7rem;
+            }
+
+            .quick-action-btn {
+                padding: 6px 3px;
+                font-size: 0.65rem;
+            }
+
+            .quick-action-btn i {
+                font-size: 0.8rem;
+            }
+
+            .quick-action-btn span {
+                font-size: 0.55rem;
             }
         }
 
@@ -4848,243 +4961,101 @@
                         </a>
                     </div>
 
-                    <!-- Profile Management Section -->
-                    <div class="dropdown-section">
-                        <h4 class="dropdown-section-title">Profile Management</h4>
-                        
-                        <!-- Profile Picture Upload -->
-                        <div class="dropdown-form-group">
-                            <label for="headerProfilePicUpload">Profile Picture</label>
-                            <div class="profile-pic-upload-wrapper">
-                                <img id="headerProfilePicPreview" src="" alt="Profile Preview" style="display: none;">
-                                <i id="headerProfilePicIcon" class="fas fa-user-circle"></i>
-                                <input type="file" id="headerProfilePicUpload" accept="image/*" style="display: none;">
-                                <label for="headerProfilePicUpload" class="upload-btn">
-                                    <i class="fas fa-camera"></i>
-                                </label>
-                            </div>
-                        </div>
 
-                        <!-- Display Name -->
-                        <div class="dropdown-form-group">
-                            <label for="headerDisplayNameInput">Display Name</label>
-                            <input type="text" id="headerDisplayNameInput" placeholder="Enter display name">
-                        </div>
-
-                        <!-- Bio -->
-                        <div class="dropdown-form-group">
-                            <label for="headerBioInput">Bio</label>
-                            <textarea id="headerBioInput" placeholder="Tell us about yourself..." rows="2"></textarea>
-                        </div>
-
-                        <!-- Location -->
-                        <div class="dropdown-form-group">
-                            <label for="headerLocationInput">Location</label>
-                            <input type="text" id="headerLocationInput" placeholder="e.g., Lagos, Nigeria">
-                        </div>
-
-                        <!-- School/University -->
-                        <div class="dropdown-form-group">
-                            <label for="headerSchoolInput">School/University</label>
-                            <input type="text" id="headerSchoolInput" placeholder="e.g., University of Lagos">
-                        </div>
-
-                        <!-- Work/Occupation -->
-                        <div class="dropdown-form-group">
-                            <label for="headerWorkInput">Work/Occupation</label>
-                            <input type="text" id="headerWorkInput" placeholder="e.g., Software Engineer">
-                        </div>
-
-                        <!-- Interests -->
-                        <div class="dropdown-form-group">
-                            <label for="headerInterestsInput">Interests</label>
-                            <textarea id="headerInterestsInput" placeholder="e.g., Reading, Hiking, Coding" rows="2"></textarea>
-                        </div>
-
-                        <!-- Website -->
-                        <div class="dropdown-form-group">
-                            <label for="headerWebsiteInput">Website/Portfolio</label>
-                            <input type="url" id="headerWebsiteInput" placeholder="https://yourwebsite.com">
-                        </div>
-
-                        <!-- Social Links -->
-                        <div class="dropdown-form-group">
-                            <label for="headerSocialLinksInput">Social Media Links</label>
-                            <textarea id="headerSocialLinksInput" placeholder="LinkedIn: profile_url, Twitter: handle" rows="2"></textarea>
-                        </div>
-
-                        <!-- Save Button -->
-                        <button id="headerSaveProfileBtn" class="dropdown-save-btn">
-                            <i class="fas fa-save"></i>
-                            Save Profile
-                        </button>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="dropdown-section">
-                        <h4 class="dropdown-section-title">Quick Actions</h4>
-                        <div class="tiny-dropdown-item" data-action="share-profile">
-                            <i class="fas fa-share-alt"></i>
-                            Share Profile
-                        </div>
-                        <div class="tiny-dropdown-item" data-action="download-qr">
-                            <i class="fas fa-qrcode"></i>
-                            Download QR
-                        </div>
-                        <div class="tiny-dropdown-item" data-action="profile-settings">
-                            <i class="fas fa-cog"></i>
-                            Profile Settings
-                        </div>
-                    </div>
                 </div>
 
                 <!-- User Profile Dropdown Menu -->
                 <div class="user-dropdown" id="userDropdown">
-                    <h4 class="user-dropdown-title">Profile Information</h4>
+                    <h4 class="user-dropdown-title">Profile Management</h4>
                     
-                    <!-- Profile Header Area in Dropdown -->
-                    <div class="dropdown-profile-header">
-                        <div class="dropdown-profile-pic-wrapper" id="dropdownProfilePicWrapper">
-                            <img id="dropdownProfilePic" src="" alt="Profile Picture" class="dropdown-profile-pic" style="display: none;">
-                            <i id="dropdownAvatarIcon" class="fas fa-user-circle dropdown-profile-pic-placeholder"></i>
-                            <input type="file" id="dropdownProfilePicUploadInput" accept="image/*" style="display: none;">
-                            <label for="dropdownProfilePicUploadInput" class="dropdown-edit-profile-pic-overlay" id="dropdownEditProfilePicOverlay">
-                                <i class="fas fa-camera"></i> Edit
+                    <!-- Profile Picture Upload -->
+                    <div class="user-form-group">
+                        <label for="headerProfilePicUpload">Profile Picture</label>
+                        <div class="profile-pic-upload-wrapper">
+                            <img id="headerProfilePicPreview" src="" alt="Profile Preview" style="display: none;">
+                            <i id="headerProfilePicIcon" class="fas fa-user-circle"></i>
+                            <input type="file" id="headerProfilePicUpload" accept="image/*" style="display: none;">
+                            <label for="headerProfilePicUpload" class="upload-btn">
+                                <i class="fas fa-camera"></i>
                             </label>
                         </div>
-                        <h3 id="dropdownProfileUsername" class="dropdown-profile-name">Loading...</h3>
-                        <p id="dropdownProfileBio" class="dropdown-profile-bio">No bio provided yet.</p>
                     </div>
-                    
-                    <!-- Profile Information Display -->
-                    <div class="dropdown-profile-info">
-                        <!-- User ID Display -->
-                        <p id="dropdownProfileUserId" class="dropdown-profile-info-item user-id-container" style="display: none;">
-                            <i class="fas fa-id-card"></i> 
-                            <span class="user-id-label">User ID:</span>
-                            <span id="dropdownUserIdText" class="user-id-text"></span>
-                            <button id="dropdownCopyUserIdBtn" class="dropdown-copy-user-id-btn" title="Copy User ID">
-                                <i class="fas fa-copy"></i>
+
+                    <!-- Display Name -->
+                    <div class="user-form-group">
+                        <label for="headerDisplayNameInput">Display Name</label>
+                        <input type="text" id="headerDisplayNameInput" placeholder="Enter display name">
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="user-form-group">
+                        <label for="headerBioInput">Bio</label>
+                        <textarea id="headerBioInput" placeholder="Tell us about yourself..." rows="2"></textarea>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="user-form-group">
+                        <label for="headerLocationInput">Location</label>
+                        <input type="text" id="headerLocationInput" placeholder="e.g., Lagos, Nigeria">
+                    </div>
+
+                    <!-- School/University -->
+                    <div class="user-form-group">
+                        <label for="headerSchoolInput">School/University</label>
+                        <input type="text" id="headerSchoolInput" placeholder="e.g., University of Lagos">
+                    </div>
+
+                    <!-- Work/Occupation -->
+                    <div class="user-form-group">
+                        <label for="headerWorkInput">Work/Occupation</label>
+                        <input type="text" id="headerWorkInput" placeholder="e.g., Software Engineer">
+                    </div>
+
+                    <!-- Interests -->
+                    <div class="user-form-group">
+                        <label for="headerInterestsInput">Interests</label>
+                        <textarea id="headerInterestsInput" placeholder="e.g., Reading, Hiking, Coding" rows="2"></textarea>
+                    </div>
+
+                    <!-- Website -->
+                    <div class="user-form-group">
+                        <label for="headerWebsiteInput">Website/Portfolio</label>
+                        <input type="url" id="headerWebsiteInput" placeholder="https://yourwebsite.com">
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="user-form-group">
+                        <label for="headerSocialLinksInput">Social Media Links</label>
+                        <textarea id="headerSocialLinksInput" placeholder="LinkedIn: profile_url, Twitter: handle" rows="2"></textarea>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button id="headerSaveProfileBtn" class="user-save-btn">
+                        <i class="fas fa-save"></i>
+                        Save Profile
+                    </button>
+
+                    <!-- Quick Actions Section -->
+                    <div class="quick-actions-section">
+                        <h4 class="quick-actions-title">Quick Actions</h4>
+                        <div class="quick-actions-grid">
+                            <button class="quick-action-btn" data-action="share-profile">
+                                <i class="fas fa-share-alt"></i>
+                                <span>Share Profile</span>
                             </button>
-                        </p>
-                        
-                        <!-- Basic Information -->
-                        <p id="dropdownProfileLocation" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-map-marker-alt"></i> 
-                            <span id="dropdownLocationText"></span>
-                        </p>
-                        <p id="dropdownProfileEmail" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-envelope"></i> 
-                            <span id="dropdownEmailText"></span>
-                        </p>
-                        
-                        <!-- Personal Information -->
-                        <p id="dropdownProfileFullName" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-user"></i> 
-                            <span id="dropdownFullNameText"></span>
-                        </p>
-                        <p id="dropdownProfileDateOfBirth" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-birthday-cake"></i> 
-                            <span id="dropdownDateOfBirthText"></span>
-                        </p>
-                        <p id="dropdownProfileGender" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-venus-mars"></i> 
-                            <span id="dropdownGenderText"></span>
-                        </p>
-                        <p id="dropdownProfilePhone" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-phone"></i> 
-                            <span id="dropdownPhoneText"></span>
-                        </p>
-                        
-                        <!-- Location Information -->
-                        <p id="dropdownProfileCountry" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-flag"></i> 
-                            <span id="dropdownCountryText"></span>
-                        </p>
-                        <p id="dropdownProfileCity" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-city"></i> 
-                            <span id="dropdownCityText"></span>
-                        </p>
-                        <p id="dropdownProfileLanguage" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-language"></i> 
-                            <span id="dropdownLanguageText"></span>
-                        </p>
-                        <p id="dropdownProfileTimezone" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-clock"></i> 
-                            <span id="dropdownTimezoneText"></span>
-                        </p>
-                        
-                        <!-- Professional Information -->
-                        <p id="dropdownProfileSchool" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-graduation-cap"></i> 
-                            <span id="dropdownSchoolText"></span>
-                        </p>
-                        <p id="dropdownProfileWork" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-briefcase"></i> 
-                            <span id="dropdownWorkText"></span>
-                        </p>
-                        <p id="dropdownProfileWebsite" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-globe"></i> 
-                            <a id="dropdownWebsiteLink" href="#" target="_blank" rel="noopener noreferrer" class="gradient-text"></a>
-                        </p>
-                        <p id="dropdownProfileSocialLinks" class="dropdown-profile-info-item" style="display: none;">
-                            <i class="fas fa-share-alt"></i> 
-                            <span id="dropdownSocialLinksText"></span>
-                        </p>
-                    </div>
-
-                    <!-- Level Info Display in Dropdown -->
-                    <div class="dropdown-profile-level-info">
-                        <i id="dropdownXpLevelIcon" class="fas fa-question-circle dropdown-profile-level-icon"></i>
-                        <span id="dropdownXpLevelName" class="dropdown-profile-level-name">Loading Level...</span>
-                        <div class="dropdown-progress-bar-container" id="dropdownProgressBarContainer">
-                            <div id="dropdownXpProgressBarFill" class="dropdown-progress-bar-fill" style="background-position: right;"></div>
-                            <div id="dropdownProgressPercentage" class="dropdown-progress-percentage">0%</div>
+                            <button class="quick-action-btn" data-action="download-qr">
+                                <i class="fas fa-qrcode"></i>
+                                <span>Download QR</span>
+                            </button>
+                            <button class="quick-action-btn" data-action="profile-settings">
+                                <i class="fas fa-cog"></i>
+                                <span>Profile Settings</span>
+                            </button>
+                            <a href="/Profile.html" class="quick-action-btn">
+                                <i class="fas fa-user"></i>
+                                <span>View Full Profile</span>
+                            </a>
                         </div>
-                    </div>
-
-                    <!-- Profile Stats in Dropdown -->
-                    <div class="dropdown-profile-stats">
-                        <div class="dropdown-stat-item">
-                            <span id="dropdownStatPosts" class="dropdown-stat-value">0</span>
-                            <span class="dropdown-stat-label">Posts</span>
-                        </div>
-                        <div class="dropdown-stat-item">
-                            <span id="dropdownStatFriends" class="dropdown-stat-value">0</span>
-                            <span class="dropdown-stat-label">Friends</span>
-                        </div>
-                        <div class="dropdown-stat-item">
-                            <span id="dropdownStatFollowers" class="dropdown-stat-value">0</span>
-                            <span class="dropdown-stat-label">Followers</span>
-                        </div>
-                        <div class="dropdown-stat-item">
-                            <span id="dropdownStatFollowing" class="dropdown-stat-value">0</span>
-                            <span class="dropdown-stat-label">Following</span>
-                        </div>
-                        <div class="dropdown-stat-item">
-                            <span id="dropdownJCoins" class="dropdown-stat-value">0</span>
-                            <span class="dropdown-stat-label">JCoins</span>
-                            <p class="dropdown-jcoin-exchange-rate" id="dropdownJcoinExchangeRate" style="display: none;">
-                                <span id="dropdownJcoinUSDValue">$0.00</span> USD
-                            </p>
-                        </div>
-                        <div class="dropdown-stat-item">
-                            <span id="dropdownGasValue" class="dropdown-stat-value">0</span>
-                            <span class="dropdown-stat-label">Gas (XP)</span>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="dropdown-profile-actions">
-                        <a href="/Profile.html" class="dropdown-action-btn primary">
-                            <i class="fas fa-user"></i> View Full Profile
-                        </a>
-                        <a href="/Settings.html" class="dropdown-action-btn secondary">
-                            <i class="fas fa-cog"></i> Settings
-                        </a>
-                        <button id="dropdownEditModeBtn" class="dropdown-action-btn edit">
-                            <i class="fas fa-edit"></i> Edit Profile
-                        </button>
                     </div>
                 </div>
             </div>
@@ -6996,9 +6967,8 @@
 
                 showMessageBox("Profile updated successfully!", 'success');
                 
-                // Close the user dropdown
-                const userDropdown = document.getElementById('userDropdown');
-                if (userDropdown) userDropdown.classList.remove('show');
+                // Note: User dropdown is intentionally NOT closed after saving
+                // to allow users to make additional edits without reopening
 
             } catch (error) {
                 console.error("JCHAT_ERROR: Error saving header profile data:", error);
@@ -7034,12 +7004,19 @@
                 }
             }
             
-            // Close user dropdown if click is outside
+            // Don't auto-close user dropdown when clicking inside it
+            // Only close if clicking the toggle button again or completely outside both toggle and dropdown
             if (userToggle && userDropdown && userDropdown.classList.contains('show')) {
-                if (!userToggle.contains(event.target) && !userDropdown.contains(event.target)) {
+                // Close only if clicking the toggle button OR clicking outside both toggle and dropdown
+                if (userToggle.contains(event.target)) {
+                    // Clicking the toggle button - this will be handled by toggleUserMenu()
+                    return;
+                } else if (!userDropdown.contains(event.target)) {
+                    // Clicking outside both toggle and dropdown - close it
                     userDropdown.classList.remove('show');
                     userToggle.classList.remove('active');
                 }
+                // If clicking inside the dropdown content, do nothing (don't close)
             }
         });
 
@@ -7057,12 +7034,18 @@
                 }
             }
             
-            // Close user dropdown if touch is outside
+            // Don't auto-close user dropdown when touching inside it
+            // Only close if touching outside both toggle and dropdown
             if (userToggle && userDropdown && userDropdown.classList.contains('show')) {
-                if (!userToggle.contains(event.target) && !userDropdown.contains(event.target)) {
+                if (userToggle.contains(event.target)) {
+                    // Touching the toggle button - this will be handled by toggleUserMenu()
+                    return;
+                } else if (!userDropdown.contains(event.target)) {
+                    // Touching outside both toggle and dropdown - close it
                     userDropdown.classList.remove('show');
                     userToggle.classList.remove('active');
                 }
+                // If touching inside the dropdown content, do nothing (don't close)
             }
         }, { passive: true });
 
@@ -7078,20 +7061,17 @@
             touchEndY = event.changedTouches[0].clientY;
             const touchDiff = touchStartY - touchEndY;
             
-            // Close dropdowns on swipe down gesture
+            // Close only tiny dropdown on swipe down gesture
+            // User dropdown should not auto-close to allow form interaction
             if (touchDiff > 50) {
-                const userDropdown = document.getElementById('userDropdown');
                 const tinyDropdown = document.getElementById('tinyDropdown');
-                
-                if (userDropdown && userDropdown.classList.contains('show')) {
-                    userDropdown.classList.remove('show');
-                    const userToggle = document.getElementById('userToggle');
-                    if (userToggle) userToggle.classList.remove('active');
-                }
                 
                 if (tinyDropdown && tinyDropdown.classList.contains('show')) {
                     closeTinyMenu();
                 }
+                
+                // Note: User dropdown is intentionally NOT closed on swipe
+                // to prevent accidental closure while filling out forms
             }
         }, { passive: true });
 
