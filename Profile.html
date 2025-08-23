@@ -1298,64 +1298,86 @@
             margin-right: 5px;
         }
 
-        /* NEW: User ID Display Styles */
+        /* NEW: User ID Display Styles - Pink and Blue Theme */
         .user-id-container {
             display: flex !important;
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
             padding: 12px;
-            background: rgba(0, 213, 255, 0.1);
-            border: 1px solid rgba(0, 213, 255, 0.3);
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.1), rgba(0, 213, 255, 0.1));
+            border: 1px solid;
+            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
             border-radius: 12px;
             margin: 8px 0;
             transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .user-id-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.05), rgba(0, 213, 255, 0.05));
+            border-radius: 12px;
+            z-index: -1;
         }
         
         .user-id-container:hover {
-            background: rgba(0, 213, 255, 0.15);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 213, 255, 0.2);
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.15), rgba(0, 213, 255, 0.15));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.2), 0 8px 25px rgba(0, 213, 255, 0.2);
         }
         
         .user-id-label {
             font-weight: 600;
-            color: var(--blue);
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin: 0 4px;
+            font-size: 0.95rem;
         }
         
         .user-id-text {
             font-family: 'Courier New', monospace;
             font-size: 0.9rem;
             color: var(--white);
-            background: rgba(0, 0, 0, 0.2);
-            padding: 4px 8px;
-            border-radius: 6px;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.2), rgba(0, 213, 255, 0.2));
+            padding: 6px 10px;
+            border-radius: 8px;
             letter-spacing: 0.5px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid;
+            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
             flex: 1;
             min-width: 0;
             word-break: break-all;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         
         .copy-user-id-btn {
-            background: linear-gradient(45deg, var(--blue), var(--pink));
+            background: linear-gradient(45deg, var(--pink), var(--blue));
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 6px 10px;
+            padding: 6px 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 4px;
-            box-shadow: 0 2px 8px rgba(0, 213, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(255, 46, 146, 0.3), 0 2px 8px rgba(0, 213, 255, 0.3);
+            font-weight: 600;
         }
         
         .copy-user-id-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 213, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.4), 0 4px 15px rgba(0, 213, 255, 0.4);
+            background: linear-gradient(45deg, var(--blue), var(--pink));
         }
         
         .copy-user-id-btn:active {
@@ -1370,6 +1392,48 @@
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
+        }
+
+        /* Pink and Blue Glow Effects for User ID */
+        .user-id-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-id-container::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                rgba(255, 46, 146, 0.1),
+                transparent,
+                rgba(0, 213, 255, 0.1),
+                transparent
+            );
+            animation: rotate 8s linear infinite;
+            z-index: -2;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Enhanced hover effects */
+        .user-id-text:hover {
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.3), rgba(0, 213, 255, 0.3));
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+
+        /* Pink and Blue focus effects */
+        .user-id-container:focus-within {
+            box-shadow: 0 0 20px rgba(255, 46, 146, 0.3), 0 0 20px rgba(0, 213, 255, 0.3);
         }
 
         .profile-stats {
