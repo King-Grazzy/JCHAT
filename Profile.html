@@ -565,6 +565,186 @@
             height: 40px;
         }
 
+        /* User Toggle Button */
+        .user-toggle {
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(255, 46, 146, 0.3);
+        }
+
+        .user-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.5);
+        }
+
+        .user-toggle i {
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        /* User Dropdown Menu */
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            min-width: 300px;
+            max-width: 400px;
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+
+        .user-dropdown.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .user-dropdown-title {
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-form-group {
+            margin-bottom: 15px;
+        }
+
+        .user-form-group label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .user-form-group input,
+        .user-form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .user-form-group input:focus,
+        .user-form-group textarea:focus {
+            outline: none;
+            border-color: var(--pink);
+            box-shadow: 0 0 0 2px rgba(255, 46, 146, 0.2);
+        }
+
+        .profile-pic-upload-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-pic-upload-wrapper img,
+        .profile-pic-upload-wrapper i {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile-pic-upload-wrapper i {
+            font-size: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .user-save-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .user-save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 46, 146, 0.4);
+        }
+
+        .user-save-btn i {
+            margin-right: 8px;
+        }
+
+        /* Profile Forms Moved Notice */
+        .profile-forms-moved-notice {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+        }
+
+        .profile-forms-moved-notice p {
+            color: var(--text-secondary);
+            margin: 10px 0;
+        }
+
+        .profile-forms-moved-notice i {
+            color: var(--pink);
+            margin: 0 5px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Notification Icon Styling (from Home.html) */
         .notification-icon-wrapper {
             position: relative;
@@ -4036,8 +4216,10 @@
                         <span class="notification-badge" id="notificationCount" style="display: none;">0</span>
                     </a>
                 </div>
-                <!-- Clean Header - No User Info Display -->
-                <div class="header-spacer"></div>
+                <!-- User Profile Toggle Button -->
+                <button class="user-toggle" id="userToggle" onclick="toggleUserMenu()">
+                    <i class="fas fa-user-edit"></i>
+                </button>
                 <!-- Tiny Plus Toggle -->
                 <button class="tiny-toggle" id="tinyToggle" onclick="toggleTinyMenu()">
                     <i class="fas fa-plus"></i>
@@ -4164,6 +4346,78 @@
                             Profile Settings
                         </div>
                     </div>
+                </div>
+
+                <!-- User Profile Dropdown Menu -->
+                <div class="user-dropdown" id="userDropdown">
+                    <h4 class="user-dropdown-title">Edit Profile</h4>
+                    
+                    <!-- Profile Picture Upload -->
+                    <div class="user-form-group">
+                        <label for="headerProfilePicUpload">Profile Picture</label>
+                        <div class="profile-pic-upload-wrapper">
+                            <img id="headerProfilePicPreview" src="" alt="Profile Preview" style="display: none;">
+                            <i id="headerProfilePicIcon" class="fas fa-user-circle"></i>
+                            <input type="file" id="headerProfilePicUpload" accept="image/*" style="display: none;">
+                            <label for="headerProfilePicUpload" class="upload-btn">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Display Name -->
+                    <div class="user-form-group">
+                        <label for="headerDisplayNameInput">Display Name</label>
+                        <input type="text" id="headerDisplayNameInput" placeholder="Enter display name">
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="user-form-group">
+                        <label for="headerBioInput">Bio</label>
+                        <textarea id="headerBioInput" placeholder="Tell us about yourself..." rows="2"></textarea>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="user-form-group">
+                        <label for="headerLocationInput">Location</label>
+                        <input type="text" id="headerLocationInput" placeholder="e.g., Lagos, Nigeria">
+                    </div>
+
+                    <!-- School/University -->
+                    <div class="user-form-group">
+                        <label for="headerSchoolInput">School/University</label>
+                        <input type="text" id="headerSchoolInput" placeholder="e.g., University of Lagos">
+                    </div>
+
+                    <!-- Work/Occupation -->
+                    <div class="user-form-group">
+                        <label for="headerWorkInput">Work/Occupation</label>
+                        <input type="text" id="headerWorkInput" placeholder="e.g., Software Engineer">
+                    </div>
+
+                    <!-- Interests -->
+                    <div class="user-form-group">
+                        <label for="headerInterestsInput">Interests</label>
+                        <textarea id="headerInterestsInput" placeholder="e.g., Reading, Hiking, Coding" rows="2"></textarea>
+                    </div>
+
+                    <!-- Website -->
+                    <div class="user-form-group">
+                        <label for="headerWebsiteInput">Website/Portfolio</label>
+                        <input type="url" id="headerWebsiteInput" placeholder="https://yourwebsite.com">
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="user-form-group">
+                        <label for="headerSocialLinksInput">Social Media Links</label>
+                        <textarea id="headerSocialLinksInput" placeholder="LinkedIn: profile_url, Twitter: handle" rows="2"></textarea>
+                    </div>
+
+                    <!-- Save Button -->
+                    <button id="headerSaveProfileBtn" class="user-save-btn">
+                        <i class="fas fa-save"></i>
+                        Save Profile
+                    </button>
                 </div>
             </div>
         </div>
@@ -6001,6 +6255,162 @@
         window.toggleTinyMenu = toggleTinyMenu;
         window.closeTinyMenu = closeTinyMenu;
 
+        /**
+         * Toggles the user profile menu dropdown.
+         */
+        function toggleUserMenu() {
+            console.log('JCHAT_DEBUG: toggleUserMenu called');
+            
+            const userDropdownEl = document.getElementById('userDropdown');
+            const userToggleEl = document.getElementById('userToggle');
+            
+            console.log('JCHAT_DEBUG: userDropdown element:', userDropdownEl);
+            console.log('JCHAT_DEBUG: userToggle element:', userToggleEl);
+            
+            if (userDropdownEl && userToggleEl) {
+                const isVisible = userDropdownEl.classList.contains('show');
+                console.log('JCHAT_DEBUG: User dropdown currently visible:', isVisible);
+                
+                if (isVisible) {
+                    userDropdownEl.classList.remove('show');
+                    userToggleEl.classList.remove('active');
+                    console.log('JCHAT_DEBUG: User dropdown closed');
+                } else {
+                    userDropdownEl.classList.add('show');
+                    userToggleEl.classList.add('active');
+                    console.log('JCHAT_DEBUG: User dropdown opened');
+                }
+                
+                // Double-check the classes were applied
+                console.log('JCHAT_DEBUG: User dropdown classes after toggle:', userDropdownEl.classList.toString());
+                console.log('JCHAT_DEBUG: User toggle classes after toggle:', userToggleEl.classList.toString());
+            } else {
+                console.error('JCHAT_ERROR: userDropdown or userToggle not found in toggleUserMenu');
+            }
+        }
+
+        // Make toggleUserMenu globally accessible
+        window.toggleUserMenu = toggleUserMenu;
+
+        /**
+         * Populates the header user form fields with current user data
+         */
+        function populateHeaderUserForm() {
+            if (!currentUserProfileData) return;
+            
+            const headerDisplayNameInput = document.getElementById('headerDisplayNameInput');
+            const headerBioInput = document.getElementById('headerBioInput');
+            const headerLocationInput = document.getElementById('headerLocationInput');
+            const headerSchoolInput = document.getElementById('headerSchoolInput');
+            const headerWorkInput = document.getElementById('headerWorkInput');
+            const headerInterestsInput = document.getElementById('headerInterestsInput');
+            const headerWebsiteInput = document.getElementById('headerWebsiteInput');
+            const headerSocialLinksInput = document.getElementById('headerSocialLinksInput');
+            
+            if (headerDisplayNameInput) headerDisplayNameInput.value = currentUserProfileData.displayName || '';
+            if (headerBioInput) headerBioInput.value = currentUserProfileData.bio || '';
+            if (headerLocationInput) headerLocationInput.value = currentUserProfileData.location || '';
+            if (headerSchoolInput) headerSchoolInput.value = currentUserProfileData.school || '';
+            if (headerWorkInput) headerWorkInput.value = currentUserProfileData.work || '';
+            if (headerInterestsInput) headerInterestsInput.value = currentUserProfileData.interests || '';
+            if (headerWebsiteInput) headerWebsiteInput.value = currentUserProfileData.website || '';
+            if (headerSocialLinksInput) headerSocialLinksInput.value = currentUserProfileData.socialLinks || '';
+            
+            // Update profile picture preview
+            const headerProfilePicPreview = document.getElementById('headerProfilePicPreview');
+            const headerProfilePicIcon = document.getElementById('headerProfilePicIcon');
+            if (currentUserProfileData.profilePicId && headerProfilePicPreview && headerProfilePicIcon) {
+                headerProfilePicPreview.src = currentUserProfileData.profilePicId;
+                headerProfilePicPreview.style.display = 'block';
+                headerProfilePicIcon.style.display = 'none';
+            }
+        }
+
+        /**
+         * Saves profile data from the header form
+         */
+        async function saveHeaderProfileData() {
+            if (!currentUser || !isAuthReady) {
+                showMessageBox("You must be logged in to save profile changes.", 'warning');
+                return;
+            }
+
+            const headerDisplayNameInput = document.getElementById('headerDisplayNameInput');
+            const headerBioInput = document.getElementById('headerBioInput');
+            const headerLocationInput = document.getElementById('headerLocationInput');
+            const headerSchoolInput = document.getElementById('headerSchoolInput');
+            const headerWorkInput = document.getElementById('headerWorkInput');
+            const headerInterestsInput = document.getElementById('headerInterestsInput');
+            const headerWebsiteInput = document.getElementById('headerWebsiteInput');
+            const headerSocialLinksInput = document.getElementById('headerSocialLinksInput');
+
+            if (!headerDisplayNameInput || !headerBioInput) {
+                showMessageBox("Profile form elements not found.", 'error');
+                return;
+            }
+
+            const newDisplayName = headerDisplayNameInput.value.trim();
+            const newBio = headerBioInput.value.trim();
+            const newLocation = headerLocationInput?.value.trim() || '';
+            const newSchool = headerSchoolInput?.value.trim() || '';
+            const newWork = headerWorkInput?.value.trim() || '';
+            const newInterests = headerInterestsInput?.value.trim() || '';
+            const newWebsite = headerWebsiteInput?.value.trim() || '';
+            const newSocialLinks = headerSocialLinksInput?.value.trim() || '';
+
+            if (!newDisplayName) {
+                showMessageBox("Display name is required.", 'error');
+                return;
+            }
+
+            try {
+                showMessageBox("Saving profile changes...", 'loading', true);
+
+                // Update Firestore private profile
+                const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
+                await updateDoc(privateProfileDocRef, {
+                    displayName: newDisplayName,
+                    bio: newBio,
+                    location: newLocation,
+                    school: newSchool,
+                    work: newWork,
+                    interests: newInterests,
+                    website: newWebsite,
+                    socialLinks: newSocialLinks,
+                    updatedAt: serverTimestamp()
+                });
+
+                // Update local profile data
+                if (currentUserProfileData) {
+                    currentUserProfileData.displayName = newDisplayName;
+                    currentUserProfileData.bio = newBio;
+                    currentUserProfileData.location = newLocation;
+                    currentUserProfileData.school = newSchool;
+                    currentUserProfileData.work = newWork;
+                    currentUserProfileData.interests = newInterests;
+                    currentUserProfileData.website = newWebsite;
+                    currentUserProfileData.socialLinks = newSocialLinks;
+                }
+
+                // Update main profile display
+                if (profileUsername) profileUsername.textContent = newDisplayName;
+                if (profileBio) profileBio.textContent = newBio;
+
+                // Also populate header form with updated data
+                populateHeaderUserForm();
+
+                showMessageBox("Profile updated successfully!", 'success');
+                
+                // Close the user dropdown
+                const userDropdown = document.getElementById('userDropdown');
+                if (userDropdown) userDropdown.classList.remove('show');
+
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error saving header profile data:", error);
+                showMessageBox(`Failed to save profile: ${error.message}`, 'error');
+            }
+        }
+
         // Add scroll event listener to close dropdown when scrolling
         let scrollTimeout;
         window.addEventListener('scroll', () => {
@@ -6015,15 +6425,25 @@
             }, 100);
         }, { passive: true });
 
-        // Add click outside handler to close dropdown
+        // Add click outside handler to close dropdowns
         document.addEventListener('click', (event) => {
             const tinyToggle = document.getElementById('tinyToggle');
             const tinyDropdown = document.getElementById('tinyDropdown');
+            const userToggle = document.getElementById('userToggle');
+            const userDropdown = document.getElementById('userDropdown');
             
+            // Close tiny dropdown if click is outside
             if (tinyToggle && tinyDropdown && tinyDropdown.classList.contains('show')) {
-                // Check if click is outside both the toggle button and dropdown
                 if (!tinyToggle.contains(event.target) && !tinyDropdown.contains(event.target)) {
                     closeTinyMenu();
+                }
+            }
+            
+            // Close user dropdown if click is outside
+            if (userToggle && userDropdown && userDropdown.classList.contains('show')) {
+                if (!userToggle.contains(event.target) && !userDropdown.contains(event.target)) {
+                    userDropdown.classList.remove('show');
+                    userToggle.classList.remove('active');
                 }
             }
         });
@@ -6032,11 +6452,21 @@
         document.addEventListener('touchend', (event) => {
             const tinyToggle = document.getElementById('tinyToggle');
             const tinyDropdown = document.getElementById('tinyDropdown');
+            const userToggle = document.getElementById('userToggle');
+            const userDropdown = document.getElementById('userDropdown');
             
+            // Close tiny dropdown if touch is outside
             if (tinyToggle && tinyDropdown && tinyDropdown.classList.contains('show')) {
-                // Check if touch is outside both the toggle button and dropdown
                 if (!tinyToggle.contains(event.target) && !tinyDropdown.contains(event.target)) {
                     closeTinyMenu();
+                }
+            }
+            
+            // Close user dropdown if touch is outside
+            if (userToggle && userDropdown && userDropdown.classList.contains('show')) {
+                if (!userToggle.contains(event.target) && !userDropdown.contains(event.target)) {
+                    userDropdown.classList.remove('show');
+                    userToggle.classList.remove('active');
                 }
             }
         }, { passive: true });
@@ -7875,6 +8305,11 @@
                     if (profileUsername) profileUsername.textContent = displayedUserProfileData.username || "JCHAT User"; // Null check
                     const usernameInitial = (displayedUserProfileData.username || "J").charAt(0).toUpperCase();
 
+                    // Populate header form with profile data if it's the current user's profile
+                    if (isCurrentUserProfile) {
+                        populateHeaderUserForm();
+                    }
+
                     // Profile Picture
                     if (profilePagePic && profilePageAvatarIcon) { // Null check
                         if (displayedUserProfileData.profilePicId && (isCurrentUserProfile || visibility.profilePic)) {
@@ -8585,6 +9020,57 @@
 
             // Profile Edit
             if (saveProfileChanges) saveProfileChanges.addEventListener('click', handleSaveProfileChanges); // Null check
+
+            // Header user form event listeners
+            const headerSaveProfileBtn = document.getElementById('headerSaveProfileBtn');
+            const headerProfilePicUpload = document.getElementById('headerProfilePicUpload');
+
+            if (headerSaveProfileBtn) {
+                headerSaveProfileBtn.addEventListener('click', saveHeaderProfileData);
+            }
+
+            if (headerProfilePicUpload) {
+                headerProfilePicUpload.addEventListener('change', async (event) => {
+                    const file = event.target.files[0];
+                    if (file) {
+                        try {
+                            showMessageBox("Uploading profile picture...", 'loading', true);
+                            
+                            // Upload to Firebase Storage
+                            const storageRef = ref(storage, `profile-pictures/${currentUser.uid}/${Date.now()}_${file.name}`);
+                            const uploadResult = await uploadBytes(storageRef, file);
+                            const downloadURL = await getDownloadURL(uploadResult.ref);
+                            
+                            // Update profile with new picture URL
+                            const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
+                            await updateDoc(privateProfileDocRef, {
+                                profilePicId: downloadURL,
+                                updatedAt: serverTimestamp()
+                            });
+                            
+                            // Update local data
+                            if (currentUserProfileData) {
+                                currentUserProfileData.profilePicId = downloadURL;
+                            }
+                            
+                            // Update preview
+                            const headerProfilePicPreview = document.getElementById('headerProfilePicPreview');
+                            const headerProfilePicIcon = document.getElementById('headerProfilePicIcon');
+                            if (headerProfilePicPreview && headerProfilePicIcon) {
+                                headerProfilePicPreview.src = downloadURL;
+                                headerProfilePicPreview.style.display = 'block';
+                                headerProfilePicIcon.style.display = 'none';
+                            }
+                            
+                            showMessageBox("Profile picture updated successfully!", 'success');
+                            
+                        } catch (error) {
+                            console.error("JCHAT_ERROR: Error uploading profile picture:", error);
+                            showMessageBox(`Failed to upload picture: ${error.message}`, 'error');
+                        }
+                    }
+                });
+            }
 
             // NEW: User ID Copy Button
             if (copyUserIdBtn) copyUserIdBtn.addEventListener('click', handleCopyUserId); // Null check
