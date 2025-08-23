@@ -1540,6 +1540,211 @@
             box-shadow: 0 8px 30px rgba(255, 46, 146, 0.15), 0 8px 30px rgba(0, 213, 255, 0.15);
         }
 
+        /* Beautiful Help & Support Section - Pink and Blue Theme */
+        .help-support-section {
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.08), rgba(0, 213, 255, 0.08));
+            border: 1px solid;
+            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
+            border-radius: 20px;
+            padding: 32px;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .help-support-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.03), rgba(0, 213, 255, 0.03));
+            border-radius: 20px;
+            z-index: -1;
+        }
+
+        .help-section-title {
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 32px;
+            font-family: 'Poppins', sans-serif;
+            text-shadow: 0 0 30px rgba(255, 46, 146, 0.3);
+        }
+
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .help-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border: 1px solid;
+            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .help-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.05), rgba(0, 213, 255, 0.05));
+            border-radius: 16px;
+            z-index: -1;
+        }
+
+        .help-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(255, 46, 146, 0.2), 0 20px 40px rgba(0, 213, 255, 0.2);
+        }
+
+        .help-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            position: relative;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.2), rgba(0, 213, 255, 0.2));
+        }
+
+        .help-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .help-card:hover .help-icon::before {
+            opacity: 0.1;
+        }
+
+        .contact-card .help-icon {
+            color: var(--pink);
+        }
+
+        .whatsapp-card .help-icon {
+            color: #25D366;
+        }
+
+        .phone-card .help-icon {
+            color: var(--blue);
+        }
+
+        .wallet-card .help-icon {
+            color: #FFD700;
+        }
+
+        .help-card h4 {
+            color: var(--text-color-primary);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .help-card p {
+            color: var(--text-color-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .help-link {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.3);
+        }
+
+        .help-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.4);
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+        }
+
+        .wallet-price {
+            display: inline-block;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .help-info {
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .help-tip {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.1), rgba(0, 213, 255, 0.1));
+            border: 1px solid;
+            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
+            border-radius: 25px;
+            padding: 16px 24px;
+            color: var(--text-color-primary);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .help-tip i {
+            color: var(--pink);
+            font-size: 1.2rem;
+        }
+
+        /* Responsive design for help section */
+        @media (max-width: 768px) {
+            .help-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .help-support-section {
+                padding: 24px;
+                margin: 20px 0;
+            }
+            
+            .help-section-title {
+                font-size: 1.6rem;
+            }
+        }
+
         .profile-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -1829,10 +2034,36 @@
             box-shadow: none;
         }
         .wallet-locked-message {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            margin-top: 5px;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.1), rgba(0, 213, 255, 0.1));
+            border: 1px solid;
+            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
+            border-radius: 12px;
+            padding: 16px;
+            color: var(--text-color-primary);
+            font-size: 0.95rem;
             text-align: center;
+            margin-top: 12px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-locked-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.05), rgba(0, 213, 255, 0.05));
+            border-radius: 12px;
+            z-index: -1;
+        }
+
+        .wallet-locked-message:hover {
+            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.15), 0 8px 25px rgba(0, 213, 255, 0.15);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
         }
 
         .profile-actions {
@@ -3775,16 +4006,13 @@
                     </a>
                     <p id="walletLockedMessage" class="wallet-locked-message" style="display: none;">
                         Contact admin to unlock wallet access for just #5,000 and you have your wallet Unlocked. Jchatguide@gmail.com
-                          Wa +2349013790707 
-                          
-                </div>
-
-
-                        
+                        Wa +2349013790707 
                     </p>
+                    
                     <!-- NEW: Request JCoins Button -->
                     <button id="requestJCoinsButton" class="profile-action-button">
                         <i class="fas fa-coins"></i> Request JCoins
+                    </button>
 
                     <!-- NEW: Report User Button (only visible for other users) -->
                     <button id="reportUserButton" class="profile-action-button danger" style="display: none;">
@@ -3872,6 +4100,62 @@
 
 
                 </div> <!-- End Clean Profile Section -->
+
+                <!-- Beautiful Help & Support Section - Pink and Blue Theme -->
+                <div class="help-support-section">
+                    <h3 class="help-section-title">Need Help? We're Here For You!</h3>
+                    
+                    <div class="help-grid">
+                        <div class="help-card contact-card">
+                            <div class="help-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <h4>Email Support</h4>
+                            <p>Get help via email</p>
+                            <a href="mailto:jchatguide@gmail.com" class="help-link">
+                                jchatguide@gmail.com
+                            </a>
+                        </div>
+
+                        <div class="help-card whatsapp-card">
+                            <div class="help-icon">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <h4>WhatsApp Support</h4>
+                            <p>Quick help via WhatsApp</p>
+                            <a href="https://wa.me/2349013790707" class="help-link" target="_blank">
+                                +234 901 379 0707
+                            </a>
+                        </div>
+
+                        <div class="help-card phone-card">
+                            <div class="help-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <h4>Phone Support</h4>
+                            <p>Call us directly</p>
+                            <a href="tel:+2349013790707" class="help-link">
+                                +234 901 379 0707
+                            </a>
+                        </div>
+
+                        <div class="help-card wallet-card">
+                            <div class="help-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <h4>Wallet Unlock</h4>
+                            <p>Unlock your wallet access</p>
+                            <span class="wallet-price">Just #5,000</span>
+                        </div>
+                    </div>
+
+                    <div class="help-info">
+                        <div class="help-tip">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Pro Tip: For fastest support, use WhatsApp during business hours!</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
