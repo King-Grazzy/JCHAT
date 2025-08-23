@@ -1655,9 +1655,7 @@
             color: var(--blue);
         }
 
-        .wallet-card .help-icon {
-            color: #FFD700;
-        }
+
 
         .help-card h4 {
             color: var(--text-color-primary);
@@ -1693,16 +1691,7 @@
             background: linear-gradient(45deg, var(--blue), var(--pink));
         }
 
-        .wallet-price {
-            display: inline-block;
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            color: #333;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: 700;
-            font-size: 1rem;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-        }
+
 
         .help-info {
             text-align: center;
@@ -1742,6 +1731,242 @@
             
             .help-section-title {
                 font-size: 1.6rem;
+            }
+        }
+
+        /* NEW: Premium Features Section - Pink and Blue Theme */
+        .premium-features-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.05), rgba(0, 213, 255, 0.05));
+            border: 1px solid;
+            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .premium-section-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .premium-section-title i {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .premium-features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .premium-feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid;
+            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .premium-feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 46, 146, 0.1), rgba(0, 213, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .premium-feature-card:hover::before {
+            left: 100%;
+        }
+
+        .premium-feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(255, 46, 146, 0.2), 0 20px 40px rgba(0, 213, 255, 0.2);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.4), 0 8px 25px rgba(0, 213, 255, 0.4);
+        }
+
+        .premium-feature-card h4 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .premium-feature-card p {
+            color: var(--text-light);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .feature-price {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.1), rgba(0, 213, 255, 0.1));
+            border-radius: 15px;
+            border: 1px solid;
+            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
+        }
+
+        .price-amount {
+            display: block;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--white);
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .price-description {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .feature-benefits {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 8px 0;
+        }
+
+        .benefit-item i {
+            color: var(--pink);
+            font-size: 1rem;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .benefit-item span {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .feature-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .premium-contact-btn, .premium-whatsapp-btn {
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 2px solid transparent;
+        }
+
+        .premium-contact-btn {
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.4);
+        }
+
+        .premium-contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.6);
+        }
+
+        .premium-whatsapp-btn {
+            background: transparent;
+            color: var(--white);
+            border-color: var(--pink);
+        }
+
+        .premium-whatsapp-btn:hover {
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.4);
+        }
+
+        /* Mobile responsive for premium features */
+        @media (max-width: 768px) {
+            .premium-features-section {
+                padding: 20px;
+                margin-top: 30px;
+            }
+
+            .premium-section-title {
+                font-size: 1.6rem;
+            }
+
+            .premium-feature-card {
+                padding: 25px;
+            }
+
+            .feature-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .feature-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .premium-contact-btn, .premium-whatsapp-btn {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
             }
         }
 
@@ -2130,50 +2355,8 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Wallet link specific styling */
-        #walletLink.disabled-link {
-            opacity: 0.6;
-            cursor: not-allowed;
-            pointer-events: none; /* Disables click events */
-            background: rgba(255, 255, 255, 0.05); /* Greyed out background */
-            box-shadow: none;
-        }
-        #walletLink.disabled-link:hover {
-            transform: none; /* No hover effect when disabled */
-            box-shadow: none;
-        }
-        .wallet-locked-message {
-            background: linear-gradient(135deg, rgba(255, 46, 146, 0.1), rgba(0, 213, 255, 0.1));
-            border: 1px solid;
-            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
-            border-radius: 12px;
-            padding: 16px;
-            color: var(--text-color-primary);
-            font-size: 0.95rem;
-            text-align: center;
-            margin-top: 12px;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
 
-        .wallet-locked-message::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(255, 46, 146, 0.05), rgba(0, 213, 255, 0.05));
-            border-radius: 12px;
-            z-index: -1;
-        }
 
-        .wallet-locked-message:hover {
-            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.15), 0 8px 25px rgba(0, 213, 255, 0.15);
-            transform: translateY(-2px);
-            transition: all 0.3s ease;
-        }
 
         .profile-actions {
             display: flex;
@@ -2382,7 +2565,7 @@
         }
 
         /* NEW: Unlocked Rewards Section */
-        .unlocked-rewards-section, .recent-activity-section, .customization-section, .wallet-guide-section {
+        .unlocked-rewards-section, .recent-activity-section, .customization-section {
             background: var(--card-background);
             border: 1px solid var(--glass-blue);
             backdrop-filter: blur(10px) saturate(180%);
@@ -2393,7 +2576,7 @@
             margin-top: 20px;
             text-align: left;
         }
-        .unlocked-rewards-section h3, .friends-snippet-section h3, .recent-activity-section h3, .customization-section h3, .wallet-guide-section h3 {
+        .unlocked-rewards-section h3, .friends-snippet-section h3, .recent-activity-section h3, .customization-section h3 {
             font-family: 'Poppins', sans-serif;
             font-size: 1.4rem;
             font-weight: 700;
@@ -3311,76 +3494,7 @@
             justify-content: center; /* Center buttons in modal */
         }
 
-        /* NEW: Wallet Guide Section */
-        .wallet-guide-section {
-            padding: 2rem;
-            text-align: left;
-        }
-        .wallet-guide-section h3 {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            background-clip: text;
-            color: transparent;
-            background-image: linear-gradient(90deg, var(--blue), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center;
-        }
-        .wallet-guide-section .guide-item {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            border: 1px solid var(--border-light);
-        }
-        .wallet-guide-section .guide-item h4 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.2rem;
-            color: var(--white);
-            margin-top: 0;
-            margin-bottom: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .wallet-guide-section .guide-item h4 i {
-            background-clip: text;
-            color: transparent;
-            background-image: linear-gradient(90deg, var(--blue), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.5rem;
-        }
-        .wallet-guide-section .guide-item p {
-            font-size: 0.95rem;
-            color: var(--text-light);
-            line-height: 1.6;
-            margin-bottom: 0.5rem;
-        }
-        .wallet-guide-section .guide-item ul {
-            list-style: none;
-            padding-left: 0;
-            margin-top: 0.5rem;
-        }
-        .wallet-guide-section .guide-item ul li {
-            font-size: 0.9rem;
-            color: var(--text-color-secondary);
-            margin-bottom: 5px;
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-        }
-        .wallet-guide-section .guide-item ul li i {
-            color: var(--accent-color);
-            margin-top: 3px;
-            flex-shrink: 0;
-        }
-        .wallet-guide-section .guide-item strong {
-            color: var(--white);
-        }
-        .wallet-guide-section .guide-item .gradient-text {
-            font-weight: 600;
-        }
+
         /* Enhanced Responsive Design */
         @media (max-width: 768px) {
             .profile-section {
@@ -3661,7 +3775,7 @@
                 transform: scale(0.8); /* Scale down for mobile */
                 transform-origin: right center;
             }
-            .unlocked-rewards-section h3, .friends-snippet-section h3, .recent-activity-section h3, .customization-section h3, .wallet-guide-section h3 {
+            .unlocked-rewards-section h3, .friends-snippet-section h3, .recent-activity-section h3, .customization-section h3 {
                 font-size: 1.2rem;
             }
             .rewards-grid, .friends-grid {
@@ -3944,10 +4058,7 @@
                         <i class="fas fa-cog"></i>
                         Settings
                     </a>
-                    <a href="/Wallet.html" class="tiny-dropdown-item">
-                        <i class="fas fa-wallet"></i>
-                        Wallet
-                    </a>
+                    
                     <a href="/Find_Friends.html" class="tiny-dropdown-item">
                         <i class="fas fa-users"></i>
                         Find Friends
@@ -4110,13 +4221,7 @@
                         <i class="fas fa-user-shield"></i> Privacy Settings
                     </a>
                     <!-- NEW: Wallet Link -->
-                    <a href="/Wallet.html" id="walletLink" class="profile-action-button secondary disabled-link">
-                        <i class="fas fa-lock padlock-icon"></i> My Wallet
-                    </a>
-                    <p id="walletLockedMessage" class="wallet-locked-message" style="display: none;">
-                        Contact admin to unlock wallet access for just #5,000 and you have your wallet Unlocked. Jchatguide@gmail.com
-                        Wa +2349013790707 
-                    </p>
+
                     
                     <!-- NEW: Request JCoins Button -->
                     <button id="requestJCoinsButton" class="profile-action-button">
@@ -4248,20 +4353,58 @@
                             </a>
                         </div>
 
-                        <div class="help-card wallet-card">
-                            <div class="help-icon">
-                                <i class="fas fa-wallet"></i>
-                            </div>
-                            <h4>Wallet Unlock</h4>
-                            <p>Unlock your wallet access</p>
-                            <span class="wallet-price">Just #5,000</span>
-                        </div>
+
                     </div>
 
                     <div class="help-info">
                         <div class="help-tip">
                             <i class="fas fa-lightbulb"></i>
                             <span>Pro Tip: For fastest support, use WhatsApp during business hours!</span>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Premium Features Section -->
+                    <div class="premium-features-section">
+                        <h3 class="premium-section-title">
+                            <i class="fas fa-crown"></i>
+                            Premium Features
+                        </h3>
+                        <div class="premium-features-grid">
+                            <div class="premium-feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-wallet"></i>
+                                </div>
+                                <h4>Digital Wallet Access</h4>
+                                <p>Unlock your digital wallet to manage JCoins, make transactions, and access premium services.</p>
+                                <div class="feature-price">
+                                    <span class="price-amount">₦5,000</span>
+                                    <span class="price-description">One-time unlock</span>
+                                </div>
+                                <div class="feature-benefits">
+                                    <div class="benefit-item">
+                                        <i class="fas fa-check"></i>
+                                        <span>Secure JCoin transactions</span>
+                                    </div>
+                                    <div class="benefit-item">
+                                        <i class="fas fa-check"></i>
+                                        <span>Premium chat features</span>
+                                    </div>
+                                    <div class="benefit-item">
+                                        <i class="fas fa-check"></i>
+                                        <span>Exclusive profile customization</span>
+                                    </div>
+                                </div>
+                                <div class="feature-actions">
+                                    <a href="mailto:jchatguide@gmail.com" class="premium-contact-btn">
+                                        <i class="fas fa-envelope"></i>
+                                        Contact Admin
+                                    </a>
+                                    <a href="https://wa.me/2349013790707" class="premium-whatsapp-btn" target="_blank">
+                                        <i class="fab fa-whatsapp"></i>
+                                        WhatsApp
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4555,8 +4698,7 @@
         const xpProgressBarFill = document.getElementById('xpProgressBarFill');
 
         const profileActions = document.getElementById('profileActions');
-        const walletLink = document.getElementById('walletLink'); // Wallet link
-        const walletLockedMessage = document.getElementById('walletLockedMessage'); // Wallet locked message
+
         const requestJCoinsButton = document.getElementById('requestJCoinsButton'); // NEW: Request JCoins Button
         const claimDailyBonusButton = document.getElementById('claimDailyBonusButton'); // NEW
         const dailyBonusCountdown = document.getElementById('dailyBonusCountdown'); // NEW
@@ -6512,11 +6654,7 @@
                         await updateDoc(privateProfileDocRef, { level: 1 });
                         profileData.level = 1;
                     }
-                    if (profileData.walletUnlocked === undefined) { // NEW: Initialize walletUnlocked
-                        console.log("JCHAT_DEBUG: 'walletUnlocked' field missing in profile, initializing to false.");
-                        await updateDoc(privateProfileDocRef, { walletUnlocked: false });
-                        profileData.walletUnlocked = false;
-                    }
+                    
                     if (profileData.unlockedBenefits === undefined) { // NEW: Initialize unlockedBenefits
                         console.log("JCHAT_DEBUG: 'unlockedBenefits' field missing in profile, initializing to [].");
                         await updateDoc(privateProfileDocRef, { unlockedBenefits: [] });
@@ -6567,7 +6705,7 @@
                         gas: 0, // Initialize GAS
                         totalGasEarned: 0, // Initialize totalGasEarned
                         level: 1, // Initialize level
-                        walletUnlocked: false, // NEW: Default to locked wallet
+        
                         unlockedBenefits: [], // NEW: Initialize unlockedBenefits
                         lastDailyBonusClaimDate: null, // NEW: Initialize daily bonus claim date
                         profileFrame: "default", // NEW
@@ -6682,10 +6820,7 @@
          * Shows the JCoin request modal.
          */
         function showJCoinRequestModal() {
-            if (!currentUser || !currentUserProfileData || !currentUserProfileData.walletUnlocked) {
-                showMessageBox("Your wallet must be unlocked by an admin to request JCoins.", 'warning');
-                return;
-            }
+            
             if (jcoinRequestModal) jcoinRequestModal.classList.add('active'); // Null check
             if (nairaAmountInput) nairaAmountInput.value = ''; // Null check
             if (calculatedJCoinsSpan) calculatedJCoinsSpan.textContent = '0 JCoins'; // Null check
@@ -6726,10 +6861,7 @@
                 showMessageBox("You must be logged in to submit a request.", 'error');
                 return;
             }
-            if (!currentUserProfileData.walletUnlocked) {
-                showMessageBox("Your wallet must be unlocked by an admin to request JCoins.", 'warning');
-                return;
-            }
+            
 
             const nairaAmount = parseInt(nairaAmountInput.value);
             const receiptFile = receiptUploadInput.files[0];
@@ -7517,8 +7649,7 @@
             if (profilePageAvatarIcon) profilePageAvatarIcon.style.display = 'block';
             
             // Hide all action buttons initially
-            if (walletLink) walletLink.style.display = 'none'; // Hide wallet link
-            if (walletLockedMessage) walletLockedMessage.style.display = 'none'; // Hide wallet locked message
+
             if (requestJCoinsButton) requestJCoinsButton.style.display = 'none'; // Hide request JCoins button
             if (claimDailyBonusButton) claimDailyBonusButton.style.display = 'none'; // NEW: Hide claim daily bonus button
             if (dailyBonusCountdown) dailyBonusCountdown.style.display = 'none'; // NEW: Hide daily bonus countdown
@@ -7878,30 +8009,12 @@
 
                     // Action Buttons and Inline Edit Fields
                     if (isCurrentUserProfile) {
-                        if (walletLink) walletLink.style.display = 'inline-flex'; // Null check
+            
                         if (requestJCoinsButton) requestJCoinsButton.style.display = 'inline-flex'; // Show Request JCoins button for owner, null check
                         if (claimDailyBonusButton) claimDailyBonusButton.style.display = 'inline-flex'; // NEW: Show daily bonus button
                         updateDailyBonusUI(); // NEW: Update daily bonus UI
 
-                        // Wallet Link Logic (only for owner)
-                        if (walletLink && walletLockedMessage) { // Null check
-                            walletLink.style.display = 'inline-flex';
-                            if (displayedUserProfileData.walletUnlocked) {
-                                walletLink.classList.remove('disabled-link');
-                                walletLockedMessage.style.display = 'none';
-                                if (walletLink.querySelector('.padlock-icon')) { // Null check for inner icon
-                                    walletLink.querySelector('.padlock-icon').classList.remove('fa-lock');
-                                    walletLink.querySelector('.padlock-icon').classList.add('fa-unlock-alt');
-                                }
-                            } else {
-                                walletLink.classList.add('disabled-link');
-                                walletLockedMessage.style.display = 'block';
-                                if (walletLink.querySelector('.padlock-icon')) { // Null check for inner icon
-                                    walletLink.querySelector('.padlock-icon').classList.add('fa-lock');
-                                    walletLink.querySelector('.padlock-icon').classList.remove('fa-unlock-alt');
-                                }
-                            }
-                        }
+                        
 
                         // Show inline edit fields and account settings for owner
                         const profileDetailsSection = displayNameInput ? displayNameInput.closest('.profile-details-section') : null; // Null check
@@ -7965,8 +8078,7 @@
 
                     } else if (currentUser) { // If logged in and viewing another user
                         // Hide all owner-specific buttons and editing sections
-                        if (walletLink) walletLink.style.display = 'none'; // Hide wallet link for others, null check
-                        if (walletLockedMessage) walletLockedMessage.style.display = 'none'; // Hide message for others, null check
+                        
                         if (requestJCoinsButton) requestJCoinsButton.style.display = 'none'; // Hide request JCoins button for others, null check
                         if (claimDailyBonusButton) claimDailyBonusButton.style.display = 'none'; // Hide daily bonus button for others
                         if (dailyBonusCountdown) dailyBonusCountdown.style.display = 'none'; // Hide daily bonus countdown for others
@@ -8002,8 +8114,7 @@
                         if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
                     } else { // Not logged in, viewing any profile
-                        if (walletLink) walletLink.style.display = 'none'; // Hide wallet link, null check
-                        if (walletLockedMessage) walletLockedMessage.style.display = 'none'; // Hide message, null check
+                        
                         if (requestJCoinsButton) requestJCoinsButton.style.display = 'none'; // Hide request JCoins button, null check
                         if (claimDailyBonusButton) claimDailyBonusButton.style.display = 'none'; // Hide daily bonus button
                         if (dailyBonusCountdown) dailyBonusCountdown.style.display = 'none'; // Hide daily bonus countdown
