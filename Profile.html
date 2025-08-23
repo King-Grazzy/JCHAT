@@ -4348,14 +4348,14 @@
         function updateNotificationBadge(count) {
             const notificationWrapper = document.querySelector('.notification-icon-wrapper');
             const notificationBadge = document.getElementById('notificationCount');
-            if (badge && notificationWrapper) {
+            if (notificationBadge && notificationWrapper) {
                 if (count > 0) {
-                    badge.textContent = count > 99 ? '99+' : count.toString();
-                    badge.style.display = 'flex';
+                    notificationBadge.textContent = count > 99 ? '99+' : count.toString();
+                    notificationBadge.style.display = 'flex';
                     notificationWrapper.classList.add('has-notifications');
                     console.log('🔔 Notification badge updated:', count, 'notifications');
                 } else {
-                    badge.style.display = 'none';
+                    notificationBadge.style.display = 'none';
                     notificationWrapper.classList.remove('has-notifications');
                     console.log('🔕 No notifications, badge hidden');
                 }
