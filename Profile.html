@@ -5509,14 +5509,10 @@
 
 
 
-                const hasBubble = currentUserProfileData.unlockedBenefits.includes(`Unlock: ${newChatBubbleStyle === 'basic' ? 'Basic Chat Bubble Style' : (newChatBubbleStyle === 'rounded' ? 'New Chat Bubble Style (Set 2)' : '')}`);
-                const hasTheme = currentUserProfileData.unlockedBenefits.includes(`Unlock: ${newProfileTheme === 'solid' ? 'Basic Profile Theme (Solid Color)' : (newProfileTheme === 'animated1' ? 'Premium Profile Theme (Animated 1)' : '')}`);
 
-                if (newProfileFrame !== 'default' && !hasFrame) {
-                    showMessageBox(`You haven't unlocked the '${newProfileFrame}' frame yet!`, 'warning');
-                    toggleButtonLoading(saveCustomizationButton, false);
-                    return;
-                }
+
+
+
                 if (newChatBubbleStyle !== 'default' && !hasBubble) {
                     showMessageBox(`You haven't unlocked the '${newChatBubbleStyle}' chat bubble style yet!`, 'warning');
                     toggleButtonLoading(saveCustomizationButton, false);
