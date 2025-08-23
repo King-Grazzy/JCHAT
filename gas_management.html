@@ -3937,6 +3937,13 @@
          * Saves the system settings from the UI to Firestore.
          */
         async function saveSystemSettings() {
+            // Verify admin permission
+            if (!currentUser || currentUser.uid !== ADMIN_UID) {
+                showMessageBox('Only admin can modify system settings!', 'error');
+                console.error('JCHAT_ERROR: Non-admin user attempted to save system settings:', currentUser?.uid);
+                return;
+            }
+
             toggleButtonLoading(saveSystemSettingsButton, true);
             showMessageBox("Saving system settings...", 'loading', true);
 
@@ -3982,6 +3989,7 @@
                     return;
                 }
 
+                console.log('JCHAT_DEBUG: Saving settings by admin UID:', currentUser.uid, 'New settings:', newSettings);
                 await setDoc(SYSTEM_SETTINGS_DOC_REF, newSettings, { merge: true });
                 showMessageBox("System settings saved successfully!", 'success');
                 playNotificationSound('success');
@@ -5412,6 +5420,13 @@
                 return;
             }
 
+            // Verify admin permission
+            if (!currentUser || currentUser.uid !== ADMIN_UID) {
+                showMessageBox('Only admin can publish announcements!', 'error');
+                console.error('JCHAT_ERROR: Non-admin user attempted to publish announcement:', currentUser?.uid);
+                return;
+            }
+
             // Create a test announcement that will appear immediately
             const testSettings = {
                 announcementEnabled: true,
@@ -5425,7 +5440,7 @@
                 lastModified: serverTimestamp()
             };
 
-            console.log('JCHAT_DEBUG: Sending test announcement:', testSettings);
+            console.log('JCHAT_DEBUG: Sending test announcement from admin UID:', currentUser.uid, 'Settings:', testSettings);
 
             // Save test announcement to Firestore
             setDoc(SYSTEM_SETTINGS_DOC_REF, testSettings, { merge: true })

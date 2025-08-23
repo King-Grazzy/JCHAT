@@ -7449,6 +7449,17 @@
                     const endOk = !settings.announcementEndTime || (settings.announcementEndTime.toDate ? settings.announcementEndTime.toDate() >= now : true);
                     const shouldShow = enabled && !!text && startOk && endOk;
                     
+                    // Additional debugging for troubleshooting
+                    if (enabled && !!text && (!startOk || !endOk)) {
+                        console.log('JCHAT_DEBUG: Announcement blocked by time constraints:', {
+                            currentTime: now,
+                            startTime: settings.announcementStartTime,
+                            endTime: settings.announcementEndTime,
+                            startTimeFormatted: settings.announcementStartTime?.toDate ? settings.announcementStartTime.toDate().toISOString() : 'none',
+                            endTimeFormatted: settings.announcementEndTime?.toDate ? settings.announcementEndTime.toDate().toISOString() : 'none'
+                        });
+                    }
+                    
                     // Enhanced debug logging for announcement system
                     console.log('JCHAT_DEBUG: Enhanced announcement system debug:', {
                         enabled,
