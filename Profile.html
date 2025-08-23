@@ -5581,8 +5581,7 @@
 
                 showMessageBox("Profile saved successfully!", 'success');
 
-                // NEW: Update profile completion progress after saving
-                updateProfileCompletion();
+
 
                 // Refresh currentUserProfileData
                 const updatedProfileSnap = await getDoc(privateProfileDocRef);
@@ -6181,15 +6180,11 @@
             }
 
             checkProfileStatus() {
-                // Check profile completion and add notifications
-                const completion = updateProfileCompletion();
-                
-                if (completion === 100) {
-                    this.addNotification('success', 'Profile Complete! 🎉', 'Your profile is 100% complete! You\'ve unlocked all features.', true);
-                } else if (completion >= 80) {
-                    this.addNotification('info', 'Almost There!', 'Your profile is ' + completion + '% complete. Just a few more details to go!');
-                } else if (completion < 40) {
-                    this.addNotification('warning', 'Profile Incomplete', 'Your profile is only ' + completion + '% complete. Add more details to unlock features!');
+                // Profile completion notifications are now handled differently
+                // Check for profile views (if analytics are enabled)
+                const analyticsEnabled = document.getElementById('analyticsOptInToggle')?.checked;
+                if (analyticsEnabled) {
+                    this.addNotification('info', 'Analytics Enabled', 'Profile view analytics are now active. Track your profile performance!');
                 }
 
                 // Check for profile views (if analytics are enabled)
@@ -8157,10 +8152,7 @@
                     // Fetch and update the real friend count for the Friends stat
                     await fetchAndUpdateFriendCount();
 
-                    // NEW: Update profile completion progress
-                    if (isCurrentUserProfile) {
-                        updateProfileCompletion();
-                    }
+
 
                     showMessageBox("Profile loaded!", 'success');
                     
