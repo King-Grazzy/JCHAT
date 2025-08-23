@@ -560,6 +560,11 @@
             gap: 10px;
         }
 
+        .header-spacer {
+            width: 40px;
+            height: 40px;
+        }
+
         /* Notification Icon Styling (from Home.html) */
         .notification-icon-wrapper {
             position: relative;
@@ -4031,61 +4036,133 @@
                         <span class="notification-badge" id="notificationCount" style="display: none;">0</span>
                     </a>
                 </div>
-                <!-- Removed Logout Button -->
-                <a href="/Profile.html" id="profileLink">
-                    <img id="headerProfilePic" src="" alt="Profile Picture" style="display: none;">
-                    <i id="headerAvatarIcon" class="fas fa-user-circle"></i>
-                    <span id="headerDisplayName">Loading...</span>
-                </a>
+                <!-- Clean Header - No User Info Display -->
+                <div class="header-spacer"></div>
                 <!-- Tiny Plus Toggle -->
                 <button class="tiny-toggle" id="tinyToggle" onclick="toggleTinyMenu()">
                     <i class="fas fa-plus"></i>
                 </button>
                 <div class="tiny-dropdown" id="tinyDropdown">
-                    <a href="/Home.html" class="tiny-dropdown-item">
-                        <i class="fas fa-home"></i>
-                        Home
-                    </a>
-                    <a href="/Chat.html" class="tiny-dropdown-item">
-                        <i class="fas fa-comments"></i>
-                        Chat
-                    </a>
-                    <a href="/Profile.html" class="tiny-dropdown-item">
-                        <i class="fas fa-user"></i>
-                        Profile
-                    </a>
-                    <a href="/Settings.html" class="tiny-dropdown-item">
-                        <i class="fas fa-cog"></i>
-                        Settings
-                    </a>
-                    
-                    <a href="/Find_Friends.html" class="tiny-dropdown-item">
-                        <i class="fas fa-users"></i>
-                        Find Friends
-                    </a>
-                    <a href="/Groups.html" class="tiny-dropdown-item">
-                        <i class="fas fa-layer-group"></i>
-                        Groups
-                    </a>
-                    <a href="/Jcoin.html" class="tiny-dropdown-item">
-                        <i class="fas fa-coins"></i>
-                        JCoins
-                    </a>
-                    <div class="tiny-dropdown-item" data-action="edit-profile">
-                        <i class="fas fa-edit"></i>
-                        Edit Profile
+                    <!-- Navigation Links -->
+                    <div class="dropdown-section">
+                        <h4 class="dropdown-section-title">Navigation</h4>
+                        <a href="/Home.html" class="tiny-dropdown-item">
+                            <i class="fas fa-home"></i>
+                            Home
+                        </a>
+                        <a href="/Chat.html" class="tiny-dropdown-item">
+                            <i class="fas fa-comments"></i>
+                            Chat
+                        </a>
+                        <a href="/Profile.html" class="tiny-dropdown-item">
+                            <i class="fas fa-user"></i>
+                            Profile
+                        </a>
+                        <a href="/Settings.html" class="tiny-dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </a>
+                        <a href="/Find_Friends.html" class="tiny-dropdown-item">
+                            <i class="fas fa-users"></i>
+                            Find Friends
+                        </a>
+                        <a href="/Groups.html" class="tiny-dropdown-item">
+                            <i class="fas fa-layer-group"></i>
+                            Groups
+                        </a>
+                        <a href="/Jcoin.html" class="tiny-dropdown-item">
+                            <i class="fas fa-coins"></i>
+                            JCoins
+                        </a>
                     </div>
-                    <div class="tiny-dropdown-item" data-action="share-profile">
-                        <i class="fas fa-share-alt"></i>
-                        Share Profile
+
+                    <!-- Profile Management Section -->
+                    <div class="dropdown-section">
+                        <h4 class="dropdown-section-title">Profile Management</h4>
+                        
+                        <!-- Profile Picture Upload -->
+                        <div class="dropdown-form-group">
+                            <label for="headerProfilePicUpload">Profile Picture</label>
+                            <div class="profile-pic-upload-wrapper">
+                                <img id="headerProfilePicPreview" src="" alt="Profile Preview" style="display: none;">
+                                <i id="headerProfilePicIcon" class="fas fa-user-circle"></i>
+                                <input type="file" id="headerProfilePicUpload" accept="image/*" style="display: none;">
+                                <label for="headerProfilePicUpload" class="upload-btn">
+                                    <i class="fas fa-camera"></i>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Display Name -->
+                        <div class="dropdown-form-group">
+                            <label for="headerDisplayNameInput">Display Name</label>
+                            <input type="text" id="headerDisplayNameInput" placeholder="Enter display name">
+                        </div>
+
+                        <!-- Bio -->
+                        <div class="dropdown-form-group">
+                            <label for="headerBioInput">Bio</label>
+                            <textarea id="headerBioInput" placeholder="Tell us about yourself..." rows="2"></textarea>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="dropdown-form-group">
+                            <label for="headerLocationInput">Location</label>
+                            <input type="text" id="headerLocationInput" placeholder="e.g., Lagos, Nigeria">
+                        </div>
+
+                        <!-- School/University -->
+                        <div class="dropdown-form-group">
+                            <label for="headerSchoolInput">School/University</label>
+                            <input type="text" id="headerSchoolInput" placeholder="e.g., University of Lagos">
+                        </div>
+
+                        <!-- Work/Occupation -->
+                        <div class="dropdown-form-group">
+                            <label for="headerWorkInput">Work/Occupation</label>
+                            <input type="text" id="headerWorkInput" placeholder="e.g., Software Engineer">
+                        </div>
+
+                        <!-- Interests -->
+                        <div class="dropdown-form-group">
+                            <label for="headerInterestsInput">Interests</label>
+                            <textarea id="headerInterestsInput" placeholder="e.g., Reading, Hiking, Coding" rows="2"></textarea>
+                        </div>
+
+                        <!-- Website -->
+                        <div class="dropdown-form-group">
+                            <label for="headerWebsiteInput">Website/Portfolio</label>
+                            <input type="url" id="headerWebsiteInput" placeholder="https://yourwebsite.com">
+                        </div>
+
+                        <!-- Social Links -->
+                        <div class="dropdown-form-group">
+                            <label for="headerSocialLinksInput">Social Media Links</label>
+                            <textarea id="headerSocialLinksInput" placeholder="LinkedIn: profile_url, Twitter: handle" rows="2"></textarea>
+                        </div>
+
+                        <!-- Save Button -->
+                        <button id="headerSaveProfileBtn" class="dropdown-save-btn">
+                            <i class="fas fa-save"></i>
+                            Save Profile
+                        </button>
                     </div>
-                    <div class="tiny-dropdown-item" data-action="download-qr">
-                        <i class="fas fa-qrcode"></i>
-                        Download QR
-                    </div>
-                    <div class="tiny-dropdown-item" data-action="profile-settings">
-                        <i class="fas fa-cog"></i>
-                        Profile Settings
+
+                    <!-- Quick Actions -->
+                    <div class="dropdown-section">
+                        <h4 class="dropdown-section-title">Quick Actions</h4>
+                        <div class="tiny-dropdown-item" data-action="share-profile">
+                            <i class="fas fa-share-alt"></i>
+                            Share Profile
+                        </div>
+                        <div class="tiny-dropdown-item" data-action="download-qr">
+                            <i class="fas fa-qrcode"></i>
+                            Download QR
+                        </div>
+                        <div class="tiny-dropdown-item" data-action="profile-settings">
+                            <i class="fas fa-cog"></i>
+                            Profile Settings
+                        </div>
                     </div>
                 </div>
             </div>
