@@ -665,6 +665,262 @@
             box-shadow: 0 0 15px rgba(255, 46, 146, 0.6);
         }
 
+        /* Dropdown Profile Header Styles */
+        .dropdown-profile-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-profile-pic-wrapper {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid;
+            border-image: linear-gradient(135deg, var(--pink), var(--blue)) 1;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.1), rgba(0, 213, 255, 0.1));
+        }
+
+        .dropdown-profile-pic {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .dropdown-profile-pic-placeholder {
+            font-size: 60px;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.2), rgba(0, 213, 255, 0.2));
+        }
+
+        .dropdown-edit-profile-pic-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--button-background);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .dropdown-profile-name {
+            color: var(--white);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dropdown-profile-bio {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* Dropdown Profile Information Styles */
+        .dropdown-profile-info {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-profile-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            padding: 6px 0;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-profile-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-profile-info-item i {
+            width: 16px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dropdown-copy-user-id-btn {
+            background: var(--button-background);
+            border: none;
+            color: white;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            margin-left: auto;
+        }
+
+        /* Dropdown Level Info Styles */
+        .dropdown-profile-level-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-profile-level-icon {
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dropdown-profile-level-name {
+            color: var(--white);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dropdown-progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .dropdown-progress-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--white);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Dropdown Stats Styles */
+        .dropdown-profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-stat-item {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-stat-value {
+            display: block;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--white);
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dropdown-stat-label {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        .dropdown-jcoin-exchange-rate {
+            font-size: 0.6rem;
+            color: var(--text-light);
+            margin: 2px 0 0 0;
+        }
+
+        /* Dropdown Action Buttons */
+        .dropdown-profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .dropdown-action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .dropdown-action-btn.primary {
+            background: var(--button-background);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.3), 0 4px 15px rgba(0, 213, 255, 0.3);
+        }
+
+        .dropdown-action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dropdown-action-btn.edit {
+            background: rgba(255, 165, 0, 0.2);
+            color: #FFA500;
+            border: 1px solid rgba(255, 165, 0, 0.3);
+        }
+
+        .dropdown-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
         /* Simple slideDown animation for user dropdown */
         .user-dropdown.show {
             animation: simpleSlideDown 0.3s ease-out;
@@ -863,25 +1119,53 @@
                 top: 80px;
             }
 
-            .user-form-group input,
-            .user-form-group textarea {
-                padding: 10px 14px;
-                font-size: 0.9rem;
-            }
-
             .user-dropdown-title {
                 font-size: 1.2rem;
             }
 
-            .profile-pic-upload-wrapper {
-                padding: 12px;
-                gap: 12px;
+            .dropdown-profile-pic-wrapper {
+                width: 60px;
+                height: 60px;
             }
 
-            .profile-pic-upload-wrapper img,
-            .profile-pic-upload-wrapper i {
-                width: 45px;
-                height: 45px;
+            .dropdown-profile-pic-placeholder {
+                font-size: 40px;
+            }
+
+            .dropdown-edit-profile-pic-overlay {
+                width: 20px;
+                height: 20px;
+                font-size: 8px;
+            }
+
+            .dropdown-profile-name {
+                font-size: 1rem;
+            }
+
+            .dropdown-profile-bio {
+                font-size: 0.8rem;
+            }
+
+            .dropdown-profile-info-item {
+                font-size: 0.8rem;
+            }
+
+            .dropdown-profile-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .dropdown-stat-value {
+                font-size: 0.9rem;
+            }
+
+            .dropdown-stat-label {
+                font-size: 0.65rem;
+            }
+
+            .dropdown-action-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
             }
 
             .user-toggle {
@@ -904,40 +1188,55 @@
                 top: 70px;
             }
 
-            .user-form-group {
-                margin-bottom: 15px;
-            }
-
-            .user-save-btn {
-                padding: 14px;
-                font-size: 1rem;
-            }
-
-            .user-form-group input,
-            .user-form-group textarea {
-                padding: 8px 12px;
-                font-size: 0.85rem;
-            }
-
             .user-dropdown-title {
                 font-size: 1.1rem;
                 margin-bottom: 20px;
             }
 
-            .profile-pic-upload-wrapper {
-                padding: 10px;
-                gap: 10px;
+            .dropdown-profile-pic-wrapper {
+                width: 50px;
+                height: 50px;
             }
 
-            .profile-pic-upload-wrapper img,
-            .profile-pic-upload-wrapper i {
-                width: 40px;
-                height: 40px;
+            .dropdown-profile-pic-placeholder {
+                font-size: 30px;
             }
 
-            .upload-btn {
-                width: 30px;
-                height: 30px;
+            .dropdown-edit-profile-pic-overlay {
+                width: 18px;
+                height: 18px;
+                font-size: 7px;
+            }
+
+            .dropdown-profile-name {
+                font-size: 0.95rem;
+            }
+
+            .dropdown-profile-bio {
+                font-size: 0.75rem;
+            }
+
+            .dropdown-profile-info-item {
+                font-size: 0.75rem;
+                margin: 6px 0;
+            }
+
+            .dropdown-profile-stats {
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+            }
+
+            .dropdown-stat-value {
+                font-size: 0.8rem;
+            }
+
+            .dropdown-stat-label {
+                font-size: 0.6rem;
+            }
+
+            .dropdown-action-btn {
+                padding: 6px 10px;
+                font-size: 0.75rem;
             }
         }
 
@@ -950,20 +1249,36 @@
                 left: 2px;
             }
 
-            .user-form-group input,
-            .user-form-group textarea {
-                padding: 6px 10px;
-                font-size: 0.8rem;
-            }
-
-            .user-save-btn {
-                padding: 12px;
-                font-size: 0.9rem;
-            }
-
             .user-dropdown-title {
                 font-size: 1rem;
                 margin-bottom: 15px;
+            }
+
+            .dropdown-profile-pic-wrapper {
+                width: 45px;
+                height: 45px;
+            }
+
+            .dropdown-profile-pic-placeholder {
+                font-size: 25px;
+            }
+
+            .dropdown-profile-name {
+                font-size: 0.9rem;
+            }
+
+            .dropdown-profile-bio {
+                font-size: 0.7rem;
+            }
+
+            .dropdown-profile-info-item {
+                font-size: 0.7rem;
+                margin: 4px 0;
+            }
+
+            .dropdown-action-btn {
+                padding: 5px 8px;
+                font-size: 0.7rem;
             }
         }
 
@@ -974,13 +1289,19 @@
                 top: 60px;
             }
 
-            .user-form-group {
+            .dropdown-profile-header {
                 margin-bottom: 12px;
+                padding-bottom: 8px;
             }
 
-            .user-form-group input,
-            .user-form-group textarea {
-                padding: 8px 12px;
+            .dropdown-profile-info {
+                margin-bottom: 12px;
+                padding-bottom: 8px;
+            }
+
+            .dropdown-profile-stats {
+                margin-bottom: 12px;
+                padding-bottom: 8px;
             }
         }
 
@@ -4619,74 +4940,152 @@
 
                 <!-- User Profile Dropdown Menu -->
                 <div class="user-dropdown" id="userDropdown">
-                    <h4 class="user-dropdown-title">Edit Profile</h4>
+                    <h4 class="user-dropdown-title">Profile Information</h4>
                     
-                    <!-- Profile Picture Upload -->
-                    <div class="user-form-group">
-                        <label for="headerProfilePicUpload">Profile Picture</label>
-                        <div class="profile-pic-upload-wrapper">
-                            <img id="headerProfilePicPreview" src="" alt="Profile Preview" style="display: none;">
-                            <i id="headerProfilePicIcon" class="fas fa-user-circle"></i>
-                            <input type="file" id="headerProfilePicUpload" accept="image/*" style="display: none;">
-                            <label for="headerProfilePicUpload" class="upload-btn">
-                                <i class="fas fa-camera"></i>
+                    <!-- Profile Header Area in Dropdown -->
+                    <div class="dropdown-profile-header">
+                        <div class="dropdown-profile-pic-wrapper" id="dropdownProfilePicWrapper">
+                            <img id="dropdownProfilePic" src="" alt="Profile Picture" class="dropdown-profile-pic" style="display: none;">
+                            <i id="dropdownAvatarIcon" class="fas fa-user-circle dropdown-profile-pic-placeholder"></i>
+                            <input type="file" id="dropdownProfilePicUploadInput" accept="image/*" style="display: none;">
+                            <label for="dropdownProfilePicUploadInput" class="dropdown-edit-profile-pic-overlay" id="dropdownEditProfilePicOverlay">
+                                <i class="fas fa-camera"></i> Edit
                             </label>
+                        </div>
+                        <h3 id="dropdownProfileUsername" class="dropdown-profile-name">Loading...</h3>
+                        <p id="dropdownProfileBio" class="dropdown-profile-bio">No bio provided yet.</p>
+                    </div>
+                    
+                    <!-- Profile Information Display -->
+                    <div class="dropdown-profile-info">
+                        <!-- User ID Display -->
+                        <p id="dropdownProfileUserId" class="dropdown-profile-info-item user-id-container" style="display: none;">
+                            <i class="fas fa-id-card"></i> 
+                            <span class="user-id-label">User ID:</span>
+                            <span id="dropdownUserIdText" class="user-id-text"></span>
+                            <button id="dropdownCopyUserIdBtn" class="dropdown-copy-user-id-btn" title="Copy User ID">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </p>
+                        
+                        <!-- Basic Information -->
+                        <p id="dropdownProfileLocation" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-map-marker-alt"></i> 
+                            <span id="dropdownLocationText"></span>
+                        </p>
+                        <p id="dropdownProfileEmail" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-envelope"></i> 
+                            <span id="dropdownEmailText"></span>
+                        </p>
+                        
+                        <!-- Personal Information -->
+                        <p id="dropdownProfileFullName" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-user"></i> 
+                            <span id="dropdownFullNameText"></span>
+                        </p>
+                        <p id="dropdownProfileDateOfBirth" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-birthday-cake"></i> 
+                            <span id="dropdownDateOfBirthText"></span>
+                        </p>
+                        <p id="dropdownProfileGender" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-venus-mars"></i> 
+                            <span id="dropdownGenderText"></span>
+                        </p>
+                        <p id="dropdownProfilePhone" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-phone"></i> 
+                            <span id="dropdownPhoneText"></span>
+                        </p>
+                        
+                        <!-- Location Information -->
+                        <p id="dropdownProfileCountry" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-flag"></i> 
+                            <span id="dropdownCountryText"></span>
+                        </p>
+                        <p id="dropdownProfileCity" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-city"></i> 
+                            <span id="dropdownCityText"></span>
+                        </p>
+                        <p id="dropdownProfileLanguage" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-language"></i> 
+                            <span id="dropdownLanguageText"></span>
+                        </p>
+                        <p id="dropdownProfileTimezone" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-clock"></i> 
+                            <span id="dropdownTimezoneText"></span>
+                        </p>
+                        
+                        <!-- Professional Information -->
+                        <p id="dropdownProfileSchool" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-graduation-cap"></i> 
+                            <span id="dropdownSchoolText"></span>
+                        </p>
+                        <p id="dropdownProfileWork" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-briefcase"></i> 
+                            <span id="dropdownWorkText"></span>
+                        </p>
+                        <p id="dropdownProfileWebsite" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-globe"></i> 
+                            <a id="dropdownWebsiteLink" href="#" target="_blank" rel="noopener noreferrer" class="gradient-text"></a>
+                        </p>
+                        <p id="dropdownProfileSocialLinks" class="dropdown-profile-info-item" style="display: none;">
+                            <i class="fas fa-share-alt"></i> 
+                            <span id="dropdownSocialLinksText"></span>
+                        </p>
+                    </div>
+
+                    <!-- Level Info Display in Dropdown -->
+                    <div class="dropdown-profile-level-info">
+                        <i id="dropdownXpLevelIcon" class="fas fa-question-circle dropdown-profile-level-icon"></i>
+                        <span id="dropdownXpLevelName" class="dropdown-profile-level-name">Loading Level...</span>
+                        <div class="dropdown-progress-bar-container" id="dropdownProgressBarContainer">
+                            <div id="dropdownXpProgressBarFill" class="dropdown-progress-bar-fill" style="background-position: right;"></div>
+                            <div id="dropdownProgressPercentage" class="dropdown-progress-percentage">0%</div>
                         </div>
                     </div>
 
-                    <!-- Display Name -->
-                    <div class="user-form-group">
-                        <label for="headerDisplayNameInput">Display Name</label>
-                        <input type="text" id="headerDisplayNameInput" placeholder="Enter display name">
+                    <!-- Profile Stats in Dropdown -->
+                    <div class="dropdown-profile-stats">
+                        <div class="dropdown-stat-item">
+                            <span id="dropdownStatPosts" class="dropdown-stat-value">0</span>
+                            <span class="dropdown-stat-label">Posts</span>
+                        </div>
+                        <div class="dropdown-stat-item">
+                            <span id="dropdownStatFriends" class="dropdown-stat-value">0</span>
+                            <span class="dropdown-stat-label">Friends</span>
+                        </div>
+                        <div class="dropdown-stat-item">
+                            <span id="dropdownStatFollowers" class="dropdown-stat-value">0</span>
+                            <span class="dropdown-stat-label">Followers</span>
+                        </div>
+                        <div class="dropdown-stat-item">
+                            <span id="dropdownStatFollowing" class="dropdown-stat-value">0</span>
+                            <span class="dropdown-stat-label">Following</span>
+                        </div>
+                        <div class="dropdown-stat-item">
+                            <span id="dropdownJCoins" class="dropdown-stat-value">0</span>
+                            <span class="dropdown-stat-label">JCoins</span>
+                            <p class="dropdown-jcoin-exchange-rate" id="dropdownJcoinExchangeRate" style="display: none;">
+                                <span id="dropdownJcoinUSDValue">$0.00</span> USD
+                            </p>
+                        </div>
+                        <div class="dropdown-stat-item">
+                            <span id="dropdownGasValue" class="dropdown-stat-value">0</span>
+                            <span class="dropdown-stat-label">Gas (XP)</span>
+                        </div>
                     </div>
 
-                    <!-- Bio -->
-                    <div class="user-form-group">
-                        <label for="headerBioInput">Bio</label>
-                        <textarea id="headerBioInput" placeholder="Tell us about yourself..." rows="2"></textarea>
+                    <!-- Action Buttons -->
+                    <div class="dropdown-profile-actions">
+                        <a href="/Profile.html" class="dropdown-action-btn primary">
+                            <i class="fas fa-user"></i> View Full Profile
+                        </a>
+                        <a href="/Settings.html" class="dropdown-action-btn secondary">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                        <button id="dropdownEditModeBtn" class="dropdown-action-btn edit">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
                     </div>
-
-                    <!-- Location -->
-                    <div class="user-form-group">
-                        <label for="headerLocationInput">Location</label>
-                        <input type="text" id="headerLocationInput" placeholder="e.g., Lagos, Nigeria">
-                    </div>
-
-                    <!-- School/University -->
-                    <div class="user-form-group">
-                        <label for="headerSchoolInput">School/University</label>
-                        <input type="text" id="headerSchoolInput" placeholder="e.g., University of Lagos">
-                    </div>
-
-                    <!-- Work/Occupation -->
-                    <div class="user-form-group">
-                        <label for="headerWorkInput">Work/Occupation</label>
-                        <input type="text" id="headerWorkInput" placeholder="e.g., Software Engineer">
-                    </div>
-
-                    <!-- Interests -->
-                    <div class="user-form-group">
-                        <label for="headerInterestsInput">Interests</label>
-                        <textarea id="headerInterestsInput" placeholder="e.g., Reading, Hiking, Coding" rows="2"></textarea>
-                    </div>
-
-                    <!-- Website -->
-                    <div class="user-form-group">
-                        <label for="headerWebsiteInput">Website/Portfolio</label>
-                        <input type="url" id="headerWebsiteInput" placeholder="https://yourwebsite.com">
-                    </div>
-
-                    <!-- Social Links -->
-                    <div class="user-form-group">
-                        <label for="headerSocialLinksInput">Social Media Links</label>
-                        <textarea id="headerSocialLinksInput" placeholder="LinkedIn: profile_url, Twitter: handle" rows="2"></textarea>
-                    </div>
-
-                    <!-- Save Button -->
-                    <button id="headerSaveProfileBtn" class="user-save-btn">
-                        <i class="fas fa-save"></i>
-                        Save Profile
-                    </button>
                 </div>
             </div>
         </div>
