@@ -578,6 +578,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 2px 10px rgba(255, 46, 146, 0.3);
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         .user-toggle:hover {
@@ -710,6 +712,11 @@
             box-sizing: border-box;
             word-wrap: break-word;
             overflow-wrap: break-word;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
         }
 
         .user-form-group input:focus,
@@ -806,7 +813,15 @@
             font-size: 1.2rem;
         }
 
-        /* Responsive design for mobile devices */
+        /* Responsive design for all devices */
+        @media (max-width: 1200px) {
+            .user-dropdown {
+                min-width: 320px;
+                max-width: 400px;
+                right: 5px;
+            }
+        }
+
         @media (max-width: 768px) {
             .user-dropdown {
                 min-width: 300px;
@@ -814,6 +829,8 @@
                 right: 10px;
                 left: 10px;
                 padding: 20px;
+                position: fixed;
+                top: 80px;
             }
 
             .user-form-group input,
@@ -836,6 +853,15 @@
                 width: 45px;
                 height: 45px;
             }
+
+            .user-toggle {
+                width: 35px;
+                height: 35px;
+            }
+
+            .user-toggle i {
+                font-size: 1rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -843,6 +869,9 @@
                 min-width: 280px;
                 max-width: 95vw;
                 padding: 18px;
+                right: 5px;
+                left: 5px;
+                top: 70px;
             }
 
             .user-form-group {
@@ -852,6 +881,76 @@
             .user-save-btn {
                 padding: 14px;
                 font-size: 1rem;
+            }
+
+            .user-form-group input,
+            .user-form-group textarea {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+
+            .user-dropdown-title {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+            }
+
+            .profile-pic-upload-wrapper {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .profile-pic-upload-wrapper img,
+            .profile-pic-upload-wrapper i {
+                width: 40px;
+                height: 40px;
+            }
+
+            .upload-btn {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .user-dropdown {
+                min-width: 260px;
+                max-width: 98vw;
+                padding: 15px;
+                right: 2px;
+                left: 2px;
+            }
+
+            .user-form-group input,
+            .user-form-group textarea {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+
+            .user-save-btn {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .user-dropdown-title {
+                font-size: 1rem;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Landscape orientation fixes */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .user-dropdown {
+                max-height: 70vh;
+                top: 60px;
+            }
+
+            .user-form-group {
+                margin-bottom: 12px;
+            }
+
+            .user-form-group input,
+            .user-form-group textarea {
+                padding: 8px 12px;
             }
         }
 
@@ -6534,6 +6633,35 @@
                 if (!userToggle.contains(event.target) && !userDropdown.contains(event.target)) {
                     userDropdown.classList.remove('show');
                     userToggle.classList.remove('active');
+                }
+            }
+        }, { passive: true });
+
+        /* Add touch gesture support for mobile */
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        document.addEventListener('touchstart', (event) => {
+            touchStartY = event.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (event) => {
+            touchEndY = event.changedTouches[0].clientY;
+            const touchDiff = touchStartY - touchEndY;
+            
+            // Close dropdowns on swipe down gesture
+            if (touchDiff > 50) {
+                const userDropdown = document.getElementById('userDropdown');
+                const tinyDropdown = document.getElementById('tinyDropdown');
+                
+                if (userDropdown && userDropdown.classList.contains('show')) {
+                    userDropdown.classList.remove('show');
+                    const userToggle = document.getElementById('userToggle');
+                    if (userToggle) userToggle.classList.remove('active');
+                }
+                
+                if (tinyDropdown && tinyDropdown.classList.contains('show')) {
+                    closeTinyMenu();
                 }
             }
         }, { passive: true });
