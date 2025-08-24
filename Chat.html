@@ -1757,6 +1757,31 @@
                 font-size: 0.8rem;
             }
         }
+        
+        /* JCHAT Premium Modal Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { 
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .premium-modal {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .premium-modal > div {
+            animation: slideIn 0.3s ease;
+        }
     </style>
 <style id="header-overflow-fix">/*header-overflow-fix*/header .header-content-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap}header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;justify-content:flex-end}#profileLink{display:inline-flex;align-items:center;column-gap:0;row-gap:0;flex-wrap:nowrap;max-width:100%;min-width:0}#profileLink #headerDisplayName{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;flex:0 1 auto}#headerProfilePic,#headerAvatarIcon{flex:0 0 auto}@media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:0}}</style></head>
 <body class="theme-dark-mode">
@@ -2843,8 +2868,8 @@
                             });
                             tab.style.background = 'var(--accent-color)';
                             
-                            // Show emojis for this category
-                            showEmojisForCategory(emojiCategories[category], emojiGrid);
+                            // Show emojis for this category with category name for entitlements check
+                            showEmojisForCategory(emojiCategories[category], emojiGrid, category);
                         });
                         
                         categoryTabs.appendChild(tab);
@@ -2862,7 +2887,8 @@
                     `;
                     
                     // Show first category by default
-                    showEmojisForCategory(emojiCategories[Object.keys(emojiCategories)[0]], emojiGrid);
+                    const firstCategoryName = Object.keys(emojiCategories)[0];
+                    showEmojisForCategory(emojiCategories[firstCategoryName], emojiGrid, firstCategoryName);
                     
                     emojiPicker.appendChild(categoryTabs);
                     emojiPicker.appendChild(emojiGrid);
@@ -2873,11 +2899,13 @@
                 showMessageBox('😊 Select an emoji from 500+ options!', 'info');
             }
             
-            function showEmojisForCategory(emojis, grid) {
+            function showEmojisForCategory(emojis, grid, categoryName) {
                 grid.innerHTML = '';
-                emojis.forEach(emoji => {
+                emojis.forEach((emoji, index) => {
                     const emojiBtn = document.createElement('button');
-                    emojiBtn.textContent = emoji;
+                    const hasAccess = hasEmojiAccess(categoryName, index);
+                    const isFree = index < 3;
+                    
                     emojiBtn.style.cssText = `
                         background: none;
                         border: 1px solid var(--border-light);
@@ -2889,27 +2917,99 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        position: relative;
+                        ${!hasAccess ? 'opacity: 0.5; filter: grayscale(70%);' : ''}
                     `;
-                    emojiBtn.addEventListener('click', () => {
-                        const messageInput = document.getElementById('messageInput');
-                        if (messageInput) {
-                            messageInput.value += emoji + ' ';
-                            messageInput.focus();
-                        }
-                        hideEmojiPicker();
-                        emojiPickerOpen = false;
-                        showMessageBox(`${emoji} Added to message!`, 'success');
-                    });
-                    emojiBtn.addEventListener('mouseenter', () => {
-                        emojiBtn.style.background = 'var(--accent-color)';
-                        emojiBtn.style.transform = 'scale(1.2)';
-                    });
-                    emojiBtn.addEventListener('mouseleave', () => {
-                        emojiBtn.style.background = 'none';
-                        emojiBtn.style.transform = 'scale(1)';
-                    });
+                    
+                    if (!hasAccess) {
+                        // Locked emoji with premium styling
+                        emojiBtn.innerHTML = `
+                            <span style="filter: grayscale(100%) brightness(0.7);">${emoji}</span>
+                            <i class="fas fa-lock" style="
+                                position: absolute;
+                                top: 2px;
+                                right: 2px;
+                                font-size: 8px;
+                                color: #ff2e92;
+                                background: rgba(0,0,0,0.8);
+                                border-radius: 50%;
+                                padding: 2px;
+                                text-shadow: 0 0 3px #ff2e92;
+                            "></i>
+                        `;
+                        
+                        // Lock click handler - show premium modal
+                        emojiBtn.addEventListener('click', () => {
+                            showPremiumUpgradeModal(categoryName);
+                            // Show helpful message
+                            showMessageBox(`🔒 ${categoryName} category locked. First 3 emojis are free!`, 'warning');
+                        });
+                        
+                        // Different hover effect for locked emojis
+                        emojiBtn.addEventListener('mouseenter', () => {
+                            emojiBtn.style.background = 'linear-gradient(45deg, #333, #555)';
+                            emojiBtn.style.transform = 'scale(1.1)';
+                            emojiBtn.style.boxShadow = '0 0 10px rgba(255, 46, 146, 0.5)';
+                        });
+                        emojiBtn.addEventListener('mouseleave', () => {
+                            emojiBtn.style.background = 'none';
+                            emojiBtn.style.transform = 'scale(1)';
+                            emojiBtn.style.boxShadow = 'none';
+                        });
+                    } else {
+                        // Free/unlocked emoji
+                        emojiBtn.innerHTML = `
+                            ${emoji}
+                            ${isFree ? '<i class="fas fa-gift" style="position: absolute; top: 1px; right: 1px; font-size: 6px; color: #4CAF50;"></i>' : ''}
+                        `;
+                        
+                        // Normal click handler - add to message
+                        emojiBtn.addEventListener('click', () => {
+                            const messageInput = document.getElementById('messageInput');
+                            if (messageInput) {
+                                messageInput.value += emoji + ' ';
+                                messageInput.focus();
+                            }
+                            hideEmojiPicker();
+                            emojiPickerOpen = false;
+                            const statusText = isFree ? `${emoji} Free emoji added!` : `${emoji} Premium emoji added!`;
+                            showMessageBox(statusText, 'success');
+                        });
+                        
+                        // Normal hover effect for accessible emojis
+                        emojiBtn.addEventListener('mouseenter', () => {
+                            emojiBtn.style.background = isFree ? '#4CAF50' : 'var(--accent-color)';
+                            emojiBtn.style.transform = 'scale(1.2)';
+                        });
+                        emojiBtn.addEventListener('mouseleave', () => {
+                            emojiBtn.style.background = 'none';
+                            emojiBtn.style.transform = 'scale(1)';
+                        });
+                    }
+                    
                     grid.appendChild(emojiBtn);
                 });
+                
+                // Add category status indicator
+                const statusIndicator = document.createElement('div');
+                const stickerKey = categoryMapping[categoryName];
+                const isUnlocked = userEntitlements.packs && userEntitlements.packs.includes(stickerKey);
+                
+                statusIndicator.innerHTML = `
+                    <div style="
+                        text-align: center;
+                        padding: 8px;
+                        margin: 10px;
+                        border-radius: 8px;
+                        font-size: 12px;
+                        background: ${isUnlocked ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 46, 146, 0.2)'};
+                        color: ${isUnlocked ? '#4CAF50' : '#ff2e92'};
+                        border: 1px solid ${isUnlocked ? '#4CAF50' : '#ff2e92'};
+                    ">
+                        ${isUnlocked ? '🔓 Premium Unlocked by JCHAT' : '🔒 3 Free • Rest Premium'}
+                    </div>
+                `;
+                grid.appendChild(statusIndicator);
             }
 
             function hideEmojiPicker() {
@@ -3418,6 +3518,149 @@
          let currentUser = null;
          let currentUserProfileData = null;
          let partnerId = null;
+         
+         // JCHAT Stickers Entitlements System
+         let userEntitlements = { packs: [] };
+         
+         // Category mapping from Chat.html categories to JCHAT Developer Center sticker keys
+         const categoryMapping = {
+             'Smileys & Emotions': 'stickers:smileys',
+             'Love & Hearts': 'stickers:hearts', 
+             'Hands & Gestures': 'stickers:hands',
+             'Animals & Nature': 'stickers:animals',
+             'Food & Drink': 'stickers:food',
+             'Activities & Sports': 'stickers:sports',
+             'Travel & Places': 'stickers:travel',
+             'Music & Arts': 'stickers:music',
+             'Objects & Symbols': 'stickers:objects',
+             'Celebrations': 'stickers:party',
+             'Weather & Nature': 'stickers:nature',
+             'People & Body': 'stickers:faces2',
+             'Medical & Health': 'stickers:misc',
+             'Technology': 'stickers:misc',
+             'Time & Calendar': 'stickers:misc',
+             'Money & Business': 'stickers:misc',
+             'Clothing & Fashion': 'stickers:misc',
+             'Buildings & Architecture': 'stickers:misc',
+             'Plants & Flowers': 'stickers:nature',
+             'Fantasy & Magic': 'stickers:misc',
+             'Tools & Equipment': 'stickers:objects',
+             'Communication': 'stickers:objects',
+             'Safety & Security': 'stickers:misc',
+             'Nature & Environment': 'stickers:nature'
+         };
+         
+         // Load user entitlements set by JCHAT team via Developer Center
+         async function loadUserEntitlements(userId) {
+             try {
+                 const entitlementsRef = doc(db, 'artifacts', appId, 'users', userId, 'profiles', 'user_entitlements');
+                 const entitlementsSnap = await getDoc(entitlementsRef);
+                 userEntitlements = entitlementsSnap.exists() ? entitlementsSnap.data() : { packs: [] };
+                 console.log('JCHAT_DEBUG: Loaded user sticker entitlements:', userEntitlements);
+             } catch (error) {
+                 console.error('JCHAT_ERROR: Error loading sticker entitlements:', error);
+                 userEntitlements = { packs: [] };
+             }
+         }
+         
+         // Check if user has access to specific emoji (first 3 free, rest require JCHAT unlock)
+         function hasEmojiAccess(categoryName, emojiIndex) {
+             const stickerKey = categoryMapping[categoryName];
+             
+             // First 3 emojis are always free
+             if (emojiIndex < 3) return true;
+             
+             // Check if JCHAT team has unlocked this category for user
+             return userEntitlements.packs && userEntitlements.packs.includes(stickerKey);
+         }
+         
+         // Show premium upgrade modal when user clicks locked emoji
+         function showPremiumUpgradeModal(categoryName) {
+             const stickerKey = categoryMapping[categoryName];
+             const modal = document.createElement('div');
+             modal.style.cssText = `
+                 position: fixed;
+                 top: 0;
+                 left: 0;
+                 width: 100%;
+                 height: 100%;
+                 background: rgba(0,0,0,0.8);
+                 display: flex;
+                 align-items: center;
+                 justify-content: center;
+                 z-index: 10000;
+                 animation: fadeIn 0.3s ease;
+             `;
+             
+             modal.innerHTML = `
+                 <div style="
+                     background: var(--card-background);
+                     border: 1px solid var(--border-light);
+                     border-radius: 15px;
+                     padding: 30px;
+                     text-align: center;
+                     max-width: 400px;
+                     color: var(--white);
+                     animation: slideIn 0.3s ease;
+                 ">
+                     <i class="fas fa-lock" style="font-size: 48px; color: #ff2e92; margin-bottom: 20px;"></i>
+                     <h3 style="margin: 0 0 15px 0; color: var(--white);">Premium Category Locked</h3>
+                     <p style="margin: 10px 0; color: var(--text-light);">The <strong>${categoryName}</strong> category requires premium unlock from JCHAT team.</p>
+                     <div style="background: var(--input-background); padding: 15px; border-radius: 8px; margin: 15px 0;">
+                         <p style="margin: 5px 0; color: #4CAF50;"><strong>✅ Free:</strong> First 3 emojis per category</p>
+                         <p style="margin: 5px 0; color: #ff2e92;"><strong>🔓 Premium:</strong> All ${categoryName} emojis</p>
+                     </div>
+                     <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                         <button onclick="this.closest('.premium-modal').remove()" style="
+                             background: var(--input-background);
+                             color: var(--white);
+                             border: 1px solid var(--border-light);
+                             padding: 12px 20px;
+                             border-radius: 8px;
+                             cursor: pointer;
+                             transition: all 0.2s ease;
+                         ">Close</button>
+                         <button onclick="window.open('/premium_subscriptions.html', '_blank')" style="
+                             background: linear-gradient(90deg, var(--blue), var(--pink));
+                             color: white;
+                             border: none;
+                             padding: 12px 20px;
+                             border-radius: 8px;
+                             cursor: pointer;
+                             transition: all 0.2s ease;
+                         ">Request Unlock</button>
+                     </div>
+                 </div>
+             `;
+             
+             modal.className = 'premium-modal';
+             document.body.appendChild(modal);
+             
+             // Auto-remove after 8 seconds
+             setTimeout(() => {
+                 if (modal.parentNode) {
+                     modal.style.opacity = '0';
+                     setTimeout(() => modal.remove(), 300);
+                 }
+             }, 8000);
+             
+             // Click outside to close
+             modal.addEventListener('click', (e) => {
+                 if (e.target === modal) {
+                     modal.remove();
+                 }
+             });
+         }
+         
+         // Refresh emoji picker when entitlements change
+         function refreshEmojiPicker() {
+             const emojiPicker = document.getElementById('emojiPicker');
+             if (emojiPicker && emojiPicker.style.display !== 'none') {
+                 // Re-render with updated entitlements
+                 hideEmojiPicker();
+                 setTimeout(() => showEmojiPicker(), 100);
+             }
+         }
          let partnerProfileData = null;
          let unsubscribeMessages = null;
          let notificationSoundEnabled = true;
@@ -5700,6 +5943,9 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  currentUser = user;
                  isAuthReady = true; // Set authentication as ready
                  
+                 // Load user sticker entitlements set by JCHAT team
+                 await loadUserEntitlements(user.uid);
+                 
                  // Fetch and display header profile
                  await fetchAndDisplayHeaderProfile(user);
                  
@@ -5742,8 +5988,9 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  // Set the user as signed out in the database
                  await setUserSignedOut();
                  
-                 // Reset current user
+                 // Reset current user and entitlements
                  currentUser = null;
+                 userEntitlements = { packs: [] };
                  isAuthReady = false;
                  
                  // Clean up call resources
