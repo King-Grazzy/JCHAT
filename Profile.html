@@ -501,84 +501,7 @@
 
 
 
-        .profile-pic-upload-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            border: 2px solid rgba(255, 46, 146, 0.2);
-            backdrop-filter: blur(10px);
-        }
 
-        .profile-pic-upload-wrapper img,
-        .profile-pic-upload-wrapper i {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255, 46, 146, 0.3);
-            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.2);
-        }
-
-        .profile-pic-upload-wrapper i {
-            font-size: 2.5rem;
-            color: var(--pink);
-            background: linear-gradient(135deg, var(--pink), var(--blue));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .upload-btn {
-            background: linear-gradient(135deg, var(--pink), var(--blue));
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.3);
-        }
-
-        .upload-btn:hover {
-            box-shadow: 0 6px 20px rgba(255, 46, 146, 0.5);
-        }
-
-        .user-save-btn {
-            width: 100%;
-            background: linear-gradient(135deg, var(--pink), var(--blue));
-            color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 16px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            margin-top: 20px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 
-                0 8px 25px rgba(255, 46, 146, 0.3),
-                0 8px 25px rgba(0, 213, 255, 0.3);
-        }
-
-        .user-save-btn:hover {
-            box-shadow: 
-                0 12px 35px rgba(255, 46, 146, 0.5),
-                0 12px 35px rgba(0, 213, 255, 0.5);
-        }
-
-        .user-save-btn i {
-            margin-right: 10px;
-            font-size: 1.2rem;
-        }
 
         /* Form help text and status */
         .form-help-text {
@@ -7620,10 +7543,7 @@
                     if (profileUsername) profileUsername.textContent = displayedUserProfileData.username || "JCHAT User"; // Null check
                     const usernameInitial = (displayedUserProfileData.username || "J").charAt(0).toUpperCase();
 
-                    // Populate header form with profile data if it's the current user's profile
-                    if (isCurrentUserProfile) {
-                        populateHeaderUserForm();
-                    }
+
 
                     // Profile Picture
                     if (profilePagePic && profilePageAvatarIcon) { // Null check
@@ -8336,56 +8256,7 @@
             // Profile Edit
             if (saveProfileChanges) saveProfileChanges.addEventListener('click', handleSaveProfileChanges); // Null check
 
-            // Header user form event listeners
-            const headerSaveProfileBtn = document.getElementById('headerSaveProfileBtn');
-            const headerProfilePicUpload = document.getElementById('headerProfilePicUpload');
 
-            if (headerSaveProfileBtn) {
-                headerSaveProfileBtn.addEventListener('click', saveHeaderProfileData);
-            }
-
-            if (headerProfilePicUpload) {
-                headerProfilePicUpload.addEventListener('change', async (event) => {
-                    const file = event.target.files[0];
-                    if (file) {
-                        try {
-                            showMessageBox("Uploading profile picture...", 'loading', true);
-                            
-                            // Upload to Firebase Storage
-                            const storageRef = ref(storage, `profile-pictures/${currentUser.uid}/${Date.now()}_${file.name}`);
-                            const uploadResult = await uploadBytes(storageRef, file);
-                            const downloadURL = await getDownloadURL(uploadResult.ref);
-                            
-                            // Update profile with new picture URL
-                            const privateProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
-                            await updateDoc(privateProfileDocRef, {
-                                profilePicId: downloadURL,
-                                updatedAt: serverTimestamp()
-                            });
-                            
-                            // Update local data
-                            if (currentUserProfileData) {
-                                currentUserProfileData.profilePicId = downloadURL;
-                            }
-                            
-                            // Update preview
-                            const headerProfilePicPreview = document.getElementById('headerProfilePicPreview');
-                            const headerProfilePicIcon = document.getElementById('headerProfilePicIcon');
-                            if (headerProfilePicPreview && headerProfilePicIcon) {
-                                headerProfilePicPreview.src = downloadURL;
-                                headerProfilePicPreview.style.display = 'block';
-                                headerProfilePicIcon.style.display = 'none';
-                            }
-                            
-                            showMessageBox("Profile picture updated successfully!", 'success');
-                            
-                        } catch (error) {
-                            console.error("JCHAT_ERROR: Error uploading profile picture:", error);
-                            showMessageBox(`Failed to upload picture: ${error.message}`, 'error');
-                        }
-                    }
-                });
-            }
 
             // NEW: User ID Copy Button
             if (copyUserIdBtn) copyUserIdBtn.addEventListener('click', handleCopyUserId); // Null check
