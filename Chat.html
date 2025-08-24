@@ -2390,17 +2390,17 @@
                      }
                      
                                           // Use settings for recording duration limit
-                     const MAX_RECORDING_DURATION = voiceNoteSettings.maxDuration;
+                     const MAX_RECORDING_DURATION = JChatAV.voiceNotes.settings.maxDuration;
                      
                      // Request microphone permission with settings
                      const audioConstraints = {
-                         echoCancellation: voiceNoteSettings.echoCancellation,
-                         noiseSuppression: voiceNoteSettings.noiseReduction,
+                         echoCancellation: true, // Use modern settings
+                         noiseSuppression: true,
                          autoGainControl: true
                      };
                      
                      // Set sample rate based on quality setting
-                     switch (voiceNoteSettings.audioQuality) {
+                     switch (JChatAV.voiceNotes.settings.quality) {
                          case 'low':
                              audioConstraints.sampleRate = 22050;
                              break;
@@ -2563,13 +2563,8 @@
                                          // Show success message
                      showMessageBox(`✅ Voice note recorded (${duration})`, 'success');
                      
-                     // Send voice note (auto-send if enabled)
-                     if (voiceNoteSettings.autoSend) {
-                         await sendVoiceNote(voiceNoteData);
-                     } else {
-                         // Show send confirmation dialog
-                         showVoiceNoteSendDialog(voiceNoteData);
-                     }
+                     // Send voice note directly (new implementation always sends)
+                     await this.sendVoiceNote(voiceData);
                     
                     // Reset recording state
                     voiceAudioChunks = [];
@@ -2715,24 +2710,16 @@
              }
 
          /**
-          * Voice Note Settings
+          * Legacy Voice Note Settings - Replaced by JChatAV.voiceNotes.settings
+          * Keeping minimal compatibility layer
           */
-         let voiceNoteSettings = {
-                 maxDuration: 5 * 60 * 1000, // 5 minutes
-                 audioQuality: 'high', // 'low', 'medium', 'high'
-                 autoSend: false, // Auto-send after recording
-                 showWaveform: true, // Show waveform visualization
-                 noiseReduction: true, // Enable noise reduction
-                 echoCancellation: true // Enable echo cancellation
-             };
+         let voiceNoteSettings = JChatAV.voiceNotes.settings; // Point to new settings
              
-         // Make voice note settings globally accessible
+         // Legacy compatibility
          window.voiceNoteSettings = voiceNoteSettings;
 
-         // Voice note settings button
-         document.getElementById('voiceNoteSettingsBtn').addEventListener('click', () => {
-             showVoiceNoteSettings();
-         });
+         // Voice note settings button - Removed in new implementation
+         // Old settings button no longer exists
 
          /**
           * Show voice note settings panel
@@ -5351,8 +5338,8 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          window.hideCallInterface = hideCallInterface;
          window.switchCamera = switchCamera;
 
-         // Make voice note functions globally accessible
-         window.playVoiceNote = playVoiceNote;
+         // Legacy voice note functions - most replaced by new implementation
+         // window.playVoiceNote = playVoiceNote; // Now handled by new system above
          window.stopVoiceNote = stopVoiceNote;
          window.stopAllVoiceNotes = stopAllVoiceNotes;
          window.createVoiceNoteMessage = createVoiceNoteMessage;
@@ -6376,9 +6363,10 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          }
 
          /**
-          * Play voice note
+          * Play voice note - Legacy function (replaced by new implementation above)
+          * Keeping for backward compatibility but using new system
           */
-         function playVoiceNote(messageId, base64Audio) {
+         function playVoiceNoteLegacy(messageId, base64Audio) {
              try {
                  // Stop any currently playing audio
                  stopAllVoiceNotes();
