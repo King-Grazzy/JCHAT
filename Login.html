@@ -1573,7 +1573,11 @@
 
         // Enhanced Google OAuth Configuration
         const GOOGLE_CLIENT_ID = '328479683167-kcpfmo292u1lqkldem38tl34totg9tau.apps.googleusercontent.com';
-        const GOOGLE_REDIRECT_URI = 'https://jchathub.netlify.app/auth/google/callback';
+        
+        // Validate Google OAuth configuration
+        if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === '') {
+            console.error('JCHAT_ERROR: Google Client ID is not configured');
+        }
         
         // Configure Google OAuth provider with enhanced scopes
         googleProvider.addScope('profile');
@@ -1581,6 +1585,9 @@
         googleProvider.setCustomParameters({
             prompt: 'select_account'
         });
+        
+        // Note: Firebase automatically uses the client ID from your Firebase project configuration
+        // The GOOGLE_CLIENT_ID constant is kept for reference and validation
 
         // GitHub OAuth Configuration
         const GITHUB_CLIENT_ID = 'Ov23liVhJtsmAG4DZOOH';
@@ -2055,6 +2062,9 @@
 
             try {
                 console.log('JCHAT_DEBUG: Starting Google authentication...', type);
+                console.log('JCHAT_DEBUG: Google provider config:', googleProvider);
+                console.log('JCHAT_DEBUG: Firebase auth config:', auth);
+                
                 const result = await signInWithPopup(auth, googleProvider);
                 const user = result.user;
 
@@ -2165,6 +2175,13 @@
 
             } catch (error) {
                 console.error("JCHAT_ERROR: Google Auth Error:", error);
+                console.error("JCHAT_ERROR: Error details:", {
+                    code: error.code,
+                    message: error.message,
+                    email: error.email,
+                    credential: error.credential
+                });
+                
                 let errorMessage = "Google sign-in failed. Please try again.";
                 if (error.code === 'auth/popup-closed-by-user') {
                     errorMessage = "❌ Google sign-in window was closed.";
@@ -2174,6 +2191,10 @@
                     errorMessage = "⚠️ An account with this email already exists using different credentials.";
                 } else if (error.code === 'auth/popup-blocked') {
                     errorMessage = "🚫 Pop-up was blocked. Please allow pop-ups and try again.";
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    errorMessage = "🚫 This domain is not authorized for Google sign-in. Please contact support.";
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    errorMessage = "🚫 Google sign-in is not enabled for this app. Please contact support.";
                 }
                 showMessageBox(errorMessage, "error");
             } finally {
