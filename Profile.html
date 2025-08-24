@@ -225,10 +225,7 @@
         /* Enhanced Touch-Friendly Scrolling */
         html {
             scroll-behavior: smooth;
-            overflow-x: auto; /* Allow horizontal scroll when needed */
-            overflow-y: auto; /* Allow vertical scroll when needed */
             -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
-            scroll-snap-type: y proximity; /* Enable scroll snapping for better control */
         }
 
         body {
@@ -239,9 +236,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-x: auto; /* Allow horizontal scroll when needed */
-            overflow-y: auto; /* Allow vertical scroll when needed */
-            -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
             padding-bottom: 0px; /* Adjusted: Removed nav bar and toggle button */
             background-color: var(--background-main);
             background-image: radial-gradient(circle at top left, var(--background-gradient-1), transparent 100px),
@@ -735,7 +729,6 @@
             gap: 20px;
             align-items: center;
             overflow: visible; /* Allow content to overflow for proper display */
-            -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
         }
         /* Enhanced scrollbar styling for better touch interaction */
         ::-webkit-scrollbar {
@@ -767,7 +760,6 @@
         .wallet-guide-section {
             touch-action: pan-y; /* Enable vertical panning */
             overscroll-behavior: contain; /* Prevent overscroll bounce */
-            -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
         }
 
         /* Enhanced Profile Section (adapted from original Profile.html and settings-section) */
@@ -789,7 +781,6 @@
             position: relative;
             transition: all 0.3s ease;
             overflow: visible; /* Allow content to overflow for proper display */
-            scroll-margin-top: 20px; /* Better scroll snapping */
         }
 
         .profile-section::before {
@@ -3647,8 +3638,6 @@
         @media (max-width: 768px) {
             .content-wrapper {
                 padding: 15px;
-                -webkit-overflow-scrolling: touch; /* Ensure touch scrolling on mobile */
-                scroll-snap-type: y proximity; /* Enable scroll snapping on mobile */
             }
             
             .profile-section,
@@ -3659,8 +3648,6 @@
                 width: 95%;
                 padding: 1.5rem;
                 margin: 15px auto;
-                -webkit-overflow-scrolling: touch; /* Ensure touch scrolling on mobile */
-                scroll-snap-type: y proximity; /* Enable scroll snapping on mobile */
             }
 
             /* Mobile-specific touch improvements */
@@ -3676,7 +3663,7 @@
         /* Additional touch improvements for very small screens */
         @media (max-width: 480px) {
             .content-wrapper {
-                scroll-snap-type: y mandatory; /* Force scroll snapping on very small screens */
+                /* Removed forced scroll snapping for better natural scrolling */
             }
             
             .profile-section,
@@ -3684,7 +3671,7 @@
             .recent-activity-section,
             .customization-section,
             .wallet-guide-section {
-                scroll-snap-type: y mandatory; /* Force scroll snapping on very small screens */
+                /* Removed forced scroll snapping for better natural scrolling */
             }
 
 
@@ -8218,7 +8205,7 @@
                             updateScrollToggleState();
                         }
                     }
-                }, 100);
+                }, 150); // Increased timeout for better performance
             }, { passive: true });
 
             // Initialize button state
