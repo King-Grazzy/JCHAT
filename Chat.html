@@ -4053,11 +4053,14 @@
 
      <!-- FULL FIREBASE AND CLOUDINARY INTEGRATION -->
      <script type="module">
-         // Import Firebase modules
-         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-         import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-         import { getFirestore, doc, getDoc, setDoc, collection, query, onSnapshot, getDocs, addDoc, serverTimestamp, orderBy, limit, updateDoc, deleteDoc, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+         // Error handling for strict mode issues
+         console.log('JCHAT_DEBUG: Starting module initialization...');
+         try {
+             // Import Firebase modules
+             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+             import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+             import { getFirestore, doc, getDoc, setDoc, collection, query, onSnapshot, getDocs, addDoc, serverTimestamp, orderBy, limit, updateDoc, deleteDoc, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+             import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
          // --- Firebase & Canvas Environment Configuration ---
          const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -9236,6 +9239,52 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              
              console.log('JCHAT_DEBUG: === END FRIENDS DATA DEBUG ===');
          };
+         
+         // Error handling for strict mode and other issues
+         } catch (error) {
+             console.error('JCHAT_ERROR: Module loading failed:', error);
+             console.error('JCHAT_ERROR: Error details:', {
+                 name: error.name,
+                 message: error.message,
+                 stack: error.stack,
+                 lineNumber: error.lineNumber,
+                 columnNumber: error.columnNumber
+             });
+             
+             // Show user-friendly error message
+             if (typeof showMessageBox === 'function') {
+                 showMessageBox('Failed to load chat functionality. Please refresh the page.', 'error');
+             } else {
+                 alert('Failed to load chat functionality. Please refresh the page.');
+             }
+         }
+         
+         // Global error handler for strict mode and other runtime errors
+         window.addEventListener('error', function(event) {
+             console.error('JCHAT_ERROR: Global error caught:', {
+                 message: event.message,
+                 filename: event.filename,
+                 lineno: event.lineno,
+                 colno: event.colno,
+                 error: event.error
+             });
+             
+             // Check if it's a strict mode error
+             if (event.message && event.message.includes('strict mode reserved word')) {
+                 console.error('JCHAT_ERROR: Strict mode reserved word error detected!');
+                 console.error('JCHAT_ERROR: This usually indicates a syntax issue or undeclared variable.');
+                 
+                 // Try to provide more context
+                 if (event.error && event.error.stack) {
+                     console.error('JCHAT_ERROR: Error stack:', event.error.stack);
+                 }
+             }
+         });
+         
+         // Unhandled promise rejection handler
+         window.addEventListener('unhandledrejection', function(event) {
+             console.error('JCHAT_ERROR: Unhandled promise rejection:', event.reason);
+         });
      </script>
 
     <!-- Select Friend Modal -->
