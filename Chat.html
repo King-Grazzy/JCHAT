@@ -3573,19 +3573,19 @@
                 const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
                 const friendsSnapshot = await getDocs(publicFriendsRef);
                 
-                const friendIds = new Set();
+                const friendIdsSet = new Set();
                 
                 // Process friendship records to find current user's friends (exact Find_Friends.html logic)
                 friendsSnapshot.forEach(docSnap => {
                     const friendData = docSnap.data();
                     if (friendData.user1Id === currentUser.uid) {
-                        friendIds.add(friendData.user2Id);
+                        friendIdsSet.add(friendData.user2Id);
                     } else if (friendData.user2Id === currentUser.uid) {
-                        friendIds.add(friendData.user1Id);
+                        friendIdsSet.add(friendData.user1Id);
                     }
                 });
 
-                if (friendIds.size === 0) {
+                if (friendIdsSet.size === 0) {
                     if (loadingFriendsModal) loadingFriendsModal.style.display = 'none';
                     if (noFriendsModal) {
                         noFriendsModal.style.display = 'block';
@@ -3597,7 +3597,7 @@
 
                 // Fetch friend profile data from public users collection (exact Find_Friends.html logic)
                 const friendsData = [];
-                for (const friendId of friendIds) {
+                for (const friendId of friendIdsSet) {
                     try {
                         const publicProfileDocRef = doc(db, "artifacts", appId, "public", "data", "users", friendId);
                         const publicProfileSnap = await getDoc(publicProfileDocRef);
@@ -3612,8 +3612,8 @@
                 allFriendsData = friendsData; // Store for filtering
                 
                 // Set up presence listeners for all friends
-                const friendIds = friendsData.map(friend => friend.userId);
-                setupFriendsPresenceListeners(friendIds);
+                const allFriendIds = friendsData.map(friend => friend.userId);
+                setupFriendsPresenceListeners(allFriendIds);
 
                 renderSelectableFriends(searchTerm);
 
@@ -3760,8 +3760,8 @@
                 // If the friend modal is open, re-render the friend list
                 if (selectFriendModal.classList.contains('active')) {
                     // Set up presence listeners for the updated friends list
-                    const friendIds = allFriendsData.map(friend => friend.userId);
-                    setupFriendsPresenceListeners(friendIds);
+                    const updatedFriendIds = allFriendsData.map(friend => friend.userId);
+                    setupFriendsPresenceListeners(updatedFriendIds);
                     renderSelectableFriends(friendSearchInput.value);
                 }
             }, (error) => {
