@@ -6962,9 +6962,9 @@
                     // Generate and copy profile share URL
                     const shareUrl = `${window.location.origin}/Profile.html?userId=${currentUser?.uid || displayedUserId}`;
                     navigator.clipboard.writeText(shareUrl).then(() => {
-                        showMessageBox('Profile URL copied to clipboard!', 'success');
+                        showEnhancedSmartSuccess('Profile URL copied to clipboard!', 'achievement');
                     }).catch(() => {
-                        showMessageBox('Failed to copy URL', 'error');
+                        console.error('Failed to copy URL');
                     });
                     break;
                 case 'download-qr':
@@ -6976,7 +6976,7 @@
                         link.href = qrImg.src;
                         link.click();
                     } else {
-                        showMessageBox('QR code not available yet', 'warning');
+                        console.warn('QR code not available yet');
                     }
                     break;
                 case 'profile-settings':
@@ -7257,22 +7257,22 @@
         async function handleChangeEmail(event) {
             event.preventDefault(); // Prevent form submission
             if (!currentUser || !isAuthReady) {
-                showMessageBox("You must be logged in to change your email.", 'warning');
+                console.warn("You must be logged in to change your email.");
                 return;
             }
 
-            showMessageBox("Updating email...", 'info');
+            console.log("Updating email...");
 
             const newEmail = newEmailInput.value.trim();
             const currentPassword = currentPasswordForEmailInput.value.trim();
 
             if (!newEmail || !currentPassword) {
-                showMessageBox("Please fill in both new email and current password.", 'error');
+                console.error("Please fill in both new email and current password.");
                 return;
             }
 
             if (newEmail === currentUser.email) {
-                showMessageBox("New email is the same as current email.", 'info');
+                console.log("New email is the same as current email.");
                 return;
             }
 
@@ -7317,7 +7317,7 @@
                 } else if (error.code === 'auth/requires-recent-login') {
                     errorMessage = "Please log out and log back in to update your email.";
                 }
-                showMessageBox(`${errorMessage} (${error.message})`, 'error');
+                console.error(`${errorMessage} (${error.message})`);
             } finally {
                 // Email update complete
             }
@@ -7328,28 +7328,28 @@
          */
         async function handleChangePassword() {
             if (!currentUser || !isAuthReady) {
-                showMessageBox("You must be logged in to change your password.", 'warning');
+                console.warn("You must be logged in to change your password.");
                 return;
             }
 
-            showMessageBox("Changing password...", 'info');
+            console.log("Changing password...");
 
             const oldPassword = oldPasswordInput.value.trim();
             const newPassword = newPasswordInput.value.trim();
             const confirmNewPassword = confirmNewPasswordInput.value.trim();
 
             if (!oldPassword || !newPassword || !confirmNewPassword) {
-                showMessageBox("Please fill in all password fields.", 'error');
+                console.error("Please fill in all password fields.");
                 return;
             }
 
             if (newPassword !== confirmNewPassword) {
-                showMessageBox("New password and confirmation do not match.", 'error');
+                console.error("New password and confirmation do not match.");
                 return;
             }
 
             if (newPassword.length < 6) {
-                showMessageBox("New password must be at least 6 characters long.", 'error');
+                console.error("New password must be at least 6 characters long.");
                 return;
             }
 
@@ -7378,7 +7378,7 @@
                 } else if (error.code === 'auth/requires-recent-login') {
                     errorMessage = "Please log out and log back in to update your password.";
                 }
-                showMessageBox(`${errorMessage} (${error.message})`, 'error');
+                console.error(`${errorMessage} (${error.message})`);
             } finally {
                 // Password change complete
             }
