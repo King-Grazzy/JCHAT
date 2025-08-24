@@ -3677,6 +3677,346 @@
 
         }
 
+        /* NEW: User Information Section Styles */
+        .user-info-section {
+            background: var(--card-background);
+            border: 1px solid var(--glass-blue);
+            backdrop-filter: blur(10px) saturate(180%);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .3);
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+            overflow: visible;
+        }
+
+        .user-info-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .user-info-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, .4);
+        }
+
+        .user-info-header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .user-info-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(90deg, var(--blue), var(--pink));
+            margin: 0 0 0.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .user-info-subtitle {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        /* Profile Display Section */
+        .profile-display-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .profile-display-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .profile-display-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .profile-display-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .profile-display-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .display-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .display-label i {
+            color: var(--blue);
+            font-size: 1rem;
+        }
+
+        .display-value {
+            color: var(--white);
+            font-size: 1rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        /* Profile Edit Form */
+        .profile-edit-form {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .edit-form-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--white);
+            margin: 0 0 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-form-title i {
+            color: var(--pink);
+        }
+
+        .edit-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 0.8rem;
+            color: var(--white);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--blue);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 0 3px rgba(0, 213, 255, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .edit-form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+
+        .save-btn,
+        .cancel-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, var(--blue), var(--pink));
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(0, 213, 255, 0.3);
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 213, 255, 0.4);
+        }
+
+        .cancel-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid var(--border-light);
+        }
+
+        .cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* User Info Actions */
+        .user-info-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.3);
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 46, 146, 0.4);
+        }
+
+        .view-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid var(--border-light);
+        }
+
+        .view-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* User Info Toggle Button Specific Styles */
+        .user-info-toggle {
+            background: linear-gradient(135deg, var(--blue), var(--pink));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-info-toggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .user-info-toggle:hover::before {
+            left: 100%;
+        }
+
+        .user-info-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--blue), 0 6px 20px var(--pink);
+        }
+
+        /* Mobile Responsiveness for User Info Section */
+        @media (max-width: 768px) {
+            .user-info-section {
+                width: 95%;
+                padding: 1.5rem;
+                margin: 15px auto;
+            }
+
+            .profile-display-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .edit-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .edit-form-actions,
+            .user-info-actions {
+                flex-direction: column;
+            }
+
+            .action-btn,
+            .save-btn,
+            .cancel-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .user-info-section {
+                width: 98%;
+                padding: 1rem;
+                margin: 10px auto;
+            }
+
+            .user-info-title {
+                font-size: 1.5rem;
+            }
+
+            .profile-display-item {
+                padding: 0.8rem;
+            }
+        }
+
         /* Responsive Adjustments (from Home.html / privacy_settings.html) */
         @media (max-width: 600px) {
             header .header-content-wrapper {
@@ -4169,6 +4509,12 @@
                     <!-- Buttons will be dynamically added/hidden based on owner/viewer -->
                     <!-- Removed Edit Profile Button -->
 
+                    <!-- NEW: User Information Toggle Button -->
+                    <button id="userInfoToggle" class="profile-action-button primary user-info-toggle">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="toggle-text">Show User Info</span>
+                    </button>
+
                     <!-- NEW: Wallet Link -->
 
                     
@@ -4182,6 +4528,132 @@
                     <!-- Removed Add Friend and Message buttons as requested -->
                 </div>
 
+                <!-- NEW: User Information Section -->
+                <div id="userInfoSection" class="user-info-section" style="display: none;">
+                    <div class="user-info-header">
+                        <h3 class="user-info-title">
+                            <i class="fas fa-user-edit"></i>
+                            User Information
+                        </h3>
+                        <p class="user-info-subtitle">Manage your profile details and preferences</p>
+                    </div>
+
+                    <!-- Profile Display Section -->
+                    <div class="profile-display-section">
+                        <div class="profile-display-grid">
+                            <div class="profile-display-item">
+                                <div class="display-label">
+                                    <i class="fas fa-user"></i>
+                                    Display Name
+                                </div>
+                                <div class="display-value" id="displayNameValue">Loading...</div>
+                            </div>
+                            
+                            <div class="profile-display-item">
+                                <div class="display-label">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Location
+                                </div>
+                                <div class="display-value" id="locationValue">Loading...</div>
+                            </div>
+                            
+                            <div class="profile-display-item">
+                                <div class="display-label">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    School
+                                </div>
+                                <div class="display-value" id="schoolValue">Loading...</div>
+                            </div>
+                            
+                            <div class="profile-display-item">
+                                <div class="display-label">
+                                    <i class="fas fa-briefcase"></i>
+                                    Work
+                                </div>
+                                <div class="display-value" id="workValue">Loading...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-display-item full-width">
+                            <div class="display-label">
+                                <i class="fas fa-quote-left"></i>
+                                Bio
+                            </div>
+                            <div class="display-value" id="bioValue">Loading...</div>
+                        </div>
+                        
+                        <div class="profile-display-item full-width">
+                            <div class="display-label">
+                                <i class="fas fa-heart"></i>
+                                Interests
+                            </div>
+                            <div class="display-value" id="interestsValue">Loading...</div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Edit Form -->
+                    <div class="profile-edit-form" id="profileEditForm" style="display: none;">
+                        <h4 class="edit-form-title">
+                            <i class="fas fa-edit"></i>
+                            Edit Profile
+                        </h4>
+                        
+                        <div class="edit-form-grid">
+                            <div class="form-group">
+                                <label for="editDisplayName">Display Name</label>
+                                <input type="text" id="editDisplayName" placeholder="Enter your display name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editLocation">Location</label>
+                                <input type="text" id="editLocation" placeholder="Enter your location">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editSchool">School</label>
+                                <input type="text" id="editSchool" placeholder="Enter your school">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editWork">Work</label>
+                                <input type="text" id="editWork" placeholder="Enter your work">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="editBio">Bio</label>
+                            <textarea id="editBio" rows="3" placeholder="Tell us about yourself..."></textarea>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label for="editInterests">Interests</label>
+                            <textarea id="editInterests" rows="2" placeholder="What are your interests?"></textarea>
+                        </div>
+                        
+                        <div class="edit-form-actions">
+                            <button type="button" id="saveProfileChanges" class="save-btn">
+                                <i class="fas fa-save"></i>
+                                Save Changes
+                            </button>
+                            <button type="button" id="cancelProfileEdit" class="cancel-btn">
+                                <i class="fas fa-times"></i>
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Profile Actions -->
+                    <div class="user-info-actions">
+                        <button id="editProfileBtn" class="action-btn edit-btn">
+                            <i class="fas fa-edit"></i>
+                            Edit Profile
+                        </button>
+                        <button id="viewProfileBtn" class="action-btn view-btn" style="display: none;">
+                            <i class="fas fa-eye"></i>
+                            View Profile
+                        </button>
+                    </div>
+                </div>
 
                     
 
@@ -8212,6 +8684,186 @@
             updateScrollToggleState();
         }
 
+        // --- User Information Toggle Functionality ---
+        function initializeUserInfoToggle() {
+            const userInfoToggle = document.getElementById('userInfoToggle');
+            const userInfoSection = document.getElementById('userInfoSection');
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const viewProfileBtn = document.getElementById('viewProfileBtn');
+            const profileEditForm = document.getElementById('profileEditForm');
+            const saveProfileChanges = document.getElementById('saveProfileChanges');
+            const cancelProfileEdit = document.getElementById('cancelProfileEdit');
+
+            if (!userInfoToggle || !userInfoSection) return;
+
+            let isUserInfoVisible = false;
+            let isEditMode = false;
+
+            // Toggle User Information Section
+            userInfoToggle.addEventListener('click', () => {
+                isUserInfoVisible = !isUserInfoVisible;
+                
+                if (isUserInfoVisible) {
+                    userInfoSection.style.display = 'flex';
+                    userInfoToggle.querySelector('.toggle-text').textContent = 'Hide User Info';
+                    userInfoToggle.innerHTML = '<i class="fas fa-eye-slash"></i><span class="toggle-text">Hide User Info</span>';
+                    
+                    // Load and display user data
+                    loadUserInfoData();
+                } else {
+                    userInfoSection.style.display = 'none';
+                    userInfoToggle.querySelector('.toggle-text').textContent = 'Show User Info';
+                    userInfoToggle.innerHTML = '<i class="fas fa-user-circle"></i><span class="toggle-text">Show User Info</span>';
+                    
+                    // Reset to view mode
+                    if (isEditMode) {
+                        toggleEditMode(false);
+                    }
+                }
+            });
+
+            // Edit Profile Button
+            if (editProfileBtn) {
+                editProfileBtn.addEventListener('click', () => {
+                    toggleEditMode(true);
+                });
+            }
+
+            // View Profile Button
+            if (viewProfileBtn) {
+                viewProfileBtn.addEventListener('click', () => {
+                    toggleEditMode(false);
+                });
+            }
+
+            // Save Profile Changes
+            if (saveProfileChanges) {
+                saveProfileChanges.addEventListener('click', async () => {
+                    await saveUserInfoData();
+                });
+            }
+
+            // Cancel Profile Edit
+            if (cancelProfileEdit) {
+                cancelProfileEdit.addEventListener('click', () => {
+                    toggleEditMode(false);
+                    loadUserInfoData(); // Reload original data
+                });
+            }
+
+            // Toggle between edit and view modes
+            function toggleEditMode(editMode) {
+                isEditMode = editMode;
+                
+                if (editMode) {
+                    profileEditForm.style.display = 'block';
+                    editProfileBtn.style.display = 'none';
+                    viewProfileBtn.style.display = 'inline-flex';
+                    
+                    // Populate form with current data
+                    populateEditForm();
+                } else {
+                    profileEditForm.style.display = 'none';
+                    editProfileBtn.style.display = 'inline-flex';
+                    viewProfileBtn.style.display = 'none';
+                }
+            }
+
+            // Load user information data
+            async function loadUserInfoData() {
+                try {
+                    const user = auth.currentUser;
+                    if (!user) return;
+
+                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        
+                        // Update display values
+                        document.getElementById('displayNameValue').textContent = userData.displayName || 'Not set';
+                        document.getElementById('locationValue').textContent = userData.location || 'Not set';
+                        document.getElementById('schoolValue').textContent = userData.school || 'Not set';
+                        document.getElementById('workValue').textContent = userData.work || 'Not set';
+                        document.getElementById('bioValue').textContent = userData.bio || 'Not set';
+                        document.getElementById('interestsValue').textContent = userData.interests || 'Not set';
+                    }
+                } catch (error) {
+                    console.error('Error loading user info:', error);
+                }
+            }
+
+            // Populate edit form with current data
+            function populateEditForm() {
+                try {
+                    const user = auth.currentUser;
+                    if (!user) return;
+
+                    // Get current display values
+                    const displayName = document.getElementById('displayNameValue').textContent;
+                    const location = document.getElementById('locationValue').textContent;
+                    const school = document.getElementById('schoolValue').textContent;
+                    const work = document.getElementById('workValue').textContent;
+                    const bio = document.getElementById('bioValue').textContent;
+                    const interests = document.getElementById('interestsValue').textContent;
+
+                    // Populate form fields (only if not "Not set")
+                    document.getElementById('editDisplayName').value = displayName !== 'Not set' ? displayName : '';
+                    document.getElementById('editLocation').value = location !== 'Not set' ? location : '';
+                    document.getElementById('editSchool').value = school !== 'Not set' ? school : '';
+                    document.getElementById('editWork').value = work !== 'Not set' ? work : '';
+                    document.getElementById('editBio').value = bio !== 'Not set' ? bio : '';
+                    document.getElementById('editInterests').value = interests !== 'Not set' ? interests : '';
+                } catch (error) {
+                    console.error('Error populating edit form:', error);
+                }
+            }
+
+            // Save user information data
+            async function saveUserInfoData() {
+                try {
+                    const user = auth.currentUser;
+                    if (!user) return;
+
+                    // Get form values
+                    const displayName = document.getElementById('editDisplayName').value.trim();
+                    const location = document.getElementById('editLocation').value.trim();
+                    const school = document.getElementById('editSchool').value.trim();
+                    const work = document.getElementById('editWork').value.trim();
+                    const bio = document.getElementById('editBio').value.trim();
+                    const interests = document.getElementById('editInterests').value.trim();
+
+                    // Update user document
+                    await updateDoc(doc(db, 'users', user.uid), {
+                        displayName: displayName || null,
+                        location: location || null,
+                        school: school || null,
+                        work: work || null,
+                        bio: bio || null,
+                        interests: interests || null,
+                        updatedAt: serverTimestamp()
+                    });
+
+                    // Update display values
+                    document.getElementById('displayNameValue').textContent = displayName || 'Not set';
+                    document.getElementById('locationValue').textContent = location || 'Not set';
+                    document.getElementById('schoolValue').textContent = school || 'Not set';
+                    document.getElementById('workValue').textContent = work || 'Not set';
+                    document.getElementById('bioValue').textContent = bio || 'Not set';
+                    document.getElementById('interestsValue').textContent = interests || 'Not set';
+
+                    // Switch back to view mode
+                    toggleEditMode(false);
+
+                    // Show success message
+                    showMessage('Profile updated successfully!', 'success');
+
+                } catch (error) {
+                    console.error('Error saving user info:', error);
+                    showMessage('Error updating profile. Please try again.', 'error');
+                }
+            }
+        }
+
         // --- Event Listeners (moved to DOMContentLoaded for safety) ---
         document.addEventListener('DOMContentLoaded', () => {
             // Apply theme on load
@@ -8253,6 +8905,9 @@
 
             // Initialize Profile Notifications
             profileNotifications = new ProfileNotifications();
+
+            // NEW: User Information Toggle Functionality
+            initializeUserInfoToggle();
 
             // Account Settings Toggle
             if (toggleAccountSettingsButton) {
