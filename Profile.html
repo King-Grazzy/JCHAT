@@ -6742,7 +6742,7 @@
             }
             catch (error) {
                 console.error("JCHAT_ERROR: Error updating profile picture:", error);
-                showMessageBox(`Failed to update profile picture: ${error.message}`, 'error');
+                console.error(`Failed to update profile picture: ${error.message}`);
             }
             finally {
 
@@ -6764,7 +6764,7 @@
                 }, 1000);
             } catch (error) {
                 console.error("JCHAT_ERROR: Error logging out:", error);
-                showMessageBox("Failed to log out. Please try again.", 'error');
+                console.error("Failed to log out. Please try again.");
             }
         }
 
@@ -6773,11 +6773,11 @@
          */
         async function handleSaveProfileChanges() {
             if (!currentUser || !isAuthReady || displayedUserId !== currentUser.uid) {
-                showMessageBox("You can only edit your own profile.", 'warning');
+                console.warn("You can only edit your own profile.");
                 return;
             }
 
-            showMessageBox("Saving profile...", 'info');
+            console.log("Saving profile...");
 
             const newDisplayName = displayNameInput.value.trim();
             const newBio = bioTextarea.value.trim();
@@ -6789,7 +6789,7 @@
             const newSocialLinks = socialLinksInput.value.trim(); // NEW
 
             if (!newDisplayName) {
-                showMessageBox("Display name cannot be empty.", 'error');
+                console.error("Display name cannot be empty.");
                 return;
             }
 
@@ -6857,7 +6857,7 @@
 
             } catch (error) {
                 console.error("JCHAT_ERROR: Error saving profile changes:", error);
-                showMessageBox(`Failed to save profile: ${error.message}`, 'error');
+                console.error(`Failed to save profile: ${error.message}`);
             } finally {
                 // Profile save complete
             }
@@ -6868,7 +6868,7 @@
          */
         async function handleCopyUserId() {
             if (!userIdText || !userIdText.textContent) {
-                showMessageBox("No User ID to copy.", 'warning');
+                console.warn("No User ID to copy.");
                 return;
             }
 
@@ -6903,7 +6903,7 @@
                     showEnhancedSmartSuccess("User ID copied to clipboard! 📋", 'achievement');
                 } catch (fallbackError) {
                     console.error("JCHAT_ERROR: Fallback copy failed:", fallbackError);
-                    showMessageBox("Failed to copy User ID. Please select and copy manually.", 'error');
+                    console.error("Failed to copy User ID. Please select and copy manually.");
                 }
             }
         }
