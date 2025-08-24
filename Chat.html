@@ -1153,6 +1153,59 @@
             transition: opacity 0.3s ease;
             color: var(--white);
         }
+        
+        /* Call Duration Timer */
+        .call-duration {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--white);
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        /* Call Control Buttons */
+        .call-controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .call-control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--white);
+            font-size: 1.5rem;
+        }
+        
+        .call-control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+        
+        .call-control-btn.active {
+            background: var(--blue);
+            border-color: var(--blue);
+        }
+        
+        .call-control-btn.mute {
+            background: var(--warning-color);
+            border-color: var(--warning-color);
+        }
+        
+        .call-control-btn.speaker.active {
+            background: var(--status-online);
+            border-color: var(--status-online);
+        }
         #callStatusOverlay.active {
             opacity: 1;
             visibility: visible;
@@ -1596,6 +1649,91 @@
                 padding-bottom: 40px; /* Reset padding for no bottom nav */
             }
         }
+
+        /* Share Modal Styles */
+        .share-options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .share-section h4 {
+            color: var(--white);
+            margin-bottom: 15px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+        }
+
+        .friends-list-share {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .share-friend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--input-background);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .share-friend-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .share-friend-item img,
+        .share-friend-item .default-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        .device-share-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+        }
+
+        .device-share-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 15px 10px;
+            background: var(--input-background);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            color: var(--text-color-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .device-share-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .device-share-btn i {
+            font-size: 1.5rem;
+            color: var(--blue);
+        }
+
+        .device-share-btn span {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
     </style>
 <style id="header-overflow-fix">/*header-overflow-fix*/header .header-content-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap}header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;justify-content:flex-end}#profileLink{display:inline-flex;align-items:center;column-gap:8px;row-gap:2px;flex-wrap:wrap;max-width:100%;min-width:0}#profileLink #headerDisplayName{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;flex:0 1 auto}#headerProfilePic,#headerAvatarIcon{flex:0 0 auto}@media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:6px}}</style></head>
 <body class="theme-dark-mode">
@@ -1665,6 +1803,14 @@
                 </div>
             </div>
             <div class="chat-input-area">
+                <!-- Reply Preview -->
+                <div class="reply-preview" id="replyPreview">
+                    <div class="reply-preview-header">
+                        <span id="replyToUsername">Replying to User</span>
+                        <span class="reply-preview-close" onclick="cancelReply()">&times;</span>
+                    </div>
+                    <div class="reply-preview-content" id="replyToContent">Original message content...</div>
+                </div>
                 <div class="chat-actions-top">
                     <input type="file" id="mediaInput" accept="image/*,video/*" style="display: none;">
                     <button id="mediaShareBtn" title="Share Media"><i class="fas fa-image"></i> Media</button>
@@ -1683,6 +1829,65 @@
             </div>
         </div>
     </main>
+
+    <!-- Message Context Menu -->
+    <div id="messageContextMenu" class="message-context-menu">
+        <div class="context-menu-item" onclick="replyToMessage()">
+            <i class="fas fa-reply"></i>
+            <span>Reply</span>
+        </div>
+        <div class="context-menu-item" onclick="shareMessage()">
+            <i class="fas fa-share"></i>
+            <span>Share</span>
+        </div>
+        <div class="context-menu-item" onclick="copyMessage()">
+            <i class="fas fa-copy"></i>
+            <span>Copy</span>
+        </div>
+        <div class="context-menu-item danger" onclick="deleteMessage()">
+            <i class="fas fa-trash"></i>
+            <span>Delete</span>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Share Message</h3>
+            <div class="share-options">
+                <div class="share-section">
+                    <h4>Share to Friends</h4>
+                    <div id="shareFriendsList" class="friends-list-share">
+                        <!-- Friends will be loaded here -->
+                    </div>
+                </div>
+                <div class="share-section">
+                    <h4>Share to Device</h4>
+                    <div class="device-share-options">
+                        <button class="device-share-btn" onclick="shareToSMS()">
+                            <i class="fas fa-sms"></i>
+                            <span>SMS</span>
+                        </button>
+                        <button class="device-share-btn" onclick="shareToEmail()">
+                            <i class="fas fa-envelope"></i>
+                            <span>Email</span>
+                        </button>
+                        <button class="device-share-btn" onclick="shareToOtherApps()">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span>Other Apps</span>
+                        </button>
+                        <button class="device-share-btn" onclick="copyToClipboard(selectedMessageContent)">
+                            <i class="fas fa-clipboard"></i>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button id="closeShareModalBtn" class="cancel-btn">Close</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Custom Message Box -->
     <div id="messageBox"></div>
@@ -1826,6 +2031,12 @@
         let isRecording = false;
         let recordingStartTime;
         let recordingInterval;
+        
+        // Call State Management
+        let callStartTime = null;
+        let callDurationInterval = null;
+        let isSpeakerOn = false;
+        let isMuted = false;
 
         // New global variables for managing unread counts and their listeners
         let unreadMessageCountsByFriendId = {}; // Stores {friendId: count}
@@ -3283,20 +3494,121 @@
          * @param {string} title - The title for the overlay.
          * @param {string} message - The message to display.
          * @param {Array<Object>} buttons - Array of button objects {text, icon, className, onClick}.
+         * @param {boolean} isConnected - Whether the call is connected (shows duration and controls).
          */
-        function showCallStatusOverlay(title, message, buttons) {
+        function showCallStatusOverlay(title, message, buttons, isConnected = false) {
             callStatusTitle.textContent = title;
             callStatusMessage.textContent = message;
             callActions.innerHTML = '';
+            
+            // Add call duration if connected
+            let durationElement = document.querySelector('.call-duration');
+            if (isConnected) {
+                if (!durationElement) {
+                    durationElement = document.createElement('div');
+                    durationElement.className = 'call-duration';
+                    callStatusOverlay.querySelector('.modal-content').insertBefore(durationElement, callActions);
+                }
+                
+                // Start call timer
+                if (!callStartTime) {
+                    callStartTime = Date.now();
+                    updateCallDuration();
+                    callDurationInterval = setInterval(updateCallDuration, 1000);
+                }
+                
+                // Add call controls
+                const controlsContainer = document.createElement('div');
+                controlsContainer.className = 'call-controls';
+                
+                // Mute button
+                const muteBtn = document.createElement('button');
+                muteBtn.className = `call-control-btn mute-btn ${isMuted ? 'mute' : ''}`;
+                muteBtn.innerHTML = `<i class="fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'}"></i>`;
+                muteBtn.title = isMuted ? 'Unmute' : 'Mute';
+                muteBtn.addEventListener('click', toggleMute);
+                controlsContainer.appendChild(muteBtn);
+                
+                // Speaker button
+                const speakerBtn = document.createElement('button');
+                speakerBtn.className = `call-control-btn speaker-btn speaker ${isSpeakerOn ? 'active' : ''}`;
+                speakerBtn.innerHTML = `<i class="fas ${isSpeakerOn ? 'fa-volume-up' : 'fa-volume-down'}"></i>`;
+                speakerBtn.title = isSpeakerOn ? 'Speaker Off' : 'Speaker On';
+                speakerBtn.addEventListener('click', toggleSpeaker);
+                controlsContainer.appendChild(speakerBtn);
+                
+                callActions.appendChild(controlsContainer);
+            } else {
+                if (durationElement) {
+                    durationElement.remove();
+                }
+                // Clear call timer
+                if (callDurationInterval) {
+                    clearInterval(callDurationInterval);
+                    callDurationInterval = null;
+                    callStartTime = null;
+                }
+            }
+            
+            // Add main action buttons
+            const mainButtons = document.createElement('div');
+            mainButtons.className = 'call-actions';
             buttons.forEach(btn => {
                 const buttonElement = document.createElement('button');
                 buttonElement.className = btn.className;
                 buttonElement.innerHTML = `<i class="${btn.icon}"></i>`;
                 buttonElement.title = btn.text;
                 buttonElement.addEventListener('click', btn.onClick);
-                callActions.appendChild(buttonElement);
+                mainButtons.appendChild(buttonElement);
             });
+            callActions.appendChild(mainButtons);
+            
             callStatusOverlay.classList.add('active');
+        }
+        
+        /**
+         * Updates the call duration display.
+         */
+        function updateCallDuration() {
+            if (!callStartTime) return;
+            
+            const elapsed = Math.floor((Date.now() - callStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            const durationElement = document.querySelector('.call-duration');
+            if (durationElement) {
+                durationElement.textContent = timeString;
+            }
+        }
+        
+        /**
+         * Toggles microphone mute state.
+         */
+        function toggleMute() {
+            isMuted = !isMuted;
+            const muteBtn = document.querySelector('.mute-btn');
+            if (muteBtn) {
+                muteBtn.className = `call-control-btn mute-btn ${isMuted ? 'mute' : ''}`;
+                muteBtn.innerHTML = `<i class="fas ${isMuted ? 'fa-microphone-slash' : 'fa-microphone'}"></i>`;
+                muteBtn.title = isMuted ? 'Unmute' : 'Mute';
+            }
+            showMessageBox(isMuted ? 'Microphone muted' : 'Microphone unmuted', 'info');
+        }
+        
+        /**
+         * Toggles speaker on/off.
+         */
+        function toggleSpeaker() {
+            isSpeakerOn = !isSpeakerOn;
+            const speakerBtn = document.querySelector('.speaker-btn');
+            if (speakerBtn) {
+                speakerBtn.className = `call-control-btn speaker-btn speaker ${isSpeakerOn ? 'active' : ''}`;
+                speakerBtn.innerHTML = `<i class="fas ${isSpeakerOn ? 'fa-volume-up' : 'fa-volume-down'}"></i>`;
+                speakerBtn.title = isSpeakerOn ? 'Speaker Off' : 'Speaker On';
+            }
+            showMessageBox(isSpeakerOn ? 'Speaker ON' : 'Speaker OFF', 'info');
         }
 
         /**
@@ -3307,6 +3619,21 @@
             callStatusTitle.textContent = '';
             callStatusMessage.textContent = '';
             callActions.innerHTML = '';
+            
+            // Clear call timer and reset state
+            if (callDurationInterval) {
+                clearInterval(callDurationInterval);
+                callDurationInterval = null;
+            }
+            callStartTime = null;
+            isSpeakerOn = false;
+            isMuted = false;
+            
+            // Remove duration element
+            const durationElement = document.querySelector('.call-duration');
+            if (durationElement) {
+                durationElement.remove();
+            }
         }
 
         /**
@@ -3498,12 +3825,13 @@
                             );
                         }
                     } else if (callData.status === 'accepted') {
-                        // Call accepted, keep overlay active and update UI
+                        // Call accepted, keep overlay active and update UI with duration and controls
                         const connectedPartnerName = (callData.callerId === currentUser.uid) ? callData.receiverUsername : callData.callerUsername;
                         showCallStatusOverlay(
                             `Call Connected`,
                             `with ${connectedPartnerName}`,
-                            [{ text: 'End Call', icon: 'fas fa-phone-slash', className: 'end-call-btn', onClick: () => endCall((callData.callerId === currentUser.uid) ? 'caller_ended' : 'receiver_ended') }]
+                            [{ text: 'End Call', icon: 'fas fa-phone-slash', className: 'end-call-btn', onClick: () => endCall((callData.callerId === currentUser.uid) ? 'caller_ended' : 'receiver_ended') }],
+                            true // isConnected = true to show duration and controls
                         );
                         playNotificationSound('success'); // Play success sound for both parties on connect
                     } else if (callData.status === 'rejected' || callData.status === 'caller_ended' || callData.status === 'receiver_ended' || callData.status === 'no_answer') {
