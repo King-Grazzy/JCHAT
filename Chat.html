@@ -215,6 +215,40 @@
              color: var(--white);
          }
          
+         /* Voice note button states and recording interface */
+         .voice-note.pressing {
+             transform: scale(0.95);
+             background: var(--accent-color) !important;
+             transition: all 0.1s ease;
+         }
+         
+         .voice-note.recording {
+             background: linear-gradient(135deg, #f44336, #d32f2f) !important;
+             animation: pulse 1s infinite;
+             transform: scale(1.1);
+         }
+         
+         .voice-note.locked {
+             background: linear-gradient(135deg, #4CAF50, #8BC34A) !important;
+             animation: pulse 1s infinite;
+             transform: scale(1.1);
+         }
+         
+         .voice-recording-interface {
+             animation: slideUp 0.3s ease;
+         }
+         
+         @keyframes slideUp {
+             from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+             to { transform: translateX(-50%) translateY(0); opacity: 1; }
+         }
+         
+         @keyframes pulse {
+             0% { transform: scale(1); }
+             50% { transform: scale(1.05); }
+             100% { transform: scale(1); }
+         }
+         
          /* Call interface styles */
          .call-interface {
              animation: fadeIn 0.3s ease;
@@ -7638,6 +7672,31 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          }
          
          /**
+          * Global voice recording functions for onclick handlers
+          */
+         function stopVoiceRecording() {
+             const voiceNoteBtn = document.querySelector('#voiceNoteBtn');
+             if (voiceNoteBtn && voiceNoteBtn.stopVoiceRecording) {
+                 voiceNoteBtn.stopVoiceRecording();
+             } else {
+                 // Fallback: find and trigger stop function
+                 const event = new Event('touchend');
+                 voiceNoteBtn.dispatchEvent(event);
+             }
+         }
+         
+         function cancelVoiceRecording() {
+             const voiceNoteBtn = document.querySelector('#voiceNoteBtn');
+             if (voiceNoteBtn && voiceNoteBtn.cancelVoiceRecording) {
+                 voiceNoteBtn.cancelVoiceRecording();
+             } else {
+                 // Fallback: find and trigger cancel function
+                 const event = new Event('touchend');
+                 voiceNoteBtn.dispatchEvent(event);
+             }
+         }
+         
+         /**
           * Play voice note - Legacy function (replaced by new implementation above)
           * Keeping for backward compatibility but using new system
           */
@@ -7779,25 +7838,394 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          }
          // JCHAT Audio/Video Event Listeners
          document.addEventListener('DOMContentLoaded', () => {
-             // Voice note button event listener
+             // Enhanced Voice Note Button with Gesture Controls
              const voiceNoteBtn = document.getElementById('voiceNoteBtn');
              if (voiceNoteBtn) {
-                 voiceNoteBtn.addEventListener('click', async (e) => {
+                 // Remove existing click listener
+                 const newVoiceNoteBtn = voiceNoteBtn.cloneNode(true);
+                 voiceNoteBtn.parentNode.replaceChild(newVoiceNoteBtn, voiceNoteBtn);
+                 
+                 // Voice note recording state
+                 let isRecording = false;
+                 let isLocked = false;
+                 let recordingStartTime = 0;
+                 let recordingTimer = null;
+                 let mediaRecorder = null;
+                 let audioChunks = [];
+                 let touchStartY = 0;
+                 let touchStartX = 0;
+                 let longPressTimer = null;
+                 
+                 // Touch events for gesture controls
+                 newVoiceNoteBtn.addEventListener('touchstart', async (e) => {
                      e.preventDefault();
                      e.stopPropagation();
                      
-                     // Add visual feedback
-                     voiceNoteBtn.classList.add('active');
-                     setTimeout(() => voiceNoteBtn.classList.remove('active'), 200);
+                     touchStartY = e.touches[0].clientY;
+                     touchStartX = e.touches[0].clientX;
                      
-                     if (!jchatVoiceNotes.isRecording) {
-                         // Start recording
-                         await jchatVoiceNotes.startRecording();
-                     } else {
-                         // Stop recording
-                         jchatVoiceNotes.stopRecording();
-                     }
+                     // Start long press timer
+                     longPressTimer = setTimeout(async () => {
+                         if (!isRecording) {
+                             await startVoiceRecording();
+                         }
+                     }, 500);
+                     
+                     // Visual feedback
+                     newVoiceNoteBtn.classList.add('pressing');
                  });
+                 
+                 newVoiceNoteBtn.addEventListener('touchmove', (e) => {
+                     if (!isRecording) return;
+                     
+                     const touchY = e.touches[0].clientY;
+                     const touchX = e.touches[0].clientX;
+                     const deltaY = touchStartY - touchY; // Swipe up = positive
+                     const deltaX = touchStartX - touchX; // Swipe left = positive
+                     
+                     // Check for swipe up (lock recording)
+                     if (deltaY > 100 && !isLocked) {
+                         lockRecording();
+                     }
+                     
+                     // Check for swipe left (cancel recording)
+                     if (deltaX > 100) {
+                         showCancelPrompt();
+                     }
+                     
+                     // Update visual feedback based on gesture
+                     updateGestureFeedback(deltaY, deltaX);
+                 });
+                 
+                 newVoiceNoteBtn.addEventListener('touchend', (e) => {
+                     // Clear long press timer
+                     if (longPressTimer) {
+                         clearTimeout(longPressTimer);
+                         longPressTimer = null;
+                     }
+                     
+                     // Remove pressing state
+                     newVoiceNoteBtn.classList.remove('pressing');
+                     
+                     // If recording and not locked, stop recording
+                     if (isRecording && !isLocked) {
+                         stopVoiceRecording();
+                     }
+                     
+                     // Reset gesture feedback
+                     resetGestureFeedback();
+                 });
+                 
+                 // Mouse events for desktop support
+                 newVoiceNoteBtn.addEventListener('mousedown', async (e) => {
+                     if (e.button !== 0) return; // Left click only
+                     
+                     e.preventDefault();
+                     e.stopPropagation();
+                     
+                     // Start long press timer
+                     longPressTimer = setTimeout(async () => {
+                         if (!isRecording) {
+                             await startVoiceRecording();
+                         }
+                     }, 500);
+                     
+                     newVoiceNoteBtn.classList.add('pressing');
+                 });
+                 
+                 newVoiceNoteBtn.addEventListener('mouseup', () => {
+                     if (longPressTimer) {
+                         clearTimeout(longPressTimer);
+                         longPressTimer = null;
+                     }
+                     
+                     newVoiceNoteBtn.classList.remove('pressing');
+                     
+                     if (isRecording && !isLocked) {
+                         stopVoiceRecording();
+                     }
+                     
+                     resetGestureFeedback();
+                 });
+                 
+                 newVoiceNoteBtn.addEventListener('mouseleave', () => {
+                     if (longPressTimer) {
+                         clearTimeout(longPressTimer);
+                         longPressTimer = null;
+                     }
+                     
+                     newVoiceNoteBtn.classList.remove('pressing');
+                     resetGestureFeedback();
+                 });
+                 
+                 // Voice recording functions
+                 async function startVoiceRecording() {
+                     try {
+                         // Check permissions
+                         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                         
+                         // Initialize recording
+                         mediaRecorder = new MediaRecorder(stream);
+                         audioChunks = [];
+                         
+                         mediaRecorder.ondataavailable = (event) => {
+                             audioChunks.push(event.data);
+                         };
+                         
+                         mediaRecorder.onstop = () => {
+                             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                             processVoiceNote(audioBlob);
+                             
+                             // Stop all tracks
+                             stream.getTracks().forEach(track => track.stop());
+                         };
+                         
+                         // Start recording
+                         mediaRecorder.start();
+                         isRecording = true;
+                         recordingStartTime = Date.now();
+                         
+                         // Update button state
+                         newVoiceNoteBtn.classList.add('recording');
+                         newVoiceNoteBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                         newVoiceNoteBtn.title = 'Recording... (Swipe up to lock, left to cancel)';
+                         
+                         // Start recording timer
+                         startRecordingTimer();
+                         
+                         // Show recording interface
+                         showRecordingInterface();
+                         
+                         showMessageBox('🎤 Recording started! Swipe up to lock, left to cancel', 'info');
+                         
+                     } catch (error) {
+                         console.error('JCHAT_ERROR: Failed to start voice recording:', error);
+                         showMessageBox('Failed to start recording. Check microphone permissions.', 'error');
+                     }
+                 }
+                 
+                 function lockRecording() {
+                     isLocked = true;
+                     newVoiceNoteBtn.classList.add('locked');
+                     newVoiceNoteBtn.title = 'Recording locked! Swipe left to cancel';
+                     
+                     showMessageBox('🔒 Recording locked! Swipe left to cancel', 'success');
+                     
+                     // Update recording interface
+                     updateRecordingInterface();
+                 }
+                 
+                 function showCancelPrompt() {
+                     const confirmCancel = confirm('Cancel recording?');
+                     if (confirmCancel) {
+                         cancelVoiceRecording();
+                     }
+                 }
+                 
+                 function cancelVoiceRecording() {
+                     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                         mediaRecorder.stop();
+                     }
+                     
+                     isRecording = false;
+                     isLocked = false;
+                     
+                     // Reset button state
+                     newVoiceNoteBtn.classList.remove('recording', 'locked');
+                     newVoiceNoteBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                     newVoiceNoteBtn.title = 'Record Voice Note (Long press to start)';
+                     
+                     // Stop timer
+                     if (recordingTimer) {
+                         clearInterval(recordingTimer);
+                         recordingTimer = null;
+                     }
+                     
+                     // Hide recording interface
+                     hideRecordingInterface();
+                     
+                     showMessageBox('❌ Recording cancelled', 'info');
+                 }
+                 
+                 function stopVoiceRecording() {
+                     if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                         mediaRecorder.stop();
+                     }
+                     
+                     isRecording = false;
+                     isLocked = false;
+                     
+                     // Reset button state
+                     newVoiceNoteBtn.classList.remove('recording', 'locked');
+                     newVoiceNoteBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                     newVoiceNoteBtn.title = 'Record Voice Note (Long press to start)';
+                     
+                     // Stop timer
+                     if (recordingTimer) {
+                         clearInterval(recordingTimer);
+                         recordingTimer = null;
+                     }
+                     
+                     // Hide recording interface
+                     hideRecordingInterface();
+                     
+                     showMessageBox('✅ Recording stopped', 'success');
+                 }
+                 
+                 function startRecordingTimer() {
+                     recordingTimer = setInterval(() => {
+                         const elapsed = Date.now() - recordingStartTime;
+                         const seconds = Math.floor(elapsed / 1000);
+                         const minutes = Math.floor(seconds / 60);
+                         const remainingSeconds = seconds % 60;
+                         
+                         const timeString = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+                         
+                         // Update button title with time
+                         newVoiceNoteBtn.title = `Recording... ${timeString} (Swipe up to lock, left to cancel)`;
+                         
+                         // Update recording interface
+                         updateRecordingInterface();
+                     }, 1000);
+                 }
+                 
+                 function processVoiceNote(audioBlob) {
+                     // Convert to base64 for storage
+                     const reader = new FileReader();
+                     reader.onload = () => {
+                         const base64Audio = reader.result;
+                         
+                         // Send voice note
+                         sendMessage('voice_note', base64Audio);
+                         
+                         showMessageBox('🎤 Voice note sent!', 'success');
+                     };
+                     reader.readAsDataURL(audioBlob);
+                 }
+                 
+                 function showRecordingInterface() {
+                     // Create recording interface
+                     const recordingInterface = document.createElement('div');
+                     recordingInterface.id = 'voiceRecordingInterface';
+                     recordingInterface.className = 'voice-recording-interface';
+                     recordingInterface.style.cssText = `
+                         position: fixed;
+                         bottom: 120px;
+                         left: 50%;
+                         transform: translateX(-50%);
+                         background: var(--card-background);
+                         border: 1px solid var(--border-light);
+                         border-radius: 15px;
+                         padding: 20px;
+                         z-index: 1000;
+                         text-align: center;
+                         color: var(--white);
+                         min-width: 300px;
+                         box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+                     `;
+                     
+                     recordingInterface.innerHTML = `
+                         <div style="margin-bottom: 15px;">
+                             <div style="
+                                 width: 60px;
+                                 height: 60px;
+                                 border-radius: 50%;
+                                 background: linear-gradient(135deg, #f44336, #d32f2f);
+                                 display: flex;
+                                 align-items: center;
+                                 justify-content: center;
+                                 margin: 0 auto 15px;
+                                 font-size: 24px;
+                                 color: white;
+                                 animation: pulse 1s infinite;
+                             ">
+                                 <i class="fas fa-microphone"></i>
+                             </div>
+                             <h3 style="margin: 0 0 10px 0;">Recording Voice Note</h3>
+                             <div id="recordingTime" style="font-size: 1.2rem; color: var(--accent-color);">0:00</div>
+                             <div id="recordingStatus" style="font-size: 0.9rem; color: var(--text-light); margin-top: 10px;">
+                                 Swipe up to lock • Swipe left to cancel
+                             </div>
+                         </div>
+                         <div style="display: flex; gap: 15px; justify-content: center;">
+                             <button onclick="stopVoiceRecording()" style="
+                                 background: linear-gradient(135deg, #4CAF50, #8BC34A);
+                                 color: white;
+                                 border: none;
+                                 border-radius: 10px;
+                                 padding: 12px 20px;
+                                 cursor: pointer;
+                                 font-size: 14px;
+                             ">
+                                 <i class="fas fa-stop"></i> Stop
+                             </button>
+                             <button onclick="cancelVoiceRecording()" style="
+                                 background: linear-gradient(135deg, #f44336, #d32f2f);
+                                 color: white;
+                                 border: none;
+                                 border-radius: 10px;
+                                 padding: 12px 20px;
+                                 cursor: pointer;
+                                 font-size: 14px;
+                             ">
+                                 <i class="fas fa-times"></i> Cancel
+                             </button>
+                         </div>
+                     `;
+                     
+                     document.body.appendChild(recordingInterface);
+                 }
+                 
+                 function updateRecordingInterface() {
+                     const interface = document.getElementById('voiceRecordingInterface');
+                     if (!interface) return;
+                     
+                     const timeElement = interface.querySelector('#recordingTime');
+                     const statusElement = interface.querySelector('#recordingStatus');
+                     
+                     if (timeElement) {
+                         const elapsed = Date.now() - recordingStartTime;
+                         const seconds = Math.floor(elapsed / 1000);
+                         const minutes = Math.floor(seconds / 60);
+                         const remainingSeconds = seconds % 60;
+                         const timeString = `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+                         timeElement.textContent = timeString;
+                     }
+                     
+                     if (statusElement) {
+                         if (isLocked) {
+                             statusElement.innerHTML = '<span style="color: #4CAF50;">🔒 Recording locked</span> • Swipe left to cancel';
+                         } else {
+                             statusElement.innerHTML = 'Swipe up to lock • Swipe left to cancel';
+                         }
+                     }
+                 }
+                 
+                 function hideRecordingInterface() {
+                     const interface = document.getElementById('voiceRecordingInterface');
+                     if (interface) {
+                         interface.remove();
+                     }
+                 }
+                 
+                 function updateGestureFeedback(deltaY, deltaX) {
+                     // Visual feedback for gestures
+                     if (deltaY > 50) {
+                         newVoiceNoteBtn.style.transform = 'scale(1.1)';
+                         newVoiceNoteBtn.style.background = 'linear-gradient(135deg, #4CAF50, #8BC34A)';
+                     } else if (deltaX > 50) {
+                         newVoiceNoteBtn.style.transform = 'scale(1.1)';
+                         newVoiceNoteBtn.style.background = 'linear-gradient(135deg, #f44336, #d32f2f)';
+                     } else {
+                         newVoiceNoteBtn.style.transform = 'scale(1)';
+                         newVoiceNoteBtn.style.background = '';
+                     }
+                 }
+                 
+                 function resetGestureFeedback() {
+                     newVoiceNoteBtn.style.transform = '';
+                     newVoiceNoteBtn.style.background = '';
+                 }
              }
              
              // Voice call button event listener
