@@ -6498,75 +6498,9 @@
                 }
             }
 
-            async function ensureUserMediaLoaded() {
-                if (!userMediaGrid) return;
-                userMediaGrid.innerHTML = '<div style="opacity:0.8;">Loading media...</div>';
-                try {
-                    const filter = mediaFilterSelect ? mediaFilterSelect.value : 'all';
-                    const postsCollectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'posts');
-                    const qy = query(postsCollectionRef, where('authorId', '==', displayedUserId), orderBy('createdAt', 'desc'));
-                    const snap = await getDocs(qy);
-                    userMediaGrid.innerHTML = '';
-                    let count = 0;
-                    snap.forEach(docSnap => {
-                        const p = docSnap.data();
-                        if (p.mediaUrl && p.mediaType && (filter === 'all' || p.mediaType === filter)) {
-                            const cell = document.createElement('div');
-                            cell.style.cssText = 'position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--border-light);background:rgba(255,255,255,0.03);';
-                            if (p.mediaType === 'image') {
-                                cell.innerHTML = `<img src="${getCloudinaryImageUrl(p.mediaUrl,'w_320,h_320,c_fill,q_auto')}" alt="media" style="width:100%;height:100%;object-fit:cover;">`;
-                            } else if (p.mediaType === 'video') {
-                                cell.innerHTML = `<video src="${p.mediaUrl}" style="width:100%;height:100%;object-fit:cover;" controls muted></video>`;
-                            }
-                            userMediaGrid.appendChild(cell);
-                            count++;
-                        }
-                    });
-                    if (count === 0) userMediaGrid.innerHTML = '<div style="opacity:0.8;">No media yet.</div>';
-                    userMediaGrid.dataset.loaded = '1';
-                } catch (e) {
-                    userMediaGrid.innerHTML = '<div style="color:salmon;">Failed to load media.</div>';
-                }
-            }
-            if (mediaFilterSelect) mediaFilterSelect.addEventListener('change', () => { userMediaGrid.dataset.loaded = '0'; ensureUserMediaLoaded(); });
 
-            async function ensureHighlightsLoaded() {
-                if (!highlightsGrid) return;
-                if (highlightsGrid.dataset.loaded === '1') return;
-                highlightsGrid.innerHTML = '<div style="opacity:0.8;">Loading highlights...</div>';
-                try {
-                    const ref = collection(db, 'artifacts', appId, 'users', displayedUserId, 'highlights');
-                    const snap = await getDocs(ref);
-                    highlightsGrid.innerHTML = '';
-                    if (snap.empty) {
-                        highlightsGrid.innerHTML = '<div style="opacity:0.8;">No highlights yet.</div>';
-                    } else {
-                        snap.forEach(d => {
-                            const h = d.data() || {};
-                            const card = document.createElement('div');
-                            card.style.cssText = 'border:1px solid var(--border-light);border-radius:12px;overflow:hidden;background:rgba(255,255,255,0.03);';
-                            const cover = h.coverPicId ? `<img src="${getCloudinaryImageUrl(h.coverPicId,'w_600,h_240,c_fill,q_auto')}" alt="cover" style="width:100%;height:140px;object-fit:cover;">` : '';
-                            card.innerHTML = `${cover}<div style="padding:10px;"><div style="font-weight:600;">${h.title || 'Untitled'}</div><div style="opacity:0.8;">${h.description || ''}</div></div>`;
-                            highlightsGrid.appendChild(card);
-                        });
-                    }
-                    highlightsGrid.dataset.loaded = '1';
-                } catch (e) {
-                    highlightsGrid.innerHTML = '<div style="color:salmon;">Failed to load highlights.</div>';
-                }
-            }
-            if (addHighlightBtn) addHighlightBtn.addEventListener('click', async () => {
-                if (!currentUser || displayedUserId !== currentUser.uid) { showMessageBox('Only the owner can add highlights.', 'warning'); return; }
-                const title = prompt('Title for highlight?');
-                if (!title) return;
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'highlights'), { title, createdAt: serverTimestamp() });
-                    highlightsGrid.dataset.loaded = '0';
-                    ensureHighlightsLoaded();
-                } catch (e) {
-                    showMessageBox('Failed to add highlight.', 'error');
-                }
-            });
+
+
 
             async function ensureSavedLoaded() {
                 if (!savedPostsList || !savedInspirationsList) return;
@@ -6614,10 +6548,7 @@
                 }
             }
 
-            function ensureActivityLoaded() {
-                if (!recentActivitySection) return;
-                recentActivitySection.style.display = 'block';
-            }
+
             // Cover upload handling (owner only)
             if (profileCoverUploadInput) {
                 let originalImage = null;
@@ -9277,85 +9208,7 @@
             }
         }
 
-        /**
-         * Fetches and displays recent activity logs for the current user.
-         * For non-owners, it would only show public activity if logged.
-         */
-        async function fetchAndDisplayRecentActivity() {
-            if (!recentActivitySection || !recentActivityList || !noActivityMessage) return;
 
-            if (displayedUserId !== currentUser.uid) { // Only show for the owner of the profile
-                recentActivitySection.style.display = 'none';
-                return;
-            }
-            recentActivitySection.style.display = 'block';
-
-            recentActivityList.innerHTML = ''; // Clear previous
-            noActivityMessage.style.display = 'block'; // Assume no activity initially
-
-            try {
-                const activityLogsRef = collection(db, "artifacts", appId, "users", currentUser.uid, "activity_logs");
-                // Fetch latest 5 activities
-                const q = query(activityLogsRef, orderBy("timestamp", "desc")); // Order by timestamp
-                const querySnapshot = await getDocs(q); // Use getDocs for one-time fetch
-
-                if (querySnapshot.empty) {
-                    noActivityMessage.style.display = 'block';
-                } else {
-                    noActivityMessage.style.display = 'none';
-                    let activities = [];
-                    querySnapshot.forEach(docSnap => {
-                        activities.push(docSnap.data());
-                    });
-                    
-                    // Limit to latest 5 activities
-                    activities = activities.slice(0, 5);
-
-                    activities.forEach(activity => {
-                        const activityItem = document.createElement('li');
-                        activityItem.classList.add('activity-item');
-
-                        let icon = 'fas fa-info-circle';
-                        let text = 'Performed an action.';
-
-                        if (activity.type === 'post_created') {
-                            icon = 'fas fa-pencil-alt';
-                            text = `Posted a new message: "${activity.contentSnippet || 'No content snippet'}"`;
-                        } else if (activity.type === 'level_up') {
-                            icon = 'fas fa-star';
-                            text = `Reached Level ${activity.newLevel || '?'}: ${activity.levelName || 'New Level'}!`;
-                        } else if (activity.type === 'jcoins_earned') {
-                            icon = 'fas fa-coins';
-                            text = `Earned ${activity.amount} JCoins for ${activity.reason || 'activity'}.`;
-                        } else if (activity.type === 'daily_bonus_claimed') {
-                            icon = 'fas fa-gift';
-                            text = `Claimed daily bonus of ${activity.jCoinsEarned} JCoins.`;
-                        } else if (activity.type === 'profile_updated') {
-                            icon = 'fas fa-user-edit';
-                            text = `Updated profile information.`;
-                        } else if (activity.type === 'friend_added') {
-                            icon = 'fas fa-user-plus';
-                            text = `Became friends with ${activity.friendUsername || 'someone'}.`;
-                        } else if (activity.type === 'chat_message_sent') {
-                            icon = 'fas fa-comment-dots';
-                            text = `Sent a chat message.`;
-                        }
-
-                        const timestamp = activity.timestamp ? new Date(activity.timestamp.toDate()).toLocaleString() : 'N/A';
-
-                        activityItem.innerHTML = `
-                            <i class="${icon}"></i>
-                            <span>${text}</span>
-                            <span class="activity-timestamp">${timestamp}</span>
-                        `;
-                        recentActivityList.appendChild(activityItem);
-                    });
-                }
-            } catch (error) {
-                console.error("JCHAT_ERROR: Error fetching recent activity:", error);
-                noActivityMessage.textContent = "Failed to load recent activity.";
-            }
-        }
         /**
          * Fetches and displays a user's profile data.
          * Determines if it's the current user's profile or another user's.
