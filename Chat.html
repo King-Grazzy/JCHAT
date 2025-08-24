@@ -3042,6 +3042,65 @@
                         'Nature & Environment': ['🌍', '🌎', '🌏', '🌐', '🗺️', '🗾', '🏔️', '⛰️', '🌋', '🗻', '🏕️', '🏖️', '🏜️', '🏝️', '🏞️', '🏟️', '🏛️', '🏗️', '🧱', '🏘️']
                     };
                     
+                    // JCHAT Stickers Entitlements System - Define here for emoji picker access
+                    let userEntitlements = { packs: [] };
+                    
+                    // Category mapping from Chat.html categories to JCHAT Developer Center sticker keys
+                    const categoryMapping = {
+                        'Smileys & Emotions': 'stickers:smileys',
+                        'Love & Hearts': 'stickers:hearts', 
+                        'Hands & Gestures': 'stickers:hands',
+                        'Animals & Nature': 'stickers:animals',
+                        'Food & Drink': 'stickers:food',
+                        'Activities & Sports': 'stickers:sports',
+                        'Travel & Places': 'stickers:travel',
+                        'Music & Arts': 'stickers:music',
+                        'Objects & Symbols': 'stickers:objects',
+                        'Celebrations': 'stickers:party',
+                        'Weather & Nature': 'stickers:nature',
+                        'People & Body': 'stickers:faces2',
+                        'Medical & Health': 'stickers:misc',
+                        'Technology': 'stickers:misc',
+                        'Time & Calendar': 'stickers:misc',
+                        'Money & Business': 'stickers:misc',
+                        'Clothing & Fashion': 'stickers:misc',
+                        'Buildings & Architecture': 'stickers:misc',
+                        'Plants & Flowers': 'stickers:nature',
+                        'Fantasy & Magic': 'stickers:misc',
+                        'Tools & Equipment': 'stickers:objects',
+                        'Communication': 'stickers:objects',
+                        'Safety & Security': 'stickers:misc',
+                        'Nature & Environment': 'stickers:nature'
+                    };
+                    
+                    // Check if user has access to specific emoji (first 3 free, rest require JCHAT unlock)
+                    function hasEmojiAccess(categoryName, emojiIndex) {
+                        try {
+                            // Safety check for required variables
+                            if (!categoryMapping || !userEntitlements) {
+                                console.warn('JCHAT_WARN: Required variables not initialized, defaulting to free access');
+                                return true;
+                            }
+                            
+                            const stickerKey = categoryMapping[categoryName];
+                            
+                            // First 3 emojis are always free
+                            if (emojiIndex < 3) return true;
+                            
+                            // Check if JCHAT team has unlocked this category for user
+                            return userEntitlements.packs && userEntitlements.packs.includes(stickerKey);
+                        } catch (error) {
+                            console.error('JCHAT_ERROR: Error in hasEmojiAccess:', error);
+                            // Default to free access on error
+                            return true;
+                        }
+                    }
+                    
+                    // Make variables accessible globally for external updates
+                    window.emojiPickerUserEntitlements = userEntitlements;
+                    window.emojiPickerCategoryMapping = categoryMapping;
+                    window.emojiPickerHasEmojiAccess = hasEmojiAccess;
+                    
                     // Create category tabs
                     const categoryTabs = document.createElement('div');
                     categoryTabs.style.cssText = `
@@ -4390,70 +4449,36 @@
          window.playVoiceNote = playVoiceNote;
          window.VoiceNotePlayer = VoiceNotePlayer;
          
-         // JCHAT Stickers Entitlements System
-         let userEntitlements = { packs: [] };
-         
-         // Category mapping from Chat.html categories to JCHAT Developer Center sticker keys
-         const categoryMapping = {
-             'Smileys & Emotions': 'stickers:smileys',
-             'Love & Hearts': 'stickers:hearts', 
-             'Hands & Gestures': 'stickers:hands',
-             'Animals & Nature': 'stickers:animals',
-             'Food & Drink': 'stickers:food',
-             'Activities & Sports': 'stickers:sports',
-             'Travel & Places': 'stickers:travel',
-             'Music & Arts': 'stickers:music',
-             'Objects & Symbols': 'stickers:objects',
-             'Celebrations': 'stickers:party',
-             'Weather & Nature': 'stickers:nature',
-             'People & Body': 'stickers:faces2',
-             'Medical & Health': 'stickers:misc',
-             'Technology': 'stickers:misc',
-             'Time & Calendar': 'stickers:misc',
-             'Money & Business': 'stickers:misc',
-             'Clothing & Fashion': 'stickers:misc',
-             'Buildings & Architecture': 'stickers:misc',
-             'Plants & Flowers': 'stickers:nature',
-             'Fantasy & Magic': 'stickers:misc',
-             'Tools & Equipment': 'stickers:objects',
-             'Communication': 'stickers:objects',
-             'Safety & Security': 'stickers:misc',
-             'Nature & Environment': 'stickers:nature'
-         };
-         
-                 // Check if user has access to specific emoji (first 3 free, rest require JCHAT unlock)
-        function hasEmojiAccess(categoryName, emojiIndex) {
-            try {
-                // Safety check for required variables
-                if (!categoryMapping || !userEntitlements) {
-                    console.warn('JCHAT_WARN: Required variables not initialized, defaulting to free access');
-                    return true;
-                }
-                
-                const stickerKey = categoryMapping[categoryName];
-                
-                // First 3 emojis are always free
-                if (emojiIndex < 3) return true;
-                
-                // Check if JCHAT team has unlocked this category for user
-                return userEntitlements.packs && userEntitlements.packs.includes(stickerKey);
-            } catch (error) {
-                console.error('JCHAT_ERROR: Error in hasEmojiAccess:', error);
-                // Default to free access on error
-                return true;
-            }
-        }
+
          
          // Load user entitlements set by JCHAT team via Developer Center
          async function loadUserEntitlements(userId) {
              try {
                  const entitlementsRef = doc(db, 'artifacts', appId, 'users', userId, 'profiles', 'user_entitlements');
                  const entitlementsSnap = await getDoc(entitlementsRef);
-                 userEntitlements = entitlementsSnap.exists() ? entitlementsSnap.data() : { packs: [] };
-                 console.log('JCHAT_DEBUG: Loaded user sticker entitlements:', userEntitlements);
+                 const entitlements = entitlementsSnap.exists() ? entitlementsSnap.data() : { packs: [] };
+                 console.log('JCHAT_DEBUG: Loaded user sticker entitlements:', entitlements);
+                 
+                 // Update emoji picker entitlements if it exists
+                 updateEmojiPickerEntitlements(entitlements);
              } catch (error) {
                  console.error('JCHAT_ERROR: Error loading sticker entitlements:', error);
-                 userEntitlements = { packs: [] };
+                 updateEmojiPickerEntitlements({ packs: [] });
+             }
+         }
+         
+         // Update emoji picker entitlements
+         function updateEmojiPickerEntitlements(entitlements) {
+             try {
+                 // Update the global emoji picker variables
+                 if (window.emojiPickerUserEntitlements) {
+                     window.emojiPickerUserEntitlements.packs = entitlements.packs || [];
+                     console.log('JCHAT_DEBUG: Updated emoji picker entitlements:', entitlements);
+                 } else {
+                     console.warn('JCHAT_WARN: Emoji picker not yet initialized');
+                 }
+             } catch (error) {
+                 console.error('JCHAT_ERROR: Error updating emoji picker entitlements:', error);
              }
          }
          
