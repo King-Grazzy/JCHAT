@@ -2735,6 +2735,177 @@
             background-color: var(--white);
         }
 
+        /* Privacy Settings Section Styles */
+        .privacy-settings-section {
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.05), rgba(0, 213, 255, 0.05));
+            border: 1px solid;
+            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .privacy-settings-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.02), rgba(0, 213, 255, 0.02));
+            border-radius: 16px;
+            z-index: -1;
+        }
+
+        .privacy-section-title {
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .privacy-section-title i {
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .privacy-section-subtitle {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+            opacity: 0.8;
+        }
+
+        .privacy-category {
+            margin-bottom: 24px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .privacy-category-title {
+            color: var(--white);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .privacy-category-title i {
+            color: var(--blue);
+            font-size: 1rem;
+        }
+
+        .privacy-toggle-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            margin-bottom: 8px;
+        }
+
+        .privacy-toggle-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .privacy-toggle-group label:first-child {
+            margin-bottom: 0;
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .privacy-actions {
+            margin-top: 24px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .save-privacy-btn {
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.3), 0 4px 15px rgba(0, 213, 255, 0.3);
+        }
+
+        .save-privacy-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.4), 0 8px 25px rgba(0, 213, 255, 0.4);
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+        }
+
+        .save-privacy-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .action-btn.privacy-btn {
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            color: white;
+            border: none;
+        }
+
+        .action-btn.privacy-btn:hover {
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            transform: translateY(-2px);
+        }
+
+        /* Mobile responsive for privacy settings */
+        @media (max-width: 768px) {
+            .privacy-settings-section {
+                padding: 20px;
+                margin: 15px 0;
+            }
+
+            .privacy-section-title {
+                font-size: 1.2rem;
+            }
+
+            .privacy-category {
+                padding: 12px;
+            }
+
+            .privacy-toggle-group {
+                padding: 10px 0;
+            }
+
+            .save-privacy-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
         /* NEW: Unlocked Rewards Section */
         .unlocked-rewards-section, .recent-activity-section, .customization-section {
             background: var(--card-background);
@@ -4657,6 +4828,126 @@
                         </div>
                     </div>
 
+                    <!-- Privacy Settings Section -->
+                    <div class="privacy-settings-section" id="privacySettingsSection" style="display: none;">
+                        <h4 class="privacy-section-title">
+                            <i class="fas fa-shield-alt"></i>
+                            Privacy Settings
+                        </h4>
+                        <p class="privacy-section-subtitle">Control who can see your information</p>
+                        
+                        <!-- Profile Information Visibility -->
+                        <div class="privacy-category">
+                            <h5 class="privacy-category-title">
+                                <i class="fas fa-user"></i>
+                                Profile Information
+                            </h5>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Make Email Public</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleEmailVisibility">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Show Location</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleLocationVisibility">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Show User ID</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleUserIdVisibility">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Show School</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleSchoolVisibility">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Show Work</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleWorkVisibility">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Show Interests</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleInterestsVisibility">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Show Website</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleWebsiteVisibility">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Show Social Links</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleSocialLinksVisibility">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Activity & Interaction Settings -->
+                        <div class="privacy-category">
+                            <h5 class="privacy-category-title">
+                                <i class="fas fa-comments"></i>
+                                Who Can Contact You
+                            </h5>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Show Online Status</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleOnlineStatusVisibility">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Allow Friend Requests</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleFriendRequests">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Allow Direct Messages</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="toggleMessages">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="privacy-actions">
+                            <button type="button" id="savePrivacySettingsButton" class="save-privacy-btn">
+                                <i class="fas fa-shield-alt"></i>
+                                Save Privacy Settings
+                            </button>
+                        </div>
+                    </div>
+
                     <!-- Profile Actions -->
                     <div class="user-info-actions">
                         <button id="editProfileBtn" class="action-btn edit-btn">
@@ -4666,6 +4957,10 @@
                         <button id="viewProfileBtn" class="action-btn view-btn" style="display: none;">
                             <i class="fas fa-eye"></i>
                             View Profile
+                        </button>
+                        <button id="privacySettingsBtn" class="action-btn privacy-btn" style="display: none;">
+                            <i class="fas fa-shield-alt"></i>
+                            Privacy Settings
                         </button>
                     </div>
                 </div>
@@ -5064,6 +5359,22 @@
         const chatBubbleStyleSelect = document.getElementById('chatBubbleStyleSelect');
         const profileThemeSelect = document.getElementById('profileThemeSelect');
         const saveCustomizationButton = document.getElementById('saveCustomizationButton');
+
+        // Privacy Settings Elements
+        const savePrivacySettingsButton = document.getElementById('savePrivacySettingsButton');
+        const privacySettingsSection = document.getElementById('privacySettingsSection');
+        const privacySettingsBtn = document.getElementById('privacySettingsBtn');
+        const toggleEmailVisibility = document.getElementById('toggleEmailVisibility');
+        const toggleLocationVisibility = document.getElementById('toggleLocationVisibility');
+        const toggleUserIdVisibility = document.getElementById('toggleUserIdVisibility');
+        const toggleSchoolVisibility = document.getElementById('toggleSchoolVisibility');
+        const toggleWorkVisibility = document.getElementById('toggleWorkVisibility');
+        const toggleInterestsVisibility = document.getElementById('toggleInterestsVisibility');
+        const toggleWebsiteVisibility = document.getElementById('toggleWebsiteVisibility');
+        const toggleSocialLinksVisibility = document.getElementById('toggleSocialLinksVisibility');
+        const toggleOnlineStatusVisibility = document.getElementById('toggleOnlineStatusVisibility');
+        const toggleFriendRequests = document.getElementById('toggleFriendRequests');
+        const toggleMessages = document.getElementById('toggleMessages');
 
         // Account Settings Fields
         const profileEmailInput = document.getElementById('profileEmailInput'); // Disabled email display
@@ -8149,6 +8460,13 @@
                         if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'flex';
                         if (saveCustomizationButton) saveCustomizationButton.style.display = 'inline-flex';
 
+                        // Show privacy settings button and load privacy settings
+                        if (privacySettingsBtn) privacySettingsBtn.style.display = 'inline-flex';
+                        if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'inline-flex';
+                        
+                        // Load privacy settings
+                        loadPrivacySettings(displayedUserProfileData);
+
                         if (profileEmailInput) profileEmailInput.value = displayedUserProfileData.email || ""; // Populate disabled email field, null check
 
                         // Show toggle button for account settings
@@ -8184,6 +8502,7 @@
                         if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
                         if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
                         if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
+                        if (privacySettingsBtn) privacySettingsBtn.style.display = 'none';
                         if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'none';
@@ -8217,6 +8536,7 @@
                         if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
                         if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
                         if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
+                        if (privacySettingsBtn) privacySettingsBtn.style.display = 'none';
                         if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'none';
@@ -8270,6 +8590,7 @@
                     if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
                     if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
                     if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
+                    if (privacySettingsBtn) privacySettingsBtn.style.display = 'none';
                     if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
                     if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
                     if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
@@ -8305,6 +8626,7 @@
                 if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
                 if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
                 if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
+                if (privacySettingsBtn) privacySettingsBtn.style.display = 'none';
                 if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
@@ -8389,6 +8711,7 @@
                 if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
                 if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
                 if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
+                if (privacySettingsBtn) privacySettingsBtn.style.display = 'none';
                 if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
@@ -8687,6 +9010,71 @@
             }
         }
 
+        // Save Privacy Settings Function
+        async function savePrivacySettings() {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    showMessageBox('Please log in to save privacy settings.', 'error');
+                    return;
+                }
+
+                // Show loading message
+                showMessageBox("Saving privacy settings...", 'loading', true);
+
+                // Collect privacy settings values
+                const privacySettings = {
+                    emailPublic: toggleEmailVisibility ? toggleEmailVisibility.checked : false,
+                    locationVisible: toggleLocationVisibility ? toggleLocationVisibility.checked : false,
+                    userIdVisible: toggleUserIdVisibility ? toggleUserIdVisibility.checked : false,
+                    schoolVisible: toggleSchoolVisibility ? toggleSchoolVisibility.checked : false,
+                    workVisible: toggleWorkVisibility ? toggleWorkVisibility.checked : false,
+                    interestsVisible: toggleInterestsVisibility ? toggleInterestsVisibility.checked : false,
+                    websiteVisible: toggleWebsiteVisibility ? toggleWebsiteVisibility.checked : false,
+                    socialLinksVisible: toggleSocialLinksVisibility ? toggleSocialLinksVisibility.checked : false,
+                    onlineStatusVisible: toggleOnlineStatusVisibility ? toggleOnlineStatusVisibility.checked : false,
+                    allowFriendRequests: toggleFriendRequests ? toggleFriendRequests.checked : true,
+                    allowDirectMessages: toggleMessages ? toggleMessages.checked : true,
+                    updatedAt: serverTimestamp()
+                };
+
+                // Update privacy settings in the user's profile document
+                const privateProfileDocRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
+                await updateDoc(privateProfileDocRef, {
+                    visibility: privacySettings
+                });
+
+                // Hide loading message and show success
+                showMessageBox('Privacy settings saved successfully!', 'success');
+                
+                console.log('Privacy settings saved:', privacySettings);
+
+            } catch (error) {
+                console.error('Error saving privacy settings:', error);
+                showMessageBox('Error saving privacy settings. Please try again.', 'error');
+            }
+        }
+
+        // Load Privacy Settings Function
+        async function loadPrivacySettings(userData) {
+            if (!userData || !userData.visibility) return;
+            
+            const visibility = userData.visibility;
+            
+            // Populate privacy toggles with saved values
+            if (toggleEmailVisibility) toggleEmailVisibility.checked = visibility.emailPublic || false;
+            if (toggleLocationVisibility) toggleLocationVisibility.checked = visibility.locationVisible || false;
+            if (toggleUserIdVisibility) toggleUserIdVisibility.checked = visibility.userIdVisible || false;
+            if (toggleSchoolVisibility) toggleSchoolVisibility.checked = visibility.schoolVisible || false;
+            if (toggleWorkVisibility) toggleWorkVisibility.checked = visibility.workVisible || false;
+            if (toggleInterestsVisibility) toggleInterestsVisibility.checked = visibility.interestsVisible || false;
+            if (toggleWebsiteVisibility) toggleWebsiteVisibility.checked = visibility.websiteVisible || false;
+            if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.checked = visibility.socialLinksVisible || false;
+            if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.checked = visibility.onlineStatusVisible || false;
+            if (toggleFriendRequests) toggleFriendRequests.checked = visibility.allowFriendRequests !== false; // Default true
+            if (toggleMessages) toggleMessages.checked = visibility.allowDirectMessages !== false; // Default true
+        }
+
         // --- Event Listeners (moved to DOMContentLoaded for safety) ---
         document.addEventListener('DOMContentLoaded', () => {
             // Apply theme on load
@@ -8874,6 +9262,27 @@
             if (reportUserButton) reportUserButton.addEventListener('click', showReportUserModal);
             if (cancelReportButton) cancelReportButton.addEventListener('click', hideReportUserModal);
             if (submitReportButton) submitReportButton.addEventListener('click', submitReport);
+
+            // Privacy Settings Event Listeners
+            if (privacySettingsBtn) {
+                privacySettingsBtn.addEventListener('click', () => {
+                    if (privacySettingsSection) {
+                        const isHidden = privacySettingsSection.style.display === 'none';
+                        privacySettingsSection.style.display = isHidden ? 'block' : 'none';
+                        
+                        // Update button text based on state
+                        if (isHidden) {
+                            privacySettingsBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Privacy Settings';
+                        } else {
+                            privacySettingsBtn.innerHTML = '<i class="fas fa-shield-alt"></i> Privacy Settings';
+                        }
+                    }
+                });
+            }
+
+            if (savePrivacySettingsButton) {
+                savePrivacySettingsButton.addEventListener('click', savePrivacySettings);
+            }
 
             // Contact Modal Event Listeners
             const contactIcon = document.getElementById('contactIcon');
