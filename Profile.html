@@ -6617,7 +6617,7 @@
                             await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), { coverPicId: url, updatedAt: serverTimestamp() });
                             await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid), { coverPicId: url, updatedAt: serverTimestamp() });
                         }
-                        showMessageBox('Cover updated!', 'success');
+                        showEnhancedSmartSuccess('Cover updated!', 'update');
                     } catch (e) {
                         showMessageBox('Failed to update cover.', 'error');
                     }
@@ -7378,7 +7378,7 @@
             if (!currentUser) return; // Only allow logout if a user is actually logged in
             try {
                 await signOut(auth);
-                showMessageBox("Logged out successfully! 👋", 'success');
+                showEnhancedSmartSuccess("Logged out successfully! 👋", 'celebration');
                 setTimeout(() => {
                     window.location.href = '/login.html'; // Redirect to login page
                 }, 1000);
@@ -7914,7 +7914,7 @@
                 });
                 console.log("JCHAT_DEBUG: Firestore private email updated.");
 
-                showMessageBox("Email updated successfully! Please verify your new email.", 'success');
+                showEnhancedSmartSuccess("Email updated successfully! Please verify your new email.", 'update');
                 if (profileEmailInput) profileEmailInput.value = newEmail; // Update displayed email, null check
                 if (newEmailInput) newEmailInput.value = ''; // Null check
                 if (currentPasswordForEmailInput) currentPasswordForEmailInput.value = ''; // Null check
@@ -7983,7 +7983,7 @@
                 await updatePassword(currentUser, newPassword);
                 console.log("JCHAT_DEBUG: Firebase Auth password updated.");
 
-                showMessageBox("Password updated successfully!", 'success');
+                showEnhancedSmartSuccess("Password updated successfully!", 'update');
                 if (oldPasswordInput) oldPasswordInput.value = ''; // Null check
                 if (newPasswordInput) newPasswordInput.value = ''; // Null check
                 if (confirmNewPasswordInput) confirmNewPasswordInput.value = ''; // Null check
@@ -8269,7 +8269,7 @@
 
             if (updated) {
                 // Show all level-up messages
-                levelsGainedMessages.forEach(msg => showMessageBox(msg, 'success', false, 5000));
+                levelsGainedMessages.forEach(msg => showEnhancedSmartSuccess(msg, 'achievement', 5000));
                 // Re-fetch and display the profile to update UI with new level, JCoins, Gas
                 await fetchAndDisplayUserProfile(userId);
             }
@@ -8563,7 +8563,7 @@
                     timestamp: serverTimestamp()
                 });
 
-                showMessageBox("JCoin request submitted successfully! An admin will review it shortly.", 'success');
+                showEnhancedSmartSuccess("JCoin request submitted successfully! An admin will review it shortly.", 'achievement');
                 hideJCoinRequestModal(); // Close modal on success
             } catch (error) {
                 console.error("JCHAT_ERROR: Error submitting JCoin request:", error);
@@ -8679,7 +8679,7 @@
                     dailyBonusAmount  // Suggested JCoin reward for daily login
                 );
 
-                showMessageBox(`Daily bonus claim submitted! ${dailyBonusAmount} JCoins and 10 XP are pending admin approval.`, 'success');
+                showEnhancedSmartSuccess(`Daily bonus claim submitted! ${dailyBonusAmount} JCoins and 10 XP are pending admin approval.`, 'achievement');
                 playNotificationSound('success');
                 
                 // Update local data for UI (without actually adding the coins yet)
@@ -8811,7 +8811,7 @@
                     timestamp: serverTimestamp()
                 });
 
-                showMessageBox("Report submitted successfully! Thank you for helping us maintain a safe community.", 'success');
+                showEnhancedSmartSuccess("Report submitted successfully! Thank you for helping us maintain a safe community.", 'achievement');
                 hideReportUserModal();
             } catch (error) {
                 console.error("JCHAT_ERROR: Error submitting report:", error);
@@ -9031,7 +9031,7 @@
                     selectFriendModal.classList.remove('active');
                     
                     // Navigate to chat page
-                    showMessageBox(`💬 Opening chat with ${friendName}...`, 'success');
+                    showEnhancedSmartSuccess(`💬 Opening chat with ${friendName}...`, 'celebration');
                     setTimeout(() => {
                         window.location.href = `/Chat.html?partner=${friendId}`;
                     }, 1000);
@@ -9744,7 +9744,7 @@
 
 
 
-                    showMessageBox("Profile loaded!", 'success');
+                    showEnhancedSmartSuccess("Profile loaded!", 'update');
                     
 
 
@@ -10206,7 +10206,7 @@
                     toggleEditMode(false);
 
                     // Show success message
-                    showMessageBox('Profile updated successfully!', 'success');
+                    showEnhancedSmartSuccess('Profile updated successfully!', 'update');
 
                 } catch (error) {
                     console.error('Error saving user info:', error);
@@ -10251,7 +10251,7 @@
                 });
 
                 // Hide loading message and show success
-                showMessageBox('Privacy settings saved successfully!', 'success');
+                showEnhancedSmartSuccess('Privacy settings saved successfully!', 'update');
                 
                 console.log('Privacy settings saved:', privacySettings);
 
