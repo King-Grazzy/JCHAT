@@ -6466,9 +6466,7 @@
         const noFriendsMessage = document.getElementById('noFriendsMessage');
 
                     // NEW: Recent Activity Section
-            const recentActivitySection = document.getElementById('recentActivitySection');
-            const recentActivityList = document.getElementById('recentActivityList');
-            const noActivityMessage = document.getElementById('noActivityMessage');
+            
 
 
 
@@ -6949,58 +6947,9 @@
             }, 200);
         }
 
-        /**
-         * Demo function to test header blur success message
-         */
-        function demoHeaderBlurSuccess() {
-            const messages = [
-                "Profile updated successfully! 🎉",
-                "Cover photo uploaded! ✨",
-                "Settings saved! 🔒",
-                "Welcome back! 👋"
-            ];
-            
-            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-            showHeaderSuccessMessage(randomMessage, 4000);
-        }
 
-        // Add demo button to page for testing (remove in production)
-        document.addEventListener('DOMContentLoaded', () => {
-            // Add demo button after profile section
-            const profileSection = document.querySelector('.profile-section');
-            if (profileSection) {
-                const demoBtn = document.createElement('button');
-                demoBtn.innerHTML = '🎯 Test Header Blur Success';
-                demoBtn.style.cssText = `
-                    position: fixed;
-                    bottom: 20px;
-                    right: 20px;
-                    padding: 12px 20px;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border: none;
-                    border-radius: 25px;
-                    cursor: pointer;
-                    font-weight: 600;
-                    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-                    z-index: 1000;
-                    transition: all 0.3s ease;
-                `;
-                
-                demoBtn.addEventListener('mouseenter', () => {
-                    demoBtn.style.transform = 'translateY(-3px) scale(1.05)';
-                    demoBtn.style.boxShadow = '0 12px 35px rgba(102, 126, 234, 0.6)';
-                });
-                
-                demoBtn.addEventListener('mouseleave', () => {
-                    demoBtn.style.transform = 'translateY(0) scale(1)';
-                    demoBtn.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.4)';
-                });
-                
-                demoBtn.addEventListener('click', demoHeaderBlurSuccess);
-                document.body.appendChild(demoBtn);
-            }
-        });
+
+
 
 
 
@@ -9265,7 +9214,6 @@
             // NEW: Hide new sections by default
             if (unlockedRewardsSection) unlockedRewardsSection.style.display = 'none';
             if (friendsSnippetSection) friendsSnippetSection.style.display = 'none';
-            if (recentActivitySection) recentActivitySection.style.display = 'none';
             if (profileFrameSelect) profileFrameSelect.closest('.customization-option').style.display = 'none'; // Hide parent div
             if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
             if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
@@ -9682,9 +9630,8 @@
                         // Show toggle button for account settings
                         if (toggleAccountSettingsButton) toggleAccountSettingsButton.style.display = 'inline-flex';
 
-                        // NEW: Show unlocked rewards and recent activity for owner
+                        // NEW: Show unlocked rewards for owner
                         await fetchAndDisplayUnlockedRewards();
-                        await fetchAndDisplayRecentActivity();
 
                     } else if (currentUser) { // If logged in and viewing another user
                         // Hide all owner-specific buttons and editing sections
@@ -9706,7 +9653,6 @@
 
                         // Hide owner-specific sections
                         if (unlockedRewardsSection) unlockedRewardsSection.style.display = 'none';
-                        if (recentActivitySection) recentActivitySection.style.display = 'none';
                         if (profileFrameSelect) profileFrameSelect.closest('.customization-option').style.display = 'none';
                         if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
                         if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
@@ -9740,7 +9686,6 @@
                         // Hide all new sections as well if profile not found
                         if (unlockedRewardsSection) unlockedRewardsSection.style.display = 'none';
                         if (friendsSnippetSection) friendsSnippetSection.style.display = 'none';
-                        if (recentActivitySection) recentActivitySection.style.display = 'none';
                         if (profileFrameSelect) profileFrameSelect.closest('.customization-option').style.display = 'none';
                         if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
                         if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
@@ -9794,7 +9739,7 @@
                     // Hide all new sections as well if profile not found
                     if (unlockedRewardsSection) unlockedRewardsSection.style.display = 'none';
                     if (friendsSnippetSection) friendsSnippetSection.style.display = 'none';
-                    if (recentActivitySection) recentActivitySection.style.display = 'none';
+
                     if (profileFrameSelect) profileFrameSelect.closest('.customization-option').style.display = 'none';
                     if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
                     if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
@@ -9830,7 +9775,7 @@
                 // Hide all new sections on error as well
                 if (unlockedRewardsSection) unlockedRewardsSection.style.display = 'none';
                 if (friendsSnippetSection) friendsSnippetSection.style.display = 'none';
-                if (recentActivitySection) recentActivitySection.style.display = 'none';
+
                 if (profileFrameSelect) profileFrameSelect.closest('.customization-option').style.display = 'none';
                 if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
                 if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
