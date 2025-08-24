@@ -3652,12 +3652,275 @@
             opacity: 1;
             display: flex;
         }
-        /* Success message box specific styling */
+        /* Enhanced Success Message Box Styling */
         #messageBox.success {
-            background-image: linear-gradient(45deg, var(--pink), var(--blue)); /* Pink and blue gradient */
-            color: var(--white); /* White text for contrast on gradient */
-            border: none; /* No border for gradient background */
-            box-shadow: 0 8px 30px rgba(0, 213, 255, 0.5), 0 8px 30px rgba(255, 46, 146, 0.5); /* Glowing shadow */
+            background: linear-gradient(135deg, 
+                rgba(76, 175, 80, 0.95), 
+                rgba(139, 195, 74, 0.95), 
+                rgba(76, 175, 80, 0.95));
+            background-size: 200% 200%;
+            color: var(--white);
+            border: none;
+            box-shadow: 
+                0 8px 30px rgba(76, 175, 80, 0.4),
+                0 4px 15px rgba(139, 195, 74, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            animation: successGradient 3s ease-in-out infinite, successFloat 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #messageBox.success::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent);
+            animation: successShine 2s ease-in-out infinite;
+        }
+
+        #messageBox.success::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                transparent 70%);
+            animation: successPulse 2s ease-in-out infinite;
+        }
+
+        /* Success message animations */
+        @keyframes successGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes successShine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes successFloat {
+            0% { 
+                transform: translateY(30px) scale(0.8);
+                opacity: 0;
+            }
+            50% { 
+                transform: translateY(-5px) scale(1.05);
+            }
+            100% { 
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes successPulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 0.1;
+            }
+            50% { 
+                transform: scale(1.1);
+                opacity: 0.2;
+            }
+        }
+
+        /* Success icon specific styling */
+        #messageBox.success i {
+            color: var(--white);
+            animation: successIconPop 0.6s ease-out 0.2s both;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        @keyframes successIconPop {
+            0% { 
+                transform: scale(0) rotate(-180deg);
+                opacity: 0;
+            }
+            50% { 
+                transform: scale(1.2) rotate(0deg);
+            }
+            100% { 
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        /* Success text animation */
+        #messageBox.success span {
+            animation: successTextSlide 0.6s ease-out 0.3s both;
+            position: relative;
+        }
+
+        @keyframes successTextSlide {
+            0% { 
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            100% { 
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Enhanced success message hover effects */
+        #messageBox.success:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 12px 40px rgba(76, 175, 80, 0.5),
+                0 6px 20px rgba(139, 195, 74, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        /* Success message progress bar */
+        #messageBox.success .success-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.8), 
+                rgba(255, 255, 255, 0.4));
+            animation: successProgress 3s linear;
+        }
+
+        @keyframes successProgress {
+            0% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        /* Enhanced Success Message Variations */
+        #messageBox.celebration-success {
+            background: linear-gradient(135deg, 
+                rgba(255, 193, 7, 0.95), 
+                rgba(255, 152, 0, 0.95), 
+                rgba(255, 193, 7, 0.95));
+            background-size: 200% 200%;
+            animation: successGradient 2s ease-in-out infinite, celebrationBounce 0.8s ease-out;
+        }
+
+        #messageBox.achievement-success {
+            background: linear-gradient(135deg, 
+                rgba(156, 39, 176, 0.95), 
+                rgba(233, 30, 99, 0.95), 
+                rgba(156, 39, 176, 0.95));
+            background-size: 200% 200%;
+            animation: successGradient 2.5s ease-in-out infinite, achievementGlow 1s ease-out;
+        }
+
+        #messageBox.update-success {
+            background: linear-gradient(135deg, 
+                rgba(0, 150, 136, 0.95), 
+                rgba(0, 188, 212, 0.95), 
+                rgba(0, 150, 136, 0.95));
+            background-size: 200% 200%;
+            animation: successGradient 3s ease-in-out infinite, updatePulse 0.6s ease-out;
+        }
+
+        /* Celebration success animations */
+        @keyframes celebrationBounce {
+            0% { transform: translateY(30px) scale(0.8); }
+            50% { transform: translateY(-10px) scale(1.1); }
+            75% { transform: translateY(-5px) scale(1.05); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        @keyframes achievementGlow {
+            0% { 
+                transform: translateY(30px) scale(0.8);
+                box-shadow: 0 0 0 rgba(156, 39, 176, 0);
+            }
+            50% { 
+                transform: translateY(-5px) scale(1.05);
+                box-shadow: 0 0 30px rgba(156, 39, 176, 0.6);
+            }
+            100% { 
+                transform: translateY(0) scale(1);
+                box-shadow: 0 0 20px rgba(156, 39, 176, 0.4);
+            }
+        }
+
+        @keyframes updatePulse {
+            0% { transform: translateY(30px) scale(0.8); }
+            50% { transform: translateY(-5px) scale(1.05); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        /* Celebration sparkles effect */
+        .celebration-sparkles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .celebration-sparkles::before,
+        .celebration-sparkles::after {
+            content: '✨';
+            position: absolute;
+            font-size: 1.5rem;
+            animation: sparkleFloat 2s ease-in-out infinite;
+        }
+
+        .celebration-sparkles::before {
+            top: 20%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .celebration-sparkles::after {
+            top: 60%;
+            right: 20%;
+            animation-delay: 1s;
+        }
+
+        @keyframes sparkleFloat {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 0.8;
+            }
+            50% { 
+                transform: translateY(-10px) rotate(180deg) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        /* Achievement glow effect */
+        .achievement-glow {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(156, 39, 176, 0.2) 0%, 
+                rgba(233, 30, 99, 0.1) 30%, 
+                transparent 70%);
+            animation: achievementGlowPulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes achievementGlowPulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: scale(1.1);
+                opacity: 0.6;
+            }
         }
         #messageBox.error { border-left: 5px solid var(--delete-button-color); background-color: var(--card-background-color); color: var(--text-color-primary); }
         #messageBox.info { border-left: 5px solid var(--accent-color); background-color: var(--card-background-color); color: var(--text-color-primary); }
@@ -5991,16 +6254,29 @@
                 clearTimeout(messageBox.timeoutId);
             }
 
-            messageBox.innerHTML = `<i id="messageBoxIcon"></i><span id="messageBoxText"></span>`;
+            // Enhanced HTML structure with progress bar for success messages
+            let progressBar = '';
+            if (type === 'success') {
+                progressBar = '<div class="success-progress"></div>';
+            }
+
+            messageBox.innerHTML = `
+                <i id="messageBoxIcon"></i>
+                <span id="messageBoxText"></span>
+                ${progressBar}
+            `;
+            
             const messageBoxIcon = document.getElementById('messageBoxIcon');
             const messageBoxText = document.getElementById('messageBoxText');
 
             messageBoxText.textContent = message;
             messageBox.className = 'message-box show ' + type; // Add type class for styling
 
-            // Set icon based on type
+            // Enhanced icon handling with better classes
             if (type === 'success') {
                 messageBoxIcon.classList.add('fas', 'fa-check-circle');
+                // Add success sound effect
+                playSuccessSound();
             } else if (type === 'error') {
                 messageBoxIcon.classList.add('fas', 'fa-times-circle');
             } else if (type === 'info') {
@@ -6013,23 +6289,131 @@
                 messageBoxIcon.className = ''; // No specific icon
             }
 
-
-
+            // Enhanced display with smooth animations
             messageBox.style.display = 'flex';
             messageBox.style.opacity = '1';
 
+            // Add entrance animation class
+            messageBox.classList.add('fade-in-up');
+
             if (!isPersistent) {
                 messageBox.timeoutId = setTimeout(() => {
+                    // Enhanced exit animation
                     messageBox.style.opacity = '0';
+                    messageBox.style.transform = 'translateY(-20px) scale(0.95)';
+                    
                     messageBox.addEventListener('transitionend', function handler() {
                         messageBox.style.display = 'none';
+                        messageBox.style.transform = 'translateY(0) scale(1)';
+                        messageBox.classList.remove('fade-in-up');
                         messageBox.removeEventListener('transitionend', handler);
                     }, { once: true });
                 }, durationMs);
             }
+
+            // Log success messages for analytics
+            if (type === 'success') {
+                console.log(`🎉 Success: ${message}`);
+            }
         }
 
 
+
+        /**
+         * Plays a pleasant success sound effect using Tone.js
+         */
+        function playSuccessSound() {
+            try {
+                if (typeof Tone !== 'undefined') {
+                    const successSynth = new Tone.Synth().toDestination();
+                    successSynth.oscillator.type = "sine";
+                    successSynth.envelope.attack = 0.01;
+                    successSynth.envelope.decay = 0.2;
+                    successSynth.envelope.sustain = 0.0;
+                    successSynth.envelope.release = 0.5;
+                    
+                    // Play a pleasant success chord
+                    const now = Tone.now();
+                    successSynth.triggerAttackRelease("C5", "8n", now);
+                    successSynth.triggerAttackRelease("E5", "8n", now + 0.1);
+                    successSynth.triggerAttackRelease("G5", "8n", now + 0.2);
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        successSynth.dispose();
+                    }, 1000);
+                }
+            } catch (error) {
+                console.log('Success sound not available:', error.message);
+            }
+        }
+
+        /**
+         * Shows an enhanced success message with celebration effects
+         * @param {string} message - The success message to display
+         * @param {string} style - The style of success message ('default', 'celebration', 'achievement')
+         * @param {number} duration - Duration in milliseconds
+         */
+        function showEnhancedSuccess(message, style = 'default', duration = 4000) {
+            if (!messageBox) return;
+
+            // Clear any existing timeouts
+            if (messageBox.timeoutId) {
+                clearTimeout(messageBox.timeoutId);
+            }
+
+            let iconClass = 'fa-check-circle';
+            let additionalClasses = '';
+
+            // Different success styles
+            switch (style) {
+                case 'celebration':
+                    iconClass = 'fa-party-horn';
+                    additionalClasses = 'celebration-success';
+                    break;
+                case 'achievement':
+                    iconClass = 'fa-trophy';
+                    additionalClasses = 'achievement-success';
+                    break;
+                case 'update':
+                    iconClass = 'fa-sync-alt';
+                    additionalClasses = 'update-success';
+                    break;
+                default:
+                    iconClass = 'fa-check-circle';
+            }
+
+            // Enhanced HTML with style-specific elements
+            messageBox.innerHTML = `
+                <i id="messageBoxIcon" class="fas ${iconClass}"></i>
+                <span id="messageBoxText">${message}</span>
+                <div class="success-progress"></div>
+                ${style === 'celebration' ? '<div class="celebration-sparkles"></div>' : ''}
+                ${style === 'achievement' ? '<div class="achievement-glow"></div>' : ''}
+            `;
+
+            messageBox.className = `message-box show success ${additionalClasses}`;
+            messageBox.style.display = 'flex';
+            messageBox.style.opacity = '1';
+
+            // Play success sound
+            playSuccessSound();
+
+            // Auto-hide after duration
+            messageBox.timeoutId = setTimeout(() => {
+                messageBox.style.opacity = '0';
+                messageBox.style.transform = 'translateY(-20px) scale(0.95)';
+                
+                messageBox.addEventListener('transitionend', function handler() {
+                    messageBox.style.display = 'none';
+                    messageBox.style.transform = 'translateY(0) scale(1)';
+                    messageBox.removeEventListener('transitionend', handler);
+                }, { once: true });
+            }, duration);
+
+            // Log for analytics
+            console.log(`🎉 Enhanced Success (${style}): ${message}`);
+        }
 
         /**
          * Displays a custom confirmation modal.
@@ -6308,7 +6692,7 @@
                 displayProfilePicture(profilePagePic, profilePageAvatarIcon, newProfilePicUrl, (currentUserProfileData?.username || 'U').charAt(0).toUpperCase(), "w_240,h_240,c_fill,g_face,r_max");
                 displayProfilePicture(headerProfilePic, headerAvatarIcon, newProfilePicUrl, (currentUserProfileData?.username || 'U').charAt(0).toUpperCase(), "w_70,h_70,c_fill,g_face,r_max");
 
-                showMessageBox("Profile picture updated successfully!", 'success');
+                                    showEnhancedSuccess("Profile picture updated successfully! 🎉", 'celebration');
 
                 // Refresh currentUserProfileData
                 const updatedProfileSnap = await getDoc(privateProfileDocRef);
@@ -6422,7 +6806,7 @@
                 if (newWebsite) { if (websiteLink) { websiteLink.href = newWebsite; websiteLink.textContent = newWebsite.replace(/^(https?:\/\/)?(www\.)?/, ''); } if (profileWebsite) profileWebsite.style.display = 'block'; } else { if (profileWebsite) profileWebsite.style.display = 'none'; }
                 if (newSocialLinks) { if (socialLinksText) socialLinksText.textContent = newSocialLinks; if (profileSocialLinks) profileSocialLinks.style.display = 'block'; } else { if (profileSocialLinks) profileSocialLinks.style.display = 'none'; }
 
-                showMessageBox("Profile saved successfully!", 'success');
+                showEnhancedSuccess("Profile saved successfully! ✨", 'update');
 
 
 
@@ -6458,7 +6842,7 @@
                 const originalIcon = copyUserIdBtn.querySelector('i');
                 originalIcon.className = 'fas fa-check';
                 
-                showMessageBox("User ID copied to clipboard! 📋", 'success');
+                showEnhancedSuccess("User ID copied to clipboard! 📋", 'achievement');
                 
                 // Reset button after 2 seconds
                 setTimeout(() => {
@@ -6478,7 +6862,7 @@
                     document.execCommand('copy');
                     document.body.removeChild(textArea);
                     
-                    showMessageBox("User ID copied to clipboard! 📋", 'success');
+                    showEnhancedSuccess("User ID copied to clipboard! 📋", 'achievement');
                 } catch (fallbackError) {
                     console.error("JCHAT_ERROR: Fallback copy failed:", fallbackError);
                     showMessageBox("Failed to copy User ID. Please select and copy manually.", 'error');
@@ -6617,7 +7001,7 @@
                     applyThemePreview(theme);
                     
                     // Show success message
-                    showMessageBox(`Theme preset "${theme}" selected!`, 'success');
+                    showEnhancedSuccess(`Theme preset "${theme}" selected! 🎨`, 'celebration');
                 });
             });
 
@@ -6731,7 +7115,7 @@
                 this.saveNotifications();
                 this.displayNotifications();
                 this.hideNotificationSection();
-                showMessageBox('All notifications cleared!', 'success');
+                showEnhancedSuccess('All notifications cleared! ✨', 'update');
             }
 
             displayNotifications() {
