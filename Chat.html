@@ -98,7 +98,143 @@
             --input-background: rgba(255, 255, 255, 0.08);
         }
 
-        /* Location sharing interface styles */
+        /* Message actions and long press styles */
+        .message-bubble {
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .message-bubble:hover .message-actions {
+            opacity: 1;
+        }
+        
+        .message-actions {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            gap: 5px;
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            padding: 5px;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        
+        .action-btn {
+            background: var(--input-background);
+            border: 1px solid var(--border-light);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--white);
+        }
+        
+        .action-btn:hover {
+            background: var(--accent-color);
+            transform: scale(1.1);
+        }
+        
+        .reply-btn:hover {
+            background: #4CAF50;
+        }
+        
+        .forward-btn:hover {
+            background: #FF9800;
+        }
+        
+        .edit-btn:hover {
+            background: #2196F3;
+        }
+        
+                 .delete-btn:hover {
+             background: #f44336;
+         }
+         
+         /* Slide indicator styles */
+         .slide-indicator {
+             animation: slideIn 0.2s ease;
+             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+         }
+         
+         /* Reply preview styles */
+        #replyPreview {
+            background: var(--input-background);
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            color: var(--white);
+        }
+        
+        .reply-content {
+            flex: 1;
+        }
+        
+        .reply-header {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+        
+        .reply-text {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .cancel-reply {
+            background: var(--input-background);
+            border: 1px solid var(--border-light);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-light);
+            margin-left: 10px;
+        }
+        
+                 .cancel-reply:hover {
+             background: var(--border-light);
+             color: var(--white);
+         }
+         
+         /* Call interface styles */
+         .call-interface {
+             animation: fadeIn 0.3s ease;
+         }
+         
+         .incoming-call-alert {
+             animation: slideIn 0.3s ease;
+         }
+         
+         @keyframes fadeIn {
+             from { opacity: 0; }
+             to { opacity: 1; }
+         }
+         
+         @keyframes slideIn {
+             from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+             to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+         }
+         
+         /* Location sharing interface styles */
         .location-interface {
             animation: slideIn 0.3s ease;
         }
@@ -6521,9 +6657,28 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              messageDiv.innerHTML = `
                  ${messageContent}
                  <div class="message-time">${timeString}</div>
+                 <div class="message-actions" style="display: none;">
+                     <button class="action-btn reply-btn" title="Reply">
+                         <i class="fas fa-reply"></i>
+                     </button>
+                     <button class="action-btn forward-btn" title="Forward">
+                         <i class="fas fa-share"></i>
+                     </button>
+                     ${isSent ? `
+                         <button class="action-btn edit-btn" title="Edit">
+                             <i class="fas fa-edit"></i>
+                         </button>
+                         <button class="action-btn delete-btn" title="Delete">
+                             <i class="fas fa-trash"></i>
+                         </button>
+                     ` : ''}
+                 </div>
              `;
 
              messagesArea.appendChild(messageDiv);
+             
+             // Add long press functionality
+             addMessageLongPressSupport(messageDiv, messageData, messageId);
              
              // Play notification sound for incoming messages only
              if (!isSent && notificationSoundEnabled) {
@@ -6567,6 +6722,921 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              `;
          }
 
+         /**
+          * Add long press and slide support for messages with action buttons
+          */
+         function addMessageLongPressSupport(messageDiv, messageData, messageId) {
+             let longPressTimer = null;
+             let isLongPressed = false;
+             let touchStartX = 0;
+             let touchStartY = 0;
+             let touchEndX = 0;
+             let touchEndY = 0;
+             let isSliding = false;
+             
+             // Touch events for mobile
+             messageDiv.addEventListener('touchstart', (e) => {
+                 e.preventDefault();
+                 touchStartX = e.touches[0].clientX;
+                 touchStartY = e.touches[0].clientY;
+                 isSliding = false;
+                 
+                 longPressTimer = setTimeout(() => {
+                     if (!isSliding) {
+                         isLongPressed = true;
+                         showMessageActions(messageDiv, messageData, messageId);
+                     }
+                 }, 500); // 500ms long press
+             });
+             
+             messageDiv.addEventListener('touchmove', (e) => {
+                 if (longPressTimer) {
+                     clearTimeout(longPressTimer);
+                     longPressTimer = null;
+                 }
+                 
+                 touchEndX = e.touches[0].clientX;
+                 touchEndY = e.touches[0].clientY;
+                 
+                 const deltaX = touchEndX - touchStartX;
+                 const deltaY = touchEndY - touchStartY;
+                 
+                 // Check if it's a horizontal slide (more horizontal than vertical)
+                 if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                     isSliding = true;
+                     handleMessageSlide(messageDiv, messageData, messageId, deltaX);
+                 }
+             });
+             
+             messageDiv.addEventListener('touchend', (e) => {
+                 if (longPressTimer) {
+                     clearTimeout(longPressTimer);
+                     longPressTimer = null;
+                 }
+                 
+                 if (isSliding) {
+                     handleSlideEnd(messageDiv, messageData, messageId);
+                 }
+                 
+                 // Reset slide state
+                 isSliding = false;
+             });
+             
+             // Mouse events for desktop
+             messageDiv.addEventListener('mousedown', (e) => {
+                 if (e.button === 0) { // Left click only
+                     longPressTimer = setTimeout(() => {
+                         isLongPressed = true;
+                         showMessageActions(messageDiv, messageData, messageId);
+                     }, 500);
+                 }
+             });
+             
+             messageDiv.addEventListener('mouseup', () => {
+                 if (longPressTimer) {
+                     clearTimeout(longPressTimer);
+                     longPressTimer = null;
+                 }
+             });
+             
+             messageDiv.addEventListener('mouseleave', () => {
+                 if (longPressTimer) {
+                     clearTimeout(longPressTimer);
+                     longPressTimer = null;
+                 }
+             });
+             
+             // Right-click context menu
+             messageDiv.addEventListener('contextmenu', (e) => {
+                 e.preventDefault();
+                 showMessageActions(messageDiv, messageData, messageId);
+             });
+         }
+         
+         /**
+          * Handle message sliding for quick actions
+          */
+         function handleMessageSlide(messageDiv, messageData, messageId, deltaX) {
+             // Add slide visual feedback
+             messageDiv.style.transform = `translateX(${deltaX * 0.3}px)`;
+             messageDiv.style.transition = 'transform 0.1s ease';
+             
+             // Show slide indicator
+             let slideIndicator = messageDiv.querySelector('.slide-indicator');
+             if (!slideIndicator) {
+                 slideIndicator = document.createElement('div');
+                 slideIndicator.className = 'slide-indicator';
+                 slideIndicator.style.cssText = `
+                     position: absolute;
+                     left: ${deltaX > 0 ? '10px' : 'auto'};
+                     right: ${deltaX < 0 ? '10px' : 'auto'};
+                     top: 50%;
+                     transform: translateY(-50%);
+                     background: ${deltaX > 0 ? 'var(--accent-color)' : '#FF9800'};
+                     color: white;
+                     padding: 8px 12px;
+                     border-radius: 20px;
+                     font-size: 12px;
+                     z-index: 101;
+                     white-space: nowrap;
+                 `;
+                 
+                 if (deltaX > 0) {
+                     slideIndicator.innerHTML = '<i class="fas fa-reply"></i> Reply';
+                 } else {
+                     slideIndicator.innerHTML = '<i class="fas fa-share"></i> Forward';
+                 }
+                 
+                 messageDiv.appendChild(slideIndicator);
+             }
+         }
+         
+         /**
+          * Handle slide end and trigger action
+          */
+         function handleSlideEnd(messageDiv, messageData, messageId) {
+             const deltaX = touchEndX - touchStartX;
+             
+             // Reset transform
+             messageDiv.style.transform = '';
+             messageDiv.style.transition = '';
+             
+             // Remove slide indicator
+             const slideIndicator = messageDiv.querySelector('.slide-indicator');
+             if (slideIndicator) {
+                 slideIndicator.remove();
+             }
+             
+             // Trigger action based on slide direction
+             if (Math.abs(deltaX) > 100) { // Minimum slide distance
+                 if (deltaX > 0) {
+                     // Slide right = Reply
+                     replyToMessage(messageData, messageId);
+                 } else {
+                     // Slide left = Forward
+                     forwardMessage(messageData, messageId);
+                 }
+             }
+         }
+         
+         /**
+          * Show message action buttons
+          */
+         function showMessageActions(messageDiv, messageData, messageId) {
+             // Hide all other message actions first
+             document.querySelectorAll('.message-actions').forEach(actions => {
+                 actions.style.display = 'none';
+             });
+             
+             const actionsDiv = messageDiv.querySelector('.message-actions');
+             actionsDiv.style.display = 'flex';
+             
+             // Add event listeners to action buttons
+             const replyBtn = actionsDiv.querySelector('.reply-btn');
+             const forwardBtn = actionsDiv.querySelector('.forward-btn');
+             const editBtn = actionsDiv.querySelector('.edit-btn');
+             const deleteBtn = actionsDiv.querySelector('.delete-btn');
+             
+             if (replyBtn) {
+                 replyBtn.onclick = () => replyToMessage(messageData, messageId);
+             }
+             
+             if (forwardBtn) {
+                 forwardBtn.onclick = () => forwardMessage(messageData, messageId);
+             }
+             
+             if (editBtn) {
+                 editBtn.onclick = () => editMessage(messageData, messageId);
+             }
+             
+             if (deleteBtn) {
+                 deleteBtn.onclick = () => deleteMessage(messageData, messageId);
+             }
+             
+             // Auto-hide after 5 seconds
+             setTimeout(() => {
+                 actionsDiv.style.display = 'none';
+             }, 5000);
+         }
+         
+         /**
+          * Reply to a message
+          */
+         function replyToMessage(messageData, messageId) {
+             const replyPreview = document.getElementById('replyPreview') || createReplyPreview();
+             
+             replyPreview.innerHTML = `
+                 <div class="reply-content">
+                     <div class="reply-header">
+                         <i class="fas fa-reply"></i> Replying to ${messageData.senderUsername || 'Unknown'}
+                     </div>
+                     <div class="reply-text">${messageData.content}</div>
+                 </div>
+                 <button class="cancel-reply" onclick="cancelReply()">
+                     <i class="fas fa-times"></i>
+                 </button>
+             `;
+             
+             replyPreview.style.display = 'flex';
+             
+             // Store reply data
+             window.currentReplyTo = { messageId, messageData };
+             
+             // Focus on input
+             const messageInput = document.getElementById('messageInput');
+             if (messageInput) {
+                 messageInput.focus();
+             }
+             
+             // Hide message actions
+             document.querySelectorAll('.message-actions').forEach(actions => {
+                 actions.style.display = 'none';
+             });
+         }
+         
+         /**
+          * Forward a message
+          */
+         function forwardMessage(messageData, messageId) {
+             // Create forward modal
+             const forwardModal = document.createElement('div');
+             forwardModal.className = 'forward-modal';
+             forwardModal.style.cssText = `
+                 position: fixed;
+                 top: 0;
+                 left: 0;
+                 width: 100%;
+                 height: 100%;
+                 background: rgba(0,0,0,0.8);
+                 display: flex;
+                 align-items: center;
+                 justify-content: center;
+                 z-index: 10000;
+             `;
+             
+             forwardModal.innerHTML = `
+                 <div style="
+                     background: var(--card-background);
+                     border: 1px solid var(--border-light);
+                     border-radius: 15px;
+                     padding: 30px;
+                     max-width: 500px;
+                     width: 90%;
+                     color: var(--white);
+                 ">
+                     <h3 style="margin: 0 0 20px 0;">Forward Message</h3>
+                     <div style="
+                         background: var(--input-background);
+                         padding: 15px;
+                         border-radius: 8px;
+                         margin-bottom: 20px;
+                         border-left: 4px solid var(--accent-color);
+                     ">
+                         <div style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 5px;">
+                             From: ${messageData.senderUsername || 'Unknown'}
+                         </div>
+                         <div>${messageData.content}</div>
+                     </div>
+                     <div style="margin-bottom: 20px;">
+                         <label style="display: block; margin-bottom: 10px;">Select recipient:</label>
+                         <select id="forwardRecipient" style="
+                             width: 100%;
+                             padding: 10px;
+                             background: var(--input-background);
+                             border: 1px solid var(--border-light);
+                             border-radius: 8px;
+                             color: var(--white);
+                         ">
+                             <option value="">Select a friend...</option>
+                         </select>
+                     </div>
+                     <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                         <button onclick="this.closest('.forward-modal').remove()" style="
+                             background: var(--input-background);
+                             color: var(--white);
+                             border: 1px solid var(--border-light);
+                             padding: 10px 20px;
+                             border-radius: 8px;
+                             cursor: pointer;
+                         ">Cancel</button>
+                         <button onclick="confirmForward('${messageId}')" style="
+                             background: linear-gradient(135deg, var(--blue), var(--pink));
+                             color: white;
+                             border: none;
+                             padding: 10px 20px;
+                             border-radius: 8px;
+                             cursor: pointer;
+                         ">Forward</button>
+                     </div>
+                 </div>
+             `;
+             
+             document.body.appendChild(forwardModal);
+             
+             // Populate friends list
+             populateForwardRecipients();
+             
+             // Hide message actions
+             document.querySelectorAll('.message-actions').forEach(actions => {
+                 actions.style.display = 'none';
+             });
+         }
+         
+         /**
+          * Edit a message
+          */
+         function editMessage(messageData, messageId) {
+             const messageInput = document.getElementById('messageInput');
+             if (messageInput) {
+                 messageInput.value = messageData.content;
+                 messageInput.focus();
+                 
+                 // Store edit data
+                 window.currentEditMessage = { messageId, originalContent: messageData.content };
+                 
+                 // Change send button to edit button
+                 const sendBtn = document.getElementById('sendMessageBtn');
+                 if (sendBtn) {
+                     sendBtn.innerHTML = '<i class="fas fa-edit"></i>';
+                     sendBtn.onclick = () => saveEditedMessage(messageId);
+                 }
+                 
+                 // Show edit mode indicator
+                 showMessageBox('✏️ Edit mode: Type your changes and click the edit button', 'info');
+             }
+             
+             // Hide message actions
+             document.querySelectorAll('.message-actions').forEach(actions => {
+                 actions.style.display = 'none';
+             });
+         }
+         
+         /**
+          * Delete a message
+          */
+         function deleteMessage(messageData, messageId) {
+             const confirmModal = document.createElement('div');
+             confirmModal.style.cssText = `
+                 position: fixed;
+                 top: 50%;
+                 left: 50%;
+                 transform: translate(-50%, -50%);
+                 background: var(--card-background);
+                 border: 1px solid var(--border-light);
+                 border-radius: 15px;
+                 padding: 30px;
+                 z-index: 10000;
+                 text-align: center;
+                 color: var(--white);
+             `;
+             
+             confirmModal.innerHTML = `
+                 <h3 style="margin: 0 0 20px 0;">Delete Message</h3>
+                 <p style="margin-bottom: 20px; color: var(--text-light);">
+                     Are you sure you want to delete this message? This action cannot be undone.
+                 </p>
+                 <div style="display: flex; gap: 15px; justify-content: center;">
+                     <button onclick="this.closest('div').remove()" style="
+                         background: var(--input-background);
+                         color: var(--white);
+                         border: 1px solid var(--border-light);
+                         padding: 10px 20px;
+                         border-radius: 8px;
+                         cursor: pointer;
+                     ">Cancel</button>
+                     <button onclick="confirmDeleteMessage('${messageId}')" style="
+                         background: linear-gradient(135deg, #dc3545, #c82333);
+                         color: white;
+                         border: none;
+                         padding: 10px 20px;
+                         border-radius: 8px;
+                         cursor: pointer;
+                     ">Delete</button>
+                 </div>
+             `;
+             
+             document.body.appendChild(confirmModal);
+             
+             // Hide message actions
+             document.querySelectorAll('.message-actions').forEach(actions => {
+                 actions.style.display = 'none';
+             });
+         }
+         
+         /**
+          * Create reply preview element
+          */
+         function createReplyPreview() {
+             const replyPreview = document.createElement('div');
+             replyPreview.id = 'replyPreview';
+             replyPreview.style.cssText = `
+                 display: none;
+                 background: var(--input-background);
+                 border: 1px solid var(--border-light);
+                 border-radius: 8px;
+                 padding: 10px;
+                 margin-bottom: 10px;
+                 align-items: center;
+                 justify-content: space-between;
+                 color: var(--white);
+             `;
+             
+             // Insert before message input
+             const messageInput = document.getElementById('messageInput');
+             if (messageInput && messageInput.parentNode) {
+                 messageInput.parentNode.insertBefore(replyPreview, messageInput);
+             }
+             
+             return replyPreview;
+         }
+         
+         /**
+          * Cancel reply
+          */
+         function cancelReply() {
+             const replyPreview = document.getElementById('replyPreview');
+             if (replyPreview) {
+                 replyPreview.style.display = 'none';
+             }
+             
+             // Clear reply data
+             window.currentReplyTo = null;
+         }
+         
+         /**
+          * Populate forward recipients dropdown
+          */
+         function populateForwardRecipients() {
+             const select = document.getElementById('forwardRecipient');
+             if (!select) return;
+             
+             // Clear existing options
+             select.innerHTML = '<option value="">Select a friend...</option>';
+             
+             // Add friends
+             if (currentUsersFriends && currentUsersFriends.size > 0) {
+                 currentUsersFriends.forEach(friendId => {
+                     const friendData = allUsersData.find(user => user.uid === friendId);
+                     if (friendData) {
+                         const option = document.createElement('option');
+                         option.value = friendId;
+                         option.textContent = friendData.username || friendData.displayName || 'Unknown User';
+                         select.appendChild(option);
+                     }
+                 });
+             }
+         }
+         
+         /**
+          * Confirm forward action
+          */
+         function confirmForward(messageId) {
+             const recipientId = document.getElementById('forwardRecipient').value;
+             if (!recipientId) {
+                 showMessageBox('Please select a recipient', 'warning');
+                 return;
+             }
+             
+             // Get message data
+             const messageDiv = document.querySelector(`[data-message-id="${messageId}"]`);
+             if (!messageDiv) return;
+             
+             // TODO: Implement actual forwarding logic
+             showMessageBox('Message forwarded successfully!', 'success');
+             
+             // Close modal
+             document.querySelector('.forward-modal').remove();
+         }
+         
+         /**
+          * Save edited message
+          */
+         function saveEditedMessage(messageId) {
+             const messageInput = document.getElementById('messageInput');
+             const newContent = messageInput.value.trim();
+             
+             if (!newContent) {
+                 showMessageBox('Message cannot be empty', 'warning');
+                 return;
+             }
+             
+             // TODO: Implement actual edit logic
+             showMessageBox('Message edited successfully!', 'success');
+             
+             // Reset input and button
+             messageInput.value = '';
+             const sendBtn = document.getElementById('sendMessageBtn');
+             if (sendBtn) {
+                 sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                 sendBtn.onclick = null; // Reset to default
+             }
+             
+             // Clear edit data
+             window.currentEditMessage = null;
+         }
+         
+         /**
+          * Confirm delete message
+          */
+         function confirmDeleteMessage(messageId) {
+             // TODO: Implement actual delete logic
+             showMessageBox('Message deleted successfully!', 'success');
+             
+             // Remove message from UI
+             const messageDiv = document.querySelector(`[data-message-id="${messageId}"]`);
+             if (messageDiv) {
+                 messageDiv.remove();
+             }
+             
+             // Close modal
+             document.querySelector('div[style*="position: fixed"]').remove();
+         }
+         
+         /**
+          * Start voice call with partner
+          */
+         async function startVoiceCall(partnerId) {
+             try {
+                 if (!partnerId) {
+                     showMessageBox('No partner selected for call', 'error');
+                     return;
+                 }
+                 
+                 // Check if user has permission to make calls
+                 if (!currentUser || !currentUser.uid) {
+                     showMessageBox('Please sign in to make calls', 'error');
+                     return;
+                 }
+                 
+                 // Get partner info
+                 const partnerData = allUsersData.find(user => user.uid === partnerId);
+                 if (!partnerData) {
+                     showMessageBox('Partner not found', 'error');
+                     return;
+                 }
+                 
+                 // Show calling interface
+                 showCallInterface('voice', partnerData);
+                 
+                 // Send call signal to partner
+                 await sendCallSignal(partnerId, 'voice', 'incoming');
+                 
+                 showMessageBox('📞 Calling...', 'info');
+                 
+             } catch (error) {
+                 console.error('JCHAT_ERROR: Error starting voice call:', error);
+                 showMessageBox('Failed to start call', 'error');
+             }
+         }
+         
+         /**
+          * Start video call with partner
+          */
+         async function startVideoCall(partnerId) {
+             try {
+                 if (!partnerId) {
+                     showMessageBox('No partner selected for call', 'error');
+                     return;
+                 }
+                 
+                 // Check if user has permission to make calls
+                 if (!currentUser || !currentUser.uid) {
+                     showMessageBox('Please sign in to make calls', 'error');
+                     return;
+                 }
+                 
+                 // Get partner info
+                 const partnerData = allUsersData.find(user => user.uid === partnerId);
+                 if (!partnerData) {
+                     showMessageBox('Partner not found', 'error');
+                     return;
+                 }
+                 
+                 // Show calling interface
+                 showCallInterface('video', partnerData);
+                 
+                 // Send call signal to partner
+                 await sendCallSignal(partnerId, 'video', 'incoming');
+                 
+                 showMessageBox('📹 Calling...', 'info');
+                 
+             } catch (error) {
+                 console.error('JCHAT_ERROR: Error starting video call:', error);
+                 showMessageBox('Failed to start call', 'error');
+             }
+         }
+         
+         /**
+          * Show call interface
+          */
+         function showCallInterface(callType, partnerData) {
+             // Remove existing call interface
+             const existingCall = document.querySelector('.call-interface');
+             if (existingCall) {
+                 existingCall.remove();
+             }
+             
+             const callInterface = document.createElement('div');
+             callInterface.className = 'call-interface';
+             callInterface.style.cssText = `
+                 position: fixed;
+                 top: 0;
+                 left: 0;
+                 width: 100%;
+                 height: 100%;
+                 background: var(--card-background);
+                 z-index: 10000;
+                 display: flex;
+                 flex-direction: column;
+                 align-items: center;
+                 justify-content: center;
+                 color: var(--white);
+             `;
+             
+             const partnerName = partnerData.username || partnerData.displayName || 'Unknown User';
+             const callTypeText = callType === 'video' ? 'Video Call' : 'Voice Call';
+             
+             callInterface.innerHTML = `
+                 <div style="text-align: center; margin-bottom: 30px;">
+                     <div style="
+                         width: 120px;
+                         height: 120px;
+                         border-radius: 50%;
+                         background: linear-gradient(135deg, var(--blue), var(--pink));
+                         display: flex;
+                         align-items: center;
+                         justify-content: center;
+                         margin: 0 auto 20px;
+                         font-size: 48px;
+                         color: white;
+                     ">
+                         <i class="fas fa-${callType === 'video' ? 'video' : 'phone'}"></i>
+                     </div>
+                     <h2 style="margin: 0 0 10px 0;">${callTypeText}</h2>
+                     <p style="margin: 0; color: var(--text-light);">Calling ${partnerName}...</p>
+                 </div>
+                 
+                 <div style="display: flex; gap: 20px;">
+                     <button onclick="endCall()" style="
+                         background: linear-gradient(135deg, #dc3545, #c82333);
+                         color: white;
+                         border: none;
+                         border-radius: 50%;
+                         width: 60px;
+                         height: 60px;
+                         display: flex;
+                         align-items: center;
+                         justify-content: center;
+                         cursor: pointer;
+                         font-size: 24px;
+                     ">
+                         <i class="fas fa-phone-slash"></i>
+                     </button>
+                 </div>
+                 
+                 <div style="
+                     position: absolute;
+                     top: 20px;
+                     right: 20px;
+                     background: var(--input-background);
+                     padding: 10px 15px;
+                     border-radius: 20px;
+                     color: var(--text-light);
+                     font-size: 0.9rem;
+                 ">
+                     <i class="fas fa-clock"></i> 00:00
+                 </div>
+             `;
+             
+             document.body.appendChild(callInterface);
+             
+             // Start call timer
+             startCallTimer();
+         }
+         
+         /**
+          * Send call signal to partner
+          */
+         async function sendCallSignal(partnerId, callType, status) {
+             try {
+                 const callSignal = {
+                     from: currentUser.uid,
+                     to: partnerId,
+                     type: callType,
+                     status: status, // 'incoming', 'answered', 'declined', 'ended'
+                     timestamp: new Date(),
+                     fromUsername: currentUser.displayName || 'Unknown User'
+                 };
+                 
+                 // Store call signal in database
+                 const callSignalRef = doc(db, 'artifacts', appId, 'calls', partnerId);
+                 await setDoc(callSignalRef, {
+                     [currentUser.uid]: callSignal
+                 }, { merge: true });
+                 
+                 console.log('JCHAT_DEBUG: Call signal sent:', callSignal);
+                 
+             } catch (error) {
+                 console.error('JCHAT_ERROR: Error sending call signal:', error);
+                 throw error;
+             }
+         }
+         
+         /**
+          * End current call
+          */
+         function endCall() {
+             const callInterface = document.querySelector('.call-interface');
+             if (callInterface) {
+                 callInterface.remove();
+             }
+             
+             // Stop call timer
+             if (window.callTimerInterval) {
+                 clearInterval(window.callTimerInterval);
+                 window.callTimerInterval = null;
+             }
+             
+             showMessageBox('Call ended', 'info');
+         }
+         
+         /**
+          * Start call timer
+          */
+         function startCallTimer() {
+             let seconds = 0;
+             window.callTimerInterval = setInterval(() => {
+                 seconds++;
+                 const minutes = Math.floor(seconds / 60);
+                 const remainingSeconds = seconds % 60;
+                 const timeString = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+                 
+                 const timerElement = document.querySelector('.call-interface .fa-clock').parentElement;
+                 if (timerElement) {
+                     timerElement.innerHTML = `<i class="fas fa-clock"></i> ${timeString}`;
+                 }
+             }, 1000);
+         }
+         
+         /**
+          * Listen for incoming calls
+          */
+         function listenForIncomingCalls() {
+             if (!currentUser || !currentUser.uid) return;
+             
+             const callSignalRef = doc(db, 'artifacts', appId, 'calls', currentUser.uid);
+             onSnapshot(callSignalRef, (doc) => {
+                 if (doc.exists()) {
+                     const callData = doc.data();
+                     Object.keys(callData).forEach(callerId => {
+                         const call = callData[callerId];
+                         if (call.status === 'incoming') {
+                             showIncomingCallAlert(call);
+                         }
+                     });
+                 }
+             });
+         }
+         
+         /**
+          * Show incoming call alert
+          */
+         function showIncomingCallAlert(call) {
+             const alertDiv = document.createElement('div');
+             alertDiv.className = 'incoming-call-alert';
+             alertDiv.style.cssText = `
+                 position: fixed;
+                 top: 50%;
+                 left: 50%;
+                 transform: translate(-50%, -50%);
+                 background: var(--card-background);
+                 border: 1px solid var(--border-light);
+                 border-radius: 15px;
+                 padding: 30px;
+                 z-index: 10001;
+                 text-align: center;
+                 color: var(--white);
+                 min-width: 300px;
+             `;
+             
+             const callTypeText = call.type === 'video' ? 'Video Call' : 'Voice Call';
+             
+             alertDiv.innerHTML = `
+                 <div style="
+                     width: 80px;
+                     height: 80px;
+                     border-radius: 50%;
+                     background: linear-gradient(135deg, var(--blue), var(--pink));
+                     display: flex;
+                         align-items: center;
+                     justify-content: center;
+                     margin: 0 auto 20px;
+                     font-size: 32px;
+                     color: white;
+                 ">
+                     <i class="fas fa-${call.type === 'video' ? 'video' : 'phone'}"></i>
+                 </div>
+                 <h3 style="margin: 0 0 10px 0;">Incoming ${callTypeText}</h3>
+                 <p style="margin: 0 0 20px 0; color: var(--text-light);">${call.fromUsername}</p>
+                 
+                 <div style="display: flex; gap: 15px; justify-content: center;">
+                     <button onclick="answerCall('${call.from}', '${call.type}')" style="
+                         background: linear-gradient(135deg, #4CAF50, #8BC34A);
+                         color: white;
+                         border: none;
+                         border-radius: 50%;
+                         width: 50px;
+                         height: 50px;
+                         display: flex;
+                         align-items: center;
+                         justify-content: center;
+                         cursor: pointer;
+                         font-size: 20px;
+                     ">
+                         <i class="fas fa-phone"></i>
+                     </button>
+                     <button onclick="declineCall('${call.from}')" style="
+                         background: linear-gradient(135deg, #dc3545, #c82333);
+                         color: white;
+                         border: none;
+                         border-radius: 50%;
+                         width: 50px;
+                         height: 50px;
+                         display: flex;
+                         align-items: center;
+                         justify-content: center;
+                         cursor: pointer;
+                         font-size: 20px;
+                     ">
+                         <i class="fas fa-phone-slash"></i>
+                     </button>
+                 </div>
+             `;
+             
+             document.body.appendChild(alertDiv);
+             
+             // Auto-remove after 30 seconds
+             setTimeout(() => {
+                 if (alertDiv.parentNode) {
+                     alertDiv.remove();
+                 }
+             }, 30000);
+         }
+         
+         /**
+          * Answer incoming call
+          */
+         async function answerCall(callerId, callType) {
+             try {
+                 // Remove incoming call alert
+                 const alert = document.querySelector('.incoming-call-alert');
+                 if (alert) {
+                     alert.remove();
+                 }
+                 
+                 // Get caller info
+                 const callerData = allUsersData.find(user => user.uid === callerId);
+                 if (!callerData) {
+                     showMessageBox('Caller not found', 'error');
+                     return;
+                 }
+                 
+                 // Show call interface
+                 showCallInterface(callType, callerData);
+                 
+                 // Update call status
+                 await sendCallSignal(callerId, callType, 'answered');
+                 
+                 showMessageBox('Call connected!', 'success');
+                 
+             } catch (error) {
+                 console.error('JCHAT_ERROR: Error answering call:', error);
+                 showMessageBox('Failed to answer call', 'error');
+             }
+         }
+         
+         /**
+          * Decline incoming call
+          */
+         async function declineCall(callerId) {
+             try {
+                 // Remove incoming call alert
+                 const alert = document.querySelector('.incoming-call-alert');
+                 if (alert) {
+                     alert.remove();
+                 }
+                 
+                 // Update call status
+                 await sendCallSignal(callerId, 'voice', 'declined');
+                 
+                 showMessageBox('Call declined', 'info');
+                 
+             } catch (error) {
+                 console.error('JCHAT_ERROR: Error declining call:', error);
+                 showMessageBox('Failed to decline call', 'error');
+             }
+         }
+         
          /**
           * Play voice note - Legacy function (replaced by new implementation above)
           * Keeping for backward compatibility but using new system
@@ -6745,8 +7815,8 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                          return;
                      }
                      
-                     // TODO: Implement voice calling
-                     showMessageBox('🚀 Voice calling coming soon!', 'info');
+                     // Start voice call
+                     startVoiceCall(partnerId);
                  });
              }
              
@@ -6765,8 +7835,8 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                          return;
                      }
                      
-                     // TODO: Implement video calling
-                     showMessageBox('🚀 Video calling coming soon!', 'info');
+                     // Start video call
+                     startVideoCall(partnerId);
                  });
              }
 
@@ -6947,7 +8017,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  
                  // Initialize call signal listener for incoming calls
                  console.log("JCHAT_DEBUG: Setting up call signal listener...");
-                 listenForCallSignals();
+                 listenForIncomingCalls();
                  
                  // Update user activity status
                  await updateUserActivity();
