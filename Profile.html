@@ -228,6 +228,12 @@
             -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
         }
 
+        /* Ensure natural scrolling behavior */
+        body, html {
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-y: auto; /* Allow natural vertical scrolling */
+        }
+
         body {
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
@@ -751,15 +757,14 @@
             background: linear-gradient(to bottom, var(--pink), var(--blue));
         }
 
-        /* Touch gesture improvements */
+        /* Touch gesture improvements - simplified for better scrolling */
         .content-wrapper,
         .profile-section,
         .unlocked-rewards-section,
         .recent-activity-section,
         .customization-section,
         .wallet-guide-section {
-            touch-action: pan-y; /* Enable vertical panning */
-            overscroll-behavior: contain; /* Prevent overscroll bounce */
+            /* Removed touch-action and overscroll restrictions for better natural scrolling */
         }
 
         /* Enhanced Profile Section (adapted from original Profile.html and settings-section) */
@@ -944,9 +949,9 @@
                 min-height: 44px;
             }
 
-            /* Swipe gestures for mobile */
+            /* Mobile touch improvements - simplified for better scrolling */
             .profile-section {
-                touch-action: pan-y;
+                /* Removed touch-action restrictions for better natural scrolling */
             }
 
             /* Mobile-friendly modals */
@@ -998,16 +1003,9 @@
             }
         }
 
-        /* Touch gesture support */
+        /* Touch gesture support - simplified for better scrolling */
         .profile-section {
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-
-        .profile-section.swiping {
-            transition: none;
+            /* Removed user-select restrictions for better touch interaction */
         }
 
         /* NEW: Theme Presets Styles */
@@ -3999,6 +3997,12 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            /* Enhanced mobile scrolling */
+            .content-wrapper {
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+            }
         }
 
         @media (max-width: 480px) {
@@ -6165,61 +6169,11 @@
 
         /**
          * Initializes touch gestures for mobile devices.
+         * Simplified to prevent interference with natural scrolling.
          */
         function initializeTouchGestures() {
-            const profileSection = document.querySelector('.profile-section');
-            if (!profileSection) return;
-
-            let startY = 0;
-            let startX = 0;
-            let isSwiping = false;
-
-            // Touch start
-            profileSection.addEventListener('touchstart', (e) => {
-                startY = e.touches[0].clientY;
-                startX = e.touches[0].clientX;
-                isSwiping = false;
-            }, { passive: true });
-
-            // Touch move
-            profileSection.addEventListener('touchmove', (e) => {
-                if (!isSwiping) {
-                    const deltaY = Math.abs(e.touches[0].clientY - startY);
-                    const deltaX = Math.abs(e.touches[0].clientX - startX);
-                    
-                    if (deltaY > 10 && deltaY > deltaX) {
-                        isSwiping = true;
-                        profileSection.classList.add('swiping');
-                    }
-                }
-            }, { passive: true });
-
-            // Touch end
-            profileSection.addEventListener('touchend', (e) => {
-                if (isSwiping) {
-                    const deltaY = e.changedTouches[0].clientY - startY;
-                    
-                    if (Math.abs(deltaY) > 50) {
-                        // Swipe up/down detected
-                        if (deltaY < 0) {
-                            // Swipe up - could trigger profile completion focus
-                            const completionSection = document.querySelector('.profile-completion-section');
-                            if (completionSection) {
-                                completionSection.scrollIntoView({ behavior: 'smooth' });
-                            }
-                        } else {
-                            // Swipe down - removed auto-trigger to prevent unwanted opening
-                            // The tiny menu should only open on explicit user clicks
-                        }
-                    }
-                    
-                    setTimeout(() => {
-                        profileSection.classList.remove('swiping');
-                    }, 100);
-                }
-            }, { passive: true });
-
-            // Add haptic feedback for mobile
+            // Only add haptic feedback for mobile buttons
+            // Removed aggressive swipe detection that was interfering with scrolling
             if ('vibrate' in navigator) {
                 const actionButtons = document.querySelectorAll('.profile-action-button');
                 actionButtons.forEach(button => {
