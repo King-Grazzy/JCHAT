@@ -7580,7 +7580,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                      ">
                          <i class="fas fa-phone"></i>
                      </button>
-                     <button onclick="declineCall('${call.from}')" style="
+                                              <button onclick="declineNewCall('${call.from}')" style="
                          background: linear-gradient(135deg, #dc3545, #c82333);
                          color: white;
                          border: none;
@@ -7643,7 +7643,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          /**
           * Decline incoming call
           */
-         async function declineCall(callerId) {
+         async function declineNewCall(callerId) {
              try {
                  // Remove incoming call alert
                  const alert = document.querySelector('.incoming-call-alert');
@@ -7667,7 +7667,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          window.startVideoCall = startVideoCall;
          window.endNewCall = endNewCall;
          window.answerCall = answerCall;
-         window.declineNewCall = declineCall;
+         window.declineNewCall = declineNewCall;
          
          /**
           * Global voice recording functions for onclick handlers
