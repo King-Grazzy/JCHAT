@@ -227,6 +227,198 @@
             touch-action: auto !important;
             -webkit-overflow-scrolling: touch !important;
         }
+
+        /* Pink and Blue Glowing Loader */
+        .jchat-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 30, 0.95));
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .jchat-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-container {
+            text-align: center;
+            position: relative;
+        }
+
+        .loader-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid transparent;
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto 20px;
+            animation: spin 2s linear infinite;
+        }
+
+        .loader-spinner::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 4px solid transparent;
+            border-top: 4px solid var(--pink);
+            border-right: 4px solid var(--blue);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite reverse;
+            filter: drop-shadow(0 0 20px var(--pink)) drop-shadow(0 0 20px var(--blue));
+        }
+
+        .loader-spinner::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 3px solid transparent;
+            border-bottom: 3px solid var(--pink);
+            border-left: 3px solid var(--blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            filter: drop-shadow(0 0 15px var(--pink)) drop-shadow(0 0 15px var(--blue));
+        }
+
+        .loader-text {
+            color: var(--white);
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--pink), var(--blue), var(--pink));
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        .loader-subtext {
+            color: var(--text-light);
+            font-size: 14px;
+            opacity: 0.7;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loader-dots {
+            display: inline-flex;
+            gap: 4px;
+            margin-left: 5px;
+        }
+
+        .loader-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            animation: bounce 1.4s ease-in-out infinite;
+            filter: drop-shadow(0 0 8px var(--pink)) drop-shadow(0 0 8px var(--blue));
+        }
+
+        .loader-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loader-dot:nth-child(2) { animation-delay: -0.16s; }
+        .loader-dot:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { 
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% { 
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Loader particle effects */
+        .loader-particles {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            margin: -100px 0 0 -100px;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--pink);
+            box-shadow: 0 0 10px var(--pink);
+            animation: orbit 4s linear infinite;
+        }
+
+        .particle:nth-child(1) {
+            background: var(--blue);
+            box-shadow: 0 0 10px var(--blue);
+            animation-delay: 0s;
+            animation-duration: 3s;
+        }
+
+        .particle:nth-child(2) {
+            animation-delay: -1s;
+            animation-duration: 4s;
+        }
+
+        .particle:nth-child(3) {
+            background: var(--blue);
+            box-shadow: 0 0 10px var(--blue);
+            animation-delay: -2s;
+            animation-duration: 3.5s;
+        }
+
+        .particle:nth-child(4) {
+            animation-delay: -3s;
+            animation-duration: 4.5s;
+        }
+
+        @keyframes orbit {
+            0% {
+                transform: rotate(0deg) translateX(100px) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: rotate(360deg) translateX(100px) rotate(-360deg);
+                opacity: 1;
+            }
+        }
         
         html, body {
             scroll-behavior: auto !important;
@@ -4502,8 +4694,27 @@
     </style>
 </head>
 <body class="theme-dark-mode">
-
-
+    <!-- JCHAT Pink & Blue Glowing Loader -->
+    <div id="jchatLoader" class="jchat-loader">
+        <div class="loader-container">
+            <div class="loader-spinner"></div>
+            <div class="loader-particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+            </div>
+            <div class="loader-text">JCHAT</div>
+            <div class="loader-subtext">
+                Loading your profile
+                <span class="loader-dots">
+                    <span class="loader-dot"></span>
+                    <span class="loader-dot"></span>
+                    <span class="loader-dot"></span>
+                </span>
+            </div>
+        </div>
+    </div>
 
     <header>
         <div class="header-content-wrapper">
@@ -5189,7 +5400,77 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-
+        // --- JCHAT Loader Management ---
+        const jchatLoader = document.getElementById('jchatLoader');
+        let loaderTimeout;
+        
+        // Show loader function
+        function showLoader(message = 'Loading your profile') {
+            if (jchatLoader) {
+                const subtext = jchatLoader.querySelector('.loader-subtext');
+                if (subtext) {
+                    const dotsHtml = `<span class="loader-dots">
+                        <span class="loader-dot"></span>
+                        <span class="loader-dot"></span>
+                        <span class="loader-dot"></span>
+                    </span>`;
+                    subtext.innerHTML = message + dotsHtml;
+                }
+                jchatLoader.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+                console.log('JCHAT_DEBUG: Profile loader shown');
+            }
+        }
+        
+        // Hide loader function
+        function hideLoader() {
+            if (jchatLoader) {
+                jchatLoader.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                console.log('JCHAT_DEBUG: Profile loader hidden');
+                
+                // Clean up after animation completes
+                setTimeout(() => {
+                    if (jchatLoader.classList.contains('hidden')) {
+                        jchatLoader.style.display = 'none';
+                    }
+                }, 500);
+            }
+        }
+        
+        // Progressive loader messages for profile
+        const profileLoaderMessages = [
+            'Initializing JCHAT',
+            'Connecting to servers',
+            'Loading your profile',
+            'Setting up features',
+            'Almost ready'
+        ];
+        
+        let messageIndex = 0;
+        
+        // Update loader message periodically
+        function updateLoaderMessage() {
+            if (messageIndex < profileLoaderMessages.length && !jchatLoader.classList.contains('hidden')) {
+                showLoader(profileLoaderMessages[messageIndex]);
+                messageIndex++;
+                setTimeout(updateLoaderMessage, 2000); // Update every 2 seconds
+            }
+        }
+        
+        // Auto-hide loader after maximum time (fallback)
+        function setLoaderTimeout() {
+            clearTimeout(loaderTimeout);
+            loaderTimeout = setTimeout(() => {
+                console.log('JCHAT_DEBUG: Profile loader auto-hide after timeout');
+                hideLoader();
+            }, 12000); // Hide after 12 seconds maximum
+        }
+        
+        // Initialize loader on page load
+        showLoader();
+        setLoaderTimeout();
+        updateLoaderMessage();
 
         // --- DOM Elements ---
         const headerProfilePic = document.getElementById('headerProfilePic');
@@ -8604,6 +8885,9 @@
                     // Fetch and display user profile after header profile is ready
                     await fetchAndDisplayUserProfile(displayedUserId);
                     fetchNotificationCount(user.uid); // Fetch notification count
+                    
+                    // Hide loader after profile is fully loaded
+                    hideLoader();
 
                 } else {
                 console.log("JCHAT_DEBUG: No user signed in.");
@@ -8660,10 +8944,15 @@
                 if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
+                
+                // Hide loader when no user is signed in
+                hideLoader();
             }
         } catch (error) {
             console.error("JCHAT_ERROR: Error in authentication flow:", error);
             showMessageBox(`Authentication error: ${error.message}`, 'error');
+            // Hide loader on error
+            hideLoader();
         } finally {
             // Always ensure loader is hidden after authentication flow
             console.log("JCHAT_DEBUG: Authentication flow complete");
