@@ -3446,69 +3446,7 @@
             min-height: 80px;
         }
 
-        /* NEW: Toggle switch for privacy settings */
-        .privacy-toggle-group {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px dashed rgba(255,255,255,0.1);
-            margin-bottom: 10px;
-        }
-        .privacy-toggle-group:last-child {
-            border-bottom: none;
-        }
-        .privacy-toggle-group label {
-            margin-bottom: 0;
-        }
-        /* Toggle button styles (reused from Admin.html) */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-switch .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--input-background);
-            transition: .4s;
-            border-radius: 34px;
-            border: 1px solid var(--border-light);
-        }
-
-        .toggle-switch .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: var(--text-light);
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        .toggle-switch input:checked + .slider {
-            background-image: linear-gradient(90deg, var(--blue), var(--pink));
-            border-color: var(--blue);
-        }
-
-        .toggle-switch input:checked + .slider:before {
-            transform: translateX(26px);
-            background-color: var(--white);
-        }
+        /* Removed privacy settings toggle CSS as privacy settings were removed */
 
         /* NEW: Unlocked Rewards Section */
         .unlocked-rewards-section, .recent-activity-section, .customization-section {
@@ -4724,13 +4662,7 @@
                 padding: 0.7rem 0.9rem;
                 font-size: 0.9rem;
             }
-            .privacy-toggle-group label {
-                font-size: 0.9rem;
-            }
-            .toggle-switch {
-                transform: scale(0.8); /* Scale down for mobile */
-                transform-origin: right center;
-            }
+            /* Removed privacy toggle responsive CSS as privacy settings were removed */
             .unlocked-rewards-section h3, .friends-snippet-section h3, .recent-activity-section h3, .customization-section h3 {
                 font-size: 1.2rem;
             }
@@ -5255,9 +5187,6 @@
                 <div class="profile-actions" id="profileActions">
                     <!-- Buttons will be dynamically added/hidden based on owner/viewer -->
                     <!-- Removed Edit Profile Button -->
-                    <a href="/privacy_settings.html" id="privacySettingsButton" class="profile-action-button secondary">
-                        <i class="fas fa-user-shield"></i> Privacy Settings
-                    </a>
                     <!-- NEW: Wallet Link -->
 
                     
@@ -5781,19 +5710,7 @@
             const highlightsGrid = document.getElementById('highlightsGrid');
             const addHighlightBtn = document.getElementById('addHighlightBtn');
 
-            // NEW: Privacy Settings Toggles
-            const toggleEmailVisibility = document.getElementById('toggleEmailVisibility');
-        const toggleLocationVisibility = document.getElementById('toggleLocationVisibility');
-        const toggleUserIdVisibility = document.getElementById('toggleUserIdVisibility');
-        const toggleOnlineStatusVisibility = document.getElementById('toggleOnlineStatusVisibility');
-        const toggleFriendRequests = document.getElementById('toggleFriendRequests');
-        const toggleMessages = document.getElementById('toggleMessages');
-        const toggleSchoolVisibility = document.getElementById('toggleSchoolVisibility');
-        const toggleWorkVisibility = document.getElementById('toggleWorkVisibility');
-        const toggleInterestsVisibility = document.getElementById('toggleInterestsVisibility');
-        const toggleWebsiteVisibility = document.getElementById('toggleWebsiteVisibility');
-        const toggleSocialLinksVisibility = document.getElementById('toggleSocialLinksVisibility');
-        const savePrivacySettingsButton = document.getElementById('savePrivacySettingsButton');
+            // Removed privacy settings toggles as requested
 
         // NEW: Customization Selects
         const profileFrameSelect = document.getElementById('profileFrameSelect');
@@ -8916,18 +8833,8 @@
             if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
             if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
             if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
-            if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
-            if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none'; // Hide parent div
-            if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
-            if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'none';
-            if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
-            if (toggleFriendRequests) toggleFriendRequests.closest('.privacy-toggle-group').style.display = 'none';
-            if (toggleMessages) toggleMessages.closest('.privacy-toggle-group').style.display = 'none';
-            if (toggleSchoolVisibility) toggleSchoolVisibility.closest('.privacy-toggle-group').style.display = 'none';
-            if (toggleWorkVisibility) toggleWorkVisibility.closest('.privacy-toggle-group').style.display = 'none';
-            if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'none';
-            if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
-            if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
+            // Removed privacy settings hiding code as requested
+            // Removed additional privacy settings hiding code as requested
 
             let profileDocRef;
             let isCurrentUserProfile = false;
@@ -9292,21 +9199,7 @@
                         if (toggleSchoolVisibility) toggleSchoolVisibility.checked = visibility.school ?? false;
                         if (toggleWorkVisibility) toggleWorkVisibility.checked = visibility.work ?? false;
                         if (toggleInterestsVisibility) toggleInterestsVisibility.checked = visibility.interests ?? false;
-                        if (toggleWebsiteVisibility) toggleWebsiteVisibility.checked = visibility.website ?? false;
-                        if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.checked = visibility.socialLinks ?? false;
-                        // Show privacy toggles and save button
-                        if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (toggleFriendRequests) toggleFriendRequests.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (toggleMessages) toggleMessages.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (toggleSchoolVisibility) toggleSchoolVisibility.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (toggleWorkVisibility) toggleWorkVisibility.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'inline-flex';
+                        // Removed privacy settings display code as requested
 
                         // Populate customization selects
                         if (profileFrameSelect) profileFrameSelect.value = displayedUserProfileData.profileFrame || 'default';
@@ -9352,18 +9245,7 @@
                         if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
                         if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
                         if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
-                        if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
-                        if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleFriendRequests) toggleFriendRequests.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleMessages) toggleMessages.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleSchoolVisibility) toggleSchoolVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleWorkVisibility) toggleWorkVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
+                        // Removed privacy settings hiding code as requested
                     } else { // Not logged in, viewing any profile
                         
                         if (requestJCoinsButton) requestJCoinsButton.style.display = 'none'; // Hide request JCoins button, null check
@@ -9385,18 +9267,7 @@
                         if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
                         if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
                         if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
-                        if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
-                        if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleFriendRequests) toggleFriendRequests.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleMessages) toggleMessages.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleSchoolVisibility) toggleSchoolVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleWorkVisibility) toggleWorkVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                        if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
+                        // Removed privacy settings hiding code as requested
                     }
 
                     // Load user's posts (if desired on profile page)
@@ -9440,17 +9311,7 @@
                     if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
                     if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
                     if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
-                    if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
-                    if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                    if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                    if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                    if (toggleFriendRequests) toggleFriendRequests.closest('.privacy-toggle-group').style.display = 'none';
-                    if (toggleMessages) toggleMessages.closest('.privacy-toggle-group').style.display = 'none';
-                    if (toggleSchoolVisibility) toggleSchoolVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                    if (toggleWorkVisibility) toggleWorkVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                    if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                    if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
-                    if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
+                    // Removed privacy settings hiding code as requested
 
                 }
             } catch (error) {
