@@ -1269,6 +1269,100 @@
             margin: 0;
         }
 
+        /* Mobile Responsive Message Box */
+        @media (max-width: 768px) {
+            #messageBox {
+                top: 15px;
+                left: 20px;
+                right: 20px;
+                transform: none;
+                min-width: auto;
+                max-width: none;
+                width: calc(100vw - 40px);
+                padding: 20px 24px;
+                border-radius: 12px;
+            }
+            
+            #messageBox.show {
+                animation: messageBoxEntranceMobile 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+            
+            #messageBox.hiding {
+                animation: messageBoxExitMobile 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+            }
+
+            #messageBox.queued {
+                animation: messageBoxQueueMobile 0.3s ease-out;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #messageBox {
+                top: 10px;
+                left: 15px;
+                right: 15px;
+                width: calc(100vw - 30px);
+                padding: 18px 20px;
+                border-radius: 10px;
+                gap: 12px;
+            }
+            
+            #messageBox i {
+                font-size: 1.5rem;
+            }
+            
+            #messageBox span {
+                font-size: 0.95rem;
+            }
+
+            #messageBox .message-close-btn {
+                top: 8px;
+                right: 8px;
+                width: 20px;
+                height: 20px;
+                font-size: 10px;
+            }
+
+            #messageBox .sound-indicator {
+                bottom: 6px;
+                right: 6px;
+                width: 14px;
+                height: 14px;
+                font-size: 7px;
+            }
+
+            #messageBox.queued {
+                animation: messageBoxQueueMobile 0.3s ease-out;
+            }
+        }
+
+        /* Professional Message Box Exit Animation */
+        #messageBox.hiding {
+            animation: messageBoxExit 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+        }
+
+        @keyframes messageBoxExit {
+            0% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px) scale(0.9);
+            }
+        }
+
+        @keyframes messageBoxExitMobile {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
+        }
+
         /* Media Filter Styles */
         .media-filter-section {
             margin-bottom: 20px;
@@ -3780,51 +3874,79 @@
         .sub-section p a:hover {
             color: var(--pink); /* Consistent hover color */
         }
-        /* Custom Message Box Styles (from Home.html) */
+        /* Professional Message Box Styles - Perfectly Positioned & No Overflow */
         #messageBox {
             position: fixed;
-            top: 50%; /* Center vertically */
+            top: 20px; /* Fixed top position - no more side positioning issues */
             left: 50%;
-            transform: translate(-50%, -50%); /* Center both horizontally and vertically */
-            background-color: var(--card-background-color); /* Default background, will be overridden for success */
-            color: var(--text-color-primary); /* Default text color */
-            padding: 20px 30px; /* Increased padding for a more substantial box */
-            border-radius: 15px; /* More rounded corners, slightly squarer */
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); /* Enhanced shadow */
-            z-index: 10000; /* Increased z-index to ensure visibility */
+            transform: translateX(-50%); /* Only center horizontally */
+            background-color: var(--card-background-color);
+            color: var(--text-color-primary);
+            padding: 24px 32px;
+            border-radius: 16px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 99999; /* Highest z-index */
             display: none;
             opacity: 0;
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-            min-width: 280px; /* Ensure a decent minimum width */
-            max-width: 90vw; /* Use viewport width for better mobile support */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            min-width: 300px;
+            max-width: 400px; /* Fixed max width - no overflow */
             text-align: center;
-            flex-direction: column; /* Stack icon and text vertically */
+            flex-direction: column;
             align-items: center;
-            gap: 15px; /* Space between icon and text */
-            /* Ensure message box stays within viewport */
-            max-height: 90vh;
-            overflow: visible; /* Allow content to be visible */
+            gap: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            /* Perfect positioning constraints */
+            margin: 0;
+            overflow: hidden; /* Prevent any overflow */
+            box-sizing: border-box;
         }
         #messageBox.show {
             opacity: 1;
             display: flex;
+            animation: messageBoxEntrance 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        /* Enhanced Success Message Box Styling */
+
+        @keyframes messageBoxEntrance {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+        }
+
+        @keyframes messageBoxEntranceMobile {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        /* Professional Success Message Styling - Perfectly Contained */
         #messageBox.success {
             background: linear-gradient(135deg, 
-                rgba(76, 175, 80, 0.95), 
-                rgba(139, 195, 74, 0.95), 
-                rgba(76, 175, 80, 0.95));
+                rgba(76, 175, 80, 0.98), 
+                rgba(139, 195, 74, 0.98), 
+                rgba(76, 175, 80, 0.98));
             background-size: 200% 200%;
             color: var(--white);
-            border: none;
+            border: 2px solid rgba(76, 175, 80, 0.3);
             box-shadow: 
-                0 8px 30px rgba(76, 175, 80, 0.4),
-                0 4px 15px rgba(139, 195, 74, 0.3),
+                0 20px 40px rgba(76, 175, 80, 0.3),
+                0 8px 16px rgba(139, 195, 74, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
             animation: successGradient 3s ease-in-out infinite, successFloat 0.6s ease-out;
             position: relative;
-            overflow: visible; /* Allow effects to be visible */
+            overflow: hidden; /* Perfect containment */
         }
 
         #messageBox.success::before {
@@ -3836,23 +3958,24 @@
             height: 100%;
             background: linear-gradient(90deg, 
                 transparent, 
-                rgba(255, 255, 255, 0.3), 
+                rgba(255, 255, 255, 0.4), 
                 transparent);
             animation: successShine 2s ease-in-out infinite;
+            pointer-events: none;
         }
 
         #messageBox.success::after {
             content: '';
             position: absolute;
-            top: -25%;
-            left: -25%;
-            width: 150%;
-            height: 150%;
-            background: radial-gradient(circle, 
-                rgba(255, 255, 255, 0.1) 0%, 
-                transparent 70%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, 
+                rgba(255, 255, 255, 0.15) 0%, 
+                transparent 60%);
             animation: successPulse 2s ease-in-out infinite;
-            pointer-events: none; /* Ensure it doesn't interfere with interactions */
+            pointer-events: none;
         }
 
         /* Success message animations */
@@ -3939,48 +4062,73 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.3);
         }
 
-        /* Success message progress bar */
+        /* Professional Success Progress Bar */
         #messageBox.success .success-progress {
             position: absolute;
             bottom: 0;
             left: 0;
-            height: 3px;
+            height: 4px;
             background: linear-gradient(90deg, 
-                rgba(255, 255, 255, 0.8), 
-                rgba(255, 255, 255, 0.4));
-            animation: successProgress 3s linear;
+                rgba(255, 255, 255, 0.9), 
+                rgba(255, 255, 255, 0.6),
+                rgba(255, 255, 255, 0.3));
+            border-radius: 0 0 16px 16px;
+            animation: successProgress 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
         @keyframes successProgress {
-            0% { width: 100%; }
-            100% { width: 0%; }
+            0% { 
+                width: 100%; 
+                opacity: 1;
+            }
+            90% { 
+                width: 10%; 
+                opacity: 1;
+            }
+            100% { 
+                width: 0%; 
+                opacity: 0;
+            }
         }
 
-        /* Enhanced Success Message Variations */
+        /* Professional Success Message Variations - Perfectly Contained */
         #messageBox.celebration-success {
             background: linear-gradient(135deg, 
-                rgba(255, 193, 7, 0.95), 
-                rgba(255, 152, 0, 0.95), 
-                rgba(255, 193, 7, 0.95));
+                rgba(255, 193, 7, 0.98), 
+                rgba(255, 152, 0, 0.98), 
+                rgba(255, 193, 7, 0.98));
             background-size: 200% 200%;
+            border-color: rgba(255, 193, 7, 0.3);
+            box-shadow: 
+                0 20px 40px rgba(255, 193, 7, 0.3),
+                0 8px 16px rgba(255, 152, 0, 0.2);
             animation: successGradient 2s ease-in-out infinite, celebrationBounce 0.8s ease-out;
         }
 
         #messageBox.achievement-success {
             background: linear-gradient(135deg, 
-                rgba(156, 39, 176, 0.95), 
-                rgba(233, 30, 99, 0.95), 
-                rgba(156, 39, 176, 0.95));
+                rgba(156, 39, 176, 0.98), 
+                rgba(233, 30, 99, 0.98), 
+                rgba(156, 39, 176, 0.98));
             background-size: 200% 200%;
+            border-color: rgba(156, 39, 176, 0.3);
+            box-shadow: 
+                0 20px 40px rgba(156, 39, 176, 0.3),
+                0 8px 16px rgba(233, 30, 99, 0.2);
             animation: successGradient 2.5s ease-in-out infinite, achievementGlow 1s ease-out;
         }
 
         #messageBox.update-success {
             background: linear-gradient(135deg, 
-                rgba(0, 150, 136, 0.95), 
-                rgba(0, 188, 212, 0.95), 
-                rgba(0, 150, 136, 0.95));
+                rgba(0, 150, 136, 0.98), 
+                rgba(0, 188, 212, 0.98), 
+                rgba(0, 150, 136, 0.98));
             background-size: 200% 200%;
+            border-color: rgba(0, 150, 136, 0.3);
+            box-shadow: 
+                0 20px 40px rgba(0, 150, 136, 0.3),
+                0 8px 16px rgba(0, 188, 212, 0.2);
             animation: successGradient 3s ease-in-out infinite, updatePulse 0.6s ease-out;
         }
 
@@ -4013,7 +4161,7 @@
             100% { transform: translateY(0) scale(1); }
         }
 
-        /* Celebration sparkles effect */
+        /* Professional Celebration Sparkles - Perfectly Contained */
         .celebration-sparkles {
             position: absolute;
             top: 0;
@@ -4028,19 +4176,20 @@
         .celebration-sparkles::after {
             content: '✨';
             position: absolute;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             animation: sparkleFloat 2s ease-in-out infinite;
+            z-index: 1;
         }
 
         .celebration-sparkles::before {
-            top: 20%;
-            left: 20%;
+            top: 15%;
+            left: 15%;
             animation-delay: 0s;
         }
 
         .celebration-sparkles::after {
-            top: 60%;
-            right: 20%;
+            top: 65%;
+            right: 15%;
             animation-delay: 1s;
         }
 
@@ -4055,19 +4204,20 @@
             }
         }
 
-        /* Achievement glow effect */
+        /* Professional Achievement Glow - Perfectly Contained */
         .achievement-glow {
             position: absolute;
-            top: -25%;
-            left: -25%;
-            width: 150%;
-            height: 150%;
-            background: radial-gradient(circle, 
-                rgba(156, 39, 176, 0.2) 0%, 
-                rgba(233, 30, 99, 0.1) 30%, 
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, 
+                rgba(156, 39, 176, 0.25) 0%, 
+                rgba(233, 30, 99, 0.15) 40%, 
                 transparent 70%);
             animation: achievementGlowPulse 2s ease-in-out infinite;
             pointer-events: none;
+            z-index: 1;
         }
 
         @keyframes achievementGlowPulse {
@@ -4102,6 +4252,108 @@
         #messageBox span {
             font-size: 1.1rem; /* Slightly larger text */
             font-weight: 600;
+        }
+
+        /* Professional Close Button */
+        #messageBox .message-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 24px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            color: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        #messageBox .message-close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        #messageBox .message-close-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Professional Sound Indicator */
+        #messageBox .sound-indicator {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 16px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: var(--white);
+            opacity: 0.7;
+            animation: soundPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes soundPulse {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 0.7;
+            }
+            50% { 
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        /* Professional Message Queue System */
+        #messageBox.queued {
+            animation: messageBoxQueue 0.3s ease-out;
+        }
+
+        @keyframes messageBoxQueue {
+            0% {
+                transform: translateX(-50%) translateY(-10px) scale(0.95);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(-50%) translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes messageBoxQueueMobile {
+            0% {
+                transform: translateY(-10px) scale(0.95);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Message Box Focus States */
+        #messageBox:focus-within {
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 8px 16px rgba(0, 0, 0, 0.3),
+                0 0 0 3px rgba(0, 213, 255, 0.3);
+        }
+
+        /* Accessibility Improvements */
+        #messageBox[aria-hidden="true"] {
+            display: none !important;
+        }
+
+        #messageBox[aria-live="polite"] {
+            outline: none;
         }
 
         @keyframes pulse-bg {
@@ -6539,16 +6791,26 @@
                 clearTimeout(messageBox.timeoutId);
             }
 
-            // Enhanced HTML structure with progress bar for success messages
+            // Professional HTML structure with close button and sound indicator
             let progressBar = '';
+            let closeButton = '';
+            let soundIndicator = '';
+            
             if (type === 'success') {
                 progressBar = '<div class="success-progress"></div>';
+                soundIndicator = '<div class="sound-indicator">🔊</div>';
+            }
+            
+            if (!isPersistent) {
+                closeButton = '<button class="message-close-btn" aria-label="Close message">×</button>';
             }
 
             messageBox.innerHTML = `
+                ${closeButton}
                 <i id="messageBoxIcon"></i>
                 <span id="messageBoxText"></span>
                 ${progressBar}
+                ${soundIndicator}
             `;
             
             const messageBoxIcon = document.getElementById('messageBoxIcon');
@@ -6574,12 +6836,20 @@
                 messageBoxIcon.className = ''; // No specific icon
             }
 
-            // Enhanced display with smooth animations
+            // Professional display with smooth animations
             messageBox.style.display = 'flex';
             messageBox.style.opacity = '1';
 
             // Add entrance animation class
             messageBox.classList.add('fade-in-up');
+
+            // Add close button functionality
+            const closeBtn = messageBox.querySelector('.message-close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    hideMessageBox();
+                });
+            }
 
             if (!isPersistent) {
                 messageBox.timeoutId = setTimeout(() => {
@@ -6601,6 +6871,138 @@
                 console.log(`🎉 Success: ${message}`);
             }
         }
+
+        /**
+         * Professional message box hiding function
+         */
+        function hideMessageBox() {
+            if (!messageBox) return;
+            
+            // Clear any existing timeout
+            if (messageBox.timeoutId) {
+                clearTimeout(messageBox.timeoutId);
+                messageBox.timeoutId = null;
+            }
+
+            // Add hiding class for exit animation
+            messageBox.classList.add('hiding');
+            
+            // Wait for animation to complete then hide
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+                messageBox.classList.remove('hiding', 'show', 'fade-in-up');
+                messageBox.style.opacity = '0';
+                messageBox.style.transform = '';
+            }, 300);
+        }
+
+        /**
+         * Professional message queue system
+         */
+        let messageQueue = [];
+        let isShowingMessage = false;
+
+        function queueMessage(message, type, isPersistent = false, durationMs = 3000, priority = 'normal') {
+            const messageItem = { message, type, isPersistent, durationMs, priority };
+            
+            if (priority === 'high') {
+                messageQueue.unshift(messageItem); // Add to front for high priority
+            } else {
+                messageQueue.push(messageItem); // Add to back for normal priority
+            }
+            
+            if (!isShowingMessage) {
+                showNextMessage();
+            }
+        }
+
+        function showNextMessage() {
+            if (messageQueue.length === 0) {
+                isShowingMessage = false;
+                return;
+            }
+
+            isShowingMessage = true;
+            const { message, type, isPersistent, durationMs, priority } = messageQueue.shift();
+            
+            // Add queued animation class
+            if (messageBox) {
+                messageBox.classList.add('queued');
+            }
+            
+            // Log message analytics
+            logMessageAnalytics(type, priority);
+            
+            showMessageBox(message, type, isPersistent, durationMs);
+            
+            // Remove queued class after animation
+            setTimeout(() => {
+                if (messageBox) {
+                    messageBox.classList.remove('queued');
+                }
+            }, 300);
+        }
+
+        /**
+         * Professional message analytics system
+         */
+        function logMessageAnalytics(type, priority) {
+            const timestamp = new Date().toISOString();
+            const analytics = {
+                timestamp,
+                type,
+                priority,
+                userAgent: navigator.userAgent,
+                screenSize: `${window.innerWidth}x${window.innerHeight}`,
+                viewport: `${window.visualViewport?.width || 'unknown'}x${window.visualViewport?.height || 'unknown'}`
+            };
+            
+            console.log('📊 Message Analytics:', analytics);
+            
+            // Store analytics in localStorage for performance tracking
+            try {
+                const existingAnalytics = JSON.parse(localStorage.getItem('jchat_message_analytics') || '[]');
+                existingAnalytics.push(analytics);
+                
+                // Keep only last 100 entries
+                if (existingAnalytics.length > 100) {
+                    existingAnalytics.splice(0, existingAnalytics.length - 100);
+                }
+                
+                localStorage.setItem('jchat_message_analytics', JSON.stringify(existingAnalytics));
+            } catch (error) {
+                console.log('Analytics storage failed:', error);
+            }
+        }
+
+        /**
+         * Professional message performance optimization
+         */
+        function optimizeMessagePerformance() {
+            // Debounce rapid message calls
+            let messageDebounceTimer;
+            
+            return function(message, type, isPersistent = false, durationMs = 3000, priority = 'normal') {
+                clearTimeout(messageDebounceTimer);
+                
+                messageDebounceTimer = setTimeout(() => {
+                    // Check if message is already showing
+                    if (messageBox && messageBox.style.display === 'flex') {
+                        // Queue the message instead of showing immediately
+                        queueMessage(message, type, isPersistent, durationMs, priority);
+                    } else {
+                        // Show message immediately
+                        showMessageBox(message, type, isPersistent, durationMs);
+                    }
+                }, 100); // 100ms debounce
+            };
+        }
+
+        // Create optimized message functions
+        const showOptimizedMessage = optimizeMessagePerformance();
+        const showOptimizedSuccess = (message, style = 'default', duration = 4000) => {
+            showOptimizedMessage(message, 'success', false, duration, 'high');
+        };
 
 
 
@@ -6654,11 +7056,13 @@
                     iconClass = 'fa-check-circle';
             }
 
-            // Enhanced HTML with style-specific elements
+            // Professional HTML with style-specific elements and close button
             messageBox.innerHTML = `
+                <button class="message-close-btn" aria-label="Close message">×</button>
                 <i id="messageBoxIcon" class="fas ${iconClass}"></i>
                 <span id="messageBoxText">${message}</span>
                 <div class="success-progress"></div>
+                <div class="sound-indicator">🔊</div>
                 ${style === 'celebration' ? '<div class="celebration-sparkles"></div>' : ''}
                 ${style === 'achievement' ? '<div class="achievement-glow"></div>' : ''}
             `;
@@ -6666,6 +7070,14 @@
             messageBox.className = `message-box show success ${additionalClasses}`;
             messageBox.style.display = 'flex';
             messageBox.style.opacity = '1';
+
+            // Add close button functionality
+            const closeBtn = messageBox.querySelector('.message-close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    hideMessageBox();
+                });
+            }
 
             // Play success sound using ne.mp3
             playSuccessSound();
