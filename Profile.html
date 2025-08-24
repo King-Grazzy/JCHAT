@@ -7997,7 +7997,7 @@
          */
         async function claimDailyBonus() {
             if (!currentUser || !currentUserProfileData) {
-                showMessageBox("You must be logged in to claim the daily bonus.", 'warning');
+                console.warn("You must be logged in to claim the daily bonus.");
                 return;
             }
 
@@ -8008,7 +8008,7 @@
                 new Date(currentUserProfileData.lastDailyBonusClaimDate.toDate()) : null;
 
             if (lastClaimDate && lastClaimDate.toDateString() === today.toDateString()) {
-                showMessageBox("You have already claimed your daily bonus today! Come back tomorrow.", 'info');
+                console.log("You have already claimed your daily bonus today! Come back tomorrow.");
                 return;
             }
             const dailyBonusAmount = currentSystemSettings.dailyBonusAmount || 50; // Use fetched amount or default
@@ -8023,7 +8023,7 @@
             //     return;
             // }
 
-            showMessageBox("Claiming daily bonus...", 'info');
+            console.log("Claiming daily bonus...");
 
             try {
                 const userProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
@@ -8067,7 +8067,7 @@
                 updateDailyBonusUI(); // Update button and countdown
             } catch (error) {
                 console.error("JCHAT_ERROR: Error claiming daily bonus:", error);
-                showMessageBox(`Failed to claim bonus: ${error.message}`, 'error');
+                console.error(`Failed to claim bonus: ${error.message}`);
                 playNotificationSound('error');
             } finally {
                 // Daily bonus claim complete
@@ -8134,11 +8134,11 @@
          */
         function showReportUserModal() {
             if (!currentUser || displayedUserId === currentUser.uid) {
-                showMessageBox("You cannot report yourself.", 'warning');
+                console.warn("You cannot report yourself.");
                 return;
             }
             if (!displayedUserProfileData) {
-                showMessageBox("Could not load user data to report.", 'error');
+                console.error("Could not load user data to report.");
                 return;
             }
             if (reportUserModal) reportUserModal.classList.add('active');
@@ -8158,11 +8158,11 @@
          */
         async function submitReport() {
             if (!currentUser || !displayedUserProfileData) {
-                showMessageBox("Cannot submit report without user data.", 'error');
+                console.error("Cannot submit report without user data.");
                 return;
             }
             if (displayedUserId === currentUser.uid) {
-                showMessageBox("You cannot report yourself.", 'warning');
+                console.warn("You cannot report yourself.");
                 return;
             }
 
@@ -8170,11 +8170,11 @@
             const details = reportDetailsTextarea.value.trim();
 
             if (!reason) {
-                showMessageBox("Please select a reason for the report.", 'error');
+                console.error("Please select a reason for the report.");
                 return;
             }
 
-            showMessageBox("Submitting report...", 'info');
+            console.log("Submitting report...");
 
             try {
                 const reportsCollectionRef = collection(db, "artifacts", appId, "public", "data", "reports");
@@ -8195,7 +8195,7 @@
                 hideReportUserModal();
             } catch (error) {
                 console.error("JCHAT_ERROR: Error submitting report:", error);
-                showMessageBox(`Failed to submit report: ${error.message}`, 'error');
+                console.error(`Failed to submit report: ${error.message}`);
             } finally {
                 // Report submission complete
             }
