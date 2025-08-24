@@ -8592,20 +8592,17 @@
                                 friendsSuggestionsSection.appendChild(nextBtn);
                             }
                             
-                            // Isolate friends carousel scrolling from main content
+                            // Carefully isolate friends carousel from main content
+                            friendsSuggestions.addEventListener('touchmove', (e) => {
+                                // Prevent touch events from affecting main screen
+                                e.stopPropagation();
+                            }, { passive: true });
+                            
                             friendsSuggestions.addEventListener('touchstart', (e) => {
                                 e.stopPropagation();
                             }, { passive: true });
                             
-                            friendsSuggestions.addEventListener('touchmove', (e) => {
-                                e.stopPropagation();
-                            }, { passive: true });
-                            
                             friendsSuggestions.addEventListener('touchend', (e) => {
-                                e.stopPropagation();
-                            }, { passive: true });
-                            
-                            friendsSuggestions.addEventListener('scroll', (e) => {
                                 e.stopPropagation();
                             }, { passive: true });
                         }
@@ -8792,6 +8789,13 @@
             
             document.addEventListener('touchmove', (e) => {
                 const scrollRow = e.target.closest('.scroll-row');
+                const friendsSection = e.target.closest('.friends-suggestions-section');
+                
+                if (friendsSection) {
+                    // In friends section - prevent main content movement but allow friends scrolling
+                    e.stopPropagation();
+                    return;
+                }
                 
                 if (!scrollRow) {
                     // Not in friends carousel - block all horizontal movement
@@ -8802,9 +8806,6 @@
                     if (deltaX > deltaY && deltaX > 10) {
                         e.preventDefault();
                     }
-                } else {
-                    // IN friends carousel - stop event from bubbling to prevent main content shift
-                    e.stopPropagation();
                 }
             }, { passive: false });
             
