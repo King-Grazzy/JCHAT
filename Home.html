@@ -992,9 +992,10 @@
             100% { filter: brightness(1.1) contrast(1.05) saturate(1.1); animation-duration: 0.5s; }
         }
 
-        /* Always show scrollbar to prevent layout shifts */
+        /* Prevent scrolling - make page non-slidable */
         html {
-            overflow-y: scroll;
+            overflow: hidden;
+            height: 100%;
         }
 
         /* Theme picker animations */
@@ -1106,18 +1107,17 @@
         }
 
         body {
-            min-height: 100vh;
+            height: 100vh;
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-x: hidden; /* Prevent horizontal scroll */
-            /* Removed padding-bottom as bottom nav is gone */
-            background-color: var(--background-main);
-            background-image: radial-gradient(circle at top left, var(--background-gradient-1), transparent 100px),
-                              radial-gradient(circle at bottom right, var(--background-gradient-2), transparent 150px);
+            overflow: hidden; /* Prevent ALL scrolling - make page non-slidable */
+            /* 100% steel background - solid, non-transparent */
+            background-color: #1a1a2e;
+            background-image: none; /* Remove gradient for solid steel look */
             color: var(--white);
             transition: background-color 0.5s ease, color 0.5s ease; /* Smooth theme transition */
         }
@@ -1511,7 +1511,7 @@
 
         .notification-list {
             max-height: 300px;
-            overflow-y: auto;
+            overflow: hidden; /* Disabled scrolling - page should remain non-slidable */
             padding: 10px;
         }
 
@@ -4057,7 +4057,7 @@
         function hideLoader() {
             if (jchatLoader) {
                 jchatLoader.classList.add('hidden');
-                document.body.style.overflow = 'auto';
+                // document.body.style.overflow = 'auto'; // Disabled - page should remain non-slidable
                 console.log('JCHAT_DEBUG: Loader hidden');
                 
                 // Clean up after animation completes
@@ -7623,7 +7623,7 @@
                 if (isCurrentUserAdmin) {
                     // Admin bypasses maintenance overlay and global disabling.
                     if (maintenanceOverlay) maintenanceOverlay.classList.remove('active');
-                    document.body.style.overflow = 'auto';
+                    // document.body.style.overflow = 'auto'; // Disabled - page should remain non-slidable
                     showMessageBox("JCHAT is in Maintenance Mode, but you (Admin) have full access.", 'info', true);
                     toggleInteractiveElements(true, true); // Enable everything for admin, pass isAdmin true.
                 } else {
@@ -7641,7 +7641,7 @@
             } else {
                 // Maintenance mode is OFF for everyone.
                 if (maintenanceOverlay) maintenanceOverlay.classList.remove('active');
-                document.body.style.overflow = 'auto';
+                // document.body.style.overflow = 'auto'; // Disabled - page should remain non-slidable
                 toggleInteractiveElements(true, isCurrentUserAdmin); // Enable all interactions initially, pass isAdmin.
             }
 
@@ -9523,12 +9523,12 @@
         if (smartScrollBtn) {
             smartScrollBtn.addEventListener('click', ()=> {
                 if (scrollTarget === 'bottom') {
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                    // window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); // Disabled - page should remain non-slidable
                 } else {
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                          // window.scrollTo({ top: 0, behavior: 'smooth' }); // Disabled - page should remain non-slidable
                 }
             });
-            window.addEventListener('scroll', updateSmartScrollState, { passive: true });
+                          // window.addEventListener('scroll', updateSmartScrollState, { passive: true }); // Disabled - page should remain non-slidable
             window.addEventListener('resize', updateSmartScrollState);
             document.addEventListener('DOMContentLoaded', updateSmartScrollState);
         }
