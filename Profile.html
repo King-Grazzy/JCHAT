@@ -5762,7 +5762,7 @@
         const headerDisplayName = document.getElementById('headerDisplayName');
         const notificationCountElement = document.getElementById('notificationCount');
         const messageBox = document.getElementById('messageBox');
-        const headerNavLinkProfile = document.getElementById('profileLink'); // Corrected ID to match HTML
+        // const headerNavLinkProfile = document.getElementById('profileLink'); // Removed - element doesn't exist
         const adminIconLink = document.getElementById('adminIconLink');
         
 
@@ -9284,24 +9284,26 @@
                 // Display generic message if not logged in and no specific user ID is provided
                 if (profileUsername) profileUsername.textContent = "Please Log In"; // Null check
                 if (profileBio) profileBio.textContent = "Log in to view your profile or search for other users."; // Null check
-                if (profileActions) profileActions.innerHTML = ''; // Clear actions, null check
+                // Clear actions if they exist
+                // if (profileActions) profileActions.innerHTML = ''; // Removed - element doesn't exist
                 // Hide inline edit fields and account settings
                 const profileDetailsSection = displayNameInput ? displayNameInput.closest('.profile-details-section') : null; // Null check
                 if (profileDetailsSection) {
                     profileDetailsSection.style.display = 'none';
                 }
-                if (toggleAccountSettingsButton) toggleAccountSettingsButton.style.display = 'none'; // NEW: Hide toggle button
-                if (accountSettingsSection) accountSettingsSection.style.display = 'none'; // NEW: Hide account settings
+                // Hide account settings if they exist
+                // if (toggleAccountSettingsButton) toggleAccountSettingsButton.style.display = 'none'; // Removed - element doesn't exist
+                // if (accountSettingsSection) accountSettingsSection.style.display = 'none'; // Removed - element doesn't exist
                 // Hide all new sections as well
-                if (unlockedRewardsSection) unlockedRewardsSection.style.display = 'none';
-                if (friendsSnippetSection) friendsSnippetSection.style.display = 'none';
-                if (recentActivitySection) recentActivitySection.style.display = 'none';
-                if (profileFrameSelect) profileFrameSelect.closest('.customization-option').style.display = 'none';
-                if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
-                if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
-                if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
-                if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
-                if (privacySettingsBtn) privacySettingsBtn.style.display = 'none';
+                // if (unlockedRewardsSection) unlockedRewardsSection.style.display = 'none'; // Removed - element doesn't exist
+                // if (friendsSnippetSection) friendsSnippetSection.style.display = 'none'; // Removed - element doesn't exist
+                // if (recentActivitySection) recentActivitySection.style.display = 'none'; // Removed - element doesn't exist
+                // if (profileFrameSelect) profileFrameSelect.closest('.customization-option').style.display = 'none'; // Removed - element doesn't exist
+                // if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none'; // Removed - element doesn't exist
+                // if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none'; // Removed - element doesn't exist
+                // if (saveCustomizationButton) saveCustomizationButton.style.display = 'none'; // Removed - element doesn't exist
+                // if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none'; // Removed - element doesn't exist
+                // if (privacySettingsBtn) privacySettingsBtn.style.display = 'none'; // Removed - element doesn't exist
                 if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
                 if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
