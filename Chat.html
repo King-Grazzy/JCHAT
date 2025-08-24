@@ -2582,29 +2582,16 @@
                          return;
                      }
                      
-                                          // Use settings for recording duration limit
-                     const MAX_RECORDING_DURATION = JChatAV.voiceNotes.settings.maxDuration;
+                                          // Use default recording duration limit
+                     const MAX_RECORDING_DURATION = 300000; // 5 minutes
                      
                      // Request microphone permission with settings
                      const audioConstraints = {
                          echoCancellation: true, // Use modern settings
                          noiseSuppression: true,
-                         autoGainControl: true
+                         autoGainControl: true,
+                         sampleRate: 44100 // High quality
                      };
-                     
-                     // Set sample rate based on quality setting
-                     switch (JChatAV.voiceNotes.settings.quality) {
-                         case 'low':
-                             audioConstraints.sampleRate = 22050;
-                             break;
-                         case 'medium':
-                             audioConstraints.sampleRate = 32000;
-                             break;
-                         case 'high':
-                         default:
-                             audioConstraints.sampleRate = 44100;
-                             break;
-                     }
                      
                      const stream = await navigator.mediaDevices.getUserMedia({ 
                          audio: audioConstraints
@@ -2903,10 +2890,14 @@
              }
 
          /**
-          * Legacy Voice Note Settings - Replaced by JChatAV.voiceNotes.settings
+          * Legacy Voice Note Settings - Default settings
           * Keeping minimal compatibility layer
           */
-         let voiceNoteSettings = JChatAV.voiceNotes.settings; // Point to new settings
+         let voiceNoteSettings = {
+             maxDuration: 300000, // 5 minutes
+             quality: 'high',
+             format: 'webm'
+         };
              
          // Legacy compatibility
          window.voiceNoteSettings = voiceNoteSettings;
@@ -4310,7 +4301,7 @@
                      if (this.isRecording) {
                          this.stopRecording();
                      }
-                 }, JChatAV.voiceNotes.settings.maxDuration);
+                 }, 300000); // 5 minutes
              }
              
              startTimer() {
@@ -5021,7 +5012,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              peerConnection.onicecandidate = (event) => {
                  if (event.candidate) {
                      console.log("JCHAT_DEBUG: Sending ICE candidate");
-                     sendCallSignal('ice-candidate', {
+                     sendWebRTCCallSignal('ice-candidate', {
                          candidate: event.candidate
                      });
                  } else {
@@ -5056,9 +5047,9 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          }
 
          /**
-          * Send call signal to Firebase
+          * Send WebRTC call signal to Firebase
           */
-         async function sendCallSignal(type, data) {
+         async function sendWebRTCCallSignal(type, data) {
              if (!currentUser || !callPartnerId) return;
              
              try {
@@ -5073,9 +5064,9 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  const signalsRef = collection(db, "artifacts", appId, "calls", callPartnerId, "signals");
                  await addDoc(signalsRef, signalData);
                  
-                 console.log(`JCHAT_DEBUG: Sent call signal ${type} to ${callPartnerId}`);
+                 console.log(`JCHAT_DEBUG: Sent WebRTC call signal ${type} to ${callPartnerId}`);
              } catch (error) {
-                 console.error("JCHAT_ERROR: Failed to send call signal:", error);
+                 console.error("JCHAT_ERROR: Failed to send WebRTC call signal:", error);
              }
          }
 
@@ -5149,7 +5140,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  await peerConnection.setLocalDescription(answer);
                  console.log("JCHAT_DEBUG: Created and set local answer");
                  
-                 sendCallSignal('answer', { answer: answer });
+                 sendWebRTCCallSignal('answer', { answer: answer });
                  
              } catch (error) {
                  console.error("JCHAT_ERROR: Failed to handle offer:", error);
@@ -5479,10 +5470,10 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  const answer = await peerConnection.createAnswer();
                  await peerConnection.setLocalDescription(answer);
                  
-                 sendCallSignal('answer', { answer: answer });
+                 sendWebRTCCallSignal('answer', { answer: answer });
                  
                  // Send call accepted signal
-                 sendCallSignal('call-accepted', {
+                 sendWebRTCCallSignal('call-accepted', {
                      accepted: true,
                      callType: callType
                  });
@@ -5524,7 +5515,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              stopRingtone();
              clearTimeout(callTimeout);
              
-             sendCallSignal('call-declined', {
+             sendWebRTCCallSignal('call-declined', {
                  declined: true
              });
              
@@ -5542,7 +5533,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              clearTimeout(callTimeout);
              
              if (notifyPartner) {
-                 sendCallSignal('call-ended', {
+                 sendWebRTCCallSignal('call-ended', {
                      ended: true
                  });
              }
@@ -5650,7 +5641,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  listenForCallSignals();
                  
                  // Send call request
-                 sendCallSignal('call-request', {
+                 sendWebRTCCallSignal('call-request', {
                      callerName: currentUser.displayName || 'Unknown',
                      callType: callType
                  });
@@ -5705,7 +5696,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          window.stopRingtone = stopRingtone;
          window.getUserMedia = getUserMedia;
          window.createPeerConnection = createPeerConnection;
-         window.sendCallSignal = sendCallSignal;
+         window.sendWebRTCCallSignal = sendWebRTCCallSignal;
          window.listenForCallSignals = listenForCallSignals;
          window.handleCallSignal = handleCallSignal;
          window.showIncomingCallInterface = showIncomingCallInterface;
