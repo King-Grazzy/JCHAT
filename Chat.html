@@ -2558,6 +2558,14 @@
             
                      // Voice note button event listener will be set up in DOMContentLoaded
             
+         // Voice recording variables
+         let voiceRecorder = null;
+         let voiceAudioChunks = [];
+         let voiceRecordingStartTime = 0;
+         let voiceRecordingDuration = 0;
+         let isRecordingVoice = false;
+         let voiceRecordingTimer = null;
+            
          /**
           * Start voice recording with full features
           */
@@ -2744,7 +2752,7 @@
                      showMessageBox(`✅ Voice note recorded (${duration})`, 'success');
                      
                      // Send voice note directly (new implementation always sends)
-                     await this.sendVoiceNote(voiceData);
+                     await sendVoiceNote(voiceNoteData);
                     
                     // Reset recording state
                     voiceAudioChunks = [];
