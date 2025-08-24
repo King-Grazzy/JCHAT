@@ -2228,12 +2228,16 @@
          */
         async function createGitHubUser(githubUser, email, authType) {
             try {
-                // Check if user already exists in our system by email
+                console.log('JCHAT_DEBUG: Creating GitHub user with email:', email, 'authType:', authType);
+                
+                // Check if user already exists in our system by checking public users collection
                 const existingUserQuery = query(
-                    collection(db, "artifacts", appId, "users"),
-                    where("profiles.user_profile.email", "==", email)
+                    collection(db, "artifacts", appId, "public", "data", "users"),
+                    where("email", "==", email)
                 );
                 const existingUserSnapshot = await getDocs(existingUserQuery);
+                
+                console.log('JCHAT_DEBUG: Existing user check - found:', existingUserSnapshot.size, 'users');
 
                 if (!existingUserSnapshot.empty && authType === 'register') {
                     showMessageBox("An account with this email already exists. Please sign in instead.", "warning");
@@ -2246,14 +2250,12 @@
                 if (existingUserSnapshot.empty) {
                     // Create new user
                     const newUserId = `github_${githubUser.id}`;
+                    console.log('JCHAT_DEBUG: Creating new GitHub user with ID:', newUserId);
                     
-                    await runTransaction(db, async (transaction) => {
+                    try {
+                        // Simplified user creation - just store basic profile first
                         const userProfileRef = doc(db, "artifacts", appId, "users", newUserId, "profiles", "user_profile");
-                        const userPublicProfileRef = doc(db, "artifacts", appId, "public", "data", "users", newUserId);
-                        const userTransactionsCollectionRef = collection(db, "artifacts", appId, "users", newUserId, "transactions");
-
-                        // Create user profile
-                        transaction.set(userProfileRef, {
+                        await setDoc(userProfileRef, {
                             username: username,
                             email: email,
                             githubId: githubUser.id,
@@ -2293,8 +2295,11 @@
                             authProvider: 'github'
                         });
 
+                        console.log('JCHAT_DEBUG: User profile created successfully');
+
                         // Create public profile
-                        transaction.set(userPublicProfileRef, {
+                        const userPublicProfileRef = doc(db, "artifacts", appId, "public", "data", "users", newUserId);
+                        await setDoc(userPublicProfileRef, {
                             username: username,
                             profilePicId: profilePicUrl,
                             jCoins: REFERRAL_JCOIN_REWARD_NEW_USER,
@@ -2305,22 +2310,21 @@
                             githubUsername: githubUser.login
                         });
 
-                        // Add initial transaction
-                        transaction.set(doc(userTransactionsCollectionRef), {
-                            type: 'initial_bonus',
-                            amount: REFERRAL_JCOIN_REWARD_NEW_USER,
-                            xpAmount: REFERRAL_XP_REWARD_NEW_USER,
-                            description: 'Welcome bonus for GitHub signup',
-                            timestamp: serverTimestamp(),
-                            relatedEntityId: null
-                        });
-                    });
+                        console.log('JCHAT_DEBUG: Public profile created successfully');
+
+                    } catch (dbError) {
+                        console.error('JCHAT_ERROR: Database error during user creation:', dbError);
+                        throw new Error(`Database error: ${dbError.message}`);
+                    }
+
+                    console.log('JCHAT_DEBUG: New user creation completed successfully');
 
                     // Store user session data
                     localStorage.setItem('jchat_user_id', newUserId);
                     localStorage.setItem('jchat_user_email', email);
                     localStorage.setItem('jchat_username', username);
 
+                    console.log('JCHAT_DEBUG: User session data stored');
                     showMessageBox("Account created with GitHub! Redirecting...", "success");
                 } else {
                     // Existing user, sign them in
@@ -2328,11 +2332,14 @@
                     const userId = existingUserDoc.id;
                     const userData = existingUserDoc.data();
 
+                    console.log('JCHAT_DEBUG: Signing in existing user:', userId);
+
                     // Store user session data
                     localStorage.setItem('jchat_user_id', userId);
                     localStorage.setItem('jchat_user_email', email);
-                    localStorage.setItem('jchat_username', userData.profiles?.user_profile?.username || username);
+                    localStorage.setItem('jchat_username', userData.username || username);
 
+                    console.log('JCHAT_DEBUG: Existing user session data stored');
                     showMessageBox("Signed in with GitHub! Redirecting...", "success");
                 }
 
@@ -2346,8 +2353,15 @@
                 }, 1500);
 
             } catch (error) {
-                console.error("Error creating/signing in GitHub user:", error);
-                showMessageBox("Failed to complete GitHub authentication. Please try again.", "error");
+                console.error("JCHAT_ERROR: Error creating/signing in GitHub user:", error);
+                console.error("JCHAT_ERROR: Error details:", error.message, error.code, error.stack);
+                
+                let errorMessage = "Failed to complete GitHub authentication. Please try again.";
+                if (error.code) {
+                    errorMessage += ` (Error: ${error.code})`;
+                }
+                
+                showMessageBox(errorMessage, "error");
                 
                 // Redirect back to login page after error
                 setTimeout(() => {
