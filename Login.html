@@ -1670,7 +1670,7 @@
                     <!-- Smart Message System Demo Section -->
                     <div class="smart-message-demo-section">
                         <h3>🚀 Smart Message System Demo</h3>
-                        <p>Experience JCHAT's intelligent, context-aware messaging system:</p>
+                        <p>Experience JCHAT's intelligent, context-aware messaging system. <strong>Success messages automatically display for exactly 4 seconds!</strong></p>
                         <div class="demo-buttons">
                             <button onclick="showcaseSmartMessages()" class="demo-btn primary">
                                 <i class="fas fa-play"></i> Showcase Smart Messages
@@ -1683,6 +1683,10 @@
                             </button>
                         </div>
                         <div class="demo-features">
+                            <div class="feature-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Fixed 4-Second Success Duration</span>
+                            </div>
                             <div class="feature-item">
                                 <i class="fas fa-brain"></i>
                                 <span>AI-Powered Duration Calculation</span>
@@ -2152,7 +2156,7 @@
          */
         function calculateSmartDuration(message, type) {
             const baseDuration = {
-                'success': 4000,
+                'success': 4000, // Fixed 4 seconds for success messages
                 'error': 6000,
                 'info': 5000,
                 'warning': 5000,
@@ -2162,7 +2166,12 @@
             const charCount = message.length;
             let duration = baseDuration[type] || 4000;
 
-            // Adjust duration based on content length
+            // For success messages, always use 4 seconds regardless of content length
+            if (type === 'success') {
+                return 4000;
+            }
+
+            // Adjust duration based on content length for other message types
             if (charCount > 100) duration += 2000;
             if (charCount > 200) duration += 3000;
             if (charCount > 300) duration += 4000;
@@ -2437,7 +2446,7 @@
         function showcaseSmartMessages() {
             const demos = [
                 {
-                    message: "Welcome to JCHAT! Your smart messaging experience starts here.",
+                    message: "Welcome to JCHAT! Your smart messaging experience starts here. (Duration: 4 seconds)",
                     type: "success",
                     options: { showProgress: true, addEmojis: true, animation: 'bounce', priority: 'high' }
                 },
