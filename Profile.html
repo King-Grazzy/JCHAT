@@ -5249,6 +5249,16 @@
                             </div>
                             
                             <div class="form-group">
+                                <label for="editEmail">Email</label>
+                                <input type="email" id="editEmail" placeholder="Enter your email address">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="editPhone">Phone</label>
+                                <input type="tel" id="editPhone" placeholder="Enter your phone number">
+                            </div>
+                            
+                            <div class="form-group">
                                 <label for="editLocation">Location</label>
                                 <input type="text" id="editLocation" placeholder="Enter your location">
                             </div>
@@ -5305,6 +5315,14 @@
                                 <label>Make Email Public</label>
                                 <label class="toggle-switch">
                                     <input type="checkbox" id="toggleEmailVisibility">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="privacy-toggle-group">
+                                <label>Show Phone Number</label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="togglePhoneVisibility">
                                     <span class="slider"></span>
                                 </label>
                             </div>
@@ -5839,6 +5857,16 @@
         const locationInput = document.getElementById('locationInput'); // Input for location
         // NEW: Inputs for additional user info
         const schoolInput = document.getElementById('schoolInput');
+
+        // Profile Edit Form Fields
+        const editDisplayNameInput = document.getElementById('editDisplayName');
+        const editEmailInput = document.getElementById('editEmail');
+        const editPhoneInput = document.getElementById('editPhone');
+        const editLocationInput = document.getElementById('editLocation');
+        const editSchoolInput = document.getElementById('editSchool');
+        const editWorkInput = document.getElementById('editWork');
+        const editBioTextarea = document.getElementById('editBio');
+        const editInterestsTextarea = document.getElementById('editInterests');
         const workInput = document.getElementById('workInput');
         const interestsInput = document.getElementById('interestsInput');
         const websiteInput = document.getElementById('websiteInput');
@@ -5870,16 +5898,17 @@
 
             // NEW: Privacy Settings Toggles
             const toggleEmailVisibility = document.getElementById('toggleEmailVisibility');
-        const toggleLocationVisibility = document.getElementById('toggleLocationVisibility');
-        const toggleUserIdVisibility = document.getElementById('toggleUserIdVisibility');
-        const toggleOnlineStatusVisibility = document.getElementById('toggleOnlineStatusVisibility');
-        const toggleFriendRequests = document.getElementById('toggleFriendRequests');
-        const toggleMessages = document.getElementById('toggleMessages');
-        const toggleSchoolVisibility = document.getElementById('toggleSchoolVisibility');
-        const toggleWorkVisibility = document.getElementById('toggleWorkVisibility');
-        const toggleInterestsVisibility = document.getElementById('toggleInterestsVisibility');
-        const toggleWebsiteVisibility = document.getElementById('toggleWebsiteVisibility');
-        const toggleSocialLinksVisibility = document.getElementById('toggleSocialLinksVisibility');
+            const togglePhoneVisibility = document.getElementById('togglePhoneVisibility');
+            const toggleLocationVisibility = document.getElementById('toggleLocationVisibility');
+            const toggleUserIdVisibility = document.getElementById('toggleUserIdVisibility');
+            const toggleOnlineStatusVisibility = document.getElementById('toggleOnlineStatusVisibility');
+            const toggleFriendRequests = document.getElementById('toggleFriendRequests');
+            const toggleMessages = document.getElementById('toggleMessages');
+            const toggleSchoolVisibility = document.getElementById('toggleSchoolVisibility');
+            const toggleWorkVisibility = document.getElementById('toggleWorkVisibility');
+            const toggleInterestsVisibility = document.getElementById('toggleInterestsVisibility');
+            const toggleWebsiteVisibility = document.getElementById('toggleWebsiteVisibility');
+            const toggleSocialLinksVisibility = document.getElementById('toggleSocialLinksVisibility');
 
 
         // NEW: Customization Selects
@@ -8619,6 +8648,7 @@
             if (profileUserId) profileUserId.style.display = 'none'; // NEW: Hide User ID during loading
             if (profileLocation) profileLocation.style.display = 'none';
             if (profileEmail) profileEmail.style.display = 'none';
+            if (profilePhone) profilePhone.style.display = 'none';
             if (profileSchool) profileSchool.style.display = 'none'; // NEW
             if (profileWork) profileWork.style.display = 'none';   // NEW
             if (profileWebsite) profileWebsite.style.display = 'none'; // NEW
@@ -8667,6 +8697,7 @@
             if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
             if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
             if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none'; // Hide parent div
+            if (togglePhoneVisibility) togglePhoneVisibility.closest('.privacy-toggle-group').style.display = 'none';
             if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
             if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'none';
             if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
@@ -9030,6 +9061,7 @@
 
                         // Populate privacy toggles
                         if (toggleEmailVisibility) toggleEmailVisibility.checked = visibility.emailPublic ?? false;
+                        if (togglePhoneVisibility) togglePhoneVisibility.checked = visibility.phoneVisible ?? false;
                         if (toggleLocationVisibility) toggleLocationVisibility.checked = visibility.location ?? false;
                         if (toggleUserIdVisibility) toggleUserIdVisibility.checked = visibility.userId ?? true; // Default to true for User ID
                         if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.checked = visibility.lastOnline ?? false;
@@ -9042,6 +9074,7 @@
                         if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.checked = visibility.socialLinks ?? false;
                         // Show privacy toggles and save button
                         if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'flex';
+                        if (togglePhoneVisibility) togglePhoneVisibility.closest('.privacy-toggle-group').style.display = 'flex';
                         if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'flex';
                         if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'flex';
                         if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'flex';
@@ -9550,6 +9583,8 @@
 
                     // Populate form fields (only if not "Not set") with null checks
                     const editDisplayName = document.getElementById('editDisplayName');
+                    const editEmail = document.getElementById('editEmail');
+                    const editPhone = document.getElementById('editPhone');
                     const editLocation = document.getElementById('editLocation');
                     const editSchool = document.getElementById('editSchool');
                     const editWork = document.getElementById('editWork');
@@ -9557,6 +9592,8 @@
                     const editInterests = document.getElementById('editInterests');
                     
                     if (editDisplayName) editDisplayName.value = displayName !== 'Not set' ? displayName : '';
+                    if (editEmail) editEmail.value = email !== 'Not set' ? email : '';
+                    if (editPhone) editPhone.value = phone !== 'Not set' ? phone : '';
                     if (editLocation) editLocation.value = location !== 'Not set' ? location : '';
                     if (editSchool) editSchool.value = school !== 'Not set' ? school : '';
                     if (editWork) editWork.value = work !== 'Not set' ? work : '';
@@ -9575,6 +9612,8 @@
 
                     // Get form values with null checks
                     const editDisplayNameEl = document.getElementById('editDisplayName');
+                    const editEmailEl = document.getElementById('editEmail');
+                    const editPhoneEl = document.getElementById('editPhone');
                     const editLocationEl = document.getElementById('editLocation');
                     const editSchoolEl = document.getElementById('editSchool');
                     const editWorkEl = document.getElementById('editWork');
@@ -9582,6 +9621,8 @@
                     const editInterestsEl = document.getElementById('editInterests');
                     
                     const displayName = editDisplayNameEl ? editDisplayNameEl.value.trim() : '';
+                    const email = editEmailEl ? editEmailEl.value.trim() : '';
+                    const phone = editPhoneEl ? editPhoneEl.value.trim() : '';
                     const location = editLocationEl ? editLocationEl.value.trim() : '';
                     const school = editSchoolEl ? editSchoolEl.value.trim() : '';
                     const work = editWorkEl ? editWorkEl.value.trim() : '';
@@ -9592,6 +9633,8 @@
                     const privateProfileDocRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
                     await updateDoc(privateProfileDocRef, {
                         username: displayName || null,  // Use 'username' field to match profileUsername
+                        email: email || null,
+                        phone: phone || null,
                         location: location || null,
                         school: school || null,
                         work: work || null,
@@ -9602,6 +9645,8 @@
 
                     // Update display values
                     document.getElementById('displayNameValue').textContent = displayName || 'Not set';
+                    document.getElementById('emailValue').textContent = email || 'Not set';
+                    document.getElementById('phoneValue').textContent = phone || 'Not set';
                     document.getElementById('locationValue').textContent = location || 'Not set';
                     document.getElementById('schoolValue').textContent = school || 'Not set';
                     document.getElementById('workValue').textContent = work || 'Not set';
@@ -9636,6 +9681,7 @@
                 // Collect privacy settings values
                 const privacySettings = {
                     emailPublic: toggleEmailVisibility ? toggleEmailVisibility.checked : false,
+                    phoneVisible: togglePhoneVisibility ? togglePhoneVisibility.checked : false,
                     locationVisible: toggleLocationVisibility ? toggleLocationVisibility.checked : false,
                     userIdVisible: toggleUserIdVisibility ? toggleUserIdVisibility.checked : false,
                     schoolVisible: toggleSchoolVisibility ? toggleSchoolVisibility.checked : false,
@@ -9674,6 +9720,7 @@
             
             // Populate privacy toggles with saved values
             if (toggleEmailVisibility) toggleEmailVisibility.checked = visibility.emailPublic || false;
+            if (togglePhoneVisibility) togglePhoneVisibility.checked = visibility.phoneVisible || false;
             if (toggleLocationVisibility) toggleLocationVisibility.checked = visibility.locationVisible || false;
             if (toggleUserIdVisibility) toggleUserIdVisibility.checked = visibility.userIdVisible || false;
             if (toggleSchoolVisibility) toggleSchoolVisibility.checked = visibility.schoolVisible || false;
