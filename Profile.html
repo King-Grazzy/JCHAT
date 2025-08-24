@@ -2067,6 +2067,189 @@
             }
         }
 
+        /* Floating Contact Icon - Bottom Left */
+        .contact-icon {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.3), 0 4px 15px rgba(0, 213, 255, 0.3);
+        }
+
+        .contact-icon:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.5), 0 8px 25px rgba(0, 213, 255, 0.5);
+        }
+
+        .contact-icon i {
+            font-size: 1.4rem;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+
+        .contact-icon:hover i {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        /* Contact Modal */
+        .contact-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .contact-modal.active {
+            display: flex;
+        }
+
+        .contact-modal-content {
+            background: var(--card-bg);
+            border-radius: 20px;
+            max-width: 90vw;
+            max-height: 90vh;
+            width: 600px;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 46, 146, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        .contact-modal-header {
+            padding: 25px 30px 15px;
+            border-bottom: 1px solid rgba(255, 46, 146, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255, 46, 146, 0.1), rgba(0, 213, 255, 0.1));
+            border-radius: 20px 20px 0 0;
+        }
+
+        .contact-modal-header h3 {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .close-contact-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-contact-btn:hover {
+            background: rgba(255, 46, 146, 0.1);
+            color: var(--pink);
+            transform: scale(1.1);
+        }
+
+        .contact-modal-body {
+            padding: 25px 30px 30px;
+        }
+
+        /* Mobile responsive for contact modal */
+        @media (max-width: 768px) {
+            .contact-icon {
+                bottom: 20px;
+                left: 20px;
+                width: 50px;
+                height: 50px;
+            }
+
+            .contact-icon i {
+                font-size: 1.2rem;
+            }
+
+            .contact-modal-content {
+                width: 95vw;
+                max-height: 95vh;
+                border-radius: 15px;
+            }
+
+            .contact-modal-header {
+                padding: 20px 20px 15px;
+                border-radius: 15px 15px 0 0;
+            }
+
+            .contact-modal-header h3 {
+                font-size: 1.3rem;
+            }
+
+            .contact-modal-body {
+                padding: 20px;
+            }
+
+            .help-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .contact-icon {
+                bottom: 15px;
+                left: 15px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .contact-icon i {
+                font-size: 1rem;
+            }
+
+            .contact-modal-header h3 {
+                font-size: 1.1rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(50px) scale(0.9); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
         .profile-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -4492,105 +4675,119 @@
 
 
 
-                <!-- Beautiful Help & Support Section - Pink and Blue Theme -->
-                <div class="help-support-section">
-                    <h3 class="help-section-title">Need Help? We're Here For You!</h3>
-                    
-                    <div class="help-grid">
-                        <div class="help-card contact-card">
-                            <div class="help-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
-                            <h4>Email Support</h4>
-                            <p>Get help via email</p>
-                            <a href="mailto:jchatguide@gmail.com" class="help-link">
-                                jchatguide@gmail.com
-                            </a>
-                        </div>
 
-                        <div class="help-card whatsapp-card">
-                            <div class="help-icon">
-                                <i class="fab fa-whatsapp"></i>
-                            </div>
-                            <h4>WhatsApp Support</h4>
-                            <p>Quick help via WhatsApp</p>
-                            <a href="https://wa.me/2349013790707" class="help-link" target="_blank">
-                                +234 901 379 0707
-                            </a>
-                        </div>
-
-                        <div class="help-card phone-card">
-                            <div class="help-icon">
-                                <i class="fas fa-phone"></i>
-                            </div>
-                            <h4>Phone Support</h4>
-                            <p>Call us directly</p>
-                            <a href="tel:+2349013790707" class="help-link">
-                                +234 901 379 0707
-                            </a>
-                        </div>
-
-
-                    </div>
-
-                    <div class="help-info">
-                        <div class="help-tip">
-                            <i class="fas fa-lightbulb"></i>
-                            <span>Pro Tip: For fastest support, use WhatsApp during business hours!</span>
-                        </div>
-                    </div>
-
-                    <!-- NEW: Premium Features Section -->
-                    <div class="premium-features-section">
-                        <h3 class="premium-section-title">
-                            <i class="fas fa-crown"></i>
-                            Premium Features
-                        </h3>
-                        <div class="premium-features-grid">
-                            <div class="premium-feature-card">
-                                <div class="feature-icon">
-                                    <i class="fas fa-wallet"></i>
-                                </div>
-                                <h4>Digital Wallet Access</h4>
-                                <p>Unlock your digital wallet to manage JCoins, make transactions, and access premium services.</p>
-                                <div class="feature-price">
-                                    <span class="price-amount">₦5,000</span>
-                                    <span class="price-description">One-time unlock</span>
-                                </div>
-                                <div class="feature-benefits">
-                                    <div class="benefit-item">
-                                        <i class="fas fa-check"></i>
-                                        <span>Secure JCoin transactions</span>
-                                    </div>
-                                    <div class="benefit-item">
-                                        <i class="fas fa-check"></i>
-                                        <span>Premium chat features</span>
-                                    </div>
-                                    <div class="benefit-item">
-                                        <i class="fas fa-check"></i>
-                                        <span>Exclusive profile customization</span>
-                                    </div>
-                                </div>
-                                <div class="feature-actions">
-                                    <a href="mailto:jchatguide@gmail.com" class="premium-contact-btn">
-                                        <i class="fas fa-envelope"></i>
-                                        Contact Admin
-                                    </a>
-                                    <a href="https://wa.me/2349013790707" class="premium-whatsapp-btn" target="_blank">
-                                        <i class="fab fa-whatsapp"></i>
-                                        WhatsApp
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </main>
 
     <!-- Custom Message Box (reused from Home.html) -->
     <div id="messageBox"></div>
+
+    <!-- Floating Contact Icon - Bottom Left -->
+    <div id="contactIcon" class="contact-icon" title="Need Help? Contact Us!">
+        <i class="fas fa-headset"></i>
+    </div>
+
+    <!-- Contact Help Modal -->
+    <div id="contactModal" class="contact-modal">
+        <div class="contact-modal-content">
+            <div class="contact-modal-header">
+                <h3>Need Help? We're Here For You!</h3>
+                <button id="closeContactModal" class="close-contact-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="contact-modal-body">
+                <div class="help-grid">
+                    <div class="help-card contact-card">
+                        <div class="help-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h4>Email Support</h4>
+                        <p>Get help via email</p>
+                        <a href="mailto:jchatguide@gmail.com" class="help-link">
+                            jchatguide@gmail.com
+                        </a>
+                    </div>
+
+                    <div class="help-card whatsapp-card">
+                        <div class="help-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <h4>WhatsApp Support</h4>
+                        <p>Quick help via WhatsApp</p>
+                        <a href="https://wa.me/2349013790707" class="help-link" target="_blank">
+                            +234 901 379 0707
+                        </a>
+                    </div>
+
+                    <div class="help-card phone-card">
+                        <div class="help-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <h4>Phone Support</h4>
+                        <p>Call us directly</p>
+                        <a href="tel:+2349013790707" class="help-link">
+                            +234 901 379 0707
+                        </a>
+                    </div>
+                </div>
+
+                <div class="help-info">
+                    <div class="help-tip">
+                        <i class="fas fa-lightbulb"></i>
+                        <span>Pro Tip: For fastest support, use WhatsApp during business hours!</span>
+                    </div>
+                </div>
+
+                <!-- Premium Features Section -->
+                <div class="premium-features-section">
+                    <h3 class="premium-section-title">
+                        <i class="fas fa-crown"></i>
+                        Premium Features
+                    </h3>
+                    <div class="premium-features-grid">
+                        <div class="premium-feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <h4>Digital Wallet Access</h4>
+                            <p>Unlock your digital wallet to manage JCoins, make transactions, and access premium services.</p>
+                            <div class="feature-price">
+                                <span class="price-amount">₦5,000</span>
+                                <span class="price-description">One-time unlock</span>
+                            </div>
+                            <div class="feature-benefits">
+                                <div class="benefit-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Secure JCoin transactions</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Premium chat features</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-check"></i>
+                                    <span>Exclusive profile customization</span>
+                                </div>
+                            </div>
+                            <div class="feature-actions">
+                                <a href="mailto:jchatguide@gmail.com" class="premium-contact-btn">
+                                    <i class="fas fa-envelope"></i>
+                                    Contact Admin
+                                </a>
+                                <a href="https://wa.me/2349013790707" class="premium-whatsapp-btn" target="_blank">
+                                    <i class="fab fa-whatsapp"></i>
+                                    WhatsApp
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Floating Scroll Toggle Button - Pink and Blue Theme -->
     <div id="scrollToggleButton" class="scroll-toggle-btn" title="Scroll to Bottom">
@@ -8678,7 +8875,49 @@
             if (cancelReportButton) cancelReportButton.addEventListener('click', hideReportUserModal);
             if (submitReportButton) submitReportButton.addEventListener('click', submitReport);
 
+            // Contact Modal Event Listeners
+            const contactIcon = document.getElementById('contactIcon');
+            const contactModal = document.getElementById('contactModal');
+            const closeContactModal = document.getElementById('closeContactModal');
 
+            // Show contact modal
+            if (contactIcon) {
+                contactIcon.addEventListener('click', () => {
+                    if (contactModal) {
+                        contactModal.classList.add('active');
+                        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                    }
+                });
+            }
+
+            // Hide contact modal
+            function hideContactModal() {
+                if (contactModal) {
+                    contactModal.classList.remove('active');
+                    document.body.style.overflow = ''; // Restore scrolling
+                }
+            }
+
+            // Close modal when clicking close button
+            if (closeContactModal) {
+                closeContactModal.addEventListener('click', hideContactModal);
+            }
+
+            // Close modal when clicking outside the content
+            if (contactModal) {
+                contactModal.addEventListener('click', (e) => {
+                    if (e.target === contactModal) {
+                        hideContactModal();
+                    }
+                });
+            }
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && contactModal && contactModal.classList.contains('active')) {
+                    hideContactModal();
+                }
+            });
 
         }); // Close DOMContentLoaded event listener
 
