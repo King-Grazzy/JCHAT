@@ -4181,9 +4181,7 @@
                 <div class="profile-actions" id="profileActions">
                     <!-- Buttons will be dynamically added/hidden based on owner/viewer -->
                     <!-- Removed Edit Profile Button -->
-                    <a href="/privacy_settings.html" id="privacySettingsButton" class="profile-action-button secondary">
-                        <i class="fas fa-user-shield"></i> Privacy Settings
-                    </a>
+
                     <!-- NEW: Wallet Link -->
 
                     
@@ -4717,7 +4715,7 @@
         const toggleInterestsVisibility = document.getElementById('toggleInterestsVisibility');
         const toggleWebsiteVisibility = document.getElementById('toggleWebsiteVisibility');
         const toggleSocialLinksVisibility = document.getElementById('toggleSocialLinksVisibility');
-        const savePrivacySettingsButton = document.getElementById('savePrivacySettingsButton');
+
 
         // NEW: Customization Selects
         const profileFrameSelect = document.getElementById('profileFrameSelect');
@@ -7482,7 +7480,6 @@
             if (chatBubbleStyleSelect) chatBubbleStyleSelect.closest('.customization-option').style.display = 'none';
             if (profileThemeSelect) profileThemeSelect.closest('.customization-option').style.display = 'none';
             if (saveCustomizationButton) saveCustomizationButton.style.display = 'none';
-            if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'none';
             if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none'; // Hide parent div
             if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
             if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'none';
@@ -7869,7 +7866,6 @@
                         if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'flex';
                         if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'flex';
                         if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'flex';
-                        if (savePrivacySettingsButton) savePrivacySettingsButton.style.display = 'inline-flex';
 
                         // Populate customization selects
                         if (profileFrameSelect) profileFrameSelect.value = displayedUserProfileData.profileFrame || 'default';
