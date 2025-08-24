@@ -2184,7 +2184,7 @@
             const authType = localStorage.getItem('github_auth_type') || 'login';
             
             try {
-                showMessageBox("Completing GitHub authentication...", "loading", true);
+                showMessageBox("🐙 Finalizing GitHub authentication...", "loading", true);
                 
                 // For demonstration purposes, we'll create a mock GitHub user
                 // In a real implementation, you would send the code to your backend
@@ -2350,7 +2350,7 @@
                         throw new Error(`Database error: ${dbError.message}`);
                     }
 
-                    showMessageBox("Account created with GitHub! Redirecting...", "success");
+                    showMessageBox("🎉 GitHub account created! Welcome to JCHAT!", "success");
                 } else {
                     console.log('JCHAT_DEBUG: User already exists, updating login timestamp');
                     
@@ -2361,7 +2361,7 @@
                         lastGithubLogin: serverTimestamp()
                     });
                     
-                    showMessageBox("Signed in with GitHub! Redirecting...", "success");
+                    showMessageBox("🚀 Welcome back! Signed in with GitHub", "success");
                 }
 
                 // Store user session data
@@ -2371,14 +2371,25 @@
 
                 console.log('JCHAT_DEBUG: User session data stored for Firebase user:', userId);
 
-                showLoader('Connecting with GitHub');
+                if (isNewUser) {
+                    showLoader('🎉 Setting up your account');
+                } else {
+                    showLoader('🚀 Welcome back');
+                }
                 
-                // Clean up URL parameters and redirect
-                setTimeout(() => {
-                    // Clean URL by removing OAuth parameters
-                    const cleanUrl = window.location.origin + '/Home.html';
-                    window.location.replace(cleanUrl);
-                }, 1500);
+                // For new users, redirect to welcome page first
+                if (isNewUser) {
+                    setTimeout(() => {
+                        const welcomeUrl = window.location.origin + '/auth/github/welcome.html';
+                        window.location.replace(welcomeUrl);
+                    }, 1500);
+                } else {
+                    // Existing users go directly to home
+                    setTimeout(() => {
+                        const cleanUrl = window.location.origin + '/Home.html';
+                        window.location.replace(cleanUrl);
+                    }, 1500);
+                }
 
             } catch (error) {
                 console.error("JCHAT_ERROR: Error creating/signing in GitHub user:", error);
