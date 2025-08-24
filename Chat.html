@@ -71,14 +71,18 @@
             --accent-color-dark: #00aaff;
             --border-color: #3a3a5a;
 
-            /* Chat specific variables */
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --text-primary: #ffffff;
-            --text-secondary: #cccccc;
-            --composer-accent: #3b82f6;
-            --play-button-green: linear-gradient(90deg, #4CAF50, #8BC34A);
-            --play-button-shadow: 0 4px 10px rgba(76, 175, 80, 0.4);
+                    /* Chat specific variables */
+        --bg-primary: #1a1a1a;
+        --bg-secondary: #2d2d2d;
+        --text-primary: #ffffff;
+        --text-secondary: #cccccc;
+        --composer-accent: #3b82f6;
+        --play-button-green: linear-gradient(90deg, #4CAF50, #8BC34A);
+        --play-button-shadow: 0 4px 10px rgba(76, 175, 80, 0.4);
+        
+        /* Location sharing button states */
+        --location-sharing-active: linear-gradient(135deg, #dc3545, #c82333);
+        --location-sharing-inactive: linear-gradient(135deg, var(--blue), var(--pink));
         }
 
         /* Theme Definitions */
@@ -94,6 +98,27 @@
             --input-background: rgba(255, 255, 255, 0.08);
         }
 
+        /* Location sharing interface styles */
+        .location-interface {
+            animation: slideIn 0.3s ease;
+        }
+        
+        .location-interface .real-time-indicator {
+            background: linear-gradient(135deg, #4CAF50, #8BC34A);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
         /* Pink and Blue Glowing Loader */
         .jchat-loader {
             position: fixed;
@@ -796,7 +821,6 @@
             display: flex;
             gap: 4px;
         }
-
         .typing-dot {
             width: 8px;
             height: 8px;
@@ -1585,7 +1609,6 @@
         .friend-item .chat-btn:active {
             transform: translateY(0);
         }
-
         .message-badge {
             background-color: var(--notification-badge-color);
             color: var(--white);
@@ -2720,7 +2743,6 @@
 
          // Voice note settings button - Removed in new implementation
          // Old settings button no longer exists
-
          /**
           * Show voice note settings panel
           */
@@ -3208,34 +3230,151 @@
 
             // Call button event listeners will be set up after call functions are defined
 
-            // Location Sharing with Map Interface
+            // Real-time Location Sharing with Map Interface
+            let locationWatchId = null;
+            let isSharingLocation = false;
+            
             document.getElementById('shareLocationBtn').addEventListener('click', () => {
                 const btn = document.getElementById('shareLocationBtn');
                 btn.classList.add('active');
                 setTimeout(() => btn.classList.remove('active'), 200);
                 
-                if (navigator.geolocation) {
-                    showMessageBox('📍 Getting your location...', 'loading', true);
-                    
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            const lat = position.coords.latitude;
-                            const lng = position.coords.longitude;
-                            showLocationInterface(lat, lng);
-                        },
-                        (error) => {
-                            showMessageBox('❌ Location access denied', 'error');
-                            showLocationInterface(null, null);
-                        }
-                    );
+                if (isSharingLocation) {
+                    // Stop sharing location
+                    stopLocationSharing();
                 } else {
-                    showMessageBox('❌ Geolocation not supported', 'error');
-                    showLocationInterface(null, null);
+                    // Start sharing location
+                    startLocationSharing();
                 }
             });
+            
+            function startLocationSharing() {
+                try {
+                    if (navigator.geolocation) {
+                        showMessageBox('📍 Starting real-time location sharing...', 'loading', true);
+                        
+                        // Get initial position
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                try {
+                                    const lat = position.coords.latitude;
+                                    const lng = position.coords.longitude;
+                                    showLocationInterface(lat, lng, true);
+                                    
+                                    // Start watching for position changes
+                                    locationWatchId = navigator.geolocation.watchPosition(
+                                        (newPosition) => {
+                                            try {
+                                                const newLat = newPosition.coords.latitude;
+                                                const newLng = newPosition.coords.longitude;
+                                                updateLocationDisplay(newLat, newLng);
+                                                
+                                                // Send real-time location update to chat
+                                                if (partnerId) {
+                                                    sendMessage('location', `📍 My Location (Live): https://maps.google.com/?q=${newLat},${newLng}`);
+                                                }
+                                            } catch (error) {
+                                                console.error('JCHAT_ERROR: Error processing location update:', error);
+                                            }
+                                        },
+                                        (error) => {
+                                            console.error('JCHAT_ERROR: Location watch error:', error);
+                                            showMessageBox('❌ Location tracking error', 'error');
+                                        },
+                                        {
+                                            enableHighAccuracy: true,
+                                            timeout: 10000,
+                                            maximumAge: 30000
+                                        }
+                                    );
+                                    
+                                    isSharingLocation = true;
+                                    updateLocationButtonState();
+                                } catch (error) {
+                                    console.error('JCHAT_ERROR: Error starting location sharing:', error);
+                                    showMessageBox('❌ Error starting location sharing', 'error');
+                                }
+                            },
+                            (error) => {
+                                console.error('JCHAT_ERROR: Location access error:', error);
+                                showMessageBox('❌ Location access denied', 'error');
+                                showLocationInterface(null, null, false);
+                            }
+                        );
+                    } else {
+                        showMessageBox('❌ Geolocation not supported', 'error');
+                        showLocationInterface(null, null, false);
+                    }
+                } catch (error) {
+                    console.error('JCHAT_ERROR: Critical error in startLocationSharing:', error);
+                    showMessageBox('❌ Critical error starting location sharing', 'error');
+                }
+            }
+            
+            function stopLocationSharing() {
+                try {
+                    if (locationWatchId) {
+                        navigator.geolocation.clearWatch(locationWatchId);
+                        locationWatchId = null;
+                    }
+                    
+                    isSharingLocation = false;
+                    updateLocationButtonState();
+                    showMessageBox('📍 Location sharing stopped', 'info');
+                    
+                    // Remove location interface if it exists
+                    const existingInterface = document.querySelector('.location-interface');
+                    if (existingInterface) {
+                        existingInterface.remove();
+                    }
+                } catch (error) {
+                    console.error('JCHAT_ERROR: Error stopping location sharing:', error);
+                    showMessageBox('❌ Error stopping location sharing', 'error');
+                }
+            }
+            
+            function updateLocationButtonState() {
+                try {
+                    const btn = document.getElementById('shareLocationBtn');
+                    if (!btn) {
+                        console.warn('JCHAT_WARN: Share location button not found');
+                        return;
+                    }
+                    
+                    if (isSharingLocation) {
+                        btn.innerHTML = '<i class="fas fa-stop-circle"></i> Stop Location';
+                        btn.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+                        btn.title = 'Stop sharing location';
+                    } else {
+                        btn.innerHTML = '<i class="fas fa-map-marker-alt"></i> Share Location';
+                        btn.style.background = 'linear-gradient(135deg, var(--blue), var(--pink))';
+                        btn.title = 'Share location in real-time';
+                    }
+                } catch (error) {
+                    console.error('JCHAT_ERROR: Error updating location button state:', error);
+                }
+            }
+            
+            function updateLocationDisplay(lat, lng) {
+                try {
+                    const locationText = document.getElementById('locationText');
+                    if (locationText) {
+                        locationText.textContent = `📍 Your Location (Live): ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                    }
+                } catch (error) {
+                    console.error('JCHAT_ERROR: Error updating location display:', error);
+                }
+            }
 
-            function showLocationInterface(lat, lng) {
+            function showLocationInterface(lat, lng, isRealTime = false) {
+                // Remove existing interface if present
+                const existingInterface = document.querySelector('.location-interface');
+                if (existingInterface) {
+                    existingInterface.remove();
+                }
+                
                 const locationInterface = document.createElement('div');
+                locationInterface.className = 'location-interface';
                 locationInterface.style.cssText = `
                     position: fixed;
                     top: 50%;
@@ -3255,49 +3394,82 @@
                     ? `📍 Your Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`
                     : '📍 Demo Location: San Francisco, CA';
                 
+                const realTimeIndicator = isRealTime ? '<div style="background: linear-gradient(135deg, #4CAF50, #8BC34A); color: white; padding: 8px 15px; border-radius: 20px; margin-bottom: 15px; font-size: 0.9rem;"><i class="fas fa-satellite-dish"></i> Real-time Tracking Active</div>' : '';
+                
                 locationInterface.innerHTML = `
                     <div style="margin-bottom: 20px;">
                         <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: var(--blue); margin-bottom: 15px;"></i>
-                        <h3 style="color: var(--white); margin: 0;">Share Location</h3>
-                        <p style="color: var(--text-light); margin: 10px 0;">${locationText}</p>
+                        <h3 style="color: var(--white); margin: 0;">${isRealTime ? 'Real-time Location Sharing' : 'Share Location'}</h3>
+                        ${realTimeIndicator}
+                        <p id="locationText" style="color: var(--text-light); margin: 10px 0;">${locationText}</p>
+                        ${isRealTime ? '<p style="color: #4CAF50; font-size: 0.9rem; margin: 5px 0;"><i class="fas fa-info-circle"></i> Location updates automatically every 30 seconds</p>' : ''}
                     </div>
-                    <div style="display: flex; gap: 15px; justify-content: center;">
-                        <button id="shareLocationConfirm" style="background: linear-gradient(135deg, var(--blue), var(--pink)); color: white; border: none; border-radius: 10px; padding: 12px 20px; cursor: pointer;">
-                            <i class="fas fa-share"></i> Share Location
-                        </button>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        ${isRealTime ? `
+                            <button id="stopLocationSharing" style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; border: none; border-radius: 10px; padding: 12px 20px; cursor: pointer;">
+                                <i class="fas fa-stop-circle"></i> Stop Sharing
+                            </button>
+                        ` : `
+                            <button id="shareLocationConfirm" style="background: linear-gradient(135deg, var(--blue), var(--pink)); color: white; border: none; border-radius: 10px; padding: 12px 20px; cursor: pointer;">
+                                <i class="fas fa-share"></i> Share Location
+                            </button>
+                        `}
                         <button id="cancelLocationShare" style="background: var(--input-background); color: var(--text-light); border: 1px solid var(--border-light); border-radius: 10px; padding: 12px 20px; cursor: pointer;">
-                            Cancel
+                            ${isRealTime ? 'Close' : 'Cancel'}
                         </button>
                     </div>
                 `;
                 
                 document.body.appendChild(locationInterface);
                 
-                document.getElementById('shareLocationConfirm').addEventListener('click', () => {
-                    showMessageBox('📍 Location shared successfully!', 'success');
-                    if (lat && lng) {
-                        sendMessage('location', `📍 My Location: https://maps.google.com/?q=${lat},${lng}`);
-                    } else {
-                        sendMessage('location', '📍 My Location: San Francisco, CA (Demo)');
+                if (isRealTime) {
+                    // Real-time mode - send initial location
+                    if (lat && lng && partnerId) {
+                        sendMessage('location', `📍 My Location (Live): https://maps.google.com/?q=${lat},${lng}`);
                     }
-                    document.body.removeChild(locationInterface);
-                });
+                    
+                    document.getElementById('stopLocationSharing').addEventListener('click', () => {
+                        stopLocationSharing();
+                    });
+                } else {
+                    // One-time share mode
+                    document.getElementById('shareLocationConfirm').addEventListener('click', () => {
+                        showMessageBox('📍 Location shared successfully!', 'success');
+                        if (lat && lng) {
+                            sendMessage('location', `📍 My Location: https://maps.google.com/?q=${lat},${lng}`);
+                        } else {
+                            sendMessage('location', '📍 My Location: San Francisco, CA (Demo)');
+                        }
+                        document.body.removeChild(locationInterface);
+                    });
+                }
                 
                 document.getElementById('cancelLocationShare').addEventListener('click', () => {
-                    showMessageBox('❌ Location sharing cancelled', 'info');
-                    document.body.removeChild(locationInterface);
+                    if (isRealTime) {
+                        stopLocationSharing();
+                    } else {
+                        showMessageBox('❌ Location sharing cancelled', 'info');
+                        document.body.removeChild(locationInterface);
+                    }
                 });
             }
 
-            // Reaction toggle functionality
-            document.getElementById('reactionToggleBtn').addEventListener('click', () => {
-                const quickReactions = document.getElementById('quickReactions');
-                if (quickReactions.style.display === 'none' || !quickReactions.style.display) {
-                    quickReactions.style.display = 'flex';
-                } else {
-                    quickReactions.style.display = 'none';
-                }
-            });
+                    // Reaction toggle functionality
+        document.getElementById('reactionToggleBtn').addEventListener('click', () => {
+            const quickReactions = document.getElementById('quickReactions');
+            if (quickReactions.style.display === 'none' || !quickReactions.style.display) {
+                quickReactions.style.display = 'flex';
+            } else {
+                quickReactions.style.display = 'none';
+            }
+        });
+        
+        // Cleanup location sharing when page is unloaded
+        window.addEventListener('beforeunload', () => {
+            if (locationWatchId) {
+                navigator.geolocation.clearWatch(locationWatchId);
+            }
+        });
 
             // Quick reaction button functionality
             document.querySelectorAll('.reaction-btn').forEach(btn => {
@@ -3439,7 +3611,6 @@
                     showMessageBox(`Error loading users: ${error.message}`, 'error');
                 });
             }
-
             // Function to create friend item HTML (mirroring Find_Friends.html styling)
             function createFriendItem(friend) {
                 const friendDiv = document.createElement('div');
@@ -4215,7 +4386,6 @@
                  showMessageBox('Failed to play voice note', 'error');
              }
          }
-         
          // Make globally accessible
          window.playVoiceNote = playVoiceNote;
          window.VoiceNotePlayer = VoiceNotePlayer;
@@ -4251,6 +4421,29 @@
              'Nature & Environment': 'stickers:nature'
          };
          
+                 // Check if user has access to specific emoji (first 3 free, rest require JCHAT unlock)
+        function hasEmojiAccess(categoryName, emojiIndex) {
+            try {
+                // Safety check for required variables
+                if (!categoryMapping || !userEntitlements) {
+                    console.warn('JCHAT_WARN: Required variables not initialized, defaulting to free access');
+                    return true;
+                }
+                
+                const stickerKey = categoryMapping[categoryName];
+                
+                // First 3 emojis are always free
+                if (emojiIndex < 3) return true;
+                
+                // Check if JCHAT team has unlocked this category for user
+                return userEntitlements.packs && userEntitlements.packs.includes(stickerKey);
+            } catch (error) {
+                console.error('JCHAT_ERROR: Error in hasEmojiAccess:', error);
+                // Default to free access on error
+                return true;
+            }
+        }
+         
          // Load user entitlements set by JCHAT team via Developer Center
          async function loadUserEntitlements(userId) {
              try {
@@ -4262,17 +4455,6 @@
                  console.error('JCHAT_ERROR: Error loading sticker entitlements:', error);
                  userEntitlements = { packs: [] };
              }
-         }
-         
-         // Check if user has access to specific emoji (first 3 free, rest require JCHAT unlock)
-         function hasEmojiAccess(categoryName, emojiIndex) {
-             const stickerKey = categoryMapping[categoryName];
-             
-             // First 3 emojis are always free
-             if (emojiIndex < 3) return true;
-             
-             // Check if JCHAT team has unlocked this category for user
-             return userEntitlements.packs && userEntitlements.packs.includes(stickerKey);
          }
          
          // Show premium upgrade modal when user clicks locked emoji
@@ -4937,7 +5119,6 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  }
              }
          }
-
          /**
           * Show connected call interface with enhanced features
           */
@@ -5737,7 +5918,6 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              }
              return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${transformations}/${urlOrPublicId}`;
          }
-
          /**
           * Displays the profile picture or a default icon.
           */
@@ -6502,7 +6682,6 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              const byteArray = new Uint8Array(byteNumbers);
              return new Blob([byteArray], { type: mimeType });
          }
-
          // JCHAT Audio/Video Event Listeners
          document.addEventListener('DOMContentLoaded', () => {
              // Voice note button event listener
@@ -7299,7 +7478,6 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              }
              renderFriendsList(filteredFriends);
          }
-
          // Function to update the friend badge count
          function updateFriendBadge() {
              const badge = document.getElementById('selectFriendBadge');
