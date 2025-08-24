@@ -222,16 +222,15 @@
             --active-item-background: rgba(255, 215, 0, 0.1);
         }
 
-        /* Enhanced Touch-Friendly Scrolling */
-        html {
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
+        /* EMERGENCY FIX: Remove all scroll restrictions */
+        * {
+            touch-action: auto !important;
+            -webkit-overflow-scrolling: touch !important;
         }
-
-        /* Ensure natural scrolling behavior */
-        body, html {
-            overflow-x: hidden; /* Prevent horizontal scroll */
-            overflow-y: auto; /* Allow natural vertical scrolling */
+        
+        html, body {
+            scroll-behavior: auto !important;
+            overflow: auto !important;
         }
 
         body {
@@ -6167,21 +6166,9 @@
 
 
 
-        /**
-         * Initializes touch gestures for mobile devices.
-         * Simplified to prevent interference with natural scrolling.
-         */
+        // EMERGENCY FIX: Disable all touch gesture interference
         function initializeTouchGestures() {
-            // Only add haptic feedback for mobile buttons
-            // Removed aggressive swipe detection that was interfering with scrolling
-            if ('vibrate' in navigator) {
-                const actionButtons = document.querySelectorAll('.profile-action-button');
-                actionButtons.forEach(button => {
-                    button.addEventListener('touchstart', () => {
-                        navigator.vibrate(10);
-                    }, { passive: true });
-                });
-            }
+            // Completely disabled to ensure natural scrolling
         }
 
         /**
