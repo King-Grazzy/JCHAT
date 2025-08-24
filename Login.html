@@ -1392,6 +1392,185 @@
             color: var(--text-light);
             font-size: 0.9rem;
         }
+
+        /* New Feature Grid Styles */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            color: var(--white);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Special Features Styles */
+        .special-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .special-feature {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .special-feature h3 {
+            color: var(--white);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .special-feature ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .special-feature li {
+            color: var(--text-light);
+            margin-bottom: 0.8rem;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .special-feature li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        /* CTA Section Styles */
+        .cta-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .cta-section h3 {
+            color: var(--white);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-benefits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-benefit {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cta-benefit i {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .cta-benefit span {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .cta-actions {
+            margin-top: 2rem;
+        }
+
+        .cta-text {
+            color: var(--white);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .cta-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .cta-btn.primary {
+            background: linear-gradient(135deg, var(--success-color), #34ce57);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .cta-btn.secondary {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
             border-bottom: 1px solid var(--border-color);
             transition: background 0.3s ease;
         }
@@ -1580,6 +1759,33 @@
                 font-size: 0.9rem;
             }
 
+            /* Mobile responsive for new features */
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .special-features {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .cta-benefits {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .cta-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
             #scrollToTopBtn {
                 width: 40px;
                 height: 40px;
@@ -1621,51 +1827,85 @@
         <!-- Welcome Screen (Initial view, contains About Us content) -->
         <div id="welcomeScreen" class="welcome-screen">
             <div class="welcome-content">
-                <h1>About JCHAT Founder & Builder</h1>
+                <h1>🚀 Welcome to JCHAT - The Future of Social Connection!</h1>
                 <div class="flex justify-center mb-6">
-                    <!-- Your profile picture -->
-                    <img src="assets/security.png" alt="Profile Picture of JCHAT Founder & Builder" class="profile-image"
-                         onerror="this.onerror=null;this.src='https://placehold.co/200x200/1a1a2e/f0f0f0?text=Elechi';">
+                    <img src="assets/security.png" alt="JCHAT - Secure Social Platform" class="profile-image"
+                         onerror="this.onerror=null;this.src='https://placehold.co/200x200/1a1a2e/f0f0f0?text=JCHAT';">
                 </div>
                 <p class="text-xl text-white font-medium text-center">
-                    Passionate about technology, community, and making a positive impact. ✨
+                    Join millions of users worldwide in the most secure, rewarding, and intelligent social platform ever created! ✨
                 </p>
 
-                <!-- Section: The JCHAT Genesis: A Dream for Everyone -->
+                <!-- Section: Why Choose JCHAT? -->
                 <section class="section-card">
-                    <h2>The JCHAT Genesis: A Dream for Everyone 🌍</h2>
+                    <h2>🌟 Why Choose JCHAT? The Ultimate Social Experience</h2>
                     <p>
-                        My name is Elechi Osoundu Joshua, and I come from a humble background in **Ebonyi State, Ezza South, Onicha Local Government, Nigeria**. As the first son and third child in my family, I learned early on the value of hard work and finding smart solutions. Growing up, I always dreamed of making things easier for people, especially when it came to connecting and sharing.
+                        JCHAT isn't just another social media platform – it's a revolutionary way to connect, earn, and grow together. Built with cutting-edge AI technology and designed for the modern user, JCHAT offers features that no other platform can match.
                     </p>
-                    <p>
-                        This dream wasn't just about building another app; it was about creating a space where everyone could communicate smoothly and feel truly valued. The unique part? **I built JCHAT from scratch, entirely from my own ideas and effort, without anyone else's help or input.** It was a journey fueled by pure passion and a clear vision. That's why JCHAT was born! I wanted to build a platform where connecting with friends, managing groups, and sharing moments felt natural and rewarding. And yes, that includes the unique part about **offering earning opportunities** 💰 to our users. It's my way of giving back to the amazing community that helps JCHAT grow.
-                    </p>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">🔒</div>
+                            <h3>Military-Grade Security</h3>
+                            <p>Your privacy and data are protected with enterprise-level encryption and security protocols.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">💰</div>
+                            <h3>Earn While You Connect</h3>
+                            <p>Get rewarded with JCoins and XP for every interaction. Turn your social time into earning time!</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">🤖</div>
+                            <h3>AI-Powered Intelligence</h3>
+                            <p>Smart features that learn from you, making your experience more personalized every day.</p>
+                        </div>
+                        
+                        <div class="feature-card">
+                            <div class="feature-icon">📱</div>
+                            <h3>Cross-Platform Sync</h3>
+                            <p>Seamlessly switch between devices with real-time synchronization and cloud backup.</p>
+                        </div>
+                    </div>
                 </section>
 
-                <!-- Section: Building JCHAT: My Expertise in Action -->
+                <!-- Section: What Makes JCHAT Special -->
                 <section class="section-card">
-                    <h2>Building JCHAT: My Expertise in Action 🛠️</h2>
-                    <p>
-                        My professional journey has been all about building and managing software projects in the tech world. I've been lucky to work on many different things, but creating JCHAT has been where I've truly put my skills to the test. **Every line of code, every feature, every design choice in JCHAT comes directly from my mind and hands.** It's a testament to what dedication and a clear vision can achieve.
-                    </p>
-                    <p>
-                        My role at JCHAT involves keeping everything running smoothly, making the user experience better, and adding new features that our community will love. I'm dedicated to making JCHAT not just a good app, but a reliable and enjoyable one for everyone. This also means making sure our earning features are fair and simple to understand. ✅
-                    </p>
-                    <h3>Key Skills:</h3>
-                    <div class="flex flex-wrap">
-                        <span class="skill-tag">Web Development (HTML, CSS, JavaScript)</span>
-                        <span class="skill-tag">Frontend Frameworks (React, Vue.js)</span>
-                        <span class="skill-tag">Backend Development (Node.js, Python)</span>
-                        <span class="skill-tag">Database Management (SQL, NoSQL)</span>
-                        <span class="skill-tag">Cloud Platforms (AWS, GCP)</span>
-                        <span class="skill-tag">UI/UX Design Principles</span>
-                        <span class="skill-tag">Project Management</span>
-                        <span class="skill-tag">Agile Methodologies</span>
-                        <span class="skill-tag">Technical Troubleshooting</span>
-                        <span class="skill-tag">API Integration</span>
-                        <span class="skill-tag">Data Analysis</span>
-                        <span class="skill-tag">Community Building</span>
+                    <h2>🎯 What Makes JCHAT Special? Revolutionary Features</h2>
+                    
+                    <div class="special-features">
+                        <div class="special-feature">
+                            <h3>🎮 Gamified Experience</h3>
+                            <ul>
+                                <li><strong>Level System:</strong> Progress through levels and unlock exclusive features</li>
+                                <li><strong>Achievement Badges:</strong> Earn badges for milestones and special activities</li>
+                                <li><strong>Daily Challenges:</strong> Complete daily tasks for bonus rewards</li>
+                                <li><strong>Leaderboards:</strong> Compete with friends and climb the ranks</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="special-feature">
+                            <h3>💎 Premium Features</h3>
+                            <ul>
+                                <li><strong>Custom Themes:</strong> Personalize your experience with exclusive themes</li>
+                                <li><strong>Advanced Analytics:</strong> Track your social growth and engagement</li>
+                                <li><strong>Priority Support:</strong> Get help faster with premium support</li>
+                                <li><strong>Exclusive Content:</strong> Access premium-only features and content</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="special-feature">
+                            <h3>🌍 Global Community</h3>
+                            <ul>
+                                <li><strong>Multi-Language Support:</strong> Connect with users worldwide</li>
+                                <li><strong>Cultural Events:</strong> Celebrate global festivals and traditions</li>
+                                <li><strong>Local Groups:</strong> Find communities in your area</li>
+                                <li><strong>International Networking:</strong> Build connections across borders</li>
+                            </ul>
+                        </div>
                     </div>
+                </section>
 
                     <!-- Smart Message System Demo Section -->
                     <div class="smart-message-demo-section">
@@ -1707,49 +1947,52 @@
                     </div>
                 </section>
 
-                <!-- Section: Beyond the Code -->
+                <!-- Section: Join the Revolution -->
                 <section class="section-card">
-                    <h2>Beyond the Code 🌳</h2>
+                    <h2>🔥 Join the JCHAT Revolution Today!</h2>
                     <p>
-                        While I love building technology, I also believe in a balanced life. When I'm not coding, you'll often find me:
+                        Don't miss out on the future of social media. JCHAT is more than just a platform – it's a movement towards a more connected, rewarding, and intelligent digital world.
                     </p>
-                    <ul>
-                        <li><strong>Exploring Nature:</strong> Hiking new trails or just enjoying a quiet moment outdoors helps me relax and see things from a fresh perspective. 🏞️</li>
-                        <li><strong>Creative Pursuits:</strong> I enjoy digital art and photography. It's a great way to unwind and express ideas visually. 🎨📸</li>
-                        <li><strong>Learning New Things:</strong> I love the challenge of learning new languages, both human ones and programming languages. It opens up new ways of thinking. 📚</li>
-                        <li><strong>Community Volunteering:</strong> Giving back, especially in areas like digital education or protecting our environment, is very important to me. 🙏</li>
-                        <li><strong>Reading & Research:</strong> My bookshelves are full of different books, from exciting sci-fi to the latest in AI and future tech. 🧠</li>
-                    </ul>
-                    <p>
-                        These activities aren't just hobbies; they help spark new ideas and improve my problem-solving skills, which I often bring back to JCHAT.
-                    </p>
-                </section>
-
-                <!-- Section: The Future of JCHAT: Empowering Every User -->
-                <section class="section-card">
-                    <h2>The Future of JCHAT: Empowering Every User ✨</h2>
-                    <p>
-                        My main belief is in always getting better and seeing every challenge as a chance to grow. This thinking was key when I created JCHAT, especially in making it powerful yet simple for everyone. I always try to work with a positive attitude, a team spirit, and a commitment to doing my best. This ensures JCHAT is not only useful but also fair, welcoming, and built to last.
-                    </p>
-                    <p>
-                        Looking ahead, my main goal is to keep making JCHAT better for you, our users. This means adding more ways to earn, introducing even simpler features, and making sure JCHAT stays a truly easy and rewarding place to connect. I'm excited to explore new ideas in communication, accessible tech, and smart AI, all to make your JCHAT experience even better.
-                    </p>
-                    <p>
-                        **Building JCHAT has been a labor of love, a solo journey from concept to reality.** To truly unlock its full potential and bring even more groundbreaking ideas to life – ideas that will further empower and benefit our community – **financial support is crucial.** Your contribution can help us scale, innovate, and create something truly greater than what you see today. 🚀
-                    </p>
-
-                    <div class="support-details">
-                        <h3>Support JCHAT's Growth</h3>
-                        <p>Every contribution, big or small, helps us build a better future for JCHAT.</p>
-                        <p class="contact-item"><i class="fas fa-envelope"></i> Email: <a href="mailto:jchatguide@gmail.com">jchatguide@gmail.com</a></p>
-                        <p class="contact-item"><i class="fab fa-whatsapp"></i> WhatsApp: <a href="https://wa.me/2349013790707">+234 901 379 0707</a></p>
-                        <!-- Bank details removed from Login page per policy: only show during premium purchase flows. -->
+                    
+                    <div class="cta-section">
+                        <h3>🚀 Ready to Get Started?</h3>
+                        <div class="cta-benefits">
+                            <div class="cta-benefit">
+                                <i class="fas fa-rocket"></i>
+                                <span>Free to join, rewards to earn</span>
+                            </div>
+                            <div class="cta-benefit">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>100% secure and private</span>
+                            </div>
+                            <div class="cta-benefit">
+                                <i class="fas fa-users"></i>
+                                <span>Join millions of users worldwide</span>
+                            </div>
+                            <div class="cta-benefit">
+                                <i class="fas fa-gift"></i>
+                                <span>Exclusive welcome bonuses</span>
+                            </div>
+                        </div>
+                        
+                        <div class="cta-actions">
+                            <p class="cta-text">Create your account now and start earning rewards from day one!</p>
+                            <div class="cta-buttons">
+                                <button onclick="showLoginForm()" class="cta-btn primary">
+                                    <i class="fas fa-sign-in-alt"></i> Sign In Now
+                                </button>
+                                <button onclick="showRegisterForm()" class="cta-btn secondary">
+                                    <i class="fas fa-user-plus"></i> Create Account
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </section>
+                
                 <div class="separator"></div>
                 <footer>
-                    <p>Designed with passion and a dash of code.</p>
-                    <p>&copy; 2025 Elechi Osoundu Joshua. All rights reserved.</p>
+                    <p>Built with cutting-edge technology for the modern user.</p>
+                    <p>&copy; 2025 JCHAT. All rights reserved.</p>
                 </footer>
             </div>
             <button id="getStartedButton" class="get-started-button">
@@ -2510,6 +2753,28 @@
             }
 
             showNextDemo();
+        }
+
+        /**
+         * Shows the login form and hides the welcome screen
+         */
+        function showLoginForm() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('authContainer').style.display = 'block';
+            document.getElementById('authTitle').textContent = 'Login to JCHAT';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+
+        /**
+         * Shows the register form and hides the welcome screen
+         */
+        function showRegisterForm() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('authContainer').style.display = 'block';
+            document.getElementById('authTitle').textContent = 'Create JCHAT Account';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
         }
 
         /**
