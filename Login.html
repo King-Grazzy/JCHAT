@@ -1571,6 +1571,17 @@
         const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
 
+        // Enhanced Google OAuth Configuration
+        const GOOGLE_CLIENT_ID = '328479683167-kcpfmo292u1lqkldem38tl34totg9tau.apps.googleusercontent.com';
+        const GOOGLE_REDIRECT_URI = 'https://jchathub.netlify.app/auth/google/callback';
+        
+        // Configure Google OAuth provider with enhanced scopes
+        googleProvider.addScope('profile');
+        googleProvider.addScope('email');
+        googleProvider.setCustomParameters({
+            prompt: 'select_account'
+        });
+
         // GitHub OAuth Configuration
         const GITHUB_CLIENT_ID = 'Ov23liVhJtsmAG4DZOOH';
         const GITHUB_REDIRECT_URI = 'https://jchathub.netlify.app/auth/github/callback';
@@ -2035,40 +2046,54 @@
         }
 
         /**
-         * Handles Google Sign-In/Registration.
+         * Enhanced Google Sign-In/Registration with beautiful UI feedback.
          */
         async function handleGoogleAuth(type) {
             const button = type === 'login' ? googleLoginButton : googleRegisterButton;
             toggleButtonLoading(button, true);
-            showMessageBox(`Signing ${type === 'login' ? 'in' : 'up'} with Google...`, "loading", true);
+            showMessageBox(`🔍 ${type === 'login' ? 'Signing in' : 'Signing up'} with Google...`, "loading", true);
 
             try {
+                console.log('JCHAT_DEBUG: Starting Google authentication...', type);
                 const result = await signInWithPopup(auth, googleProvider);
                 const user = result.user;
+
+                console.log('JCHAT_DEBUG: Google auth successful for user:', user.email);
+                showMessageBox("✨ Google authentication successful!", "loading", true);
 
                 const userProfileRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
                 const userDocSnap = await getDoc(userProfileRef);
 
+                let isNewUser = false;
+                let username = user.displayName || user.email.split('@')[0];
+
                 if (!userDocSnap.exists()) {
                     // New user, create profile
-                    let username = user.displayName || user.email.split('@')[0];
-                    // You might want to ask for a referral code here if it's a new Google signup
-                    // For simplicity, we'll assume no referral for Google signups for now, or you can prompt
-                    await runTransaction(db, async (transaction) => {
-                        transaction.set(userProfileRef, {
+                    isNewUser = true;
+                    console.log('JCHAT_DEBUG: Creating new Google user profile');
+                    
+                    try {
+                        // Create user profile
+                        await setDoc(userProfileRef, {
                             username: username,
                             email: user.email,
+                            googleId: user.uid,
                             profilePicId: user.photoURL || null,
-                            bio: "", location: "", friendsCount: 0, followersCount: 0, followingCount: 0,
-                            createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+                            bio: "", 
+                            location: "", 
+                            friendsCount: 0, 
+                            followersCount: 0, 
+                            followingCount: 0,
+                            createdAt: serverTimestamp(), 
+                            updatedAt: serverTimestamp(),
                             inspirationType: "motivational",
                             visibility: {
                                 displayName: true, profilePic: true, bio: false, location: false,
                                 emailPublic: false, lastOnline: false, allowFriendRequests: true, allowMessages: true,
                             },
                             totalPosts: 0,
-                            jCoins: REFERRAL_JCOIN_REWARD_NEW_USER, // Google new user gets initial JCoins
-                            gas: REFERRAL_XP_REWARD_NEW_USER, // Google new user gets initial XP
+                            jCoins: REFERRAL_JCOIN_REWARD_NEW_USER,
+                            gas: REFERRAL_XP_REWARD_NEW_USER,
                             level: 1,
                             currentXp: REFERRAL_XP_REWARD_NEW_USER,
                             xpToNextLevel: 100,
@@ -2078,39 +2103,77 @@
                             questProgress: {},
                             referralCode: generateReferralCode(),
                             successfulReferrals: 0,
-                            walletUnlocked: true
+                            walletUnlocked: true,
+                            authProvider: 'google'
                         });
-                        // Set new user's public profile
+
+                        // Create public profile
                         const userPublicProfileRef = doc(db, "artifacts", appId, "public", "data", "users", user.uid);
-                        transaction.set(userPublicProfileRef, {
+                        await setDoc(userPublicProfileRef, {
                             username: username,
                             profilePicId: user.photoURL || null,
                             jCoins: REFERRAL_JCOIN_REWARD_NEW_USER,
                             level: 1,
                             userId: user.uid,
                             email: user.email,
-                            messagesSentCount: 0
+                            messagesSentCount: 0,
+                            googleId: user.uid
                         });
-                    });
-                    showMessageBox("Account created with Google! Redirecting...", "success");
+
+                        console.log('JCHAT_DEBUG: Google user profile created successfully');
+                        showMessageBox("🎉 Google account created! Welcome to JCHAT!", "success");
+                    } catch (dbError) {
+                        console.error('JCHAT_ERROR: Database error during Google user creation:', dbError);
+                        throw new Error(`Database error: ${dbError.message}`);
+                    }
                 } else {
-                    showMessageBox("Signed in with Google! Redirecting...", "success");
+                    // Existing user, update login timestamp
+                    console.log('JCHAT_DEBUG: Existing Google user, updating login timestamp');
+                    await updateDoc(userProfileRef, {
+                        updatedAt: serverTimestamp(),
+                        lastGoogleLogin: serverTimestamp()
+                    });
+                    showMessageBox("🚀 Welcome back! Signed in with Google", "success");
+                }
+
+                // Store user session data
+                localStorage.setItem('jchat_user_id', user.uid);
+                localStorage.setItem('jchat_user_email', user.email);
+                localStorage.setItem('jchat_username', username);
+
+                console.log('JCHAT_DEBUG: Google user session data stored');
+
+                if (isNewUser) {
+                    showLoader('🎉 Setting up your account');
+                } else {
+                    showLoader('🚀 Welcome back');
                 }
                 
-                showLoader('Connecting with Google');
-                setTimeout(() => {
-                    window.location.href = '/home.html';
-                }, 1000);
+                // For new users, redirect to Google welcome page
+                if (isNewUser) {
+                    setTimeout(() => {
+                        const welcomeUrl = window.location.origin + '/auth/google/welcome.html';
+                        window.location.replace(welcomeUrl);
+                    }, 1500);
+                } else {
+                    // Existing users go directly to home
+                    setTimeout(() => {
+                        const cleanUrl = window.location.origin + '/Home.html';
+                        window.location.replace(cleanUrl);
+                    }, 1500);
+                }
 
             } catch (error) {
-                console.error("Google Auth Error:", error);
+                console.error("JCHAT_ERROR: Google Auth Error:", error);
                 let errorMessage = "Google sign-in failed. Please try again.";
                 if (error.code === 'auth/popup-closed-by-user') {
-                    errorMessage = "Google sign-in window closed.";
+                    errorMessage = "❌ Google sign-in window was closed.";
                 } else if (error.code === 'auth/cancelled-popup-request') {
-                    errorMessage = "Another sign-in request is pending.";
+                    errorMessage = "⚠️ Another sign-in request is pending.";
                 } else if (error.code === 'auth/account-exists-with-different-credential') {
-                    errorMessage = "An account with this email already exists using different credentials.";
+                    errorMessage = "⚠️ An account with this email already exists using different credentials.";
+                } else if (error.code === 'auth/popup-blocked') {
+                    errorMessage = "🚫 Pop-up was blocked. Please allow pop-ups and try again.";
                 }
                 showMessageBox(errorMessage, "error");
             } finally {
