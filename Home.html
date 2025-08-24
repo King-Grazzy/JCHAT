@@ -1112,18 +1112,14 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            /* Facebook-like fixed layout - no shifting */
-            position: relative;
-            overflow-x: hidden; /* Prevent horizontal scroll */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             overflow-y: auto; /* Allow vertical scrolling */
+            overflow-x: hidden; /* Prevent horizontal scroll */
             /* 100% steel background - solid, non-transparent */
             background-color: #1a1a2e;
             background-image: none; /* Remove gradient for solid steel look */
-            background-attachment: fixed;
-            /* Add subtle texture for steel effect */
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.01) 0%, transparent 50%);
             color: var(--white);
             transition: background-color 0.5s ease, color 0.5s ease; /* Smooth theme transition */
         }
@@ -1677,46 +1673,23 @@
         main {
             flex-grow: 1;
             padding: 40px 0;
-            padding-top: 75px; /* Adjust for fixed header */
+            padding-top: 55px; /* Back to original header spacing */
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start; /* Align content to top */
             text-align: center;
-            /* Prevent layout shifts */
-            min-height: calc(100vh - 140px);
         }
 
-        /* Facebook-like responsive layout container */
         .content-wrapper {
             width: 100%;
-            max-width: 1200px; /* Increased max-width for better desktop experience */
-            margin: 0 auto;
+            max-width: 1000px; /* Back to original max-width */
             padding: 20px;
-            /* Grid layout for responsive design */
-            display: grid;
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
-            /* Prevent layout shifts */
-            min-height: calc(100vh - 140px); /* Account for header/footer */
-            position: relative;
-        }
-
-        /* Responsive grid breakpoints like Facebook */
-        @media (min-width: 768px) {
-            .content-wrapper {
-                grid-template-columns: 1fr;
-                padding: 30px;
-                gap: 24px;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .content-wrapper {
-                padding: 40px;
-                gap: 30px;
-            }
+            align-items: center;
         }
 
         /* Daily Inspiration Section */
