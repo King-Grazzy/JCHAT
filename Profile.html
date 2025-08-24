@@ -4195,14 +4195,7 @@
             outline: none;
         }
 
-        /* 🎯 HEADER BLUR SUCCESS MESSAGE SYSTEM */
-        .header.blurred {
-            filter: blur(8px);
-            opacity: 0.7;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            transform: scale(0.98);
-            position: relative;
-        }
+
 
         /* 🚀 SMART SUCCESS MESSAGE PANEL - Edge Slide System */
         .smart-success-panel {
@@ -4454,240 +4447,11 @@
             }
         }
 
-        .header.blurred::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.3);
-            z-index: 999;
-            pointer-events: none;
-        }
 
-        .header.blurred * {
-            pointer-events: none;
-        }
 
-        #headerSuccessMessage {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            background: linear-gradient(135deg, 
-                rgba(76, 175, 80, 0.98), 
-                rgba(139, 195, 74, 0.98), 
-                rgba(76, 175, 80, 0.98));
-            color: var(--white);
-            padding: 20px 32px;
-            border-radius: 16px;
-            box-shadow: 
-                0 20px 40px rgba(76, 175, 80, 0.4),
-                0 8px 16px rgba(139, 195, 74, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(76, 175, 80, 0.3);
-            backdrop-filter: blur(20px);
-            display: none;
-            opacity: 0;
-            min-width: 280px;
-            max-width: 400px;
-            text-align: center;
-            animation: headerSuccessEntrance 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
 
-        #headerSuccessMessage.show {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-        }
 
-        #headerSuccessMessage i {
-            font-size: 2rem;
-            color: var(--white);
-            animation: headerSuccessIconPop 0.8s ease-out 0.2s both;
-        }
 
-        #headerSuccessMessage span {
-            font-size: 1.1rem;
-            font-weight: 600;
-            line-height: 1.4;
-            animation: headerSuccessTextSlide 0.6s ease-out 0.4s both;
-        }
-
-        #headerSuccessMessage .header-success-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 4px;
-            background: linear-gradient(90deg, 
-                rgba(255, 255, 255, 0.9), 
-                rgba(255, 255, 255, 0.6),
-                rgba(255, 255, 255, 0.3));
-            border-radius: 0 0 16px 16px;
-            animation: headerSuccessProgress 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        /* Header Success Close Button */
-        #headerSuccessMessage .header-close-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 24px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
-            border-radius: 50%;
-            color: var(--white);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        #headerSuccessMessage .header-close-btn:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: scale(1.1);
-        }
-
-        #headerSuccessMessage .header-close-btn:active {
-            transform: scale(0.95);
-        }
-
-        /* Header Success Animations */
-        @keyframes headerSuccessEntrance {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8) translateY(-20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1) translateY(0);
-            }
-        }
-
-        @keyframes headerSuccessIconPop {
-            0% {
-                transform: scale(0) rotate(-180deg);
-                opacity: 0;
-            }
-            50% {
-                transform: scale(1.2) rotate(0deg);
-            }
-            100% {
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
-            }
-        }
-
-        @keyframes headerSuccessTextSlide {
-            0% {
-                transform: translateX(-30px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes headerSuccessProgress {
-            0% { 
-                width: 100%; 
-                opacity: 1;
-            }
-            90% { 
-                width: 10%; 
-                opacity: 1;
-            }
-            100% { 
-                width: 0%; 
-                opacity: 0;
-            }
-        }
-
-        /* Header Success Exit Animation */
-        #headerSuccessMessage.hiding {
-            animation: headerSuccessExit 0.4s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
-        }
-
-        @keyframes headerSuccessExit {
-            0% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1) translateY(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.8) translateY(-20px);
-            }
-        }
-
-        /* Mobile Responsive Header Success */
-        @media (max-width: 768px) {
-            #headerSuccessMessage {
-                min-width: 250px;
-                max-width: calc(100vw - 40px);
-                padding: 18px 24px;
-                left: 20px;
-                right: 20px;
-                transform: translateY(-50%);
-                width: calc(100vw - 40px);
-            }
-
-            @keyframes headerSuccessEntrance {
-                0% {
-                    opacity: 0;
-                    transform: translateY(-50%) scale(0.8) translateY(-20px);
-                }
-                100% {
-                    opacity: 1;
-                    transform: translateY(-50%) scale(1) translateY(0);
-                }
-            }
-
-            @keyframes headerSuccessExit {
-                0% {
-                    opacity: 1;
-                    transform: translateY(-50%) scale(1) translateY(0);
-                }
-                100% {
-                    opacity: 0;
-                    transform: translateY(-50%) scale(0.8) translateY(-20px);
-                }
-            }
-        }
-
-        @media (max-width: 480px) {
-            #headerSuccessMessage {
-                min-width: 200px;
-                padding: 16px 20px;
-                left: 15px;
-                right: 15px;
-                width: calc(100vw - 30px);
-            }
-
-            #headerSuccessMessage i {
-                font-size: 1.5rem;
-            }
-
-            #headerSuccessMessage span {
-                font-size: 1rem;
-            }
-
-            #headerSuccessMessage .header-close-btn {
-                top: 8px;
-                right: 8px;
-                width: 20px;
-                height: 20px;
-                font-size: 12px;
-            }
-        }
 
         @keyframes pulse-bg {
             0% { background-color: var(--accent-color); }
@@ -5722,12 +5486,22 @@
         </div>
     </div>
 
-    <!-- Header Success Message -->
-    <div id="headerSuccessMessage">
-        <button class="header-close-btn" aria-label="Close success message">×</button>
-        <i class="fas fa-check-circle"></i>
-        <span id="headerSuccessText">Success!</span>
-        <div class="header-success-progress"></div>
+    <!-- Smart Success Message Panel -->
+    <div class="smart-success-panel" id="smartSuccessPanel">
+        <div class="smart-success-content">
+            <div class="smart-success-header">
+                <div class="smart-success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <button class="smart-success-close" aria-label="Close success message">×</button>
+            </div>
+            <div class="smart-success-title" id="smartSuccessTitle">Success!</div>
+            <div class="smart-success-message" id="smartSuccessMessage">Operation completed successfully.</div>
+            <div class="smart-success-footer">
+                <div class="smart-success-timestamp" id="smartSuccessTimestamp"></div>
+                <div class="smart-success-sound-indicator">🔊</div>
+            </div>
+        </div>
     </div>
 
     <header>
@@ -7123,33 +6897,34 @@
         };
 
         /**
-         * 🎯 HEADER BLUR SUCCESS MESSAGE SYSTEM
-         * Shows success message on header while blurring it
+         * 🚀 SMART SUCCESS MESSAGE PANEL SYSTEM
+         * Shows success message panel that slides out from the edge
          */
-        function showHeaderSuccessMessage(message, duration = 4000) {
-            const header = document.querySelector('header');
-            const headerSuccessMessage = document.getElementById('headerSuccessMessage');
-            const headerSuccessText = document.getElementById('headerSuccessText');
+        function showSmartSuccessPanel(message, title = 'Success!', duration = 4000) {
+            const panel = document.getElementById('smartSuccessPanel');
+            const titleEl = document.getElementById('smartSuccessTitle');
+            const messageEl = document.getElementById('smartSuccessMessage');
+            const timestampEl = document.getElementById('smartSuccessTimestamp');
             
-            if (!header || !headerSuccessMessage || !headerSuccessText) {
-                console.error('Header success message elements not found');
+            if (!panel || !titleEl || !messageEl || !timestampEl) {
+                console.error('Smart success panel elements not found');
                 return;
             }
 
-            // Update message text
-            headerSuccessText.textContent = message;
+            // Update content
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            timestampEl.textContent = new Date().toLocaleTimeString();
 
-            // Start header blur effect
-            header.classList.add('blurred');
-
-            // Show success message with entrance animation
-            headerSuccessMessage.classList.add('show');
+            // Show panel with slide animation
+            panel.classList.remove('hide');
+            panel.classList.add('show');
 
             // Add close button functionality
-            const closeBtn = headerSuccessMessage.querySelector('.header-close-btn');
+            const closeBtn = panel.querySelector('.smart-success-close');
             if (closeBtn) {
                 closeBtn.addEventListener('click', () => {
-                    hideHeaderSuccessMessage();
+                    hideSmartSuccessPanel();
                 });
             }
 
@@ -7158,43 +6933,46 @@
 
             // Auto-hide after duration
             setTimeout(() => {
-                hideHeaderSuccessMessage();
+                hideSmartSuccessPanel();
             }, duration);
         }
 
         /**
-         * Hide header success message and unblur header
+         * Hide smart success panel with slide animation
          */
-        function hideHeaderSuccessMessage() {
-            const header = document.querySelector('header');
-            const headerSuccessMessage = document.getElementById('headerSuccessMessage');
+        function hideSmartSuccessPanel() {
+            const panel = document.getElementById('smartSuccessPanel');
             
-            if (!header || !headerSuccessMessage) return;
+            if (!panel) return;
 
-            // Add exit animation
-            headerSuccessMessage.classList.add('hiding');
-
-            // Wait for exit animation to complete
-            setTimeout(() => {
-                // Hide message
-                headerSuccessMessage.classList.remove('show', 'hiding');
-                
-                // Unblur header
-                header.classList.remove('blurred');
-            }, 400);
+            // Add hide animation
+            panel.classList.remove('show');
+            panel.classList.add('hide');
         }
 
         /**
-         * Enhanced success message with header blur effect
+         * Enhanced smart success message with custom styling
          */
-        function showEnhancedHeaderSuccess(message, style = 'default', duration = 4000) {
-            // Show header success message
-            showHeaderSuccessMessage(message, duration);
+        function showEnhancedSmartSuccess(message, style = 'default', duration = 4000) {
+            let title = 'Success!';
             
-            // Also show regular success message for consistency
-            setTimeout(() => {
-                showEnhancedSuccess(message, style, duration);
-            }, 200);
+            // Customize based on style
+            switch (style) {
+                case 'achievement':
+                    title = '🎉 Achievement Unlocked!';
+                    break;
+                case 'update':
+                    title = '✅ Update Complete!';
+                    break;
+                case 'celebration':
+                    title = '🎊 Celebration!';
+                    break;
+                default:
+                    title = 'Success!';
+            }
+            
+            // Show smart success panel
+            showSmartSuccessPanel(message, title, duration);
         }
 
 
@@ -7572,7 +7350,7 @@
                 displayProfilePicture(profilePagePic, profilePageAvatarIcon, newProfilePicUrl, (currentUserProfileData?.username || 'U').charAt(0).toUpperCase(), "w_240,h_240,c_fill,g_face,r_max");
                 displayProfilePicture(headerProfilePic, headerAvatarIcon, newProfilePicUrl, (currentUserProfileData?.username || 'U').charAt(0).toUpperCase(), "w_70,h_70,c_fill,g_face,r_max");
 
-                                    showEnhancedSuccess("Profile picture updated successfully! 🎉", 'celebration');
+                                    showEnhancedSmartSuccess("Profile picture updated successfully! 🎉", 'celebration');
 
                 // Refresh currentUserProfileData
                 const updatedProfileSnap = await getDoc(privateProfileDocRef);
@@ -7686,7 +7464,7 @@
                 if (newWebsite) { if (websiteLink) { websiteLink.href = newWebsite; websiteLink.textContent = newWebsite.replace(/^(https?:\/\/)?(www\.)?/, ''); } if (profileWebsite) profileWebsite.style.display = 'block'; } else { if (profileWebsite) profileWebsite.style.display = 'none'; }
                 if (newSocialLinks) { if (socialLinksText) socialLinksText.textContent = newSocialLinks; if (profileSocialLinks) profileSocialLinks.style.display = 'block'; } else { if (profileSocialLinks) profileSocialLinks.style.display = 'none'; }
 
-                showEnhancedSuccess("Profile saved successfully! ✨", 'update');
+                showEnhancedSmartSuccess("Profile saved successfully! ✨", 'update');
 
 
 
@@ -7722,7 +7500,7 @@
                 const originalIcon = copyUserIdBtn.querySelector('i');
                 originalIcon.className = 'fas fa-check';
                 
-                showEnhancedSuccess("User ID copied to clipboard! 📋", 'achievement');
+                showEnhancedSmartSuccess("User ID copied to clipboard! 📋", 'achievement');
                 
                 // Reset button after 2 seconds
                 setTimeout(() => {
@@ -7742,7 +7520,7 @@
                     document.execCommand('copy');
                     document.body.removeChild(textArea);
                     
-                    showEnhancedSuccess("User ID copied to clipboard! 📋", 'achievement');
+                    showEnhancedSmartSuccess("User ID copied to clipboard! 📋", 'achievement');
                 } catch (fallbackError) {
                     console.error("JCHAT_ERROR: Fallback copy failed:", fallbackError);
                     showMessageBox("Failed to copy User ID. Please select and copy manually.", 'error');
@@ -7881,7 +7659,7 @@
                     applyThemePreview(theme);
                     
                     // Show success message
-                    showEnhancedSuccess(`Theme preset "${theme}" selected! 🎨`, 'celebration');
+                    showEnhancedSmartSuccess(`Theme preset "${theme}" selected! 🎨`, 'celebration');
                 });
             });
 
@@ -7995,7 +7773,7 @@
                 this.saveNotifications();
                 this.displayNotifications();
                 this.hideNotificationSection();
-                showEnhancedSuccess('All notifications cleared! ✨', 'update');
+                showEnhancedSmartSuccess('All notifications cleared! ✨', 'update');
             }
 
             displayNotifications() {
