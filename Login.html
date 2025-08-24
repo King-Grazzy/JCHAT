@@ -2224,37 +2224,70 @@
         }
 
         /**
-         * Creates or signs in a GitHub user.
+         * Creates or signs in a GitHub user using Firebase Authentication.
          */
         async function createGitHubUser(githubUser, email, authType) {
             try {
                 console.log('JCHAT_DEBUG: Creating GitHub user with email:', email, 'authType:', authType);
                 
-                // Check if user already exists in our system by checking public users collection
-                const existingUserQuery = query(
-                    collection(db, "artifacts", appId, "public", "data", "users"),
-                    where("email", "==", email)
-                );
-                const existingUserSnapshot = await getDocs(existingUserQuery);
-                
-                console.log('JCHAT_DEBUG: Existing user check - found:', existingUserSnapshot.size, 'users');
-
-                if (!existingUserSnapshot.empty && authType === 'register') {
-                    showMessageBox("An account with this email already exists. Please sign in instead.", "warning");
-                    return;
-                }
-
                 const username = githubUser.login || githubUser.name || email.split('@')[0];
                 const profilePicUrl = githubUser.avatar_url;
 
-                if (existingUserSnapshot.empty) {
-                    // Create new user
-                    const newUserId = `github_${githubUser.id}`;
-                    console.log('JCHAT_DEBUG: Creating new GitHub user with ID:', newUserId);
+                // Create a temporary password for Firebase Auth (GitHub users won't use this)
+                const tempPassword = 'github_oauth_' + Math.random().toString(36).slice(-12);
+                
+                let firebaseUser;
+                let isNewUser = false;
+
+                try {
+                    // Try to sign in first (for existing users)
+                    console.log('JCHAT_DEBUG: Attempting to sign in existing user with email:', email);
+                    firebaseUser = await signInWithEmailAndPassword(auth, email, tempPassword);
+                    console.log('JCHAT_DEBUG: Existing user signed in successfully');
+                } catch (signInError) {
+                    console.log('JCHAT_DEBUG: User not found or wrong password, creating new user...');
+                    
+                    if (authType === 'login') {
+                        // If this is a login attempt but user doesn't exist, create them anyway
+                        console.log('JCHAT_DEBUG: Login attempt for non-existent user, creating new account');
+                    }
                     
                     try {
-                        // Simplified user creation - just store basic profile first
-                        const userProfileRef = doc(db, "artifacts", appId, "users", newUserId, "profiles", "user_profile");
+                        // Create new Firebase user
+                        const userCredential = await createUserWithEmailAndPassword(auth, email, tempPassword);
+                        firebaseUser = userCredential.user;
+                        isNewUser = true;
+                        console.log('JCHAT_DEBUG: New Firebase user created:', firebaseUser.uid);
+                        
+                        // Update the display name
+                        await updateProfile(firebaseUser, { 
+                            displayName: username,
+                            photoURL: profilePicUrl
+                        });
+                        
+                    } catch (createError) {
+                        if (createError.code === 'auth/email-already-in-use') {
+                            // Email exists but with different password, try a different approach
+                            console.log('JCHAT_DEBUG: Email already in use, user exists but password mismatch');
+                            showMessageBox("An account with this email already exists. Please use the regular login or try a different authentication method.", "warning");
+                            return;
+                        } else {
+                            console.error('JCHAT_ERROR: Failed to create Firebase user:', createError);
+                            throw createError;
+                        }
+                    }
+                }
+
+                // Now that we have an authenticated Firebase user, create/update their profile
+                const userId = firebaseUser.uid;
+                console.log('JCHAT_DEBUG: Working with Firebase user ID:', userId);
+
+                if (isNewUser) {
+                    console.log('JCHAT_DEBUG: Creating Firestore profile for new user');
+                    
+                    try {
+                        // Create user profile in Firestore
+                        const userProfileRef = doc(db, "artifacts", appId, "users", userId, "profiles", "user_profile");
                         await setDoc(userProfileRef, {
                             username: username,
                             email: email,
@@ -2298,13 +2331,13 @@
                         console.log('JCHAT_DEBUG: User profile created successfully');
 
                         // Create public profile
-                        const userPublicProfileRef = doc(db, "artifacts", appId, "public", "data", "users", newUserId);
+                        const userPublicProfileRef = doc(db, "artifacts", appId, "public", "data", "users", userId);
                         await setDoc(userPublicProfileRef, {
                             username: username,
                             profilePicId: profilePicUrl,
                             jCoins: REFERRAL_JCOIN_REWARD_NEW_USER,
                             level: 1,
-                            userId: newUserId,
+                            userId: userId,
                             email: email,
                             messagesSentCount: 0,
                             githubUsername: githubUser.login
@@ -2313,35 +2346,30 @@
                         console.log('JCHAT_DEBUG: Public profile created successfully');
 
                     } catch (dbError) {
-                        console.error('JCHAT_ERROR: Database error during user creation:', dbError);
+                        console.error('JCHAT_ERROR: Database error during profile creation:', dbError);
                         throw new Error(`Database error: ${dbError.message}`);
                     }
 
-                    console.log('JCHAT_DEBUG: New user creation completed successfully');
-
-                    // Store user session data
-                    localStorage.setItem('jchat_user_id', newUserId);
-                    localStorage.setItem('jchat_user_email', email);
-                    localStorage.setItem('jchat_username', username);
-
-                    console.log('JCHAT_DEBUG: User session data stored');
                     showMessageBox("Account created with GitHub! Redirecting...", "success");
                 } else {
-                    // Existing user, sign them in
-                    const existingUserDoc = existingUserSnapshot.docs[0];
-                    const userId = existingUserDoc.id;
-                    const userData = existingUserDoc.data();
-
-                    console.log('JCHAT_DEBUG: Signing in existing user:', userId);
-
-                    // Store user session data
-                    localStorage.setItem('jchat_user_id', userId);
-                    localStorage.setItem('jchat_user_email', email);
-                    localStorage.setItem('jchat_username', userData.username || username);
-
-                    console.log('JCHAT_DEBUG: Existing user session data stored');
+                    console.log('JCHAT_DEBUG: User already exists, updating login timestamp');
+                    
+                    // Update last login timestamp for existing user
+                    const userProfileRef = doc(db, "artifacts", appId, "users", userId, "profiles", "user_profile");
+                    await updateDoc(userProfileRef, {
+                        updatedAt: serverTimestamp(),
+                        lastGithubLogin: serverTimestamp()
+                    });
+                    
                     showMessageBox("Signed in with GitHub! Redirecting...", "success");
                 }
+
+                // Store user session data
+                localStorage.setItem('jchat_user_id', userId);
+                localStorage.setItem('jchat_user_email', email);
+                localStorage.setItem('jchat_username', username);
+
+                console.log('JCHAT_DEBUG: User session data stored for Firebase user:', userId);
 
                 showLoader('Connecting with GitHub');
                 
