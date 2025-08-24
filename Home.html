@@ -1781,6 +1781,171 @@
             box-shadow: none;
         }
 
+        /* Global Announcements Section */
+        .global-announcements-section {
+            background: var(--card-background);
+            border: 1px solid var(--glass-blue);
+            backdrop-filter: blur(10px) saturate(180%);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .3);
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 700px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            animation: announcementSlideIn 0.5s ease-out;
+        }
+
+        .announcement-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .announcement-icon {
+            font-size: 1.5rem;
+            color: var(--blue);
+            animation: announcementPulse 2s infinite;
+        }
+
+        .announcement-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--white);
+            margin: 0;
+            flex: 1;
+        }
+
+        .announcement-dismiss-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .announcement-dismiss-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--white);
+            transform: scale(1.1);
+        }
+
+        .announcement-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .announcement-type-badge,
+        .announcement-priority-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            align-self: flex-start;
+        }
+
+        .announcement-type-badge {
+            background: rgba(0, 213, 255, 0.2);
+            color: var(--blue);
+            border: 1px solid rgba(0, 213, 255, 0.3);
+        }
+
+        .announcement-priority-badge {
+            background: rgba(255, 46, 146, 0.2);
+            color: var(--pink);
+            border: 1px solid rgba(255, 46, 146, 0.3);
+        }
+
+        .announcement-message {
+            color: var(--white);
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .announcement-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .announcement-timestamp {
+            font-style: italic;
+        }
+
+        .announcement-source {
+            color: var(--blue);
+            font-weight: 600;
+        }
+
+        /* Priority-specific colors */
+        .announcement-priority-badge[data-priority="urgent"] {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border-color: rgba(220, 53, 69, 0.3);
+        }
+
+        .announcement-priority-badge[data-priority="high"] {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border-color: rgba(255, 193, 7, 0.3);
+        }
+
+        .announcement-priority-badge[data-priority="medium"] {
+            background: rgba(255, 46, 146, 0.2);
+            color: var(--pink);
+            border-color: rgba(255, 46, 146, 0.3);
+        }
+
+        .announcement-priority-badge[data-priority="low"] {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border-color: rgba(40, 167, 69, 0.3);
+        }
+
+        /* Announcement animations */
+        @keyframes announcementSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes announcementPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
         /* Post Creation Section */
         .post-creation-section {
             background: var(--card-background);
@@ -3437,7 +3602,35 @@
                 gap: 16px;
             }
             
+            .global-announcements-section {
+                width: 95%;
+                padding: 1rem;
+                margin: 15px auto;
+            }
 
+            .announcement-header {
+                gap: 0.8rem;
+                padding-bottom: 0.8rem;
+            }
+
+            .announcement-title {
+                font-size: 1.1rem;
+            }
+
+            .announcement-icon {
+                font-size: 1.3rem;
+            }
+
+            .announcement-message {
+                font-size: 0.95rem;
+                padding: 0.8rem;
+            }
+
+            .announcement-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -3607,6 +3800,26 @@
                     </div>
                 </div>
             </div>
+            </div>
+
+            <!-- Global Announcements Section -->
+            <div id="globalAnnouncementsSection" class="global-announcements-section" style="display: none;">
+                <div class="announcement-header">
+                    <i class="fas fa-bullhorn announcement-icon"></i>
+                    <h3 class="announcement-title">Important Announcement</h3>
+                    <button id="dismissAnnouncementBtn" class="announcement-dismiss-btn" aria-label="Dismiss announcement">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="announcement-content">
+                    <div class="announcement-type-badge" id="announcementTypeBadge"></div>
+                    <div class="announcement-priority-badge" id="announcementPriorityBadge"></div>
+                    <p id="announcementMessage" class="announcement-message"></p>
+                    <div class="announcement-meta">
+                        <small id="announcementTimestamp" class="announcement-timestamp"></small>
+                        <small class="announcement-source">From JCHAT Admin</small>
+                    </div>
+                </div>
             </div>
 
             <!-- Home Chips: Level and Wallet -->
@@ -4529,6 +4742,130 @@
         }
         // Theme picker functionality
         let themePickerEl = null;
+
+        // ===== GLOBAL ANNOUNCEMENT SYSTEM =====
+        
+        /**
+         * Checks for and displays global announcements from admin
+         */
+        async function checkGlobalAnnouncements() {
+            try {
+                const systemSettingsDoc = await getDoc(SYSTEM_SETTINGS_DOC_REF);
+                if (systemSettingsDoc.exists()) {
+                    const settings = systemSettingsDoc.data();
+                    if (settings.globalAnnouncement && typeof settings.globalAnnouncement === 'object') {
+                        displayGlobalAnnouncement(settings.globalAnnouncement);
+                    } else {
+                        hideGlobalAnnouncement();
+                    }
+                }
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error checking global announcements:", error);
+            }
+        }
+
+        /**
+         * Displays a global announcement to the user
+         */
+        function displayGlobalAnnouncement(announcementData) {
+            const announcementsSection = document.getElementById('globalAnnouncementsSection');
+            const announcementTypeBadge = document.getElementById('announcementTypeBadge');
+            const announcementPriorityBadge = document.getElementById('announcementPriorityBadge');
+            const announcementMessage = document.getElementById('announcementMessage');
+            const announcementTimestamp = document.getElementById('announcementTimestamp');
+
+            if (announcementsSection && announcementData) {
+                // Set announcement type
+                if (announcementTypeBadge) {
+                    announcementTypeBadge.textContent = getAnnouncementTypeLabel(announcementData.type);
+                }
+
+                // Set announcement priority
+                if (announcementPriorityBadge) {
+                    announcementPriorityBadge.textContent = getAnnouncementPriorityLabel(announcementData.priority);
+                    announcementPriorityBadge.setAttribute('data-priority', announcementData.priority);
+                }
+
+                // Set announcement message
+                if (announcementMessage) {
+                    announcementMessage.textContent = announcementData.message;
+                }
+
+                // Set timestamp
+                if (announcementTimestamp) {
+                    const timestamp = announcementData.publishedAt?.toDate?.() || new Date();
+                    announcementTimestamp.textContent = `Published: ${timestamp.toLocaleString()}`;
+                }
+
+                // Show the announcement section
+                announcementsSection.style.display = 'block';
+                
+                // Store announcement in localStorage to remember dismissal
+                localStorage.setItem('jchat-last-announcement', JSON.stringify({
+                    id: announcementData.publishedAt?.toMillis?.() || Date.now(),
+                    dismissed: false
+                }));
+            }
+        }
+
+        /**
+         * Hides the global announcement section
+         */
+        function hideGlobalAnnouncement() {
+            const announcementsSection = document.getElementById('globalAnnouncementsSection');
+            if (announcementsSection) {
+                announcementsSection.style.display = 'none';
+            }
+        }
+
+        /**
+         * Dismisses the current global announcement
+         */
+        function dismissGlobalAnnouncement() {
+            const announcementsSection = document.getElementById('globalAnnouncementsSection');
+            if (announcementsSection) {
+                announcementsSection.style.display = 'none';
+                
+                // Mark as dismissed in localStorage
+                const lastAnnouncement = localStorage.getItem('jchat-last-announcement');
+                if (lastAnnouncement) {
+                    try {
+                        const announcementData = JSON.parse(lastAnnouncement);
+                        announcementData.dismissed = true;
+                        localStorage.setItem('jchat-last-announcement', JSON.stringify(announcementData));
+                    } catch (error) {
+                        console.error("JCHAT_ERROR: Error updating announcement dismissal:", error);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Gets the display label for announcement type
+         */
+        function getAnnouncementTypeLabel(type) {
+            const typeLabels = {
+                'info': 'ℹ️ Information',
+                'warning': '⚠️ Warning',
+                'success': '✅ Success',
+                'maintenance': '🔧 Maintenance',
+                'update': '🆕 Update'
+            };
+            return typeLabels[type] || 'ℹ️ Information';
+        }
+
+        /**
+         * Gets the display label for announcement priority
+         */
+        function getAnnouncementPriorityLabel(priority) {
+            const priorityLabels = {
+                'low': '🟢 Low',
+                'medium': '🟡 Medium',
+                'high': '🔴 High',
+                'urgent': '🚨 Urgent'
+            };
+            return priorityLabels[priority] || '🟡 Medium';
+        }
 
         // Ensure theme picker element exists
         function ensureThemePicker() {
@@ -8191,6 +8528,13 @@
                         console.log("JCHAT_DEBUG: Real-time system settings update:", currentSystemSettings);
                         // Apply system settings immediately for faster announcement display
                         applySystemSettings(currentSystemSettings);
+                        
+                        // Check for global announcements
+                        if (currentSystemSettings.globalAnnouncement && typeof currentSystemSettings.globalAnnouncement === 'object') {
+                            displayGlobalAnnouncement(currentSystemSettings.globalAnnouncement);
+                        } else {
+                            hideGlobalAnnouncement();
+                        }
                                         // Update wallet chip
                 if (homeChipsRow && walletChipAmount && jcoinRateSpan) {
                     walletChipAmount.textContent = String(currentUserProfileData?.jCoins || 0);
@@ -8244,7 +8588,15 @@
                 });
                 unsubscribeListeners.push(unsubscribeSettings); // Add to list to unsubscribe on unload.
 
-                if (navigator.onLine) { try { await fetchSystemSettings(); } catch(_){} } else { console.warn('JCHAT_WARN: offline, skipping system settings fetch'); } // Initial fetch of system settings.
+                if (navigator.onLine) { 
+                    try { 
+                        await fetchSystemSettings(); 
+                        // Check for announcements after initial fetch
+                        await checkGlobalAnnouncements();
+                    } catch(_){} 
+                } else { 
+                    console.warn('JCHAT_WARN: offline, skipping system settings fetch'); 
+                } // Initial fetch of system settings.
                 // Level chip mirrors Profile.html calculation
                 try {
                     const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
@@ -8518,6 +8870,12 @@
                     hideNotificationDropdown();
                 }
             });
+
+            // Announcement System Event Listeners
+            const dismissAnnouncementBtn = document.getElementById('dismissAnnouncementBtn');
+            if (dismissAnnouncementBtn) {
+                dismissAnnouncementBtn.addEventListener('click', dismissGlobalAnnouncement);
+            }
         });
 
         // Listen for changes in local storage (e.g., theme changes from other tabs).

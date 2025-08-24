@@ -584,6 +584,97 @@
             cursor: not-allowed;
         }
 
+        /* ===== ANNOUNCEMENT SYSTEM STYLES ===== */
+        .input-help {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            margin-top: 4px;
+            opacity: 0.8;
+        }
+
+        .current-announcement-display {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .current-announcement-display h5 {
+            color: var(--white);
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .announcement-preview {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .announcement-type-badge,
+        .announcement-priority-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .announcement-type-badge {
+            background: rgba(0, 213, 255, 0.2);
+            color: var(--accent-color);
+            border: 1px solid rgba(0, 213, 255, 0.3);
+        }
+
+        .announcement-priority-badge {
+            background: rgba(255, 46, 146, 0.2);
+            color: var(--pink);
+            border: 1px solid rgba(255, 46, 146, 0.3);
+        }
+
+        .announcement-preview p {
+            color: var(--white);
+            margin: 8px 0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .announcement-preview small {
+            color: var(--text-light);
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* Priority-specific colors */
+        .announcement-priority-badge[data-priority="urgent"] {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border-color: rgba(220, 53, 69, 0.3);
+        }
+
+        .announcement-priority-badge[data-priority="high"] {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border-color: rgba(255, 193, 7, 0.3);
+        }
+
+        .announcement-priority-badge[data-priority="medium"] {
+            background: rgba(255, 46, 146, 0.2);
+            color: var(--pink);
+            border-color: rgba(255, 46, 146, 0.3);
+        }
+
+        .announcement-priority-badge[data-priority="low"] {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            border-color: rgba(40, 167, 69, 0.3);
+        }
+
         /* Orders toolbar and cards layout improvements */
         .orders-toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
         .orders-toolbar select, .orders-toolbar input, .orders-toolbar button { flex: 0 1 auto; }
@@ -1473,6 +1564,52 @@
                                 <div class="input-group">
                                     <label for="profanityFilterSensitivityInput">Profanity Filter Sensitivity (1-10):</label>
                                     <input type="number" id="profanityFilterSensitivityInput" min="1" max="10">
+                                </div>
+                            </div>
+
+                            <div class="management-card">
+                                <h4>Global Announcements</h4>
+                                <div class="input-group">
+                                    <label for="globalAnnouncementInput">Announcement Message:</label>
+                                    <textarea id="globalAnnouncementInput" placeholder="Enter announcement to broadcast to all users..." rows="3" maxlength="500"></textarea>
+                                    <small class="input-help">Max 500 characters. Leave empty to clear announcements.</small>
+                                </div>
+                                <div class="input-group">
+                                    <label for="announcementTypeSelect">Announcement Type:</label>
+                                    <select id="announcementTypeSelect">
+                                        <option value="info">ℹ️ Information</option>
+                                        <option value="warning">⚠️ Warning</option>
+                                        <option value="success">✅ Success</option>
+                                        <option value="maintenance">🔧 Maintenance</option>
+                                        <option value="update">🆕 Update</option>
+                                    </select>
+                                </div>
+                                <div class="input-group">
+                                    <label for="announcementPrioritySelect">Priority:</label>
+                                    <select id="announcementPrioritySelect">
+                                        <option value="low">🟢 Low</option>
+                                        <option value="medium">🟡 Medium</option>
+                                        <option value="high">🔴 High</option>
+                                        <option value="urgent">🚨 Urgent</option>
+                                    </select>
+                                </div>
+                                <div class="button-group">
+                                    <button id="publishAnnouncementButton" class="admin-button primary">
+                                        <span class="button-text"><i class="fas fa-bullhorn"></i> Publish Announcement</span>
+                                        <div class="button-loader"></div>
+                                    </button>
+                                    <button id="clearAnnouncementButton" class="admin-button secondary">
+                                        <span class="button-text"><i class="fas fa-trash"></i> Clear All</span>
+                                    </button>
+                                </div>
+                                <div class="current-announcement-display" id="currentAnnouncementDisplay" style="display: none;">
+                                    <h5>Current Active Announcement:</h5>
+                                    <div class="announcement-preview">
+                                        <span class="announcement-type-badge" id="currentAnnouncementType"></span>
+                                        <span class="announcement-priority-badge" id="currentAnnouncementPriority"></span>
+                                        <p id="currentAnnouncementText"></p>
+                                        <small id="currentAnnouncementTimestamp"></small>
+                                    </div>
                                 </div>
                             </div>
 
@@ -3930,6 +4067,169 @@
         }
 
         /**
+         * Publishes a global announcement to all users.
+         */
+        async function publishGlobalAnnouncement() {
+            // Verify admin permission
+            if (!currentUser || currentUser.uid !== ADMIN_UID) {
+                showMessageBox('Only admin can publish announcements!', 'error');
+                console.error('JCHAT_ERROR: Non-admin user attempted to publish announcement:', currentUser?.uid);
+                return;
+            }
+
+            const announcementText = globalAnnouncementInput.value.trim();
+            const announcementType = announcementTypeSelect.value;
+            const announcementPriority = announcementPrioritySelect.value;
+
+            if (!announcementText) {
+                showMessageBox('Please enter an announcement message.', 'warning');
+                return;
+            }
+
+            toggleButtonLoading(publishAnnouncementButton, true);
+            showMessageBox("Publishing announcement...", 'loading', true);
+
+            try {
+                const announcementData = {
+                    message: announcementText,
+                    type: announcementType,
+                    priority: announcementPriority,
+                    publishedBy: currentUser.uid,
+                    publishedAt: serverTimestamp(),
+                    isActive: true
+                };
+
+                // Save to system settings
+                await setDoc(SYSTEM_SETTINGS_DOC_REF, {
+                    globalAnnouncement: announcementData,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                // Update UI to show current announcement
+                updateCurrentAnnouncementDisplay(announcementData);
+                
+                showMessageBox("Announcement published successfully! All users will see this announcement.", 'success');
+                playNotificationSound('success');
+
+                // Clear input field
+                globalAnnouncementInput.value = '';
+
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error publishing announcement:", error);
+                showMessageBox(`Failed to publish announcement: ${error.message}`, 'error');
+                playNotificationSound('error');
+            } finally {
+                toggleButtonLoading(publishAnnouncementButton, false);
+            }
+        }
+
+        /**
+         * Clears all global announcements.
+         */
+        async function clearGlobalAnnouncement() {
+            // Verify admin permission
+            if (!currentUser || currentUser.uid !== ADMIN_UID) {
+                showMessageBox('Only admin can clear announcements!', 'error');
+                console.error('JCHAT_ERROR: Non-admin user attempted to clear announcement:', currentUser?.uid);
+                return;
+            }
+
+            const confirmed = await showConfirmationModal(
+                "Clear Announcements",
+                "Are you sure you want to clear all global announcements? This action cannot be undone."
+            );
+            
+            if (!confirmed) return;
+
+            toggleButtonLoading(clearAnnouncementButton, true);
+            showMessageBox("Clearing announcements...", 'loading', true);
+
+            try {
+                // Clear from system settings
+                await setDoc(SYSTEM_SETTINGS_DOC_REF, {
+                    globalAnnouncement: "",
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+
+                // Hide current announcement display
+                const currentAnnouncementDisplay = document.getElementById('currentAnnouncementDisplay');
+                if (currentAnnouncementDisplay) {
+                    currentAnnouncementDisplay.style.display = 'none';
+                }
+
+                showMessageBox("All announcements cleared successfully!", 'success');
+                playNotificationSound('success');
+
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error clearing announcements:", error);
+                showMessageBox(`Failed to clear announcements: ${error.message}`, 'error');
+                playNotificationSound('error');
+            } finally {
+                toggleButtonLoading(clearAnnouncementButton, false);
+            }
+        }
+
+        /**
+         * Updates the current announcement display in the admin UI.
+         */
+        function updateCurrentAnnouncementDisplay(announcementData) {
+            const currentAnnouncementDisplay = document.getElementById('currentAnnouncementDisplay');
+            const currentAnnouncementType = document.getElementById('currentAnnouncementType');
+            const currentAnnouncementPriority = document.getElementById('currentAnnouncementPriority');
+            const currentAnnouncementText = document.getElementById('currentAnnouncementText');
+            const currentAnnouncementTimestamp = document.getElementById('currentAnnouncementTimestamp');
+
+            if (currentAnnouncementDisplay && announcementData) {
+                currentAnnouncementDisplay.style.display = 'block';
+                
+                if (currentAnnouncementType) {
+                    currentAnnouncementType.textContent = getAnnouncementTypeLabel(announcementData.type);
+                }
+                
+                if (currentAnnouncementPriority) {
+                    currentAnnouncementPriority.textContent = getAnnouncementPriorityLabel(announcementData.priority);
+                    currentAnnouncementPriority.setAttribute('data-priority', announcementData.priority);
+                }
+                
+                if (currentAnnouncementText) {
+                    currentAnnouncementText.textContent = announcementData.message;
+                }
+                
+                if (currentAnnouncementTimestamp) {
+                    const timestamp = announcementData.publishedAt?.toDate?.() || new Date();
+                    currentAnnouncementTimestamp.textContent = `Published: ${timestamp.toLocaleString()}`;
+                }
+            }
+        }
+
+        /**
+         * Gets the display label for announcement type.
+         */
+        function getAnnouncementTypeLabel(type) {
+            const typeLabels = {
+                'info': 'ℹ️ Information',
+                'warning': '⚠️ Warning',
+                'success': '✅ Success',
+                'maintenance': '🔧 Maintenance',
+                'update': '🆕 Update'
+            };
+            return typeLabels[type] || 'ℹ️ Information';
+        }
+
+        /**
+         * Gets the display label for announcement priority.
+         */
+        function getAnnouncementPriorityLabel(priority) {
+            const priorityLabels = {
+                'low': '🟢 Low',
+                'medium': '🟡 Medium',
+                'high': '🔴 High',
+                'urgent': '🚨 Urgent'
+            };
+            return priorityLabels[priority] || '🟡 Medium';
+        }
+
+        /**
          * Applies the fetched system settings, specifically handling maintenance mode for admin.
          * @param {object} settings - The system settings object.
          */
@@ -3937,6 +4237,17 @@
             console.log("JCHAT_DEBUG: Applying system settings to Admin UI:", settings);
             const isCurrentUserAdmin = currentUser && currentUser.uid === ADMIN_UID;
             const now = new Date();
+
+            // Apply announcement settings if they exist
+            if (settings.globalAnnouncement && typeof settings.globalAnnouncement === 'object') {
+                updateCurrentAnnouncementDisplay(settings.globalAnnouncement);
+            } else {
+                // Hide announcement display if no active announcement
+                const currentAnnouncementDisplay = document.getElementById('currentAnnouncementDisplay');
+                if (currentAnnouncementDisplay) {
+                    currentAnnouncementDisplay.style.display = 'none';
+                }
+            }
 
 
 
@@ -5021,6 +5332,10 @@
 
             // System Settings
             if (saveSystemSettingsButton) saveSystemSettingsButton.addEventListener('click', saveSystemSettings);
+
+            // Announcement System
+            if (publishAnnouncementButton) publishAnnouncementButton.addEventListener('click', publishGlobalAnnouncement);
+            if (clearAnnouncementButton) clearAnnouncementButton.addEventListener('click', clearGlobalAnnouncement);
 
             // User Lookup
             if (lookupUserButton) lookupUserButton.addEventListener('click', () => lookupUser());
