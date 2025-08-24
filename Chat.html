@@ -1402,6 +1402,60 @@
             margin-bottom: 8px;
             cursor: pointer;
             transition: background-color 0.2s ease, transform 0.1s ease;
+            position: relative;
+        }
+
+        /* Friend status indicator in modal */
+        .friend-status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--status-offline);
+            border: 2px solid var(--white);
+            position: absolute;
+            bottom: 8px;
+            left: 38px; /* Position on profile picture */
+            z-index: 2;
+        }
+
+        .friend-status-indicator.online {
+            background-color: var(--status-online);
+            animation: pulse-online 2s infinite;
+        }
+
+        .friend-status-indicator.away {
+            background-color: var(--status-away);
+        }
+
+        .friend-status-indicator.offline {
+            background-color: var(--status-offline);
+        }
+
+        /* Friend name with status text */
+        .friend-name-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .friend-status-text {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .friend-status-text.online {
+            color: var(--status-online);
+        }
+
+        .friend-status-text.away {
+            color: var(--status-away);
+        }
+
+        .friend-status-text.offline {
+            color: var(--status-offline);
         }
 
         #selectFriendModal .friend-item:hover {
@@ -1784,6 +1838,10 @@
         let isTyping = false;
         let typingTimeout = null;
         let presenceUpdateInterval = null;
+        
+        // Friends presence tracking
+        let friendsPresenceListeners = new Map(); // Map of friendId -> unsubscribe function
+        let friendsPresenceData = new Map(); // Map of friendId -> presence data
 
         // --- Tone.js Synths for Notification Sounds ---
         const successSynth = new Tone.Synth().toDestination();
@@ -2348,6 +2406,109 @@
             }, (error) => {
                 console.error("JCHAT_ERROR: Error listening to typing status:", error);
                 showTypingIndicator(false);
+            });
+        }
+
+        /**
+         * Sets up presence listeners for all friends in the list.
+         * @param {Array} friendIds - Array of friend user IDs
+         */
+        function setupFriendsPresenceListeners(friendIds) {
+            // Clean up existing listeners
+            friendsPresenceListeners.forEach((unsubscribe, friendId) => {
+                unsubscribe();
+            });
+            friendsPresenceListeners.clear();
+            friendsPresenceData.clear();
+
+            // Set up new listeners for each friend
+            friendIds.forEach(friendId => {
+                const presenceRef = doc(db, "artifacts", appId, "public", "data", "presence", friendId);
+                
+                const unsubscribe = onSnapshot(presenceRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const presenceData = docSnap.data();
+                        friendsPresenceData.set(friendId, {
+                            status: presenceData.status || 'offline',
+                            lastSeen: presenceData.lastSeen
+                        });
+                    } else {
+                        friendsPresenceData.set(friendId, {
+                            status: 'offline',
+                            lastSeen: null
+                        });
+                    }
+                    
+                    // Update UI if modal is open
+                    if (selectFriendModal.classList.contains('active')) {
+                        updateFriendStatusInUI(friendId);
+                    }
+                }, (error) => {
+                    console.error(`JCHAT_ERROR: Error listening to friend ${friendId} presence:`, error);
+                    friendsPresenceData.set(friendId, {
+                        status: 'offline',
+                        lastSeen: null
+                    });
+                });
+                
+                friendsPresenceListeners.set(friendId, unsubscribe);
+            });
+        }
+
+        /**
+         * Updates a specific friend's status in the UI.
+         * @param {string} friendId - The friend's user ID
+         */
+        function updateFriendStatusInUI(friendId) {
+            const friendItem = document.querySelector(`[data-user-id="${friendId}"]`);
+            if (!friendItem) return;
+
+            const presenceData = friendsPresenceData.get(friendId) || { status: 'offline', lastSeen: null };
+            
+            // Update status indicator
+            let statusIndicator = friendItem.querySelector('.friend-status-indicator');
+            if (statusIndicator) {
+                statusIndicator.className = `friend-status-indicator ${presenceData.status}`;
+            }
+
+            // Update status text
+            let statusText = friendItem.querySelector('.friend-status-text');
+            if (statusText) {
+                statusText.className = `friend-status-text ${presenceData.status}`;
+                
+                if (presenceData.status === 'online') {
+                    statusText.textContent = 'Online';
+                } else if (presenceData.status === 'away') {
+                    statusText.textContent = 'Away';
+                } else if (presenceData.lastSeen) {
+                    const lastSeenDate = presenceData.lastSeen.toDate ? presenceData.lastSeen.toDate() : new Date(presenceData.lastSeen);
+                    statusText.textContent = `Last seen ${formatLastSeen(lastSeenDate)}`;
+                } else {
+                    statusText.textContent = 'Offline';
+                }
+            }
+        }
+
+        /**
+         * Sorts friends by online status (online first, then away, then offline).
+         * @param {Array} friends - Array of friend objects
+         * @returns {Array} Sorted friends array
+         */
+        function sortFriendsByStatus(friends) {
+            return friends.sort((a, b) => {
+                const statusA = friendsPresenceData.get(a.userId)?.status || 'offline';
+                const statusB = friendsPresenceData.get(b.userId)?.status || 'offline';
+                
+                const statusOrder = { 'online': 0, 'away': 1, 'offline': 2 };
+                const orderA = statusOrder[statusA] ?? 2;
+                const orderB = statusOrder[statusB] ?? 2;
+                
+                if (orderA !== orderB) {
+                    return orderA - orderB;
+                }
+                
+                // If same status, sort alphabetically by username
+                return a.username.localeCompare(b.username);
             });
         }
 
@@ -3378,6 +3539,13 @@
         function closeSelectFriendModal() {
             selectFriendModal.classList.remove('active');
             friendSearchInput.value = ''; // Clear search input
+            
+            // Clean up friends presence listeners when modal closes
+            friendsPresenceListeners.forEach((unsubscribe, friendId) => {
+                unsubscribe();
+            });
+            friendsPresenceListeners.clear();
+            friendsPresenceData.clear();
         }
 
         let allFriendsData = []; // Store all friends data for filtering
@@ -3442,6 +3610,10 @@
                 }
 
                 allFriendsData = friendsData; // Store for filtering
+                
+                // Set up presence listeners for all friends
+                const friendIds = friendsData.map(friend => friend.userId);
+                setupFriendsPresenceListeners(friendIds);
 
                 renderSelectableFriends(searchTerm);
 
@@ -3464,7 +3636,7 @@
             friendListContainer.innerHTML = ''; // Clear existing list
             if (loadingFriendsModal) loadingFriendsModal.style.display = 'none';
 
-            const filteredFriends = allFriendsData.filter(friend =>
+            let filteredFriends = allFriendsData.filter(friend =>
                 friend.username.toLowerCase().includes(searchTerm.toLowerCase())
             );
 
@@ -3475,6 +3647,9 @@
             } else {
                 if (noFriendsModal) noFriendsModal.style.display = 'none';
             }
+
+            // Sort friends by online status
+            filteredFriends = sortFriendsByStatus(filteredFriends);
 
             filteredFriends.forEach(friend => {
                 const friendItem = document.createElement('div');
@@ -3487,10 +3662,28 @@
                     : `<div class="default-avatar"><i class="fas fa-user-circle"></i></div>`;
 
                 const unreadCount = unreadMessageCountsByFriendId[friend.userId] || 0;
+                
+                // Get friend's presence data
+                const presenceData = friendsPresenceData.get(friend.userId) || { status: 'offline', lastSeen: null };
+                let statusText = 'Offline';
+                if (presenceData.status === 'online') {
+                    statusText = 'Online';
+                } else if (presenceData.status === 'away') {
+                    statusText = 'Away';
+                } else if (presenceData.lastSeen) {
+                    const lastSeenDate = presenceData.lastSeen.toDate ? presenceData.lastSeen.toDate() : new Date(presenceData.lastSeen);
+                    statusText = `Last seen ${formatLastSeen(lastSeenDate)}`;
+                }
 
                 friendItem.innerHTML = `
-                    ${profilePicHtml}
-                    <span>${friend.username || 'Unknown User'}</span>
+                    <div style="position: relative;">
+                        ${profilePicHtml}
+                        <div class="friend-status-indicator ${presenceData.status}"></div>
+                    </div>
+                    <div class="friend-name-container">
+                        <span>${friend.username || 'Unknown User'}</span>
+                        <span class="friend-status-text ${presenceData.status}">${statusText}</span>
+                    </div>
                     <span class="message-badge" style="display: ${unreadCount > 0 ? 'flex' : 'none'};">
                         ${unreadCount}
                     </span>
@@ -3566,6 +3759,9 @@
 
                 // If the friend modal is open, re-render the friend list
                 if (selectFriendModal.classList.contains('active')) {
+                    // Set up presence listeners for the updated friends list
+                    const friendIds = allFriendsData.map(friend => friend.userId);
+                    setupFriendsPresenceListeners(friendIds);
                     renderSelectableFriends(friendSearchInput.value);
                 }
             }, (error) => {
@@ -3882,6 +4078,13 @@
             if (unsubscribeCallStatus) unsubscribeCallStatus();
             if (unsubscribePresence) unsubscribePresence();
             if (unsubscribeTyping) unsubscribeTyping();
+            
+            // Clean up friends presence listeners
+            friendsPresenceListeners.forEach((unsubscribe, friendId) => {
+                unsubscribe();
+            });
+            friendsPresenceListeners.clear();
+            friendsPresenceData.clear();
             
             // Clear intervals
             if (presenceUpdateInterval) clearInterval(presenceUpdateInterval);
