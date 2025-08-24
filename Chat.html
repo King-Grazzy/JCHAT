@@ -216,21 +216,20 @@
             --active-item-background: rgba(255, 215, 0, 0.1);
         }
 
-        /* Always show scrollbar to prevent layout shifts */
+        /* No HTML scrolling */
         html {
-            overflow-y: scroll;
+            overflow: hidden;
         }
 
         body {
-            min-height: 100vh;
+            height: 100vh;
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-x: hidden; /* Prevent horizontal scroll */
-            padding-bottom: 40px; /* Adjusted padding as bottom nav is removed */
+            overflow: hidden; /* No body scrolling */
             background-color: var(--background-main);
             background-image: radial-gradient(circle at top left, var(--background-gradient-1), transparent 100px),
                               radial-gradient(circle at bottom right, var(--background-gradient-2), transparent 150px);
@@ -429,24 +428,25 @@
         /* Main Content Area */
         main {
             flex-grow: 1;
-            padding: 40px 0;
             padding-top: 55px; /* Adjust for fixed header */
             width: 100%;
+            height: calc(100vh - 55px); /* Full height minus header */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Align content to top */
+            justify-content: flex-start;
             text-align: center;
+            overflow: hidden; /* No main scrolling */
         }
 
         .content-wrapper {
             width: 100%;
-            max-width: 800px; /* Adjust as needed */
-            padding: 20px;
+            max-width: 800px;
+            height: 100%;
             display: flex;
             flex-direction: column;
-            gap: 20px;
             align-items: center;
+            overflow: hidden; /* No content wrapper scrolling */
         }
 
         /* Chat Specific Styles */
@@ -455,7 +455,7 @@
             flex-direction: column;
             width: 100%;
             max-width: 800px;
-            height: calc(100vh - 120px); /* Adjust height to fit screen, considering header and input */
+            height: 100%; /* Use full available height */
             background: var(--card-background);
             border: 1px solid var(--glass-blue);
             backdrop-filter: blur(10px) saturate(180%);
@@ -566,11 +566,12 @@
         .messages-display {
             flex-grow: 1;
             padding: 20px;
-            overflow-y: auto;
+            overflow-y: auto; /* Only messages area scrolls */
             display: flex;
             flex-direction: column;
             gap: 10px;
             scroll-behavior: smooth; /* Smooth scrolling to new messages */
+            height: 0; /* Allow flex-grow to determine height */
         }
 
         .message-bubble {
@@ -2974,26 +2975,47 @@
             if (noFriendsModal) noFriendsModal.style.display = 'none';
 
             try {
-                const friendsCollectionRef = collection(db, "artifacts", appId, "users", currentUser.uid, "friends");
-                const friendsSnapshot = await getDocs(friendsCollectionRef);
-                const friendIds = friendsSnapshot.docs.map(doc => doc.id);
-
-                const friendsDataPromises = friendIds.map(async (friendId) => {
-                    const publicProfileDocRef = doc(db, "artifacts", appId, "public", "data", "users", friendId);
-                    const publicDocSnap = await getDoc(publicProfileDocRef);
-                    if (publicDocSnap.exists()) {
-                        const friendProfile = publicDocSnap.data();
-                        return {
-                            userId: friendId,
-                            username: friendProfile.username,
-                            profilePicId: friendProfile.profilePicId,
-                        };
+                // Use exact same logic as Find_Friends.html - get friends from public/data/friends collection
+                const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
+                const friendsSnapshot = await getDocs(publicFriendsRef);
+                
+                const friendIds = new Set();
+                
+                // Process friendship records to find current user's friends (exact Find_Friends.html logic)
+                friendsSnapshot.forEach(docSnap => {
+                    const friendData = docSnap.data();
+                    if (friendData.user1Id === currentUser.uid) {
+                        friendIds.add(friendData.user2Id);
+                    } else if (friendData.user2Id === currentUser.uid) {
+                        friendIds.add(friendData.user1Id);
                     }
-                    return null; // Return null if profile not found
                 });
 
-                const fetchedFriends = (await Promise.all(friendsDataPromises)).filter(f => f !== null);
-                allFriendsData = fetchedFriends; // Store for filtering
+                if (friendIds.size === 0) {
+                    if (loadingFriendsModal) loadingFriendsModal.style.display = 'none';
+                    if (noFriendsModal) {
+                        noFriendsModal.style.display = 'block';
+                        noFriendsModal.textContent = "No friends found. Add some friends to start chatting!";
+                    }
+                    allFriendsData = [];
+                    return;
+                }
+
+                // Fetch friend profile data from public users collection (exact Find_Friends.html logic)
+                const friendsData = [];
+                for (const friendId of friendIds) {
+                    try {
+                        const publicProfileDocRef = doc(db, "artifacts", appId, "public", "data", "users", friendId);
+                        const publicProfileSnap = await getDoc(publicProfileDocRef);
+                        if (publicProfileSnap.exists()) {
+                            friendsData.push({ userId: friendId, ...publicProfileSnap.data() });
+                        }
+                    } catch (error) {
+                        console.error("JCHAT_ERROR: Error fetching friend profile for", friendId, error);
+                    }
+                }
+
+                allFriendsData = friendsData; // Store for filtering
 
                 renderSelectableFriends(searchTerm);
 
