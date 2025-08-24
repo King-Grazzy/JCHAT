@@ -1325,6 +1325,29 @@
             display: block;
         }
 
+        /* Highlights Header Styles */
+        .highlights-header {
+            margin-bottom: 20px;
+        }
+
+        .add-highlight-btn {
+            padding: 8px 16px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 6px;
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-highlight-btn:hover {
+            background: var(--accent-color-dark);
+            transform: translateY(-1px);
+        }
+
         /* Touch gesture support - simplified for better scrolling */
         .profile-section {
             /* Removed user-select restrictions for better touch interaction */
@@ -5657,6 +5680,12 @@
                     <div id="tabPanelHighlights" class="tab-panel">
                         <div class="tab-content">
                             <h3>Highlights</h3>
+                            <div class="highlights-header">
+                                <button id="addHighlightBtn" class="add-highlight-btn">
+                                    <i class="fas fa-plus"></i>
+                                    Add Highlight
+                                </button>
+                            </div>
                             <div id="highlightsGrid">
                                 <p>Loading highlights...</p>
                             </div>
@@ -6226,6 +6255,29 @@
                     if (tab === 'highlights') { tabPanelHighlights.style.display = 'block'; ensureHighlightsLoaded(); }
                     if (tab === 'saved') { tabPanelSaved.style.display = 'block'; ensureSavedLoaded(); }
                     if (tab === 'activity') { tabPanelActivity.style.display = 'block'; ensureActivityLoaded(); }
+                });
+            }
+
+            // Saved tabs behavior
+            const savedTabsContainer = document.querySelector('.saved-tabs');
+            if (savedTabsContainer) {
+                savedTabsContainer.addEventListener('click', (e) => {
+                    const btn = e.target.closest('button[data-saved-tab]');
+                    if (!btn) return;
+                    const savedTab = btn.getAttribute('data-saved-tab');
+                    
+                    // Update active button
+                    savedTabsContainer.querySelectorAll('.saved-tab-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    // Show/hide content
+                    if (savedTab === 'posts') {
+                        savedPostsList.classList.add('active');
+                        savedInspirationsList.classList.remove('active');
+                    } else if (savedTab === 'inspirations') {
+                        savedPostsList.classList.remove('active');
+                        savedInspirationsList.classList.add('active');
+                    }
                 });
             }
 
