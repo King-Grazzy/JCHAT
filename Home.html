@@ -992,9 +992,10 @@
             100% { filter: brightness(1.1) contrast(1.05) saturate(1.1); animation-duration: 0.5s; }
         }
 
-        /* Prevent scrolling - make page non-slidable */
+        /* Allow vertical scrolling but prevent horizontal scroll */
         html {
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             height: 100%;
         }
 
@@ -1107,14 +1108,15 @@
         }
 
         body {
-            height: 100vh;
+            min-height: 100vh;
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow: hidden; /* Prevent ALL scrolling - make page non-slidable */
+            overflow-y: auto; /* Allow vertical scrolling */
+            overflow-x: hidden; /* Prevent horizontal scroll */
             /* 100% steel background - solid, non-transparent */
             background-color: #1a1a2e;
             background-image: none; /* Remove gradient for solid steel look */
@@ -1511,7 +1513,7 @@
 
         .notification-list {
             max-height: 300px;
-            overflow: hidden; /* Disabled scrolling - page should remain non-slidable */
+            overflow-y: auto;
             padding: 10px;
         }
 
@@ -4057,7 +4059,7 @@
         function hideLoader() {
             if (jchatLoader) {
                 jchatLoader.classList.add('hidden');
-                // document.body.style.overflow = 'auto'; // Disabled - page should remain non-slidable
+                document.body.style.overflow = 'auto';
                 console.log('JCHAT_DEBUG: Loader hidden');
                 
                 // Clean up after animation completes
@@ -7623,7 +7625,7 @@
                 if (isCurrentUserAdmin) {
                     // Admin bypasses maintenance overlay and global disabling.
                     if (maintenanceOverlay) maintenanceOverlay.classList.remove('active');
-                    // document.body.style.overflow = 'auto'; // Disabled - page should remain non-slidable
+                    document.body.style.overflow = 'auto';
                     showMessageBox("JCHAT is in Maintenance Mode, but you (Admin) have full access.", 'info', true);
                     toggleInteractiveElements(true, true); // Enable everything for admin, pass isAdmin true.
                 } else {
@@ -7641,7 +7643,7 @@
             } else {
                 // Maintenance mode is OFF for everyone.
                 if (maintenanceOverlay) maintenanceOverlay.classList.remove('active');
-                // document.body.style.overflow = 'auto'; // Disabled - page should remain non-slidable
+                document.body.style.overflow = 'auto';
                 toggleInteractiveElements(true, isCurrentUserAdmin); // Enable all interactions initially, pass isAdmin.
             }
 
@@ -9523,12 +9525,12 @@
         if (smartScrollBtn) {
             smartScrollBtn.addEventListener('click', ()=> {
                 if (scrollTarget === 'bottom') {
-                    // window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); // Disabled - page should remain non-slidable
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
                 } else {
-                                          // window.scrollTo({ top: 0, behavior: 'smooth' }); // Disabled - page should remain non-slidable
+                                          window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
             });
-                          // window.addEventListener('scroll', updateSmartScrollState, { passive: true }); // Disabled - page should remain non-slidable
+                          window.addEventListener('scroll', updateSmartScrollState, { passive: true });
             window.addEventListener('resize', updateSmartScrollState);
             document.addEventListener('DOMContentLoaded', updateSmartScrollState);
         }
