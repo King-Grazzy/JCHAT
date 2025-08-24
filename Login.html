@@ -898,7 +898,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Custom Message Box Styles */
+        /* SMART MESSAGE BOX SYSTEM - Enhanced Styles */
         #messageBox {
             position: fixed;
             top: 50%;
@@ -906,37 +906,231 @@
             transform: translate(-50%, -50%);
             background-color: var(--card-background-color);
             color: var(--text-color-primary);
-            padding: 20px 30px;
-            border-radius: 15px;
+            padding: 0;
+            border-radius: 20px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             z-index: 1000;
             display: none;
             opacity: 0;
-            transition: opacity 0.3s ease-in-out;
+            transition: all 0.3s ease-in-out;
             min-width: 280px;
             max-width: 90%;
-            text-align: center;
+            text-align: left;
             flex-direction: column;
-            align-items: center;
-            gap: 15px;
+            align-items: stretch;
+            gap: 0;
             overflow: hidden;
             box-sizing: border-box;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Smart Message Header */
+        .message-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 10px;
+        }
+
+        .message-type-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .message-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .message-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        /* Smart Message Content */
+        .message-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Smart Message Actions */
+        .message-actions {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .message-action-btn {
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .message-action-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Progress Bar for Smart Dismissal */
+        .message-progress-bar {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .message-progress-bar::before {
+            content: '';
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, var(--success-color), var(--accent-color));
+            width: 100%;
+            border-radius: 2px;
         }
         #messageBox.show {
             opacity: 1;
             display: flex;
         }
+        /* Smart Message Type Styling */
         #messageBox.success {
             background: var(--success-color);
             color: var(--white);
             border: 1px solid var(--success-color-dark);
             box-shadow: 0 4px 20px rgba(40, 167, 69, 0.25), 0 2px 10px rgba(0, 0, 0, 0.1);
-            animation: successMessageAppear 0.3s ease-out;
         }
 
+        #messageBox.success .message-header {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #messageBox.success .message-type-label {
+            color: var(--white);
+        }
+
+        #messageBox.error {
+            background: var(--delete-button-color);
+            color: var(--white);
+            border: 1px solid #c82333;
+        }
+
+        #messageBox.error .message-header {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #messageBox.info {
+            background: var(--accent-color);
+            color: var(--white);
+            border: 1px solid var(--accent-color-dark);
+        }
+
+        #messageBox.info .message-header {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #messageBox.warning {
+            background: var(--warning-color);
+            color: #000;
+            border: 1px solid #e0a800;
+        }
+
+        #messageBox.warning .message-header {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        #messageBox.loading {
+            background: var(--accent-color);
+            color: var(--white);
+            border: 1px solid var(--accent-color-dark);
+        }
+
+        #messageBox.loading .message-header {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Smart Animation Classes */
+        .animate-success-in {
+            animation: successMessageAppear 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .animate-error-in {
+            animation: errorMessageAppear 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .animate-loading-in {
+            animation: loadingMessageAppear 0.4s ease-out;
+        }
+
+        .animate-fade-in {
+            animation: fadeInMessage 0.3s ease-out;
+        }
+
+        .animate-slide-in {
+            animation: slideInMessage 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .bounce-in {
+            animation: bounceInMessage 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* Smart Animation Keyframes */
         @keyframes successMessageAppear {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8) rotate(-5deg);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05) rotate(2deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes errorMessageAppear {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8) translateX(-20px);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05) translateX(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1) translateX(0);
+            }
+        }
+
+        @keyframes loadingMessageAppear {
             0% {
                 opacity: 0;
                 transform: translate(-50%, -50%) scale(0.9);
@@ -945,6 +1139,94 @@
                 opacity: 1;
                 transform: translate(-50%, -50%) scale(1);
             }
+        }
+
+        @keyframes fadeInMessage {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInMessage {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) translateY(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) translateY(0);
+            }
+        }
+
+        @keyframes bounceInMessage {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.05);
+            }
+            70% {
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        /* Priority and Theme Classes */
+        .priority-high {
+            border-width: 2px;
+            box-shadow: 0 8px 30px rgba(255, 0, 0, 0.3), 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .theme-dark {
+            background-color: #1a1a1a;
+            border-color: #333;
+        }
+
+        .theme-light {
+            background-color: #f8f9fa;
+            color: #333;
+            border-color: #dee2e6;
+        }
+
+        /* Smart Message Responsive Design */
+        @media (max-width: 768px) {
+            #messageBox {
+                min-width: 250px;
+                max-width: 95%;
+                margin: 10px;
+            }
+
+            .message-header {
+                padding: 12px 15px;
+            }
+
+            .message-content {
+                padding: 15px;
+            }
+
+            .message-actions {
+                padding: 12px 15px;
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Smart Message Hover Effects */
+        #messageBox:hover {
+            transform: translate(-50%, -50%) scale(1.02);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Smart Message Focus States */
+        #messageBox:focus-within {
+            outline: 2px solid var(--accent-color);
+            outline-offset: 2px;
         }
         #messageBox.error { border-left: 5px solid var(--delete-button-color); background-color: var(--card-background-color); color: var(--text-color-primary); }
         #messageBox.info { border-left: 5px solid var(--accent-color); background-color: var(--card-background-color); color: var(--text-color-primary); }
@@ -1016,6 +1298,100 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Smart Message Demo Section Styles */
+        .smart-message-demo-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .smart-message-demo-section h3 {
+            color: var(--white);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            text-align: center;
+        }
+
+        .smart-message-demo-section p {
+            color: var(--text-light);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .demo-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--white);
+        }
+
+        .demo-btn.primary {
+            background: linear-gradient(135deg, var(--success-color), #34ce57);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .demo-btn.secondary {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
+
+        .demo-btn.accent {
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            box-shadow: 0 4px 15px rgba(224, 58, 140, 0.3);
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .demo-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-item i {
+            color: var(--accent-color);
+            font-size: 1.1rem;
+        }
+
+        .feature-item span {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
             border-bottom: 1px solid var(--border-color);
             transition: background 0.3s ease;
         }
@@ -1289,6 +1665,41 @@
                         <span class="skill-tag">API Integration</span>
                         <span class="skill-tag">Data Analysis</span>
                         <span class="skill-tag">Community Building</span>
+                    </div>
+
+                    <!-- Smart Message System Demo Section -->
+                    <div class="smart-message-demo-section">
+                        <h3>🚀 Smart Message System Demo</h3>
+                        <p>Experience JCHAT's intelligent, context-aware messaging system:</p>
+                        <div class="demo-buttons">
+                            <button onclick="showcaseSmartMessages()" class="demo-btn primary">
+                                <i class="fas fa-play"></i> Showcase Smart Messages
+                            </button>
+                            <button onclick="showMessageAnalytics()" class="demo-btn secondary">
+                                <i class="fas fa-chart-bar"></i> View Analytics
+                            </button>
+                            <button onclick="showMessageBox('This is a custom smart message with options!', 'info', null, false, {showProgress: true, addEmojis: true, animation: 'bounce', position: 'top'})" class="demo-btn accent">
+                                <i class="fas fa-magic"></i> Custom Message
+                            </button>
+                        </div>
+                        <div class="demo-features">
+                            <div class="feature-item">
+                                <i class="fas fa-brain"></i>
+                                <span>AI-Powered Duration Calculation</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-mobile-alt"></i>
+                                <span>Smart Mobile Positioning</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-palette"></i>
+                                <span>Context-Aware Styling</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Performance Analytics</span>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -1673,58 +2084,440 @@
         // --- Utility Functions ---
 
         /**
-         * Displays a temporary message box with a given message and type.
+         * SMART MESSAGE BOX SYSTEM - Intelligent, Context-Aware Notifications
          * @param {string} message - The message to display.
          * @param {string} type - The type of message ('success', 'error', 'info', 'loading', 'warning').
-         * @param {number} [durationMs=3000] - Duration in milliseconds for the message to display.
-         * @param {boolean} [isPersistent=false] - If true, message stays until explicitly cleared or replaced.
+         * @param {number} [durationMs=null] - Duration in milliseconds (null = auto-calculate based on content).
+         * @param {boolean} [isPersistent=false] - If true, message stays until explicitly cleared.
+         * @param {Object} [options={}] - Additional smart options for enhanced behavior.
          */
-        function showMessageBox(message, type, durationMs = 3000, isPersistent = false) {
+        function showMessageBox(message, type, durationMs = null, isPersistent = false, options = {}) {
+            // Smart duration calculation based on content length and type
+            if (durationMs === null) {
+                durationMs = calculateSmartDuration(message, type);
+            }
+
+            // Smart positioning based on screen size and content
+            const position = calculateSmartPosition(message, type, options);
+
+            // Clear any existing message with smooth transition
             if (messageBox.timeoutId) {
                 clearTimeout(messageBox.timeoutId);
                 messageBox.timeoutId = null;
             }
 
-            messageBox.innerHTML = `<i id="messageBoxIcon"></i><span id="messageBoxText"></span>`;
+            // Enhanced message content with smart formatting
+            const enhancedMessage = enhanceMessageContent(message, type, options);
+            
+            messageBox.innerHTML = `
+                <div class="message-header">
+                    <i id="messageBoxIcon"></i>
+                    <span class="message-type-label">${getMessageTypeLabel(type)}</span>
+                    ${options.dismissible !== false ? '<button class="message-close-btn" onclick="hideMessageBox()" aria-label="Close message">×</button>' : ''}
+                </div>
+                <div class="message-content">
+                    <span id="messageBoxText">${enhancedMessage}</span>
+                    ${options.showProgress ? '<div class="message-progress-bar"></div>' : ''}
+                </div>
+                ${options.actions ? `<div class="message-actions">${options.actions}</div>` : ''}
+            `;
+
             const messageBoxIcon = messageBox.querySelector('#messageBoxIcon');
             const messageBoxText = messageBox.querySelector('#messageBoxText');
 
-            messageBoxText.textContent = message;
-            messageBox.className = 'message-box show ' + type;
+            // Smart icon selection with enhanced visual feedback
+            setSmartIcon(messageBoxIcon, type, options);
 
-            if (messageBoxIcon) {
-                if (type === 'success') {
-                    messageBoxIcon.classList.add('fas', 'fa-check-circle');
-                } else if (type === 'error') {
-                    messageBoxIcon.classList.add('fas', 'fa-times-circle');
-                } else if (type === 'info') {
-                    messageBoxIcon.classList.add('fas', 'fa-info-circle');
-                } else if (type === 'warning') {
-                    messageBoxIcon.classList.add('fas', 'fa-exclamation-triangle');
-                } else if (type === 'loading') {
-                    messageBoxIcon.classList.add('fas', 'fa-spinner', 'fa-spin');
-                }
-            }
+            // Apply smart styling and positioning
+            applySmartStyling(messageBox, type, position, options);
 
-            if (type === 'loading') {
-                messageBox.classList.add('loading-pulse');
-            } else {
-                messageBox.classList.remove('loading-pulse');
-            }
+            // Smart animation based on message type and content
+            triggerSmartAnimation(messageBox, type, options);
 
+            // Show message with smart timing
             messageBox.style.display = 'flex';
             messageBox.style.opacity = '1';
 
-            if (!isPersistent) {
-                messageBox.timeoutId = setTimeout(() => {
-                    messageBox.style.opacity = '0';
-                    messageBox.addEventListener('transitionend', function handler() {
-                        messageBox.style.display = 'none';
-                        messageBox.removeEventListener('transitionend', handler);
-                        messageBox.classList.remove('loading-pulse');
-                    }, { once: true });
-                }, durationMs);
+            // Smart auto-dismissal with progress indication
+            if (!isPersistent && durationMs > 0) {
+                startSmartDismissal(messageBox, durationMs, options);
             }
+
+            // Track message analytics for future improvements
+            trackMessageAnalytics(message, type, durationMs, options);
+        }
+
+        /**
+         * Calculates smart duration based on content length and message type
+         */
+        function calculateSmartDuration(message, type) {
+            const baseDuration = {
+                'success': 4000,
+                'error': 6000,
+                'info': 5000,
+                'warning': 5000,
+                'loading': 0 // Persistent until manually dismissed
+            };
+
+            const charCount = message.length;
+            let duration = baseDuration[type] || 4000;
+
+            // Adjust duration based on content length
+            if (charCount > 100) duration += 2000;
+            if (charCount > 200) duration += 3000;
+            if (charCount > 300) duration += 4000;
+
+            // Adjust for mobile devices
+            if (window.innerWidth <= 768) {
+                duration = Math.min(duration, 8000); // Cap at 8 seconds on mobile
+            }
+
+            return duration;
+        }
+
+        /**
+         * Calculates smart positioning based on screen size and content
+         */
+        function calculateSmartPosition(message, type, options) {
+            const screenHeight = window.innerHeight;
+            const screenWidth = window.innerWidth;
+            
+            // Smart positioning based on message type and screen size
+            if (options.position === 'top') {
+                return { top: '20px', left: '50%', transform: 'translateX(-50%)' };
+            } else if (options.position === 'bottom') {
+                return { bottom: '20px', left: '50%', transform: 'translateX(-50%)' };
+            } else if (options.position === 'left') {
+                return { top: '50%', left: '20px', transform: 'translateY(-50%)' };
+            } else if (options.position === 'right') {
+                return { top: '50%', right: '20px', transform: 'translateY(-50%)' };
+            }
+
+            // Default smart positioning
+            if (screenWidth <= 768) {
+                // Mobile: center with slight top offset
+                return { top: '15%', left: '50%', transform: 'translate(-50%, -50%)' };
+            } else if (screenHeight < 600) {
+                // Small screens: top positioning
+                return { top: '10px', left: '50%', transform: 'translateX(-50%)' };
+            } else {
+                // Desktop: center with slight top offset
+                return { top: '20%', left: '50%', transform: 'translate(-50%, -50%)' };
+            }
+        }
+
+        /**
+         * Enhances message content with smart formatting
+         */
+        function enhanceMessageContent(message, type, options) {
+            let enhanced = message;
+
+            // Add emojis for better visual appeal
+            if (options.addEmojis !== false) {
+                enhanced = addSmartEmojis(message, type);
+            }
+
+            // Add smart formatting for long messages
+            if (message.length > 100 && options.formatLongMessages !== false) {
+                enhanced = formatLongMessage(message);
+            }
+
+            return enhanced;
+        }
+
+        /**
+         * Adds smart emojis based on message content and type
+         */
+        function addSmartEmojis(message, type) {
+            const emojiMap = {
+                'success': ['✅', '🎉', '✨', '🚀', '💫', '🌟'],
+                'error': ['❌', '⚠️', '🚫', '💥', '🔥'],
+                'info': ['ℹ️', '💡', '📝', '🔍', '📚'],
+                'warning': ['⚠️', '⚡', '💭', '🔔'],
+                'loading': ['⏳', '🔄', '⚙️', '🔧']
+            };
+
+            const emojis = emojiMap[type] || [];
+            if (emojis.length === 0) return message;
+
+            // Smart emoji selection based on content
+            let selectedEmoji = emojis[0];
+            
+            if (message.toLowerCase().includes('welcome')) selectedEmoji = '👋';
+            if (message.toLowerCase().includes('login')) selectedEmoji = '🔐';
+            if (message.toLowerCase().includes('register')) selectedEmoji = '📝';
+            if (message.toLowerCase().includes('google')) selectedEmoji = '🔍';
+            if (message.toLowerCase().includes('github')) selectedEmoji = '🐙';
+            if (message.toLowerCase().includes('password')) selectedEmoji = '🔒';
+            if (message.toLowerCase().includes('email')) selectedEmoji = '📧';
+            if (message.toLowerCase().includes('redirect')) selectedEmoji = '➡️';
+
+            return `${selectedEmoji} ${message}`;
+        }
+
+        /**
+         * Formats long messages for better readability
+         */
+        function formatLongMessage(message) {
+            if (message.length <= 100) return message;
+
+            // Split into sentences and add line breaks
+            const sentences = message.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            if (sentences.length > 1) {
+                return sentences.map(s => s.trim()).join('.\n');
+            }
+
+            return message;
+        }
+
+        /**
+         * Sets smart icon with enhanced visual feedback
+         */
+        function setSmartIcon(iconElement, type, options) {
+            if (!iconElement) return;
+
+            const iconMap = {
+                'success': { class: 'fas fa-check-circle', color: 'success' },
+                'error': { class: 'fas fa-times-circle', color: 'error' },
+                'info': { class: 'chat-icon', color: 'info' },
+                'warning': { class: 'fas fa-exclamation-triangle', color: 'warning' },
+                'loading': { class: 'fas fa-spinner fa-spin', color: 'loading' }
+            };
+
+            const iconConfig = iconMap[type] || iconMap.info;
+            
+            // Clear existing classes and add new ones
+            iconElement.className = iconConfig.class;
+            iconElement.setAttribute('data-type', type);
+
+            // Add smart color classes
+            iconElement.classList.add(`icon-${iconConfig.color}`);
+        }
+
+        /**
+         * Applies smart styling and positioning
+         */
+        function applySmartStyling(messageBox, type, position, options) {
+            // Apply positioning
+            Object.assign(messageBox.style, position);
+
+            // Smart sizing based on content
+            const contentLength = messageBox.querySelector('#messageBoxText').textContent.length;
+            if (contentLength > 200) {
+                messageBox.style.maxWidth = '500px';
+                messageBox.style.minWidth = '350px';
+            } else if (contentLength > 100) {
+                messageBox.style.maxWidth = '400px';
+                messageBox.style.minWidth = '300px';
+            } else {
+                messageBox.style.maxWidth = '350px';
+                messageBox.style.minWidth = '280px';
+            }
+
+            // Smart theme adaptation
+            if (options.theme === 'dark') {
+                messageBox.classList.add('theme-dark');
+            } else if (options.theme === 'light') {
+                messageBox.classList.add('theme-light');
+            }
+
+            // Add smart classes
+            messageBox.className = `message-box show ${type} smart-message`;
+            if (options.priority === 'high') {
+                messageBox.classList.add('priority-high');
+            }
+        }
+
+        /**
+         * Triggers smart animations based on message type
+         */
+        function triggerSmartAnimation(messageBox, type, options) {
+            // Remove existing animation classes
+            messageBox.classList.remove('animate-slide-in', 'animate-fade-in', 'animate-bounce-in');
+
+            // Smart animation selection
+            let animationClass = 'animate-fade-in';
+            
+            if (options.animation === 'slide') animationClass = 'animate-slide-in';
+            else if (options.animation === 'bounce') animationClass = 'bounce-in';
+            else if (type === 'success') animationClass = 'animate-success-in';
+            else if (type === 'error') animationClass = 'animate-error-in';
+            else if (type === 'loading') animationClass = 'animate-loading-in';
+
+            messageBox.classList.add(animationClass);
+        }
+
+        /**
+         * Starts smart dismissal with progress indication
+         */
+        function startSmartDismissal(messageBox, durationMs, options) {
+            if (options.showProgress) {
+                const progressBar = messageBox.querySelector('.message-progress-bar');
+                if (progressBar) {
+                    animateProgressBar(progressBar, durationMs);
+                }
+            }
+
+            messageBox.timeoutId = setTimeout(() => {
+                hideMessageBox();
+            }, durationMs);
+        }
+
+        /**
+         * Animates progress bar for message dismissal
+         */
+        function animateProgressBar(progressBar, durationMs) {
+            progressBar.style.width = '100%';
+            progressBar.style.transition = `width ${durationMs}ms linear`;
+            progressBar.style.width = '0%';
+        }
+
+        /**
+         * Hides message box with smart animation
+         */
+        function hideMessageBox() {
+            if (messageBox.timeoutId) {
+                clearTimeout(messageBox.timeoutId);
+                messageBox.timeoutId = null;
+            }
+
+            messageBox.style.opacity = '0';
+            messageBox.addEventListener('transitionend', function handler() {
+                messageBox.style.display = 'none';
+                messageBox.removeEventListener('transitionend', handler);
+                messageBox.classList.remove('loading-pulse', 'smart-message');
+            }, { once: true });
+        }
+
+        /**
+         * Tracks message analytics for future improvements
+         */
+        function trackMessageAnalytics(message, type, durationMs, options) {
+            // Store analytics data for optimization
+            const analytics = {
+                timestamp: Date.now(),
+                type: type,
+                duration: durationMs,
+                contentLength: message.length,
+                options: options,
+                userAgent: navigator.userAgent,
+                screenSize: `${window.innerWidth}x${window.innerHeight}`
+            };
+
+            // Store in localStorage for analysis
+            const messageHistory = JSON.parse(localStorage.getItem('jchat_message_analytics') || '[]');
+            messageHistory.push(analytics);
+            
+            // Keep only last 100 entries
+            if (messageHistory.length > 100) {
+                messageHistory.splice(0, messageHistory.length - 100);
+            }
+            
+            localStorage.setItem('jchat_message_analytics', JSON.stringify(messageHistory));
+        }
+
+        /**
+         * Gets human-readable message type labels
+         */
+        function getMessageTypeLabel(type) {
+            const labels = {
+                'success': 'Success',
+                'error': 'Error',
+                'info': 'Information',
+                'warning': 'Warning',
+                'loading': 'Processing'
+            };
+            return labels[type] || 'Message';
+        }
+
+        /**
+         * DEMO: Showcase all smart message features
+         * Call this function to see the smart message system in action
+         */
+        function showcaseSmartMessages() {
+            const demos = [
+                {
+                    message: "Welcome to JCHAT! Your smart messaging experience starts here.",
+                    type: "success",
+                    options: { showProgress: true, addEmojis: true, animation: 'bounce', priority: 'high' }
+                },
+                {
+                    message: "This is a smart error message with enhanced styling and positioning.",
+                    type: "error",
+                    options: { showProgress: true, addEmojis: true, animation: 'slide', position: 'top' }
+                },
+                {
+                    message: "Smart info messages adapt to content length and screen size automatically.",
+                    type: "info",
+                    options: { showProgress: true, addEmojis: true, animation: 'fade', position: 'bottom' }
+                },
+                {
+                    message: "Warning messages are smart enough to know when to use different animations.",
+                    type: "warning",
+                    options: { showProgress: true, addEmojis: true, animation: 'bounce' }
+                },
+                {
+                    message: "Loading messages can be persistent and show real-time progress.",
+                    type: "loading",
+                    options: { addEmojis: true, animation: 'slide', isPersistent: true }
+                }
+            ];
+
+            let currentDemo = 0;
+            
+            function showNextDemo() {
+                if (currentDemo < demos.length) {
+                    const demo = demos[currentDemo];
+                    showMessageBox(demo.message, demo.type, null, false, demo.options);
+                    currentDemo++;
+                    setTimeout(showNextDemo, 3000);
+                }
+            }
+
+            showNextDemo();
+        }
+
+        /**
+         * Smart message analytics dashboard
+         * Shows insights about message performance and user interaction
+         */
+        function showMessageAnalytics() {
+            const analytics = JSON.parse(localStorage.getItem('jchat_message_analytics') || '[]');
+            
+            if (analytics.length === 0) {
+                showMessageBox("No message analytics available yet. Start using the smart message system!", "info", null, false, {
+                    addEmojis: true,
+                    animation: 'slide'
+                });
+                return;
+            }
+
+            const totalMessages = analytics.length;
+            const messageTypes = {};
+            const avgDuration = analytics.reduce((sum, msg) => sum + (msg.duration || 0), 0) / totalMessages;
+            
+            analytics.forEach(msg => {
+                messageTypes[msg.type] = (messageTypes[msg.type] || 0) + 1;
+            });
+
+            const report = `
+                📊 Message Analytics Report
+                
+                Total Messages: ${totalMessages}
+                Average Duration: ${Math.round(avgDuration)}ms
+                
+                Message Types:
+                ${Object.entries(messageTypes).map(([type, count]) => `• ${type}: ${count}`).join('\n')}
+                
+                Screen Sizes: ${[...new Set(analytics.map(msg => msg.screenSize))].join(', ')}
+            `;
+
+            showMessageBox(report, "info", null, false, {
+                addEmojis: false,
+                animation: 'slide',
+                showProgress: true,
+                actions: '<button class="message-action-btn" onclick="localStorage.removeItem(\'jchat_message_analytics\')">Clear Data</button>'
+            });
         }
 
         /**
@@ -1819,7 +2612,11 @@
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
-                showMessageBox("Login successful! Redirecting...", "success");
+                showMessageBox("Login successful! Redirecting...", "success", null, false, {
+                showProgress: true,
+                addEmojis: true,
+                animation: 'bounce'
+            });
                 showLoader('Redirecting to dashboard');
                 setTimeout(() => {
                     window.location.href = '/home.html';
@@ -2018,7 +2815,12 @@
                     );
                 }
 
-                showMessageBox("Registration successful! Redirecting...", "success");
+                showMessageBox("Registration successful! Redirecting...", "success", null, false, {
+                showProgress: true,
+                addEmojis: true,
+                animation: 'bounce',
+                priority: 'high'
+            });
                 showLoader('Setting up your account');
                 setTimeout(() => {
                     window.location.href = '/home.html';
@@ -2057,7 +2859,12 @@
 
             try {
                 await sendPasswordResetEmail(auth, email);
-                showMessageBox("Password reset email sent! Check your inbox.", "success", 5000);
+                showMessageBox("Password reset email sent! Check your inbox.", "success", null, false, {
+                showProgress: true,
+                addEmojis: true,
+                position: 'top',
+                actions: '<button class="message-action-btn" onclick="window.location.reload()">Refresh</button>'
+            });
                 resetEmailInput.value = ''; // Clear input
                 // Transition back to login form after success
                 loginForm.style.display = 'block';
@@ -2095,7 +2902,11 @@
                 const user = result.user;
 
                 console.log('JCHAT_DEBUG: Google auth successful for user:', user.email);
-                showMessageBox("✨ Google authentication successful!", "loading", true);
+                showMessageBox("✨ Google authentication successful!", "loading", null, true, {
+                addEmojis: false,
+                animation: 'slide',
+                theme: 'dark'
+            });
 
                 const userProfileRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
                 const userDocSnap = await getDoc(userProfileRef);
@@ -2157,7 +2968,12 @@
                         });
 
                         console.log('JCHAT_DEBUG: Google user profile created successfully');
-                        showMessageBox("🎉 Google account created! Welcome to JCHAT!", "success");
+                        showMessageBox("🎉 Google account created! Welcome to JCHAT!", "success", null, false, {
+                showProgress: true,
+                addEmojis: false,
+                animation: 'bounce',
+                priority: 'high'
+            });
                     } catch (dbError) {
                         console.error('JCHAT_ERROR: Database error during Google user creation:', dbError);
                         throw new Error(`Database error: ${dbError.message}`);
@@ -2169,7 +2985,11 @@
                         updatedAt: serverTimestamp(),
                         lastGoogleLogin: serverTimestamp()
                     });
-                    showMessageBox("🚀 Welcome back! Signed in with Google", "success");
+                    showMessageBox("🚀 Welcome back! Signed in with Google", "success", null, false, {
+                showProgress: true,
+                addEmojis: false,
+                animation: 'bounce'
+            });
                 }
 
                 // Store user session data
