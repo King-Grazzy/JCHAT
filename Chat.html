@@ -71,6 +71,12 @@
             /* New Green for Play Button */
             --play-button-green: linear-gradient(90deg, #4CAF50, #8BC34A); /* Green gradient */
             --play-button-shadow: 0 4px 10px rgba(76, 175, 80, 0.4);
+
+            /* Real-time Status Colors */
+            --status-indicator-sent: #FFC107;
+            --status-indicator-delivered: #2196F3;
+            --status-indicator-read: #4CAF50;
+            --typing-indicator-color: #00d5ff;
         }
 
         /* --- Theme Definitions (Light and Dark Mode) --- */
@@ -525,6 +531,43 @@
             text-overflow: ellipsis;
             flex-grow: 1;
             text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Online Status Indicator */
+        .online-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--status-offline);
+            border: 2px solid var(--white);
+            display: inline-block;
+            position: relative;
+        }
+
+        .online-status.online {
+            background-color: var(--status-online);
+            animation: pulse-online 2s infinite;
+        }
+
+        .online-status.away {
+            background-color: var(--status-away);
+        }
+
+        @keyframes pulse-online {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+
+        /* Last seen text */
+        .last-seen {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 400;
+            opacity: 0.8;
         }
 
         .chat-header .select-friend-btn {
@@ -619,10 +662,39 @@
             color: var(--text-light);
             margin-top: 5px;
             text-align: right; /* For sent messages */
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            justify-content: flex-end;
         }
 
         .message-bubble.received .message-info {
             text-align: left; /* For received messages */
+            justify-content: flex-start;
+        }
+
+        /* Message Status Indicators */
+        .message-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .status-icon {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .status-icon.sent {
+            color: var(--status-indicator-sent);
+        }
+
+        .status-icon.delivered {
+            color: var(--status-indicator-delivered);
+        }
+
+        .status-icon.read {
+            color: var(--status-indicator-read);
         }
 
         .message-content img, .message-content video {
@@ -1010,11 +1082,58 @@
             box-shadow: 0 6px 15px rgba(0, 213, 255, 0.4);
         }
 
-        .chat-input-area #sendMessageBtn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
+                    .chat-input-area #sendMessageBtn:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                box-shadow: none;
+            }
+
+            /* Typing Indicator */
+            .typing-indicator {
+                display: none;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 15px;
+                color: var(--text-light);
+                font-size: 0.85rem;
+                font-style: italic;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 15px;
+                margin: 5px 0;
+                max-width: 150px;
+            }
+
+            .typing-indicator.active {
+                display: flex;
+            }
+
+            .typing-dots {
+                display: flex;
+                gap: 3px;
+            }
+
+            .typing-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background-color: var(--typing-indicator-color);
+                animation: typing-bounce 1.4s ease-in-out infinite;
+            }
+
+            .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+            .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+            .typing-dot:nth-child(3) { animation-delay: 0s; }
+
+            @keyframes typing-bounce {
+                0%, 80%, 100% {
+                    transform: scale(0.8);
+                    opacity: 0.5;
+                }
+                40% {
+                    transform: scale(1.2);
+                    opacity: 1;
+                }
+            }
 
         /* Call Status Overlay */
         #callStatusOverlay {
@@ -1466,7 +1585,12 @@
                 <button class="back-btn" onclick="window.history.back()"><i class="fas fa-arrow-left"></i></button>
                 <img id="partnerProfilePic" src="" alt="Partner Profile Picture" style="display: none;">
                 <div id="partnerAvatarIcon" class="default-avatar"><i class="fas fa-user-circle"></i></div>
-                <h2 id="partnerDisplayName">Loading...</h2>
+                <div style="display: flex; flex-direction: column; flex-grow: 1; min-width: 0;">
+                    <h2 id="partnerDisplayName">Loading...
+                        <span class="online-status" id="partnerOnlineStatus"></span>
+                    </h2>
+                    <div class="last-seen" id="partnerLastSeen" style="display: none;"></div>
+                </div>
                 <button id="selectFriendBtn" class="select-friend-btn" title="Select Chat Partner">
                     <i class="fas fa-users"></i>
                     <span class="select-friend-badge" id="selectFriendBadge" style="display: none;">0</span>
@@ -1476,6 +1600,15 @@
                 <!-- Messages will be loaded here dynamically -->
                 <p id="loadingMessages" style="text-align: center; color: var(--text-light);">Loading messages...</p>
                 <p id="noMessages" style="text-align: center; color: var(--text-light); display: none;">No messages yet. Start a conversation!</p>
+                <!-- Typing indicator -->
+                <div class="typing-indicator" id="typingIndicator">
+                    <span id="typingUsername">Partner</span> is typing
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
             </div>
             <div class="chat-input-area">
                 <div class="chat-actions-top">
@@ -1584,11 +1717,15 @@
         const partnerProfilePic = document.getElementById('partnerProfilePic');
         const partnerAvatarIcon = document.getElementById('partnerAvatarIcon');
         const partnerDisplayName = document.getElementById('partnerDisplayName');
+        const partnerOnlineStatus = document.getElementById('partnerOnlineStatus');
+        const partnerLastSeen = document.getElementById('partnerLastSeen');
         const messagesDisplay = document.getElementById('messagesDisplay');
         const messageInput = document.getElementById('messageInput');
         const sendMessageBtn = document.getElementById('sendMessageBtn');
         const loadingMessages = document.getElementById('loadingMessages');
         const noMessages = document.getElementById('noMessages');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const typingUsername = document.getElementById('typingUsername');
 
         // New elements for media/voice/calls
         const mediaInput = document.getElementById('mediaInput');
@@ -1640,6 +1777,13 @@
         let unreadMessageCountsByFriendId = {}; // Stores {friendId: count}
         let totalUnreadMessages = 0;
         let unsubscribeAllFriendUnreadListeners = []; // Array to store unsubscribe functions for all nested listeners
+
+        // Real-time presence and typing tracking
+        let unsubscribePresence = null;
+        let unsubscribeTyping = null;
+        let isTyping = false;
+        let typingTimeout = null;
+        let presenceUpdateInterval = null;
 
         // --- Tone.js Synths for Notification Sounds ---
         const successSynth = new Tone.Synth().toDestination();
@@ -1998,6 +2142,250 @@
         }
 
         /**
+         * Returns the appropriate status icon HTML based on message status.
+         * @param {string} status - The message status ('sent', 'delivered', 'read')
+         * @returns {string} HTML string for the status icon
+         */
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'sent':
+                    return '<i class="fas fa-clock status-icon sent" title="Sent"></i>';
+                case 'delivered':
+                    return '<i class="fas fa-check status-icon delivered" title="Delivered"></i>';
+                case 'read':
+                    return '<i class="fas fa-check-double status-icon read" title="Read"></i>';
+                default:
+                    return '<i class="fas fa-clock status-icon sent" title="Sent"></i>';
+            }
+        }
+
+        /**
+         * Updates message status indicators in real-time.
+         * @param {string} messageId - The ID of the message to update
+         * @param {string} newStatus - The new status ('delivered', 'read')
+         */
+        function updateMessageStatus(messageId, newStatus) {
+            const messageBubble = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageBubble && messageBubble.classList.contains('sent')) {
+                const statusElement = messageBubble.querySelector('.message-status');
+                if (statusElement) {
+                    statusElement.innerHTML = getStatusIcon(newStatus);
+                }
+            }
+        }
+
+        /**
+         * Updates the user's presence status.
+         * @param {string} status - 'online', 'away', or 'offline'
+         */
+        async function updatePresenceStatus(status) {
+            if (!currentUser) return;
+            
+            try {
+                const presenceRef = doc(db, "artifacts", appId, "public", "data", "presence", currentUser.uid);
+                await setDoc(presenceRef, {
+                    status: status,
+                    lastSeen: serverTimestamp(),
+                    userId: currentUser.uid
+                }, { merge: true });
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error updating presence:", error);
+            }
+        }
+
+        /**
+         * Listens for partner's presence status.
+         */
+        function listenToPartnerPresence() {
+            if (!partnerId) {
+                if (unsubscribePresence) {
+                    unsubscribePresence();
+                    unsubscribePresence = null;
+                }
+                return;
+            }
+
+            const presenceRef = doc(db, "artifacts", appId, "public", "data", "presence", partnerId);
+            
+            if (unsubscribePresence) unsubscribePresence();
+            
+            unsubscribePresence = onSnapshot(presenceRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const presenceData = docSnap.data();
+                    updatePartnerStatusUI(presenceData.status, presenceData.lastSeen);
+                } else {
+                    updatePartnerStatusUI('offline', null);
+                }
+            }, (error) => {
+                console.error("JCHAT_ERROR: Error listening to partner presence:", error);
+                updatePartnerStatusUI('offline', null);
+            });
+        }
+
+        /**
+         * Updates the partner's status in the UI.
+         * @param {string} status - 'online', 'away', or 'offline'
+         * @param {Object} lastSeen - Firestore timestamp or null
+         */
+        function updatePartnerStatusUI(status, lastSeen) {
+            if (partnerOnlineStatus) {
+                partnerOnlineStatus.className = `online-status ${status}`;
+            }
+            
+            if (partnerLastSeen) {
+                if (status === 'online') {
+                    partnerLastSeen.style.display = 'none';
+                } else if (lastSeen) {
+                    const lastSeenDate = lastSeen.toDate ? lastSeen.toDate() : new Date(lastSeen);
+                    const timeString = formatLastSeen(lastSeenDate);
+                    partnerLastSeen.textContent = `Last seen ${timeString}`;
+                    partnerLastSeen.style.display = 'block';
+                } else {
+                    partnerLastSeen.textContent = 'Offline';
+                    partnerLastSeen.style.display = 'block';
+                }
+            }
+        }
+
+        /**
+         * Formats the last seen timestamp.
+         * @param {Date} date - The last seen date
+         * @returns {string} Formatted string
+         */
+        function formatLastSeen(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        /**
+         * Shows or hides typing indicator.
+         * @param {boolean} isVisible - Whether to show the indicator
+         * @param {string} username - Username of the person typing
+         */
+        function showTypingIndicator(isVisible, username = 'Partner') {
+            if (typingIndicator && typingUsername) {
+                if (isVisible) {
+                    typingUsername.textContent = username;
+                    typingIndicator.classList.add('active');
+                    // Scroll to bottom to show typing indicator
+                    setTimeout(() => {
+                        messagesDisplay.scrollTop = messagesDisplay.scrollHeight;
+                    }, 100);
+                } else {
+                    typingIndicator.classList.remove('active');
+                }
+            }
+        }
+
+        /**
+         * Updates typing status in Firestore.
+         * @param {boolean} typing - Whether the user is typing
+         */
+        async function updateTypingStatus(typing) {
+            if (!currentUser || !partnerId) return;
+            
+            try {
+                const chatRoomId = getChatRoomId(currentUser.uid, partnerId);
+                const typingRef = doc(db, "artifacts", appId, "public", "data", "typing", chatRoomId);
+                
+                if (typing) {
+                    await setDoc(typingRef, {
+                        [`${currentUser.uid}`]: {
+                            isTyping: true,
+                            username: currentUserProfileData?.username || 'User',
+                            timestamp: serverTimestamp()
+                        }
+                    }, { merge: true });
+                } else {
+                    await updateDoc(typingRef, {
+                        [`${currentUser.uid}.isTyping`]: false
+                    });
+                }
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error updating typing status:", error);
+            }
+        }
+
+        /**
+         * Listens for partner's typing status.
+         */
+        function listenToTypingStatus() {
+            if (!partnerId || !currentUser) {
+                if (unsubscribeTyping) {
+                    unsubscribeTyping();
+                    unsubscribeTyping = null;
+                }
+                return;
+            }
+
+            const chatRoomId = getChatRoomId(currentUser.uid, partnerId);
+            const typingRef = doc(db, "artifacts", appId, "public", "data", "typing", chatRoomId);
+            
+            if (unsubscribeTyping) unsubscribeTyping();
+            
+            unsubscribeTyping = onSnapshot(typingRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const typingData = docSnap.data();
+                    const partnerTyping = typingData[partnerId];
+                    
+                    if (partnerTyping && partnerTyping.isTyping) {
+                        showTypingIndicator(true, partnerTyping.username || 'Partner');
+                    } else {
+                        showTypingIndicator(false);
+                    }
+                } else {
+                    showTypingIndicator(false);
+                }
+            }, (error) => {
+                console.error("JCHAT_ERROR: Error listening to typing status:", error);
+                showTypingIndicator(false);
+            });
+        }
+
+        /**
+         * Marks messages as read when user views them.
+         * @param {string} senderId - The ID of the message sender
+         */
+        async function markMessagesAsRead(senderId) {
+            if (!currentUser || !partnerId || senderId === currentUser.uid) return;
+            
+            try {
+                const chatRoomId = getChatRoomId(currentUser.uid, partnerId);
+                const messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatRoomId, "messages");
+                
+                // Get unread messages from the sender
+                const q = query(messagesRef, 
+                    where("senderId", "==", senderId),
+                    where("status", "!=", "read")
+                );
+                
+                const snapshot = await getDocs(q);
+                
+                // Update all unread messages to 'read'
+                const updatePromises = snapshot.docs.map(docSnap => {
+                    const messageRef = doc(db, "artifacts", appId, "public", "data", "chats", chatRoomId, "messages", docSnap.id);
+                    return updateDoc(messageRef, {
+                        status: 'read',
+                        readAt: serverTimestamp()
+                    });
+                });
+                
+                await Promise.all(updatePromises);
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error marking messages as read:", error);
+            }
+        }
+
+        /**
          * Fetches and displays the chat partner's profile data.
          * @param {string} pId - The UID of the chat partner.
          */
@@ -2018,19 +2406,26 @@
                     const username = partnerProfileData.username || `User_${pId.substring(0, 8)}`;
                     const usernameInitial = username.charAt(0).toUpperCase();
 
-                    partnerDisplayName.textContent = partnerProfileData.visibility?.displayName !== false ? username : 'Anonymous User';
+                    const displayName = partnerProfileData.visibility?.displayName !== false ? username : 'Anonymous User';
+                    partnerDisplayName.childNodes[0].textContent = displayName; // Update just the text node
                     displayProfilePicture(partnerProfilePic, partnerAvatarIcon, partnerProfileData?.profilePicId, usernameInitial, "w_90,h_90,c_fill,g_face,r_max");
+                    
+                    // Set up presence and typing listeners for this partner
+                    listenToPartnerPresence();
+                    listenToTypingStatus();
                 } else {
-                    partnerDisplayName.textContent = "Unknown User";
+                    partnerDisplayName.childNodes[0].textContent = "Unknown User";
                     partnerProfilePic.style.display = 'none';
                     partnerAvatarIcon.style.display = 'block';
+                    updatePartnerStatusUI('offline', null);
                     showMessageBox("Chat partner profile not found.", 'warning');
                 }
             } catch (error) {
                 console.error("JCHAT_ERROR: Error fetching partner profile:", error);
-                partnerDisplayName.textContent = "Error Loading";
+                partnerDisplayName.childNodes[0].textContent = "Error Loading";
                 partnerProfilePic.style.display = 'none';
                 partnerAvatarIcon.style.display = 'block';
+                updatePartnerStatusUI('offline', null);
                 showMessageBox(`Error loading partner profile: ${error.message}`, 'error');
             }
         }
@@ -2092,7 +2487,20 @@
             if (message.type !== 'call_status') {
                 const messageInfo = document.createElement('div');
                 messageInfo.classList.add('message-info');
-                messageInfo.textContent = timeString;
+                
+                if (isSentByCurrentUser) {
+                    // For sent messages, show status indicators
+                    const statusIcon = getStatusIcon(message.status || 'sent');
+                    messageInfo.innerHTML = `
+                        <span class="message-status">
+                            ${statusIcon}
+                        </span>
+                        <span>${timeString}</span>
+                    `;
+                } else {
+                    messageInfo.textContent = timeString;
+                }
+                
                 messageBubble.appendChild(messageInfo);
             }
 
@@ -2341,7 +2749,22 @@
                         setDoc(chatMetadataDocRef, { lastReadMessageTimestamp: latestMessageTimestamp }, { merge: true })
                             .then(() => console.log("JCHAT_DEBUG: Chat metadata updated with last read timestamp."))
                             .catch(error => console.error("JCHAT_ERROR: Error updating chat metadata:", error));
+                        
+                        // Mark messages as read
+                        markMessagesAsRead(latestMessage.data().senderId);
                     }
+                    
+                    // Also mark delivered status for partner's messages
+                    snapshot.docs.forEach(docSnap => {
+                        const messageData = docSnap.data();
+                        if (messageData.senderId === partnerId && messageData.status === 'sent') {
+                            const messageRef = doc(db, "artifacts", appId, "public", "data", "chats", getChatRoomId(currentUser.uid, partnerId), "messages", docSnap.id);
+                            updateDoc(messageRef, {
+                                status: 'delivered',
+                                deliveredAt: serverTimestamp()
+                            }).catch(error => console.error("JCHAT_ERROR: Error updating message delivery status:", error));
+                        }
+                    });
                 }
             }, (error) => {
                 console.error("JCHAT_ERROR: Error fetching messages:", error);
@@ -2388,7 +2811,10 @@
                     type: type,
                     timestamp: serverTimestamp(),
                     senderUsername: currentUserProfileData.username,
-                    receiverUsername: partnerProfileData?.username || 'Unknown User'
+                    receiverUsername: partnerProfileData?.username || 'Unknown User',
+                    status: 'sent', // Initial status
+                    deliveredAt: null,
+                    readAt: null
                 };
 
                 if (type === 'text') {
@@ -3081,6 +3507,12 @@
                     await fetchPartnerProfile(partnerId);
                     await fetchAndDisplayMessages();
                     listenForCallStatus(); // Re-establish call listener for new partner
+                    
+                    // Update URL with new partnerId
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.set('partnerId', partnerId);
+                    window.history.replaceState({}, '', newUrl);
+                    
                     closeFriendModalBtn.click();
                     showMessageBox(`Chatting with ${friend.username}`, 'success');
                 });
@@ -3229,19 +3661,36 @@
                     await fetchPartnerProfile(partnerId);
                     fetchAndDisplayMessages(); // Fetch messages once authenticated and partnerId is set
                     listenForCallStatus(); // Start listening for call status
+                    
+                    // Set user as online
+                    updatePresenceStatus('online');
+                    
+                    // Set up periodic presence updates
+                    presenceUpdateInterval = setInterval(() => {
+                        updatePresenceStatus('online');
+                    }, 30000); // Update every 30 seconds
                 } else {
                     // If no partnerId, open the friend selection modal by default
                     openSelectFriendModal();
                     // Update initial display for no partner selected
-                    partnerDisplayName.textContent = "No Partner Selected";
+                    partnerDisplayName.childNodes[0].textContent = "No Partner Selected";
                     partnerProfilePic.style.display = 'none';
                     partnerAvatarIcon.style.display = 'block';
+                    updatePartnerStatusUI('offline', null);
                     messagesDisplay.innerHTML = ''; // Clear any loading messages
                     if (loadingMessages) loadingMessages.style.display = 'none';
                     if (noMessages) {
                         noMessages.style.display = 'block';
                         noMessages.textContent = "Please select a friend to start chatting.";
                     }
+                    
+                    // Set user as online
+                    updatePresenceStatus('online');
+                    
+                    // Set up periodic presence updates
+                    presenceUpdateInterval = setInterval(() => {
+                        updatePresenceStatus('online');
+                    }, 30000); // Update every 30 seconds
                 }
                 fetchNotificationCount(user.uid); // For the bell icon
                 setupFriendUnreadCountListeners(); // For friend message badges
@@ -3306,16 +3755,50 @@
                 }
             }
 
-            // Auto-resize textarea
+            // Auto-resize textarea and handle typing indicator
             messageInput.addEventListener('input', () => {
                 messageInput.style.height = 'auto';
                 messageInput.style.height = messageInput.scrollHeight + 'px';
+                
+                // Handle typing indicator
+                if (messageInput.value.trim() && !isTyping) {
+                    isTyping = true;
+                    updateTypingStatus(true);
+                } else if (!messageInput.value.trim() && isTyping) {
+                    isTyping = false;
+                    updateTypingStatus(false);
+                }
+                
+                // Clear typing timeout and set new one
+                if (typingTimeout) {
+                    clearTimeout(typingTimeout);
+                }
+                
+                if (messageInput.value.trim()) {
+                    typingTimeout = setTimeout(() => {
+                        if (isTyping) {
+                            isTyping = false;
+                            updateTypingStatus(false);
+                        }
+                    }, 2000); // Stop typing indicator after 2 seconds of inactivity
+                }
             });
 
-            sendMessageBtn.addEventListener('click', () => sendMessage('text', messageInput.value));
+            sendMessageBtn.addEventListener('click', () => {
+                if (isTyping) {
+                    isTyping = false;
+                    updateTypingStatus(false);
+                }
+                sendMessage('text', messageInput.value);
+            });
+            
             messageInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault(); // Prevent new line
+                    if (isTyping) {
+                        isTyping = false;
+                        updateTypingStatus(false);
+                    }
                     sendMessage('text', messageInput.value);
                 }
             });
@@ -3364,9 +3847,46 @@
             }
         });
 
+        // Handle visibility changes for presence
+        document.addEventListener('visibilitychange', () => {
+            if (currentUser) {
+                if (document.hidden) {
+                    updatePresenceStatus('away');
+                } else {
+                    updatePresenceStatus('online');
+                }
+            }
+        });
+        
+        // Handle page focus/blur for presence
+        window.addEventListener('focus', () => {
+            if (currentUser) {
+                updatePresenceStatus('online');
+            }
+        });
+        
+        window.addEventListener('blur', () => {
+            if (currentUser) {
+                updatePresenceStatus('away');
+            }
+        });
+
         window.addEventListener('beforeunload', () => {
+            // Set user as offline before leaving
+            if (currentUser) {
+                updatePresenceStatus('offline');
+            }
+            
+            // Clear all listeners
             if (unsubscribeMessages) unsubscribeMessages();
             if (unsubscribeCallStatus) unsubscribeCallStatus();
+            if (unsubscribePresence) unsubscribePresence();
+            if (unsubscribeTyping) unsubscribeTyping();
+            
+            // Clear intervals
+            if (presenceUpdateInterval) clearInterval(presenceUpdateInterval);
+            if (typingTimeout) clearTimeout(typingTimeout);
+            
             // Clear all dynamic friend unread listeners
             unsubscribeAllFriendUnreadListeners.forEach(unsub => unsub());
             unsubscribeAllFriendUnreadListeners = [];
