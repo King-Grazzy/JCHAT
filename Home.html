@@ -3,7 +3,7 @@
 <head>
     <!-- Last updated: 2025-08-21T18:19:29Z -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>JCHAT - Home</title>
     <link rel="canonical" href="https://jchat.app/Home.html">
     <link rel="manifest" href="/manifest.webmanifest">
@@ -997,6 +997,8 @@
             overflow-y: auto;
             overflow-x: hidden;
             height: 100%;
+            /* Prevent horizontal swipe gestures */
+            touch-action: pan-y pinch-zoom;
         }
 
         /* Theme picker animations */
@@ -1122,6 +1124,10 @@
             background-image: none; /* Remove gradient for solid steel look */
             color: var(--white);
             transition: background-color 0.5s ease, color 0.5s ease; /* Smooth theme transition */
+            /* Prevent horizontal swipe gestures on main content */
+            touch-action: pan-y pinch-zoom;
+            /* Prevent elastic scrolling bounce */
+            overscroll-behavior-x: none;
         }
 
         /* Header Styling */
@@ -1680,6 +1686,9 @@
             align-items: center;
             justify-content: flex-start; /* Align content to top */
             text-align: center;
+            /* Prevent horizontal swipe gestures */
+            touch-action: pan-y pinch-zoom;
+            overscroll-behavior-x: none;
         }
 
         .content-wrapper {
@@ -1690,6 +1699,9 @@
             flex-direction: column;
             gap: 20px;
             align-items: center;
+            /* Prevent horizontal swipe gestures */
+            touch-action: pan-y pinch-zoom;
+            overscroll-behavior-x: none;
         }
 
         /* Daily Inspiration Section */
@@ -3398,6 +3410,9 @@
             -ms-overflow-style: none; /* IE and Edge */
             /* Custom scrollbar for webkit browsers */
             position: relative;
+            /* Allow horizontal touch scrolling ONLY for friends */
+            touch-action: pan-x;
+            overscroll-behavior-x: contain;
         }
 
         .scroll-row::-webkit-scrollbar { 
@@ -8731,6 +8746,38 @@
             // Initialize theme switcher
             initializeThemeSwitcher();
             console.log("JCHAT_DEBUG: DOMContentLoaded fired.");
+            
+            // Prevent horizontal swipe gestures on main content
+            const preventHorizontalSwipe = (e) => {
+                // Allow vertical scrolling but prevent horizontal
+                if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+                    e.preventDefault();
+                }
+            };
+            
+            // Prevent touch-based horizontal scrolling outside of friends carousel
+            let startX = 0;
+            let startY = 0;
+            
+            document.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+            }, { passive: true });
+            
+            document.addEventListener('touchmove', (e) => {
+                if (!e.target.closest('.scroll-row')) {
+                    const deltaX = Math.abs(e.touches[0].clientX - startX);
+                    const deltaY = Math.abs(e.touches[0].clientY - startY);
+                    
+                    // If horizontal movement is greater than vertical, prevent it
+                    if (deltaX > deltaY && deltaX > 10) {
+                        e.preventDefault();
+                    }
+                }
+            }, { passive: false });
+            
+            // Prevent wheel horizontal scrolling
+            document.addEventListener('wheel', preventHorizontalSwipe, { passive: false });
             
             // Initially disable interactive elements until authentication state is confirmed.
             toggleInteractiveElements(false, false);
