@@ -66,22 +66,28 @@
         const state = urlParams.get('state');
         const error = urlParams.get('error');
 
+        console.log('GitHub Callback - Code:', !!code, 'State:', !!state, 'Error:', error);
+
         // Determine the base URL for redirection
         const baseUrl = window.location.origin;
         
-        if (error) {
-            // Handle OAuth error
-            console.error('GitHub OAuth Error:', error);
-            window.location.href = `${baseUrl}/Login.html?error=${encodeURIComponent(error)}`;
-        } else if (code && state) {
-            // Success - redirect to login page with OAuth parameters
-            const redirectUrl = `${baseUrl}/Login.html?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
-            window.location.href = redirectUrl;
-        } else {
-            // Missing required parameters
-            console.error('Missing OAuth parameters');
-            window.location.href = `${baseUrl}/Login.html?error=missing_parameters`;
-        }
+        // Add a small delay to show the loading screen
+        setTimeout(() => {
+            if (error) {
+                // Handle OAuth error
+                console.error('GitHub OAuth Error:', error);
+                window.location.href = `${baseUrl}/Login.html?error=${encodeURIComponent(error)}`;
+            } else if (code && state) {
+                // Success - redirect to login page with OAuth parameters
+                const redirectUrl = `${baseUrl}/Login.html?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+                console.log('Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            } else {
+                // Missing required parameters
+                console.error('Missing OAuth parameters - Code:', code, 'State:', state);
+                window.location.href = `${baseUrl}/Login.html?error=missing_parameters`;
+            }
+        }, 1000);
     </script>
 </body>
 </html>

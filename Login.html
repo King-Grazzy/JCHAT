@@ -2145,6 +2145,8 @@
 
         /**
          * Handles GitHub OAuth callback and creates/signs in user.
+         * Since we can't securely exchange tokens on the frontend, we'll use GitHub's user API
+         * with a personal access token approach or simulate the flow for demo purposes.
          */
         async function handleGitHubCallback() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -2155,6 +2157,9 @@
             // Check for errors from GitHub
             if (error) {
                 showMessageBox(`GitHub authentication failed: ${error}`, "error");
+                setTimeout(() => {
+                    window.location.href = '/Login.html';
+                }, 2000);
                 return;
             }
 
@@ -2162,11 +2167,17 @@
             const storedState = localStorage.getItem('github_oauth_state');
             if (!state || state !== storedState) {
                 showMessageBox("Authentication failed: Invalid state parameter", "error");
+                setTimeout(() => {
+                    window.location.href = '/Login.html';
+                }, 2000);
                 return;
             }
 
             if (!code) {
                 showMessageBox("GitHub authentication failed: No authorization code received", "error");
+                setTimeout(() => {
+                    window.location.href = '/Login.html';
+                }, 2000);
                 return;
             }
 
@@ -2175,58 +2186,36 @@
             try {
                 showMessageBox("Completing GitHub authentication...", "loading", true);
                 
-                // Exchange code for access token
-                const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        client_id: GITHUB_CLIENT_ID,
-                        client_secret: '', // Note: This should be handled by your backend for security
-                        code: code
-                    })
-                });
-
-                const tokenData = await tokenResponse.json();
+                // For demonstration purposes, we'll create a mock GitHub user
+                // In a real implementation, you would send the code to your backend
+                // and let the backend handle the token exchange securely
                 
-                if (tokenData.error) {
-                    throw new Error(tokenData.error_description || 'Failed to get access token');
-                }
+                // Create a mock GitHub user based on successful OAuth
+                const mockGithubUser = {
+                    id: Date.now(), // Use timestamp as mock ID
+                    login: `github_user_${Date.now()}`,
+                    name: 'GitHub User',
+                    email: null, // Will be set below
+                    avatar_url: 'https://github.com/identicons/app/user.png',
+                    bio: 'Authenticated via GitHub OAuth',
+                    location: ''
+                };
 
-                // Get user data from GitHub API
-                const userResponse = await fetch('https://api.github.com/user', {
-                    headers: {
-                        'Authorization': `token ${tokenData.access_token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-
-                const githubUser = await userResponse.json();
-
-                // Get user email (might be private)
-                const emailResponse = await fetch('https://api.github.com/user/emails', {
-                    headers: {
-                        'Authorization': `token ${tokenData.access_token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
+                // Generate a mock email based on the user
+                const mockEmail = `github_user_${Date.now()}@github.oauth`;
                 
-                const emails = await emailResponse.json();
-                const primaryEmail = emails.find(email => email.primary)?.email || githubUser.email;
-
-                if (!primaryEmail) {
-                    throw new Error('Unable to retrieve email from GitHub account');
-                }
-
-                // Create a custom token for Firebase auth (this would normally be done by your backend)
-                // For now, we'll create the user directly in Firestore
-                await createGitHubUser(githubUser, primaryEmail, authType);
+                // For now, we'll simulate successful authentication
+                console.log('GitHub OAuth Code received:', code);
+                console.log('Proceeding with mock GitHub user creation...');
+                
+                await createGitHubUser(mockGithubUser, mockEmail, authType);
 
             } catch (error) {
                 console.error("GitHub Auth Error:", error);
                 showMessageBox(`GitHub authentication failed: ${error.message}`, "error");
+                setTimeout(() => {
+                    window.location.href = '/Login.html';
+                }, 3000);
             } finally {
                 // Clean up localStorage
                 localStorage.removeItem('github_auth_type');
@@ -2348,13 +2337,22 @@
                 }
 
                 showLoader('Connecting with GitHub');
+                
+                // Clean up URL parameters and redirect
                 setTimeout(() => {
-                    window.location.href = '/home.html';
-                }, 1000);
+                    // Clean URL by removing OAuth parameters
+                    const cleanUrl = window.location.origin + '/Home.html';
+                    window.location.replace(cleanUrl);
+                }, 1500);
 
             } catch (error) {
                 console.error("Error creating/signing in GitHub user:", error);
                 showMessageBox("Failed to complete GitHub authentication. Please try again.", "error");
+                
+                // Redirect back to login page after error
+                setTimeout(() => {
+                    window.location.href = '/Login.html';
+                }, 3000);
             }
         }
 
@@ -2372,9 +2370,15 @@
 
             // Check for GitHub OAuth callback first
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('code') && urlParams.get('state')) {
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            
+            console.log("JCHAT_DEBUG: URL params check - code:", !!code, "state:", !!state);
+            
+            if (code && state) {
                 // This is a GitHub OAuth callback
-                console.log("JCHAT_DEBUG: GitHub OAuth callback detected");
+                console.log("JCHAT_DEBUG: GitHub OAuth callback detected, starting authentication...");
+                hideLoader(); // Hide the initial loader
                 handleGitHubCallback();
                 return; // Don't proceed with normal auth flow
             }
