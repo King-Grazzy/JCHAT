@@ -31,8 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Tone.js for audio notifications (if used) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Audio support for success notifications -->
 
     <style>
         /* Universal box-sizing for consistent layout */
@@ -6353,31 +6352,17 @@
 
 
         /**
-         * Plays a pleasant success sound effect using Tone.js
+         * Plays a pleasant success sound effect using ne.mp3
          */
         function playSuccessSound() {
             try {
-                if (typeof Tone !== 'undefined') {
-                    const successSynth = new Tone.Synth().toDestination();
-                    successSynth.oscillator.type = "sine";
-                    successSynth.envelope.attack = 0.01;
-                    successSynth.envelope.decay = 0.2;
-                    successSynth.envelope.sustain = 0.0;
-                    successSynth.envelope.release = 0.5;
-                    
-                    // Play a pleasant success chord
-                    const now = Tone.now();
-                    successSynth.triggerAttackRelease("C5", "8n", now);
-                    successSynth.triggerAttackRelease("E5", "8n", now + 0.1);
-                    successSynth.triggerAttackRelease("G5", "8n", now + 0.2);
-                    
-                    // Clean up
-                    setTimeout(() => {
-                        successSynth.dispose();
-                    }, 1000);
-                }
+                const audio = new Audio('ne.mp3');
+                audio.volume = 0.7; // Set volume to 70%
+                audio.play().catch(error => {
+                    console.log('Audio playback failed:', error);
+                });
             } catch (error) {
-                console.log('Success sound not available:', error.message);
+                console.log('Audio creation failed:', error);
             }
         }
 
@@ -6429,7 +6414,7 @@
             messageBox.style.display = 'flex';
             messageBox.style.opacity = '1';
 
-            // Play success sound
+            // Play success sound using ne.mp3
             playSuccessSound();
 
             // Auto-hide after duration
