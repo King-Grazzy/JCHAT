@@ -48,6 +48,8 @@
             --border-color: rgba(255, 255, 255, 0.08);
 
             --success-color: #28a745;
+            --success-color-dark: #1e7e34;
+            --success-color-light: #34ce57;
         }
 
         /* Pink and Blue Glowing Loader */
@@ -910,23 +912,39 @@
             z-index: 1000;
             display: none;
             opacity: 0;
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            transition: opacity 0.3s ease-in-out;
             min-width: 280px;
             max-width: 90%;
             text-align: center;
             flex-direction: column;
             align-items: center;
             gap: 15px;
+            overflow: hidden;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         #messageBox.show {
             opacity: 1;
             display: flex;
         }
         #messageBox.success {
-            background-image: linear-gradient(45deg, var(--pink), var(--blue));
+            background: var(--success-color);
             color: var(--white);
-            border: none;
-            box-shadow: 0 8px 30px rgba(0, 213, 255, 0.5), 0 8px 30px rgba(255, 46, 146, 0.5);
+            border: 1px solid var(--success-color-dark);
+            box-shadow: 0 4px 20px rgba(40, 167, 69, 0.25), 0 2px 10px rgba(0, 0, 0, 0.1);
+            animation: successMessageAppear 0.3s ease-out;
+        }
+
+        @keyframes successMessageAppear {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
         }
         #messageBox.error { border-left: 5px solid var(--delete-button-color); background-color: var(--card-background-color); color: var(--text-color-primary); }
         #messageBox.info { border-left: 5px solid var(--accent-color); background-color: var(--card-background-color); color: var(--text-color-primary); }
@@ -941,7 +959,13 @@
             -webkit-text-fill-color: transparent;
             color: transparent;
         }
-        #messageBox.success i { color: var(--white); }
+        #messageBox.success i { 
+            color: var(--white); 
+            background-image: none;
+            background-clip: unset;
+            -webkit-background-clip: unset;
+            -webkit-text-fill-color: unset;
+        }
         #messageBox.error i { color: var(--delete-button-color); }
         #messageBox.info i { color: var(--accent-color); }
         #messageBox.warning i { color: var(--warning-color); }
@@ -1157,6 +1181,8 @@
             #messageBox {
                 padding: 15px 20px;
                 font-size: 1rem;
+                max-width: 95%;
+                min-width: 250px;
             }
             #messageBox i {
                 font-size: 2rem;
