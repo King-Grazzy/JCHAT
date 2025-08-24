@@ -3371,20 +3371,7 @@
         .chip-text { display:flex; flex-direction:column; gap:4px; }
         .chip-progress { width:140px; height:6px; background: rgba(255,255,255,0.1); border-radius:6px; overflow:hidden; }
         .chip-progress > div { height:100%; width:100%; background-image: linear-gradient(90deg, #ff4757 0%, #ff6b35 25%, #ffa726 50%, #ffd700 75%, #4caf50 100%); background-size:200% 100%; background-position:right; transition: background-position 0.8s ease-out; }
-        /* Enhanced friends suggestions section */
-        .friends-suggestions-section {
-            background: var(--card-background);
-            border: 1px solid var(--glass-blue);
-            border-radius: 15px;
-            padding: 16px;
-            margin-bottom: 20px;
-            /* Prevent content shifting */
-            min-height: 140px;
-            position: relative;
-            /* Completely isolate from main content */
-            contain: layout style paint;
-            overflow: hidden;
-        }
+
 
         .section-title { 
             font-weight: 700; 
@@ -3438,195 +3425,10 @@
         .scroll-row::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(90deg, var(--blue), var(--pink));
         }
-        .highlight-card, .friend-card, .saved-card { flex:0 0 auto; width:160px; border:1px solid var(--glass-blue); background: var(--card-background); border-radius:10px; overflow:hidden; }
-        /* Enhanced friend cards with better animations */
-        .friend-card { 
-            /* Consistent sizing to prevent shifts */
-            width: 88px; 
-            min-width: 88px; /* Prevent shrinking */
-            height: 110px;
-            border-radius: 12px; 
-            padding: 8px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 6px; 
-            background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)); 
-            border: 2px solid transparent;
-            background-clip: padding-box;
-            position: relative;
-            /* Smooth animations */
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            /* Scroll snap for better UX */
-            scroll-snap-align: start;
-            /* Prevent layout shifts */
-            flex-shrink: 0;
-        }
-        .friend-card::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, var(--pink), var(--blue), var(--pink));
-            border-radius: 14px;
-            z-index: -1;
-            opacity: 0.8;
-            transition: all 0.3s ease;
-        }
+        .highlight-card, .saved-card { flex:0 0 auto; width:160px; border:1px solid var(--glass-blue); background: var(--card-background); border-radius:10px; overflow:hidden; }
+        .highlight-card img, .saved-card img { width:100%; height:100px; object-fit:cover; display:block; } 
 
-        .friend-card:hover {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 
-                0 8px 25px rgba(255, 46, 146, 0.3),
-                0 8px 25px rgba(0, 213, 255, 0.3);
-        }
 
-        .friend-card:hover::before {
-            opacity: 1;
-            filter: blur(8px);
-        }
-        @keyframes friendGlow {
-            0% { box-shadow: 0 0 20px rgba(255, 46, 146, 0.4), 0 0 40px rgba(0, 213, 255, 0.3); }
-            100% { box-shadow: 0 0 30px rgba(0, 213, 255, 0.4), 0 0 60px rgba(255, 46, 146, 0.3); }
-        }
-        @keyframes friendGlowBorder {
-            0% { background: linear-gradient(45deg, var(--pink), var(--blue), var(--pink)); }
-            50% { background: linear-gradient(45deg, var(--blue), var(--pink), var(--blue)); }
-            100% { background: linear-gradient(45deg, var(--pink), var(--blue), var(--pink)); }
-        }
-        .friend-card img { 
-            width: 48px; 
-            height: 48px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .friend-card:hover img {
-            border-color: rgba(255, 255, 255, 0.4);
-            transform: scale(1.05);
-        }
-
-        .friend-card .name { 
-            font-size: 0.7rem; 
-            text-align: center; 
-            line-height: 1.1; 
-            background-image: linear-gradient(90deg, var(--pink), var(--blue)); 
-            -webkit-background-clip: text; 
-            background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            font-weight: 600; 
-            /* Prevent text overflow */
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .friend-card .actions { 
-            display: none; 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            background: rgba(0, 0, 0, 0.95); 
-            border: 2px solid transparent;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.95)), 
-                             linear-gradient(45deg, var(--pink), var(--blue));
-            background-origin: border-box;
-            background-clip: content-box, border-box;
-            border-radius: 12px; 
-            padding: 8px; 
-            gap: 8px; 
-            z-index: 10;
-            backdrop-filter: blur(10px);
-            box-shadow: 
-                0 10px 30px rgba(0, 0, 0, 0.5),
-                0 0 20px rgba(255, 46, 146, 0.3), 
-                0 0 20px rgba(0, 213, 255, 0.3);
-            /* Smooth entrance animation */
-            opacity: 0;
-            transform: translate(-50%, -50%) scale(0.8);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .friend-card .actions.show {
-            display: flex;
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
-        .friend-card .actions button { 
-            font-size: 0.7rem; 
-            padding: 8px 10px; 
-            border: 1px solid transparent; 
-            border-radius: 8px; 
-            background: linear-gradient(45deg, var(--pink), var(--blue)); 
-            color: #fff; 
-            cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 600;
-            min-width: 40px;
-        }
-
-        .friend-card .actions button:hover {
-            transform: scale(1.1);
-            box-shadow: 
-                0 0 15px rgba(255, 46, 146, 0.5), 
-                0 0 15px rgba(0, 213, 255, 0.5);
-            background: linear-gradient(45deg, var(--blue), var(--pink));
-        }
-        .highlight-card img, .saved-card img { width:100%; height:100px; object-fit:cover; display:block; }
-        .friend-card .meta { display:none; } 
-
-        /* Carousel navigation buttons */
-        .carousel-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid transparent;
-            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
-                             linear-gradient(45deg, var(--pink), var(--blue));
-            background-origin: border-box;
-            background-clip: content-box, border-box;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 5;
-            transition: all 0.3s ease;
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .friends-suggestions-section:hover .carousel-nav {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .carousel-nav:hover {
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 0 20px rgba(255, 46, 146, 0.4), 0 0 20px rgba(0, 213, 255, 0.4);
-        }
-
-        .carousel-nav.prev {
-            left: -18px;
-        }
-
-        .carousel-nav.next {
-            right: -18px;
-        }
-
-        .carousel-nav i {
-            color: #fff;
-            font-size: 14px;
-        }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
@@ -3635,25 +3437,7 @@
                 gap: 16px;
             }
             
-            .friends-suggestions-section {
-                padding: 12px;
-                margin-bottom: 16px;
-            }
-            
-            .friend-card {
-                width: 80px;
-                min-width: 80px;
-                height: 100px;
-            }
-            
-            .friend-card img {
-                width: 40px;
-                height: 40px;
-            }
-            
-            .carousel-nav {
-                display: none; /* Hide navigation on mobile, use touch scroll */
-            }
+
         }
 
         @media (max-width: 480px) {
@@ -3662,21 +3446,7 @@
                 padding: 6px 0 10px 0;
             }
             
-            .friend-card {
-                width: 72px;
-                min-width: 72px;
-                height: 92px;
-                padding: 6px;
-            }
-            
-            .friend-card img {
-                width: 36px;
-                height: 36px;
-            }
-            
-            .friend-card .name {
-                font-size: 0.65rem;
-            }
+
         }
 
         /* Engagement Panel */
@@ -3902,11 +3672,7 @@
                 <div class="section-title"><i class="fas fa-bookmark"></i> Highlights</div>
                 <div class="scroll-row" id="highlightsStrip"></div>
             </div>
-            <!-- Friends Suggestions -->
-            <div class="friends-suggestions-section" id="friendsSuggestionsSection" style="display:none;">
-                <div class="section-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;"><i class="fas fa-user-friends"></i> People you may know</div>
-                <div class="scroll-row" id="friendsSuggestions"></div>
-            </div>
+
             <!-- Saved Widget -->
             <div class="saved-widget-section" id="savedWidgetSection" style="display:none;">
                 <div class="section-title"><i class="fas fa-bookmark"></i> Saved</div>
@@ -4999,8 +4765,7 @@
                 window.jcoinRateSpan = document.getElementById('jcoinRate');
                 window.highlightsSection = document.getElementById('highlightsSection');
                 window.highlightsStrip = document.getElementById('highlightsStrip');
-                window.friendsSuggestionsSection = document.getElementById('friendsSuggestionsSection');
-                window.friendsSuggestions = document.getElementById('friendsSuggestions');
+
                 window.savedWidgetSection = document.getElementById('savedWidgetSection');
                 window.savedWidget = document.getElementById('savedWidget');
                 notificationCountElement = document.getElementById('notificationCount');
@@ -8515,7 +8280,7 @@
                         homeChipsRow.style.display = 'flex';
                     }
                 } catch(e) { console.warn('level chip load', e); }
-                // Highlights and Friends suggestions (best-effort)
+                // Highlights (best-effort)
                 try {
                     if (highlightsSection && highlightsStrip) {
                         const ref = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'highlights');
@@ -8535,118 +8300,7 @@
                         }
                     }
                 } catch(e) { console.warn('highlights load', e); }
-                try {
-                    if (friendsSuggestionsSection && friendsSuggestions) {
-                        const publicUsersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
-                        const q = query(publicUsersRef, where(documentId(), '!=', currentUser.uid));
-                        const snap = await getDocs(q);
-                        const users=[]; snap.forEach(d=>users.push({id:d.id,...d.data()}));
-                        // Fetch my friends to hide add for existing
-                        const myFriendsSnap = await getDocs(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'friends'));
-                        const myFriends = new Set(); myFriendsSnap.forEach(f=>myFriends.add(f.id));
-                        // Fetch sent requests to hide duplicate
-                        const sentSnap = await getDocs(query(collection(db, 'artifacts', appId, 'public', 'data', 'friend_requests'), where('senderId','==', currentUser.uid)));
-                        const sentSet = new Set(); sentSnap.forEach(s=>sentSet.add(s.data().receiverId||s.id));
-                        const subset = users.slice(0,8);
-                        if (subset.length>0) {
-                            friendsSuggestionsSection.style.display='block';
-                            friendsSuggestions.innerHTML='';
-                            subset.forEach(u=>{
-                                const card = document.createElement('div');
-                                card.className='friend-card';
-                                card.style.position='relative';
-                                const p = u.profilePicId ? getCloudinaryImageUrl(u.profilePicId,'w_96,h_96,c_fill,g_face,r_max') : '';
-                                card.innerHTML = `${p?`<img src=\"${p}\" alt=\"${u.username}\">`:`<i class=\"fas fa-user-circle\" style=\"font-size:42px;opacity:.8;\"></i>`}
-                                    <div class=\"name\">${u.username||'User'}</div>
-                                    <div class=\"actions\">
-                                        ${myFriends.has(u.id) ? '' : (sentSet.has(u.id) ? '' : `<button class=\"friend-add-btn\" data-user-id=\"${u.id}\"><i class=\"fas fa-user-plus\"></i></button>`)}
-                                        <button class=\"friend-msg-btn\" data-user-id=\"${u.id}\"><i class=\"fas fa-paper-plane\"></i></button>
-                                    </div>`;
-                                friendsSuggestions.appendChild(card);
-                            });
-                            
-                            // Add carousel navigation if we have enough friends to scroll
-                            if (subset.length > 4) {
-                                // Add navigation buttons
-                                const prevBtn = document.createElement('button');
-                                prevBtn.className = 'carousel-nav prev';
-                                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-                                prevBtn.addEventListener('click', () => {
-                                    friendsSuggestions.scrollBy({
-                                        left: -200,
-                                        behavior: 'smooth'
-                                    });
-                                });
-                                
-                                const nextBtn = document.createElement('button');
-                                nextBtn.className = 'carousel-nav next';
-                                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
-                                nextBtn.addEventListener('click', () => {
-                                    friendsSuggestions.scrollBy({
-                                        left: 200,
-                                        behavior: 'smooth'
-                                    });
-                                });
-                                
-                                friendsSuggestionsSection.appendChild(prevBtn);
-                                friendsSuggestionsSection.appendChild(nextBtn);
-                            }
-                            
-                            // Carefully isolate friends carousel from main content
-                            friendsSuggestions.addEventListener('touchmove', (e) => {
-                                // Prevent touch events from affecting main screen
-                                e.stopPropagation();
-                            }, { passive: true });
-                            
-                            friendsSuggestions.addEventListener('touchstart', (e) => {
-                                e.stopPropagation();
-                            }, { passive: true });
-                            
-                            friendsSuggestions.addEventListener('touchend', (e) => {
-                                e.stopPropagation();
-                            }, { passive: true });
-                        }
-                    }
-                } catch(e) { console.warn('friends suggest load', e); }
-                // Friends suggestions: toggle actions on click
-                try {
-                    friendsSuggestions?.addEventListener('click', (ev)=>{
-                        const card = ev.target.closest('.friend-card');
-                        if (!card) return;
-                        const actions = card.querySelector('.actions');
-                        if (actions) {
-                            // Use the new show class for smooth animations
-                            actions.classList.toggle('show');
-                        }
-                    });
-                    friendsSuggestions?.addEventListener('click', async (ev)=>{
-                        const addBtn = ev.target.closest('.friend-add-btn');
-                        const msgBtn = ev.target.closest('.friend-msg-btn');
-                        if (addBtn) {
-                            if (!isAuthReady || !currentUser) return showMessageBox('Please log in.', 'warning');
-                            const userId = addBtn.dataset.userId;
-                            try {
-                                // Write public friend request (single collection)
-                                const req = {
-                                    senderId: currentUser.uid,
-                                    receiverId: userId,
-                                    senderUsername: currentUserProfileData?.username || 'User',
-                                    status: 'pending',
-                                    timestamp: serverTimestamp()
-                                };
-                                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'friend_requests'), req);
-                                addBtn.remove();
-                                showMessageBox('Friend request sent', 'success');
-                            } catch(e){ console.error(e); showMessageBox('Failed to send request','error'); }
-                            return;
-                        }
-                        if (msgBtn) {
-                            const uid = msgBtn.dataset.userId;
-                            window.location.href = `/Private_Chat.html?partnerId=${encodeURIComponent(uid)}`;
-                            return;
-                        }
-                    });
-                } catch(e) { console.warn('friends suggest actions', e); }
+
                 // Saved widget (recent saved)
                 try {
                     if (savedWidgetSection && savedWidget) {
@@ -8789,16 +8443,9 @@
             
             document.addEventListener('touchmove', (e) => {
                 const scrollRow = e.target.closest('.scroll-row');
-                const friendsSection = e.target.closest('.friends-suggestions-section');
-                
-                if (friendsSection) {
-                    // In friends section - prevent main content movement but allow friends scrolling
-                    e.stopPropagation();
-                    return;
-                }
                 
                 if (!scrollRow) {
-                    // Not in friends carousel - block all horizontal movement
+                    // Not in any scroll area - block all horizontal movement
                     const deltaX = Math.abs(e.touches[0].clientX - startX);
                     const deltaY = Math.abs(e.touches[0].clientY - startY);
                     
