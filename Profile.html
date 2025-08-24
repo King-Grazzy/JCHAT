@@ -298,6 +298,26 @@
             transform: scale(0.95);
         }
 
+        /* Light Mode Styling for Tiny Toggle */
+        body.theme-light-mode .tiny-toggle {
+            background: linear-gradient(135deg, #2193b0, #6dd5ed);
+            color: white;
+            border: 2px solid rgba(33, 147, 176, 0.3);
+            box-shadow: 0 2px 8px rgba(33, 147, 176, 0.4);
+        }
+
+        body.theme-light-mode .tiny-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(33, 147, 176, 0.6);
+            border-color: rgba(33, 147, 176, 0.5);
+        }
+
+        body.theme-light-mode .tiny-toggle.active {
+            transform: rotate(45deg);
+            background: linear-gradient(135deg, #6dd5ed, #2193b0);
+            border-color: rgba(109, 213, 237, 0.5);
+        }
+
         /* Tiny Dropdown */
         .tiny-dropdown {
             position: absolute;
@@ -314,6 +334,13 @@
             transform: translateY(-10px);
             transition: all 0.2s ease;
             z-index: 1001;
+        }
+
+        /* Light Mode Styling for Tiny Dropdown */
+        body.theme-light-mode .tiny-dropdown {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(33, 147, 176, 0.2);
+            box-shadow: 0 8px 32px rgba(33, 147, 176, 0.3);
         }
 
         .tiny-dropdown.show {
@@ -342,6 +369,37 @@
         .tiny-dropdown-item i {
             width: 14px;
             font-size: 12px;
+        }
+
+        /* Dropdown Section Title Styling */
+        .dropdown-section-title {
+            color: var(--white);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            padding: 4px 8px;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Light Mode Styling for Tiny Dropdown Items */
+        body.theme-light-mode .tiny-dropdown-item {
+            color: #333;
+        }
+
+        body.theme-light-mode .tiny-dropdown-item:hover {
+            background: rgba(33, 147, 176, 0.1);
+            color: #2193b0;
+        }
+
+        body.theme-light-mode .dropdown-section-title {
+            color: #333;
+            background: linear-gradient(135deg, #2193b0, #6dd5ed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         header .header-content-wrapper {
@@ -4557,6 +4615,11 @@
                 height: 28px;
                 font-size: 12px;
             }
+
+            /* Light mode mobile tiny toggle */
+            body.theme-light-mode .tiny-toggle {
+                border-width: 1px;
+            }
         }
 
         /* Additional touch improvements for very small screens */
@@ -4578,6 +4641,11 @@
                 width: 32px;
                 height: 32px;
                 font-size: 14px;
+            }
+
+            /* Light mode very small screen tiny toggle */
+            body.theme-light-mode .tiny-toggle {
+                border-width: 2px;
             }
         }
 
