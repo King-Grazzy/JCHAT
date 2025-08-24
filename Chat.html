@@ -5690,7 +5690,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          window.initiateCall = initiateCall;
          window.acceptCall = acceptCall;
          window.declineCall = declineCall;
-         window.endCall = endCall;
+         window.endWebRTCCall = endCall; // WebRTC call system
          window.cleanupCall = cleanupCall;
          window.playRingtone = playRingtone;
          window.stopRingtone = stopRingtone;
@@ -7402,7 +7402,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  </div>
                  
                  <div style="display: flex; gap: 20px;">
-                     <button onclick="endCall()" style="
+                                              <button onclick="endNewCall()" style="
                          background: linear-gradient(135deg, #dc3545, #c82333);
                          color: white;
                          border: none;
@@ -7468,9 +7468,9 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          }
          
          /**
-          * End current call
+          * End current new call
           */
-         function endCall() {
+         function endNewCall() {
              const callInterface = document.querySelector('.call-interface');
              if (callInterface) {
                  callInterface.remove();
@@ -7661,6 +7661,13 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  showMessageBox('Failed to decline call', 'error');
              }
          }
+         
+         // Make new call system functions globally accessible
+         window.startVoiceCall = startVoiceCall;
+         window.startVideoCall = startVideoCall;
+         window.endNewCall = endNewCall;
+         window.answerCall = answerCall;
+         window.declineNewCall = declineCall;
          
          /**
           * Global voice recording functions for onclick handlers
