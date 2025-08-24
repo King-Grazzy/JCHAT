@@ -3381,6 +3381,9 @@
             /* Prevent content shifting */
             min-height: 140px;
             position: relative;
+            /* Completely isolate from main content */
+            contain: layout style paint;
+            overflow: hidden;
         }
 
         .section-title { 
@@ -3410,9 +3413,15 @@
             -ms-overflow-style: none; /* IE and Edge */
             /* Custom scrollbar for webkit browsers */
             position: relative;
-            /* Allow horizontal touch scrolling ONLY for friends */
+            /* COMPLETELY ISOLATED horizontal scrolling */
             touch-action: pan-x;
             overscroll-behavior-x: contain;
+            overscroll-behavior-y: none;
+            /* Prevent any parent scrolling */
+            contain: layout style paint;
+            /* Create stacking context to isolate */
+            transform: translateZ(0);
+            will-change: scroll-position;
         }
 
         .scroll-row::-webkit-scrollbar { 
@@ -8582,6 +8591,23 @@
                                 friendsSuggestionsSection.appendChild(prevBtn);
                                 friendsSuggestionsSection.appendChild(nextBtn);
                             }
+                            
+                            // Isolate friends carousel scrolling from main content
+                            friendsSuggestions.addEventListener('touchstart', (e) => {
+                                e.stopPropagation();
+                            }, { passive: true });
+                            
+                            friendsSuggestions.addEventListener('touchmove', (e) => {
+                                e.stopPropagation();
+                            }, { passive: true });
+                            
+                            friendsSuggestions.addEventListener('touchend', (e) => {
+                                e.stopPropagation();
+                            }, { passive: true });
+                            
+                            friendsSuggestions.addEventListener('scroll', (e) => {
+                                e.stopPropagation();
+                            }, { passive: true });
                         }
                     }
                 } catch(e) { console.warn('friends suggest load', e); }
@@ -8765,7 +8791,10 @@
             }, { passive: true });
             
             document.addEventListener('touchmove', (e) => {
-                if (!e.target.closest('.scroll-row')) {
+                const scrollRow = e.target.closest('.scroll-row');
+                
+                if (!scrollRow) {
+                    // Not in friends carousel - block all horizontal movement
                     const deltaX = Math.abs(e.touches[0].clientX - startX);
                     const deltaY = Math.abs(e.touches[0].clientY - startY);
                     
@@ -8773,6 +8802,9 @@
                     if (deltaX > deltaY && deltaX > 10) {
                         e.preventDefault();
                     }
+                } else {
+                    // IN friends carousel - stop event from bubbling to prevent main content shift
+                    e.stopPropagation();
                 }
             }, { passive: false });
             
