@@ -1343,6 +1343,9 @@
                 <button class="social-login-button" id="googleLoginButton">
                     <i class="fab fa-google"></i> Sign in with Google
                 </button>
+                <button class="social-login-button" id="githubLoginButton">
+                    <i class="fab fa-github"></i> Sign in with GitHub
+                </button>
                 <p class="toggle-form-link" id="showRegisterLink">Don't have an account? Register here.</p>
             </form>
 
@@ -1374,6 +1377,9 @@
                 <div class="separator">OR</div>
                 <button class="social-login-button" id="googleRegisterButton">
                     <i class="fab fa-google"></i> Sign up with Google
+                </button>
+                <button class="social-login-button" id="githubRegisterButton">
+                    <i class="fab fa-github"></i> Sign up with GitHub
                 </button>
                 <p class="toggle-form-link" id="showLoginLinkFromRegister">Already have an account? Login here.</p>
             </form>
@@ -1545,7 +1551,7 @@
         // Corrected import for Auth specific functions, including GoogleAuthProvider
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         // Correct Firestore imports
-        import { getFirestore, doc, setDoc, collection, query, where, getDocs, runTransaction, serverTimestamp, increment, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, collection, query, where, getDocs, getDoc, runTransaction, serverTimestamp, increment, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         // --- Firebase & Canvas Environment Configuration ---
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -1565,6 +1571,11 @@
         const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
 
+        // GitHub OAuth Configuration
+        const GITHUB_CLIENT_ID = 'Ov23liVhJtsmAG4DZOOH';
+        const GITHUB_REDIRECT_URI = 'https://jchathub.netlify.app/auth/github/callback';
+        const GITHUB_SCOPE = 'user:email';
+
         // --- DOM Elements ---
         const welcomeScreen = document.getElementById('welcomeScreen');
         const getStartedButton = document.getElementById('getStartedButton');
@@ -1583,6 +1594,7 @@
         const loginPasswordInput = document.getElementById('loginPassword');
         const loginButton = document.getElementById('loginButton');
         const googleLoginButton = document.getElementById('googleLoginButton');
+        const githubLoginButton = document.getElementById('githubLoginButton');
         const showRegisterLink = document.getElementById('showRegisterLink');
         const showResetPasswordLink = document.getElementById('showResetPasswordLink');
 
@@ -1593,6 +1605,7 @@
         const referralCodeInput = document.getElementById('referralCode');
         const registerButton = document.getElementById('registerButton');
         const googleRegisterButton = document.getElementById('googleRegisterButton');
+        const githubRegisterButton = document.getElementById('githubRegisterButton');
         const showLoginLinkFromRegister = document.getElementById('showLoginLinkFromRegister');
 
         // Reset Password Elements
@@ -2105,6 +2118,246 @@
             }
         }
 
+        /**
+         * Initiates GitHub OAuth flow by redirecting to GitHub's authorization page.
+         */
+        function initiateGitHubAuth(type) {
+            const button = type === 'login' ? githubLoginButton : githubRegisterButton;
+            toggleButtonLoading(button, true);
+            showMessageBox(`Redirecting to GitHub...`, "loading", true);
+
+            // Store the authentication type in localStorage to handle after callback
+            localStorage.setItem('github_auth_type', type);
+            
+            // Build the GitHub OAuth authorization URL
+            const state = Math.random().toString(36).substring(2, 15); // Generate random state for security
+            localStorage.setItem('github_oauth_state', state);
+            
+            const githubAuthUrl = `https://github.com/login/oauth/authorize?` +
+                `client_id=${GITHUB_CLIENT_ID}` +
+                `&redirect_uri=${encodeURIComponent(GITHUB_REDIRECT_URI)}` +
+                `&scope=${encodeURIComponent(GITHUB_SCOPE)}` +
+                `&state=${state}`;
+
+            // Redirect to GitHub for authorization
+            window.location.href = githubAuthUrl;
+        }
+
+        /**
+         * Handles GitHub OAuth callback and creates/signs in user.
+         */
+        async function handleGitHubCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+            const state = urlParams.get('state');
+            const error = urlParams.get('error');
+
+            // Check for errors from GitHub
+            if (error) {
+                showMessageBox(`GitHub authentication failed: ${error}`, "error");
+                return;
+            }
+
+            // Verify state parameter to prevent CSRF attacks
+            const storedState = localStorage.getItem('github_oauth_state');
+            if (!state || state !== storedState) {
+                showMessageBox("Authentication failed: Invalid state parameter", "error");
+                return;
+            }
+
+            if (!code) {
+                showMessageBox("GitHub authentication failed: No authorization code received", "error");
+                return;
+            }
+
+            const authType = localStorage.getItem('github_auth_type') || 'login';
+            
+            try {
+                showMessageBox("Completing GitHub authentication...", "loading", true);
+                
+                // Exchange code for access token
+                const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        client_id: GITHUB_CLIENT_ID,
+                        client_secret: '', // Note: This should be handled by your backend for security
+                        code: code
+                    })
+                });
+
+                const tokenData = await tokenResponse.json();
+                
+                if (tokenData.error) {
+                    throw new Error(tokenData.error_description || 'Failed to get access token');
+                }
+
+                // Get user data from GitHub API
+                const userResponse = await fetch('https://api.github.com/user', {
+                    headers: {
+                        'Authorization': `token ${tokenData.access_token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                const githubUser = await userResponse.json();
+
+                // Get user email (might be private)
+                const emailResponse = await fetch('https://api.github.com/user/emails', {
+                    headers: {
+                        'Authorization': `token ${tokenData.access_token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                
+                const emails = await emailResponse.json();
+                const primaryEmail = emails.find(email => email.primary)?.email || githubUser.email;
+
+                if (!primaryEmail) {
+                    throw new Error('Unable to retrieve email from GitHub account');
+                }
+
+                // Create a custom token for Firebase auth (this would normally be done by your backend)
+                // For now, we'll create the user directly in Firestore
+                await createGitHubUser(githubUser, primaryEmail, authType);
+
+            } catch (error) {
+                console.error("GitHub Auth Error:", error);
+                showMessageBox(`GitHub authentication failed: ${error.message}`, "error");
+            } finally {
+                // Clean up localStorage
+                localStorage.removeItem('github_auth_type');
+                localStorage.removeItem('github_oauth_state');
+            }
+        }
+
+        /**
+         * Creates or signs in a GitHub user.
+         */
+        async function createGitHubUser(githubUser, email, authType) {
+            try {
+                // Check if user already exists in our system by email
+                const existingUserQuery = query(
+                    collection(db, "artifacts", appId, "users"),
+                    where("profiles.user_profile.email", "==", email)
+                );
+                const existingUserSnapshot = await getDocs(existingUserQuery);
+
+                if (!existingUserSnapshot.empty && authType === 'register') {
+                    showMessageBox("An account with this email already exists. Please sign in instead.", "warning");
+                    return;
+                }
+
+                const username = githubUser.login || githubUser.name || email.split('@')[0];
+                const profilePicUrl = githubUser.avatar_url;
+
+                if (existingUserSnapshot.empty) {
+                    // Create new user
+                    const newUserId = `github_${githubUser.id}`;
+                    
+                    await runTransaction(db, async (transaction) => {
+                        const userProfileRef = doc(db, "artifacts", appId, "users", newUserId, "profiles", "user_profile");
+                        const userPublicProfileRef = doc(db, "artifacts", appId, "public", "data", "users", newUserId);
+                        const userTransactionsCollectionRef = collection(db, "artifacts", appId, "users", newUserId, "transactions");
+
+                        // Create user profile
+                        transaction.set(userProfileRef, {
+                            username: username,
+                            email: email,
+                            githubId: githubUser.id,
+                            githubUsername: githubUser.login,
+                            profilePicId: profilePicUrl,
+                            bio: githubUser.bio || "",
+                            location: githubUser.location || "",
+                            friendsCount: 0,
+                            followersCount: 0,
+                            followingCount: 0,
+                            createdAt: serverTimestamp(),
+                            updatedAt: serverTimestamp(),
+                            inspirationType: "motivational",
+                            visibility: {
+                                displayName: true,
+                                profilePic: true,
+                                bio: false,
+                                location: false,
+                                emailPublic: false,
+                                lastOnline: false,
+                                allowFriendRequests: true,
+                                allowMessages: true,
+                            },
+                            totalPosts: 0,
+                            jCoins: REFERRAL_JCOIN_REWARD_NEW_USER,
+                            gas: REFERRAL_XP_REWARD_NEW_USER,
+                            level: 1,
+                            currentXp: REFERRAL_XP_REWARD_NEW_USER,
+                            xpToNextLevel: 100,
+                            messagesSentCount: 0,
+                            lastGroupCheckIn: null,
+                            completedQuests: [],
+                            questProgress: {},
+                            referralCode: generateReferralCode(),
+                            successfulReferrals: 0,
+                            walletUnlocked: true,
+                            authProvider: 'github'
+                        });
+
+                        // Create public profile
+                        transaction.set(userPublicProfileRef, {
+                            username: username,
+                            profilePicId: profilePicUrl,
+                            jCoins: REFERRAL_JCOIN_REWARD_NEW_USER,
+                            level: 1,
+                            userId: newUserId,
+                            email: email,
+                            messagesSentCount: 0,
+                            githubUsername: githubUser.login
+                        });
+
+                        // Add initial transaction
+                        transaction.set(doc(userTransactionsCollectionRef), {
+                            type: 'initial_bonus',
+                            amount: REFERRAL_JCOIN_REWARD_NEW_USER,
+                            xpAmount: REFERRAL_XP_REWARD_NEW_USER,
+                            description: 'Welcome bonus for GitHub signup',
+                            timestamp: serverTimestamp(),
+                            relatedEntityId: null
+                        });
+                    });
+
+                    // Store user session data
+                    localStorage.setItem('jchat_user_id', newUserId);
+                    localStorage.setItem('jchat_user_email', email);
+                    localStorage.setItem('jchat_username', username);
+
+                    showMessageBox("Account created with GitHub! Redirecting...", "success");
+                } else {
+                    // Existing user, sign them in
+                    const existingUserDoc = existingUserSnapshot.docs[0];
+                    const userId = existingUserDoc.id;
+                    const userData = existingUserDoc.data();
+
+                    // Store user session data
+                    localStorage.setItem('jchat_user_id', userId);
+                    localStorage.setItem('jchat_user_email', email);
+                    localStorage.setItem('jchat_username', userData.profiles?.user_profile?.username || username);
+
+                    showMessageBox("Signed in with GitHub! Redirecting...", "success");
+                }
+
+                showLoader('Connecting with GitHub');
+                setTimeout(() => {
+                    window.location.href = '/home.html';
+                }, 1000);
+
+            } catch (error) {
+                console.error("Error creating/signing in GitHub user:", error);
+                showMessageBox("Failed to complete GitHub authentication. Please try again.", "error");
+            }
+        }
+
         // --- Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
             // Apply saved theme
@@ -2115,6 +2368,15 @@
                 document.body.classList.add(savedTheme);
             } else {
                 document.body.classList.add('theme-dark-mode'); // Default to dark mode
+            }
+
+            // Check for GitHub OAuth callback first
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('code') && urlParams.get('state')) {
+                // This is a GitHub OAuth callback
+                console.log("JCHAT_DEBUG: GitHub OAuth callback detected");
+                handleGitHubCallback();
+                return; // Don't proceed with normal auth flow
             }
 
             // Check for existing user on page load
@@ -2196,6 +2458,8 @@
             // Social Login Buttons
             googleLoginButton.addEventListener('click', () => handleGoogleAuth('login'));
             googleRegisterButton.addEventListener('click', () => handleGoogleAuth('register'));
+            githubLoginButton.addEventListener('click', () => initiateGitHubAuth('login'));
+            githubRegisterButton.addEventListener('click', () => initiateGitHubAuth('register'));
 
             // New: Features Section Toggle
             featuresHeader.addEventListener('click', () => {

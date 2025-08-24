@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Authentication - JCHAT</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .callback-container {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #00b8e0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .message {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #00b8e0, #e03a8c);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+        .submessage {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="callback-container">
+        <div class="spinner"></div>
+        <div class="message">Completing GitHub Authentication</div>
+        <div class="submessage">Please wait while we complete your sign-in...</div>
+    </div>
+
+    <script>
+        // Extract OAuth parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        const error = urlParams.get('error');
+
+        // Determine the base URL for redirection
+        const baseUrl = window.location.origin;
+        
+        if (error) {
+            // Handle OAuth error
+            console.error('GitHub OAuth Error:', error);
+            window.location.href = `${baseUrl}/Login.html?error=${encodeURIComponent(error)}`;
+        } else if (code && state) {
+            // Success - redirect to login page with OAuth parameters
+            const redirectUrl = `${baseUrl}/Login.html?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+            window.location.href = redirectUrl;
+        } else {
+            // Missing required parameters
+            console.error('Missing OAuth parameters');
+            window.location.href = `${baseUrl}/Login.html?error=missing_parameters`;
+        }
+    </script>
+</body>
+</html>
