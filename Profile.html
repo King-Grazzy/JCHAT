@@ -7642,7 +7642,7 @@
 
                 } catch (transactionError) {
                     console.error("JCHAT_ERROR: Transaction failed during level-up:", transactionError);
-                    showMessageBox(`Failed to apply level-up rewards for Level ${currentLevel}: ${transactionError.message}`, 'error');
+                    console.error(`Failed to apply level-up rewards for Level ${currentLevel}: ${transactionError.message}`);
                     break; // Stop processing further levels if a transaction fails
                 }
             }
@@ -7802,7 +7802,7 @@
                 const usernameInitial = (user.displayName || "J").charAt(0).toUpperCase();
                 displayProfilePicture(headerProfilePic, headerAvatarIcon, user.photoURL, usernameInitial, "w_70,h_70,c_fill,g_face,r_max");
                 if (headerDisplayName) headerDisplayName.textContent = user.displayName || "JCHAT User"; // Null check
-                showMessageBox(`Error loading header profile: ${error.message}`, 'error');
+                console.error(`Error loading header profile: ${error.message}`);
             }
         }
         /**
@@ -7853,7 +7853,7 @@
                 }
             } catch (error) {
                 console.error("JCHAT_ERROR: Error fetching system settings:", error);
-                showMessageBox("Failed to load system settings.", 'error');
+                console.error("Failed to load system settings.");
             }
         }
 
@@ -7899,7 +7899,7 @@
          */
         async function submitJCoinRequest() {
             if (!currentUser || !currentUserProfileData) {
-                showMessageBox("You must be logged in to submit a request.", 'error');
+                console.error("You must be logged in to submit a request.");
                 return;
             }
             
@@ -7908,19 +7908,19 @@
             const receiptFile = receiptUploadInput.files[0];
 
             if (isNaN(nairaAmount) || nairaAmount <= 0) {
-                showMessageBox("Please enter a valid Naira amount.", 'error');
+                console.error("Please enter a valid Naira amount.");
                 return;
             }
             if (nairaAmount < 100) { // Minimum request amount
-                showMessageBox("Minimum request amount is #100.", 'warning');
+                console.warn("Minimum request amount is #100.");
                 return;
             }
             if (!receiptFile) {
-                showMessageBox("Please upload a payment receipt.", 'error');
+                console.error("Please upload a payment receipt.");
                 return;
             }
 
-            showMessageBox("Submitting JCoin request...", 'info');
+            console.log("Submitting JCoin request...");
 
             try {
                 const requestedJCoins = calculateJCoins(nairaAmount);
@@ -7947,7 +7947,7 @@
                 hideJCoinRequestModal(); // Close modal on success
             } catch (error) {
                 console.error("JCHAT_ERROR: Error submitting JCoin request:", error);
-                showMessageBox(`Failed to submit request: ${error.message}`, 'error');
+                console.error(`Failed to submit request: ${error.message}`);
             } finally {
                 // JCoin request complete
             }
