@@ -3166,6 +3166,9 @@
                             if (messageInput) {
                                 messageInput.value += emoji + ' ';
                                 messageInput.focus();
+                                
+                                // Trigger input event to update send button state
+                                messageInput.dispatchEvent(new Event('input', { bubbles: true }));
                             }
                             hideEmojiPicker();
                             emojiPickerOpen = false;
@@ -6224,9 +6227,14 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                      setTypingStatus(partnerId, false);
                  }
 
-                 if (messageInput) {
-                     messageInput.value = '';
-                     messageInput.style.height = 'auto';
+                 // Clear message input (get current reference in case it was replaced)
+                 const currentInput = document.getElementById('messageInput');
+                 if (currentInput) {
+                     currentInput.value = '';
+                     currentInput.style.height = 'auto';
+                     
+                     // Trigger input event to update send button state
+                     currentInput.dispatchEvent(new Event('input', { bubbles: true }));
                  }
 
                  // Visual feedback for send button
@@ -6580,10 +6588,11 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  const newSendBtn = existingSendBtn.cloneNode(true);
                  existingSendBtn.parentNode.replaceChild(newSendBtn, existingSendBtn);
                  
-                 // Ensure button is always enabled
-                 newSendBtn.disabled = false;
-                 newSendBtn.style.opacity = '1';
-                 newSendBtn.style.cursor = 'pointer';
+                 // Start with button disabled until user types
+                 newSendBtn.disabled = true;
+                 newSendBtn.style.opacity = '0.6';
+                 newSendBtn.style.cursor = 'not-allowed';
+                 newSendBtn.style.background = '#6b7280';
                  
                  // Add new listener with proper error handling
                  newSendBtn.addEventListener('click', (e) => {
@@ -6607,19 +6616,59 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                  console.log('JCHAT_DEBUG: Firebase send button activated and ready');
              }
 
-             // Override message input
+             // Override message input with improved event handling
              if (currentMessageInput) {
                  // Remove existing listeners by cloning
                  const newMessageInput = currentMessageInput.cloneNode(true);
                  currentMessageInput.parentNode.replaceChild(newMessageInput, currentMessageInput);
                  
-                 // Add new listeners
+                 // Add comprehensive input event handling
                  newMessageInput.addEventListener('input', () => {
+                     // Auto-resize textarea
                      newMessageInput.style.height = 'auto';
                      newMessageInput.style.height = Math.min(newMessageInput.scrollHeight, 120) + 'px';
+                     
+                     // Enable/disable send button based on content
+                     const sendBtn = document.getElementById('sendMessageBtn');
+                     const message = newMessageInput.value.trim();
+                     if (sendBtn) {
+                         if (message) {
+                             sendBtn.disabled = false;
+                             sendBtn.style.opacity = '1';
+                             sendBtn.style.cursor = 'pointer';
+                             sendBtn.style.background = 'var(--composer-accent)';
+                         } else {
+                             sendBtn.disabled = true;
+                             sendBtn.style.opacity = '0.6';
+                             sendBtn.style.cursor = 'not-allowed';
+                             sendBtn.style.background = '#6b7280';
+                         }
+                     }
+                     
+                     // Handle typing status for Firebase
+                     if (partnerId && partnerId !== 'demo-partner-123') {
+                         setTypingStatus(partnerId, true);
+                         
+                         // Clear typing status after 3 seconds of inactivity
+                         clearTimeout(window.typingTimeout);
+                         window.typingTimeout = setTimeout(() => {
+                             setTypingStatus(partnerId, false);
+                         }, 3000);
+                     }
                  });
 
-                 // Enter key functionality removed - only send button works now
+                 // Add Enter key functionality back for better UX
+                 newMessageInput.addEventListener('keydown', (e) => {
+                     if (e.key === 'Enter' && !e.shiftKey) {
+                         e.preventDefault();
+                         const sendBtn = document.getElementById('sendMessageBtn');
+                         if (sendBtn && !sendBtn.disabled) {
+                             sendBtn.click();
+                         }
+                     }
+                 });
+                 
+                 console.log('JCHAT_DEBUG: Message input event handlers properly restored');
              }
 
              // Sound toggle
