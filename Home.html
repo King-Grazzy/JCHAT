@@ -1112,14 +1112,18 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-y: auto; /* Allow vertical scrolling */
+            /* Facebook-like fixed layout - no shifting */
+            position: relative;
             overflow-x: hidden; /* Prevent horizontal scroll */
+            overflow-y: auto; /* Allow vertical scrolling */
             /* 100% steel background - solid, non-transparent */
             background-color: #1a1a2e;
             background-image: none; /* Remove gradient for solid steel look */
+            background-attachment: fixed;
+            /* Add subtle texture for steel effect */
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.01) 0%, transparent 50%);
             color: var(--white);
             transition: background-color 0.5s ease, color 0.5s ease; /* Smooth theme transition */
         }
@@ -1673,23 +1677,46 @@
         main {
             flex-grow: 1;
             padding: 40px 0;
-            padding-top: 55px; /* Adjust for fixed header */
+            padding-top: 75px; /* Adjust for fixed header */
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start; /* Align content to top */
             text-align: center;
+            /* Prevent layout shifts */
+            min-height: calc(100vh - 140px);
         }
 
+        /* Facebook-like responsive layout container */
         .content-wrapper {
             width: 100%;
-            max-width: 1000px; /* Adjust as needed */
+            max-width: 1200px; /* Increased max-width for better desktop experience */
+            margin: 0 auto;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
+            /* Grid layout for responsive design */
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 20px;
-            align-items: center;
+            /* Prevent layout shifts */
+            min-height: calc(100vh - 140px); /* Account for header/footer */
+            position: relative;
+        }
+
+        /* Responsive grid breakpoints like Facebook */
+        @media (min-width: 768px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+                padding: 30px;
+                gap: 24px;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .content-wrapper {
+                padding: 40px;
+                gap: 30px;
+            }
         }
 
         /* Daily Inspiration Section */
@@ -3359,24 +3386,85 @@
         .chip-text { display:flex; flex-direction:column; gap:4px; }
         .chip-progress { width:140px; height:6px; background: rgba(255,255,255,0.1); border-radius:6px; overflow:hidden; }
         .chip-progress > div { height:100%; width:100%; background-image: linear-gradient(90deg, #ff4757 0%, #ff6b35 25%, #ffa726 50%, #ffd700 75%, #4caf50 100%); background-size:200% 100%; background-position:right; transition: background-position 0.8s ease-out; }
-        .section-title { font-weight:700; margin:12px 0 6px; display:flex; align-items:center; gap:8px; }
-        .scroll-row { display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; }
-        .scroll-row::-webkit-scrollbar { height:6px; }
-        .scroll-row::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius:6px; }
+        /* Enhanced friends suggestions section */
+        .friends-suggestions-section {
+            background: var(--card-background);
+            border: 1px solid var(--glass-blue);
+            border-radius: 15px;
+            padding: 16px;
+            margin-bottom: 20px;
+            /* Prevent content shifting */
+            min-height: 140px;
+            position: relative;
+        }
+
+        .section-title { 
+            font-weight: 700; 
+            margin: 0 0 16px 0; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            /* Prevent text shifting */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Enhanced scroll-row for friends carousel */
+        .scroll-row { 
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            overflow-y: hidden;
+            padding: 8px 0 12px 0;
+            /* Smooth scrolling like Facebook */
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+            /* Hide scrollbar but keep functionality */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+            /* Custom scrollbar for webkit browsers */
+            position: relative;
+        }
+
+        .scroll-row::-webkit-scrollbar { 
+            height: 6px; 
+            background: transparent;
+        }
+
+        .scroll-row::-webkit-scrollbar-thumb { 
+            background: linear-gradient(90deg, var(--pink), var(--blue)); 
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .scroll-row::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+        }
         .highlight-card, .friend-card, .saved-card { flex:0 0 auto; width:160px; border:1px solid var(--glass-blue); background: var(--card-background); border-radius:10px; overflow:hidden; }
+        /* Enhanced friend cards with better animations */
         .friend-card { 
-            width:88px; 
-            border-radius:999px; 
-            padding:6px; 
-            display:flex; 
-            flex-direction:column; 
-            align-items:center; 
-            gap:6px; 
-            background: #000000; 
+            /* Consistent sizing to prevent shifts */
+            width: 88px; 
+            min-width: 88px; /* Prevent shrinking */
+            height: 110px;
+            border-radius: 12px; 
+            padding: 8px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 6px; 
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)); 
             border: 2px solid transparent;
             background-clip: padding-box;
             position: relative;
-            animation: friendGlow 2s ease-in-out infinite alternate;
+            /* Smooth animations */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            /* Scroll snap for better UX */
+            scroll-snap-align: start;
+            /* Prevent layout shifts */
+            flex-shrink: 0;
         }
         .friend-card::before {
             content: '';
@@ -3386,9 +3474,22 @@
             right: -2px;
             bottom: -2px;
             background: linear-gradient(45deg, var(--pink), var(--blue), var(--pink));
-            border-radius: 999px;
+            border-radius: 14px;
             z-index: -1;
-            animation: friendGlowBorder 3s ease-in-out infinite;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .friend-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 
+                0 8px 25px rgba(255, 46, 146, 0.3),
+                0 8px 25px rgba(0, 213, 255, 0.3);
+        }
+
+        .friend-card:hover::before {
+            opacity: 1;
+            filter: blur(8px);
         }
         @keyframes friendGlow {
             0% { box-shadow: 0 0 20px rgba(255, 46, 146, 0.4), 0 0 40px rgba(0, 213, 255, 0.3); }
@@ -3399,40 +3500,187 @@
             50% { background: linear-gradient(45deg, var(--blue), var(--pink), var(--blue)); }
             100% { background: linear-gradient(45deg, var(--pink), var(--blue), var(--pink)); }
         }
-        .friend-card img { width:48px; height:48px; border-radius:50%; object-fit:cover; border:2px solid rgba(255, 255, 255, 0.1); }
-        .friend-card .name { font-size:.72rem; text-align:center; line-height:1.1; background-image: linear-gradient(90deg, var(--pink), var(--blue)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; font-weight: 600; text-shadow: 0 0 10px rgba(255, 46, 146, 0.3); }
+        .friend-card img { 
+            width: 48px; 
+            height: 48px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .friend-card:hover img {
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        .friend-card .name { 
+            font-size: 0.7rem; 
+            text-align: center; 
+            line-height: 1.1; 
+            background-image: linear-gradient(90deg, var(--pink), var(--blue)); 
+            -webkit-background-clip: text; 
+            background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            font-weight: 600; 
+            /* Prevent text overflow */
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
         .friend-card .actions { 
-            display:none; 
-            position:absolute; 
-            top:54px; 
-            left:50%; 
-            transform:translateX(-50%); 
-            background: #000000; 
-            border:2px solid;
-            border-image: linear-gradient(45deg, var(--pink), var(--blue)) 1;
-            border-radius:10px; 
-            padding:6px; 
-            gap:6px; 
-            z-index:5;
-            box-shadow: 0 0 20px rgba(255, 46, 146, 0.3), 0 0 20px rgba(0, 213, 255, 0.3);
+            display: none; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            background: rgba(0, 0, 0, 0.95); 
+            border: 2px solid transparent;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.95)), 
+                             linear-gradient(45deg, var(--pink), var(--blue));
+            background-origin: border-box;
+            background-clip: content-box, border-box;
+            border-radius: 12px; 
+            padding: 8px; 
+            gap: 8px; 
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(255, 46, 146, 0.3), 
+                0 0 20px rgba(0, 213, 255, 0.3);
+            /* Smooth entrance animation */
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.8);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .friend-card .actions.show {
+            display: flex;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
         }
         .friend-card .actions button { 
-            font-size:.7rem; 
-            padding:6px 8px; 
-            border:1px solid transparent; 
-            border-radius:8px; 
+            font-size: 0.7rem; 
+            padding: 8px 10px; 
+            border: 1px solid transparent; 
+            border-radius: 8px; 
             background: linear-gradient(45deg, var(--pink), var(--blue)); 
-            color:#fff; 
-            cursor:pointer; 
-            transition: all 0.3s ease;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            color: #fff; 
+            cursor: pointer; 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            min-width: 40px;
         }
+
         .friend-card .actions button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(255, 46, 146, 0.4), 0 0 15px rgba(0, 213, 255, 0.4);
+            transform: scale(1.1);
+            box-shadow: 
+                0 0 15px rgba(255, 46, 146, 0.5), 
+                0 0 15px rgba(0, 213, 255, 0.5);
+            background: linear-gradient(45deg, var(--blue), var(--pink));
         }
         .highlight-card img, .saved-card img { width:100%; height:100px; object-fit:cover; display:block; }
         .friend-card .meta { display:none; } 
+
+        /* Carousel navigation buttons */
+        .carousel-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid transparent;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+                             linear-gradient(45deg, var(--pink), var(--blue));
+            background-origin: border-box;
+            background-clip: content-box, border-box;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5;
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .friends-suggestions-section:hover .carousel-nav {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .carousel-nav:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 46, 146, 0.4), 0 0 20px rgba(0, 213, 255, 0.4);
+        }
+
+        .carousel-nav.prev {
+            left: -18px;
+        }
+
+        .carousel-nav.next {
+            right: -18px;
+        }
+
+        .carousel-nav i {
+            color: #fff;
+            font-size: 14px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 16px;
+                gap: 16px;
+            }
+            
+            .friends-suggestions-section {
+                padding: 12px;
+                margin-bottom: 16px;
+            }
+            
+            .friend-card {
+                width: 80px;
+                min-width: 80px;
+                height: 100px;
+            }
+            
+            .friend-card img {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .carousel-nav {
+                display: none; /* Hide navigation on mobile, use touch scroll */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .scroll-row {
+                gap: 8px;
+                padding: 6px 0 10px 0;
+            }
+            
+            .friend-card {
+                width: 72px;
+                min-width: 72px;
+                height: 92px;
+                padding: 6px;
+            }
+            
+            .friend-card img {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .friend-card .name {
+                font-size: 0.65rem;
+            }
+        }
 
         /* Engagement Panel */
         .engagement-panel { display:grid; grid-template-columns: 1fr; gap: 12px; margin: 10px 0; }
@@ -8319,6 +8567,33 @@
                                     </div>`;
                                 friendsSuggestions.appendChild(card);
                             });
+                            
+                            // Add carousel navigation if we have enough friends to scroll
+                            if (subset.length > 4) {
+                                // Add navigation buttons
+                                const prevBtn = document.createElement('button');
+                                prevBtn.className = 'carousel-nav prev';
+                                prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                                prevBtn.addEventListener('click', () => {
+                                    friendsSuggestions.scrollBy({
+                                        left: -200,
+                                        behavior: 'smooth'
+                                    });
+                                });
+                                
+                                const nextBtn = document.createElement('button');
+                                nextBtn.className = 'carousel-nav next';
+                                nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+                                nextBtn.addEventListener('click', () => {
+                                    friendsSuggestions.scrollBy({
+                                        left: 200,
+                                        behavior: 'smooth'
+                                    });
+                                });
+                                
+                                friendsSuggestionsSection.appendChild(prevBtn);
+                                friendsSuggestionsSection.appendChild(nextBtn);
+                            }
                         }
                     }
                 } catch(e) { console.warn('friends suggest load', e); }
@@ -8328,7 +8603,10 @@
                         const card = ev.target.closest('.friend-card');
                         if (!card) return;
                         const actions = card.querySelector('.actions');
-                        if (actions) actions.style.display = actions.style.display==='flex'?'none':'flex';
+                        if (actions) {
+                            // Use the new show class for smooth animations
+                            actions.classList.toggle('show');
+                        }
                     });
                     friendsSuggestions?.addEventListener('click', async (ev)=>{
                         const addBtn = ev.target.closest('.friend-add-btn');
