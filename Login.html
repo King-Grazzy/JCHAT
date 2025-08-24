@@ -912,7 +912,7 @@
             z-index: 1000;
             display: none;
             opacity: 0;
-            transition: all 0.3s ease-in-out;
+            transition: opacity 0.3s ease-in-out;
             min-width: 280px;
             max-width: 90%;
             text-align: left;
@@ -2096,10 +2096,20 @@
          * @param {Object} [options={}] - Additional smart options for enhanced behavior.
          */
         function showMessageBox(message, type, durationMs = null, isPersistent = false, options = {}) {
+            console.log(`JCHAT_DEBUG: showMessageBox called with:`, { message, type, durationMs, isPersistent, options });
+            
+            // Check if messageBox element exists
+            if (!messageBox) {
+                console.error('JCHAT_ERROR: messageBox element not found!');
+                return;
+            }
+            
             // Smart duration calculation based on content length and type
             if (durationMs === null) {
                 durationMs = calculateSmartDuration(message, type);
             }
+            
+            console.log(`JCHAT_DEBUG: Calculated duration: ${durationMs}ms`);
 
             // Smart positioning based on screen size and content
             const position = calculateSmartPosition(message, type, options);
@@ -2144,7 +2154,10 @@
 
             // Smart auto-dismissal with progress indication
             if (!isPersistent && durationMs > 0) {
+                console.log(`JCHAT_DEBUG: Starting auto-dismissal for ${durationMs}ms`);
                 startSmartDismissal(messageBox, durationMs, options);
+            } else {
+                console.log(`JCHAT_DEBUG: Message is persistent or has no duration`);
             }
 
             // Track message analytics for future improvements
@@ -2360,6 +2373,8 @@
          * Starts smart dismissal with progress indication
          */
         function startSmartDismissal(messageBox, durationMs, options) {
+            console.log(`JCHAT_DEBUG: Starting smart dismissal for ${durationMs}ms`);
+            
             if (options.showProgress) {
                 const progressBar = messageBox.querySelector('.message-progress-bar');
                 if (progressBar) {
@@ -2368,6 +2383,7 @@
             }
 
             messageBox.timeoutId = setTimeout(() => {
+                console.log(`JCHAT_DEBUG: Timeout fired, hiding message box`);
                 hideMessageBox();
             }, durationMs);
         }
@@ -2390,8 +2406,18 @@
                 messageBox.timeoutId = null;
             }
 
+            // Start fade out animation
             messageBox.style.opacity = '0';
+            
+            // Use a fallback timeout in case transitionend doesn't fire
+            const fallbackTimeout = setTimeout(() => {
+                messageBox.style.display = 'none';
+                messageBox.classList.remove('loading-pulse', 'smart-message');
+            }, 350); // Slightly longer than the CSS transition
+
+            // Listen for transition end
             messageBox.addEventListener('transitionend', function handler() {
+                clearTimeout(fallbackTimeout);
                 messageBox.style.display = 'none';
                 messageBox.removeEventListener('transitionend', handler);
                 messageBox.classList.remove('loading-pulse', 'smart-message');
