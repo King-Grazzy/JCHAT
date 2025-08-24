@@ -1684,6 +1684,313 @@
         .premium-modal > div {
             animation: slideIn 0.3s ease;
         }
+        
+        /* JCHAT Audio/Video Design System */
+        :root {
+            --av-primary: #00d5ff;
+            --av-secondary: #ff2e92;
+            --av-success: #4CAF50;
+            --av-danger: #dc3545;
+            --av-surface: rgba(255, 255, 255, 0.1);
+            --av-backdrop: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Floating Action Buttons */
+        .jchat-av-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .av-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 16px;
+        }
+
+        .av-btn.voice-note {
+            background: linear-gradient(135deg, var(--av-primary), var(--av-secondary));
+        }
+
+        .av-btn.voice-call {
+            background: linear-gradient(135deg, var(--av-success), #66BB6A);
+        }
+
+        .av-btn.video-call {
+            background: linear-gradient(135deg, var(--av-primary), #42A5F5);
+        }
+
+        .av-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .av-btn.recording {
+            animation: pulse-record 1.5s infinite;
+            background: linear-gradient(135deg, var(--av-danger), #ef5350);
+        }
+
+        /* Voice Note Recording UI */
+        .voice-recording-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--av-backdrop);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+        }
+
+        .voice-recording-modal {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            color: var(--white);
+        }
+
+        .recording-waveform {
+            width: 100%;
+            height: 60px;
+            margin: 20px 0;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .recording-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .recording-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 20px;
+            color: white;
+        }
+
+        .recording-btn.stop {
+            background: var(--av-danger);
+        }
+
+        .recording-btn.send {
+            background: var(--av-success);
+        }
+
+        .recording-btn.cancel {
+            background: #666;
+        }
+
+        /* Voice Note Message Styles */
+        .voice-note-message {
+            background: var(--av-surface);
+            border-radius: 18px;
+            padding: 16px;
+            max-width: 280px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .voice-note-player {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .voice-play-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--av-primary);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+
+        .voice-play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .voice-play-btn.playing {
+            background: var(--av-danger);
+        }
+
+        .voice-waveform-canvas {
+            flex: 1;
+            height: 32px;
+            cursor: pointer;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .voice-duration {
+            font-size: 12px;
+            color: var(--text-light);
+            min-width: 35px;
+            text-align: right;
+        }
+
+        /* Call Window */
+        .call-window {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            min-height: 200px;
+            background: var(--av-surface);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .call-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .caller-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .caller-info h3 {
+            margin: 0;
+            font-size: 16px;
+            color: var(--white);
+        }
+
+        .call-status {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+
+        .call-content {
+            flex: 1;
+            position: relative;
+            min-height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .local-video, .remote-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .local-video {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 80px;
+            height: 60px;
+            border-radius: 8px;
+            z-index: 2;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .audio-visualizer {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--av-primary), var(--av-secondary));
+        }
+
+        .call-controls {
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .control-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: white;
+            font-size: 16px;
+        }
+
+        .control-btn:not(.end-call) {
+            background: var(--av-surface);
+        }
+
+        .control-btn.end-call {
+            background: var(--av-danger);
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .control-btn.active {
+            background: var(--av-primary);
+        }
+
+        /* Animations */
+        @keyframes pulse-record {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        @keyframes wave-pulse {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.5); }
+        }
+
+        /* Recording timer */
+        .recording-timer {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--av-danger);
+            margin: 10px 0;
+        }
     </style>
 <style id="header-overflow-fix">/*header-overflow-fix*/header .header-content-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap}header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;justify-content:flex-end}#profileLink{display:inline-flex;align-items:center;column-gap:0;row-gap:0;flex-wrap:nowrap;max-width:100%;min-width:0}#profileLink #headerDisplayName{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;flex:0 1 auto}#headerProfilePic,#headerAvatarIcon{flex:0 0 auto}@media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:0}}</style></head>
 <body class="theme-dark-mode">
@@ -1781,6 +2088,21 @@
                     <button id="emojiBtn" title="Add Emoji">
                         <i class="fas fa-laugh"></i> Emoji
                     </button>
+                    
+                    <!-- JCHAT Audio/Video Controls -->
+                    <div class="jchat-av-controls">
+                        <button id="voiceNoteBtn" class="av-btn voice-note" title="Record Voice Note">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        
+                        <button id="voiceCallBtn" class="av-btn voice-call" title="Voice Call">
+                            <i class="fas fa-phone"></i>
+                        </button>
+                        
+                        <button id="videoCallBtn" class="av-btn video-call" title="Video Call">
+                            <i class="fas fa-video"></i>
+                        </button>
+                    </div>
                     
 
                     
@@ -3393,6 +3715,520 @@
          let currentUser = null;
          let currentUserProfileData = null;
          let partnerId = null;
+         
+         // JCHAT Audio/Video System - Modern Architecture
+         const JChatAV = {
+             voiceNotes: {
+                 isRecording: false,
+                 recorder: null,
+                 audioChunks: [],
+                 startTime: null,
+                 settings: {
+                     quality: 'high',
+                     maxDuration: 300000, // 5 minutes
+                     format: 'webm'
+                 }
+             },
+             calls: {
+                 isInCall: false,
+                 localStream: null,
+                 remoteStream: null,
+                 peerConnection: null,
+                 callType: null, // 'audio' | 'video'
+                 callState: 'idle' // 'idle' | 'calling' | 'ringing' | 'connected'
+             },
+             ui: {
+                 currentModal: null,
+                 isCallMinimized: false,
+                 activePlayer: null
+             }
+         };
+         
+         // Make globally accessible
+         window.JChatAV = JChatAV;
+         
+         // JCHAT Voice Notes - Modern Implementation
+         class JChatVoiceNotes {
+             constructor() {
+                 this.recorder = null;
+                 this.audioChunks = [];
+                 this.isRecording = false;
+                 this.startTime = null;
+                 this.waveformData = [];
+                 this.audioContext = null;
+                 this.analyser = null;
+             }
+             
+             async startRecording() {
+                 try {
+                     if (!partnerId) {
+                         showMessageBox('Please select a friend to send voice note to', 'warning');
+                         return;
+                     }
+                     
+                     // Check browser support
+                     if (!navigator.mediaDevices || !window.MediaRecorder) {
+                         showMessageBox('Voice notes not supported in this browser', 'error');
+                         return;
+                     }
+                     
+                     // Get microphone access with high quality settings
+                     const stream = await navigator.mediaDevices.getUserMedia({
+                         audio: {
+                             echoCancellation: true,
+                             noiseSuppression: true,
+                             autoGainControl: true,
+                             sampleRate: 44100
+                         }
+                     });
+                     
+                     // Setup MediaRecorder
+                     const mimeType = this.getSupportedMimeType();
+                     this.recorder = new MediaRecorder(stream, { mimeType });
+                     
+                     this.audioChunks = [];
+                     this.startTime = Date.now();
+                     this.isRecording = true;
+                     
+                     // Setup real-time audio analysis
+                     this.setupAudioAnalysis(stream);
+                     
+                     // Start recording
+                     this.recorder.start(100);
+                     
+                     // Show recording UI
+                     this.showRecordingInterface();
+                     
+                     // Update button state
+                     const btn = document.getElementById('voiceNoteBtn');
+                     btn.classList.add('recording');
+                     
+                     // Handle data and stop events
+                     this.recorder.ondataavailable = (event) => {
+                         if (event.data.size > 0) {
+                             this.audioChunks.push(event.data);
+                         }
+                     };
+                     
+                     this.recorder.onstop = () => {
+                         this.processRecording();
+                     };
+                     
+                     console.log('JCHAT_DEBUG: Voice recording started');
+                     
+                 } catch (error) {
+                     console.error('JCHAT_ERROR: Failed to start recording:', error);
+                     showMessageBox('Failed to start recording. Please check microphone permissions.', 'error');
+                 }
+             }
+             
+             getSupportedMimeType() {
+                 const types = [
+                     'audio/webm;codecs=opus',
+                     'audio/webm',
+                     'audio/mp4',
+                     'audio/ogg;codecs=opus'
+                 ];
+                 
+                 for (const type of types) {
+                     if (MediaRecorder.isTypeSupported(type)) {
+                         return type;
+                     }
+                 }
+                 
+                 return 'audio/webm'; // fallback
+             }
+             
+             setupAudioAnalysis(stream) {
+                 this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                 this.analyser = this.audioContext.createAnalyser();
+                 const source = this.audioContext.createMediaStreamSource(stream);
+                 
+                 this.analyser.fftSize = 256;
+                 source.connect(this.analyser);
+                 
+                 this.visualizeWaveform();
+             }
+             
+             visualizeWaveform() {
+                 const canvas = document.getElementById('recordingWaveform');
+                 if (!canvas) return;
+                 
+                 const ctx = canvas.getContext('2d');
+                 const dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                 
+                 const draw = () => {
+                     if (!this.isRecording) return;
+                     
+                     this.analyser.getByteFrequencyData(dataArray);
+                     
+                     ctx.clearRect(0, 0, canvas.width, canvas.height);
+                     
+                     const barWidth = canvas.width / dataArray.length;
+                     let x = 0;
+                     
+                     // Create gradient
+                     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                     gradient.addColorStop(0, '#00d5ff');
+                     gradient.addColorStop(1, '#ff2e92');
+                     ctx.fillStyle = gradient;
+                     
+                     for (let i = 0; i < dataArray.length; i++) {
+                         const barHeight = (dataArray[i] / 255) * canvas.height;
+                         ctx.fillRect(x, canvas.height - barHeight, barWidth - 1, barHeight);
+                         x += barWidth;
+                     }
+                     
+                     requestAnimationFrame(draw);
+                 };
+                 
+                 draw();
+             }
+             
+             showRecordingInterface() {
+                 const overlay = document.createElement('div');
+                 overlay.className = 'voice-recording-overlay';
+                 overlay.id = 'voiceRecordingOverlay';
+                 
+                 overlay.innerHTML = `
+                     <div class="voice-recording-modal">
+                         <i class="fas fa-microphone" style="font-size: 48px; color: var(--av-primary); margin-bottom: 20px;"></i>
+                         <h3>Recording Voice Note</h3>
+                         <div class="recording-timer" id="recordingTimer">0:00</div>
+                         <canvas id="recordingWaveform" class="recording-waveform" width="300" height="60"></canvas>
+                         <div class="recording-controls">
+                             <button class="recording-btn stop" onclick="jchatVoiceNotes.stopRecording()" title="Stop Recording">
+                                 <i class="fas fa-stop"></i>
+                             </button>
+                             <button class="recording-btn cancel" onclick="jchatVoiceNotes.cancelRecording()" title="Cancel">
+                                 <i class="fas fa-times"></i>
+                             </button>
+                         </div>
+                         <p style="margin-top: 15px; font-size: 12px; color: var(--text-light);">
+                             Max duration: 5 minutes
+                         </p>
+                     </div>
+                 `;
+                 
+                 document.body.appendChild(overlay);
+                 
+                 // Start timer
+                 this.startTimer();
+                 
+                 // Auto-stop after 5 minutes
+                 setTimeout(() => {
+                     if (this.isRecording) {
+                         this.stopRecording();
+                     }
+                 }, JChatAV.voiceNotes.settings.maxDuration);
+             }
+             
+             startTimer() {
+                 const timerElement = document.getElementById('recordingTimer');
+                 if (!timerElement) return;
+                 
+                 const updateTimer = () => {
+                     if (!this.isRecording) return;
+                     
+                     const elapsed = Date.now() - this.startTime;
+                     const minutes = Math.floor(elapsed / 60000);
+                     const seconds = Math.floor((elapsed % 60000) / 1000);
+                     
+                     timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                     
+                     setTimeout(updateTimer, 1000);
+                 };
+                 
+                 updateTimer();
+             }
+             
+             stopRecording() {
+                 if (!this.isRecording) return;
+                 
+                 this.isRecording = false;
+                 this.recorder.stop();
+                 
+                 // Stop all tracks
+                 this.recorder.stream.getTracks().forEach(track => track.stop());
+                 
+                 // Update button state
+                 const btn = document.getElementById('voiceNoteBtn');
+                 btn.classList.remove('recording');
+                 
+                 console.log('JCHAT_DEBUG: Voice recording stopped');
+             }
+             
+             cancelRecording() {
+                 this.stopRecording();
+                 this.hideRecordingInterface();
+                 showMessageBox('Voice note cancelled', 'info');
+             }
+             
+             hideRecordingInterface() {
+                 const overlay = document.getElementById('voiceRecordingOverlay');
+                 if (overlay) {
+                     overlay.remove();
+                 }
+             }
+             
+             async processRecording() {
+                 try {
+                     this.hideRecordingInterface();
+                     
+                     if (this.audioChunks.length === 0) {
+                         showMessageBox('No audio recorded', 'warning');
+                         return;
+                     }
+                     
+                     // Create audio blob
+                     const mimeType = this.recorder.mimeType || 'audio/webm';
+                     const audioBlob = new Blob(this.audioChunks, { type: mimeType });
+                     
+                     // Calculate duration
+                     const duration = Date.now() - this.startTime;
+                     const durationText = this.formatDuration(duration);
+                     
+                     // Generate waveform data for playback
+                     const waveformData = await this.generateWaveformData(audioBlob);
+                     
+                     // Send voice note
+                     await this.sendVoiceNote({
+                         audioBlob,
+                         waveformData,
+                         duration,
+                         durationText
+                     });
+                     
+                 } catch (error) {
+                     console.error('JCHAT_ERROR: Error processing recording:', error);
+                     showMessageBox('Failed to process voice note', 'error');
+                 }
+             }
+             
+             async generateWaveformData(audioBlob) {
+                 try {
+                     const audioContext = new AudioContext();
+                     const arrayBuffer = await audioBlob.arrayBuffer();
+                     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                     
+                     const channelData = audioBuffer.getChannelData(0);
+                     const peaks = [];
+                     const samplesPerPeak = Math.floor(channelData.length / 100);
+                     
+                     for (let i = 0; i < 100; i++) {
+                         let peak = 0;
+                         for (let j = 0; j < samplesPerPeak; j++) {
+                             const sample = Math.abs(channelData[i * samplesPerPeak + j]);
+                             if (sample > peak) peak = sample;
+                         }
+                         peaks.push(peak);
+                     }
+                     
+                     return peaks;
+                     
+                 } catch (error) {
+                     console.error('Error generating waveform:', error);
+                     // Return dummy waveform data
+                     return Array(100).fill(0).map(() => Math.random() * 0.5);
+                 }
+             }
+             
+             async sendVoiceNote(voiceData) {
+                 try {
+                     // Convert blob to base64
+                     const base64Audio = await this.blobToBase64(voiceData.audioBlob);
+                     
+                     // Create message data
+                     const messageData = {
+                         type: 'voice_note',
+                         audioData: base64Audio,
+                         waveformData: voiceData.waveformData,
+                         duration: voiceData.duration,
+                         durationText: voiceData.durationText,
+                         timestamp: serverTimestamp(),
+                         fromUserId: currentUser.uid,
+                         toUserId: partnerId
+                     };
+                     
+                     // Save to Firebase
+                     const chatRoomId = getChatRoomId(currentUser.uid, partnerId);
+                     const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'chats', chatRoomId, 'messages');
+                     
+                     await addDoc(messagesRef, messageData);
+                     
+                     showMessageBox(`🎤 Voice note sent! (${voiceData.durationText})`, 'success');
+                     
+                 } catch (error) {
+                     console.error('JCHAT_ERROR: Failed to send voice note:', error);
+                     showMessageBox('Failed to send voice note', 'error');
+                 }
+             }
+             
+             blobToBase64(blob) {
+                 return new Promise((resolve, reject) => {
+                     const reader = new FileReader();
+                     reader.onload = () => resolve(reader.result);
+                     reader.onerror = reject;
+                     reader.readAsDataURL(blob);
+                 });
+             }
+             
+             formatDuration(ms) {
+                 const minutes = Math.floor(ms / 60000);
+                 const seconds = Math.floor((ms % 60000) / 1000);
+                 return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+             }
+         }
+         
+         // Initialize voice notes
+         const jchatVoiceNotes = new JChatVoiceNotes();
+         window.jchatVoiceNotes = jchatVoiceNotes;
+         
+         // Voice Note Player - Modern Implementation
+         class VoiceNotePlayer {
+             constructor(messageId, audioData, waveformData) {
+                 this.messageId = messageId;
+                 this.audioData = audioData;
+                 this.waveformData = waveformData || [];
+                 this.audio = null;
+                 this.isPlaying = false;
+                 this.canvas = document.getElementById(`waveform-${messageId}`);
+                 this.playButton = null;
+                 
+                 this.setupAudio();
+                 this.drawWaveform();
+             }
+             
+             setupAudio() {
+                 // Create audio element from base64 data
+                 this.audio = new Audio(this.audioData);
+                 this.audio.preload = 'metadata';
+                 
+                 this.audio.addEventListener('loadedmetadata', () => {
+                     this.drawWaveform();
+                 });
+                 
+                 this.audio.addEventListener('timeupdate', () => {
+                     this.updateWaveformProgress();
+                 });
+                 
+                 this.audio.addEventListener('ended', () => {
+                     this.stop();
+                 });
+                 
+                 this.audio.addEventListener('error', (e) => {
+                     console.error('Audio playback error:', e);
+                     showMessageBox('Failed to play voice note', 'error');
+                 });
+             }
+             
+             play() {
+                 if (!this.audio) return;
+                 
+                 // Stop any other playing voice notes
+                 if (window.currentVoicePlayer && window.currentVoicePlayer !== this) {
+                     window.currentVoicePlayer.stop();
+                 }
+                 
+                 this.audio.play();
+                 this.isPlaying = true;
+                 this.updatePlayButton();
+                 window.currentVoicePlayer = this;
+             }
+             
+             pause() {
+                 if (!this.audio) return;
+                 
+                 this.audio.pause();
+                 this.isPlaying = false;
+                 this.updatePlayButton();
+             }
+             
+             stop() {
+                 if (!this.audio) return;
+                 
+                 this.audio.pause();
+                 this.audio.currentTime = 0;
+                 this.isPlaying = false;
+                 this.updatePlayButton();
+                 this.drawWaveform(); // Reset waveform
+                 
+                 if (window.currentVoicePlayer === this) {
+                     window.currentVoicePlayer = null;
+                 }
+             }
+             
+             updatePlayButton() {
+                 this.playButton = document.querySelector(`#waveform-${this.messageId}`).parentElement.querySelector('.voice-play-btn');
+                 if (!this.playButton) return;
+                 
+                 if (this.isPlaying) {
+                     this.playButton.innerHTML = '<i class="fas fa-pause"></i>';
+                     this.playButton.classList.add('playing');
+                 } else {
+                     this.playButton.innerHTML = '<i class="fas fa-play"></i>';
+                     this.playButton.classList.remove('playing');
+                 }
+             }
+             
+             drawWaveform() {
+                 if (!this.canvas) return;
+                 
+                 const ctx = this.canvas.getContext('2d');
+                 const width = this.canvas.width;
+                 const height = this.canvas.height;
+                 
+                 ctx.clearRect(0, 0, width, height);
+                 
+                 if (this.waveformData.length === 0) {
+                     // Generate dummy waveform if no data
+                     this.waveformData = Array(50).fill(0).map(() => Math.random() * 0.7 + 0.1);
+                 }
+                 
+                 const barWidth = width / this.waveformData.length;
+                 const progress = this.audio ? (this.audio.currentTime / this.audio.duration) || 0 : 0;
+                 
+                 this.waveformData.forEach((peak, index) => {
+                     const barHeight = peak * height * 0.8;
+                     const x = index * barWidth;
+                     const y = (height - barHeight) / 2;
+                     
+                     // Determine color based on progress
+                     const barProgress = index / this.waveformData.length;
+                     ctx.fillStyle = barProgress < progress ? '#00d5ff' : 'rgba(255, 255, 255, 0.3)';
+                     
+                     ctx.fillRect(x, y, barWidth - 1, barHeight);
+                 });
+             }
+             
+             updateWaveformProgress() {
+                 this.drawWaveform();
+             }
+         }
+         
+         // Global voice note playback function
+         function playVoiceNote(messageId, audioData, waveformData) {
+             try {
+                 const player = new VoiceNotePlayer(messageId, audioData, waveformData);
+                 
+                 if (player.isPlaying) {
+                     player.pause();
+                 } else {
+                     player.play();
+                 }
+                 
+                 // Store player reference for button updates
+                 window[`voicePlayer_${messageId}`] = player;
+                 
+             } catch (error) {
+                 console.error('Error playing voice note:', error);
+                 showMessageBox('Failed to play voice note', 'error');
+             }
+         }
+         
+         // Make globally accessible
+         window.playVoiceNote = playVoiceNote;
+         window.VoiceNotePlayer = VoiceNotePlayer;
          
          // JCHAT Stickers Entitlements System
          let userEntitlements = { packs: [] };
@@ -5474,7 +6310,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              // Handle different message types
              let messageContent = '';
              
-             if (messageData.type === 'voice') {
+             if (messageData.type === 'voice_note' || messageData.type === 'voice') {
                  // Create voice note message
                  messageContent = createVoiceNoteMessage(messageData, messageId);
              } else {
@@ -5511,24 +6347,21 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
          }
 
          /**
-          * Create voice note message element
+          * Create voice note message element - Modern Implementation
           */
          function createVoiceNoteMessage(messageData, messageId) {
-             const duration = messageData.durationText || formatVoiceDuration(messageData.duration || 0);
+             const duration = messageData.durationText || jchatVoiceNotes.formatDuration(messageData.duration || 0);
+             const audioData = messageData.audioData || messageData.content;
+             const waveformData = messageData.waveformData || [];
              
              return `
                  <div class="voice-note-message">
-                     <div class="voice-note-icon">
-                         <i class="fas fa-microphone"></i>
-                     </div>
-                     <div class="voice-note-controls">
-                         <button class="voice-note-play-btn" onclick="playVoiceNote('${messageId}', '${messageData.content}')" title="Play voice note">
+                     <div class="voice-note-player">
+                         <button class="voice-play-btn" onclick="playVoiceNote('${messageId}', '${audioData}', ${JSON.stringify(waveformData)})" title="Play voice note">
                              <i class="fas fa-play"></i>
                          </button>
-                         <div class="voice-note-progress">
-                             <div class="voice-note-progress-bar" id="progress-${messageId}"></div>
-                         </div>
-                         <div class="voice-note-duration">${duration}</div>
+                         <canvas class="voice-waveform-canvas" id="waveform-${messageId}" width="200" height="32"></canvas>
+                         <div class="voice-duration">${duration}</div>
                      </div>
                  </div>
              `;
@@ -5674,7 +6507,7 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
              return new Blob([byteArray], { type: mimeType });
          }
 
-         // Override existing button event listeners with Firebase functionality
+         // JCHAT Audio/Video Event Listeners
          document.addEventListener('DOMContentLoaded', () => {
              // Voice note button event listener
              const voiceNoteBtn = document.getElementById('voiceNoteBtn');
@@ -5687,13 +6520,53 @@ let currentCameraFacing = 'user'; // Track current camera facing mode
                      voiceNoteBtn.classList.add('active');
                      setTimeout(() => voiceNoteBtn.classList.remove('active'), 200);
                      
-                     if (!isRecordingVoice) {
+                     if (!jchatVoiceNotes.isRecording) {
                          // Start recording
-                         await startVoiceRecording(voiceNoteBtn);
+                         await jchatVoiceNotes.startRecording();
                      } else {
                          // Stop recording
-                         await stopVoiceRecording(voiceNoteBtn);
+                         jchatVoiceNotes.stopRecording();
                      }
+                 });
+             }
+             
+             // Voice call button event listener
+             const voiceCallBtn = document.getElementById('voiceCallBtn');
+             if (voiceCallBtn) {
+                 voiceCallBtn.addEventListener('click', (e) => {
+                     e.preventDefault();
+                     e.stopPropagation();
+                     
+                     voiceCallBtn.classList.add('active');
+                     setTimeout(() => voiceCallBtn.classList.remove('active'), 200);
+                     
+                     if (!partnerId) {
+                         showMessageBox('Please select a friend to call', 'warning');
+                         return;
+                     }
+                     
+                     // TODO: Implement voice calling
+                     showMessageBox('🚀 Voice calling coming soon!', 'info');
+                 });
+             }
+             
+             // Video call button event listener
+             const videoCallBtn = document.getElementById('videoCallBtn');
+             if (videoCallBtn) {
+                 videoCallBtn.addEventListener('click', (e) => {
+                     e.preventDefault();
+                     e.stopPropagation();
+                     
+                     videoCallBtn.classList.add('active');
+                     setTimeout(() => videoCallBtn.classList.remove('active'), 200);
+                     
+                     if (!partnerId) {
+                         showMessageBox('Please select a friend to video call', 'warning');
+                         return;
+                     }
+                     
+                     // TODO: Implement video calling
+                     showMessageBox('🚀 Video calling coming soon!', 'info');
                  });
              }
 
