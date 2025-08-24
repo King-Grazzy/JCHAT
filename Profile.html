@@ -3637,16 +3637,19 @@
             padding: 20px 30px; /* Increased padding for a more substantial box */
             border-radius: 15px; /* More rounded corners, slightly squarer */
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); /* Enhanced shadow */
-            z-index: 1000;
+            z-index: 10000; /* Increased z-index to ensure visibility */
             display: none;
             opacity: 0;
             transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
             min-width: 280px; /* Ensure a decent minimum width */
-            max-width: 90%;
+            max-width: 90vw; /* Use viewport width for better mobile support */
             text-align: center;
             flex-direction: column; /* Stack icon and text vertically */
             align-items: center;
             gap: 15px; /* Space between icon and text */
+            /* Ensure message box stays within viewport */
+            max-height: 90vh;
+            overflow: visible; /* Allow content to be visible */
         }
         #messageBox.show {
             opacity: 1;
@@ -3667,7 +3670,7 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
             animation: successGradient 3s ease-in-out infinite, successFloat 0.6s ease-out;
             position: relative;
-            overflow: hidden;
+            overflow: visible; /* Allow effects to be visible */
         }
 
         #messageBox.success::before {
@@ -3687,14 +3690,15 @@
         #messageBox.success::after {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -25%;
+            left: -25%;
+            width: 150%;
+            height: 150%;
             background: radial-gradient(circle, 
                 rgba(255, 255, 255, 0.1) 0%, 
                 transparent 70%);
             animation: successPulse 2s ease-in-out infinite;
+            pointer-events: none; /* Ensure it doesn't interfere with interactions */
         }
 
         /* Success message animations */
@@ -3900,10 +3904,10 @@
         /* Achievement glow effect */
         .achievement-glow {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
+            top: -25%;
+            left: -25%;
+            width: 150%;
+            height: 150%;
             background: radial-gradient(circle, 
                 rgba(156, 39, 176, 0.2) 0%, 
                 rgba(233, 30, 99, 0.1) 30%, 
