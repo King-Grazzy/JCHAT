@@ -1185,99 +1185,7 @@
 
 
 
-        /* Mobile Responsive Message Box */
-        @media (max-width: 768px) {
-            #messageBox {
-                top: 15px;
-                left: 20px;
-                right: 20px;
-                transform: none;
-                min-width: auto;
-                max-width: none;
-                width: calc(100vw - 40px);
-                padding: 20px 24px;
-                border-radius: 12px;
-            }
-            
-            #messageBox.show {
-                animation: messageBoxEntranceMobile 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            }
-            
-            #messageBox.hiding {
-                animation: messageBoxExitMobile 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
-            }
 
-            #messageBox.queued {
-                animation: messageBoxQueueMobile 0.3s ease-out;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #messageBox {
-                top: 10px;
-                left: 15px;
-                right: 15px;
-                width: calc(100vw - 30px);
-                padding: 18px 20px;
-                border-radius: 10px;
-                gap: 12px;
-            }
-            
-            #messageBox i {
-                font-size: 1.5rem;
-            }
-            
-            #messageBox span {
-                font-size: 0.95rem;
-            }
-
-            #messageBox .message-close-btn {
-                top: 8px;
-                right: 8px;
-                width: 20px;
-                height: 20px;
-                font-size: 10px;
-            }
-
-            #messageBox .sound-indicator {
-                bottom: 6px;
-                right: 6px;
-                width: 14px;
-                height: 14px;
-                font-size: 7px;
-            }
-
-            #messageBox.queued {
-                animation: messageBoxQueueMobile 0.3s ease-out;
-            }
-        }
-
-        /* Professional Message Box Exit Animation */
-        #messageBox.hiding {
-            animation: messageBoxExit 0.3s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
-        }
-
-        @keyframes messageBoxExit {
-            0% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px) scale(0.9);
-            }
-        }
-
-        @keyframes messageBoxExitMobile {
-            0% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.9);
-            }
-        }
 
 
 
@@ -3713,100 +3621,7 @@
         .sub-section p a:hover {
             color: var(--pink); /* Consistent hover color */
         }
-        /* Professional Message Box Styles - Perfectly Positioned & No Overflow */
-        #messageBox {
-            position: fixed;
-            top: 20px; /* Fixed top position - no more side positioning issues */
-            left: 50%;
-            transform: translateX(-50%); /* Only center horizontally */
-            background-color: var(--card-background-color);
-            color: var(--text-color-primary);
-            padding: 24px 32px;
-            border-radius: 16px;
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.3),
-                0 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 99999; /* Highest z-index */
-            display: none;
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            min-width: 300px;
-            max-width: 400px; /* Fixed max width - no overflow */
-            text-align: center;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            /* Perfect positioning constraints */
-            margin: 0;
-            overflow: hidden; /* Prevent any overflow */
-            box-sizing: border-box;
-        }
-        #messageBox.show {
-            opacity: 1;
-            display: flex;
-            animation: messageBoxEntrance 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
 
-        @keyframes messageBoxEntrance {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px) scale(0.9);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0) scale(1);
-            }
-        }
-
-        @keyframes messageBoxEntranceMobile {
-            0% {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.9);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-        /* Professional Success Message Styling - Perfectly Contained */
-        #messageBox.success {
-            background: linear-gradient(135deg, 
-                rgba(76, 175, 80, 0.98), 
-                rgba(139, 195, 74, 0.98), 
-                rgba(76, 175, 80, 0.98));
-            background-size: 200% 200%;
-            color: var(--white);
-            border: 2px solid rgba(76, 175, 80, 0.3);
-            box-shadow: 
-                0 20px 40px rgba(76, 175, 80, 0.3),
-                0 8px 16px rgba(139, 195, 74, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            animation: successGradient 3s ease-in-out infinite, successFloat 0.6s ease-out;
-            position: relative;
-            overflow: hidden; /* Perfect containment */
-        }
-
-        #messageBox.success::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.4), 
-                transparent);
-            animation: successShine 2s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        #messageBox.success::after {
-            content: '';
-            position: absolute;
-            top: 0;
             left: 0;
             width: 100%;
             height: 100%;
@@ -3854,122 +3669,9 @@
             }
         }
 
-        /* Success icon specific styling */
-        #messageBox.success i {
-            color: var(--white);
-            animation: successIconPop 0.6s ease-out 0.2s both;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        }
 
-        @keyframes successIconPop {
-            0% { 
-                transform: scale(0) rotate(-180deg);
-                opacity: 0;
-            }
-            50% { 
-                transform: scale(1.2) rotate(0deg);
-            }
-            100% { 
-                transform: scale(1) rotate(0deg);
-                opacity: 1;
-            }
-        }
 
-        /* Success text animation */
-        #messageBox.success span {
-            animation: successTextSlide 0.6s ease-out 0.3s both;
-            position: relative;
-        }
 
-        @keyframes successTextSlide {
-            0% { 
-                transform: translateX(-20px);
-                opacity: 0;
-            }
-            100% { 
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        /* Enhanced success message hover effects */
-        #messageBox.success:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 
-                0 12px 40px rgba(76, 175, 80, 0.5),
-                0 6px 20px rgba(139, 195, 74, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-
-        /* Professional Success Progress Bar */
-        #messageBox.success .success-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 4px;
-            background: linear-gradient(90deg, 
-                rgba(255, 255, 255, 0.9), 
-                rgba(255, 255, 255, 0.6),
-                rgba(255, 255, 255, 0.3));
-            border-radius: 0 0 16px 16px;
-            animation: successProgress 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        @keyframes successProgress {
-            0% { 
-                width: 100%; 
-                opacity: 1;
-            }
-            90% { 
-                width: 10%; 
-                opacity: 1;
-            }
-            100% { 
-                width: 0%; 
-                opacity: 0;
-            }
-        }
-
-        /* Professional Success Message Variations - Perfectly Contained */
-        #messageBox.celebration-success {
-            background: linear-gradient(135deg, 
-                rgba(255, 193, 7, 0.98), 
-                rgba(255, 152, 0, 0.98), 
-                rgba(255, 193, 7, 0.98));
-            background-size: 200% 200%;
-            border-color: rgba(255, 193, 7, 0.3);
-            box-shadow: 
-                0 20px 40px rgba(255, 193, 7, 0.3),
-                0 8px 16px rgba(255, 152, 0, 0.2);
-            animation: successGradient 2s ease-in-out infinite, celebrationBounce 0.8s ease-out;
-        }
-
-        #messageBox.achievement-success {
-            background: linear-gradient(135deg, 
-                rgba(156, 39, 176, 0.98), 
-                rgba(233, 30, 99, 0.98), 
-                rgba(156, 39, 176, 0.98));
-            background-size: 200% 200%;
-            border-color: rgba(156, 39, 176, 0.3);
-            box-shadow: 
-                0 20px 40px rgba(156, 39, 176, 0.3),
-                0 8px 16px rgba(233, 30, 99, 0.2);
-            animation: successGradient 2.5s ease-in-out infinite, achievementGlow 1s ease-out;
-        }
-
-        #messageBox.update-success {
-            background: linear-gradient(135deg, 
-                rgba(0, 150, 136, 0.98), 
-                rgba(0, 188, 212, 0.98), 
-                rgba(0, 150, 136, 0.98));
-            background-size: 200% 200%;
-            border-color: rgba(0, 150, 136, 0.3);
-            box-shadow: 
-                0 20px 40px rgba(0, 150, 136, 0.3),
-                0 8px 16px rgba(0, 188, 212, 0.2);
-            animation: successGradient 3s ease-in-out infinite, updatePulse 0.6s ease-out;
-        }
 
         /* Celebration success animations */
         @keyframes celebrationBounce {
@@ -4069,131 +3771,15 @@
                 opacity: 0.6;
             }
         }
-        #messageBox.error { border-left: 5px solid var(--delete-button-color); background-color: var(--card-background-color); color: var(--text-color-primary); }
-        #messageBox.info { border-left: 5px solid var(--accent-color); background-color: var(--card-background-color); color: var(--text-color-primary); }
-        #messageBox.warning { border-left: 5px solid var(--warning-color); background-color: var(--card-background-color); color: var(--text-color-primary); }
 
-        #messageBox i {
-            font-size: 2.5rem; /* Larger icon for prominence */
-            margin-bottom: 5px; /* Space between icon and text */
-            /* Apply gradient to message box icons */
-            background-clip: text;
-            color: transparent;
-            background-image: linear-gradient(90deg, var(--blue), var(--pink));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        #messageBox.success i { color: var(--white); } /* White icon for success */
-        #messageBox.error i { color: var(--delete-button-color); }
-        #messageBox.info i { color: var(--accent-color); }
-        #messageBox.warning i { color: var(--warning-color); }
 
-        #messageBox span {
-            font-size: 1.1rem; /* Slightly larger text */
-            font-weight: 600;
-        }
 
-        /* Professional Close Button */
-        #messageBox .message-close-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 24px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            border-radius: 50%;
-            color: var(--white);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
 
-        #messageBox .message-close-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.1);
-        }
 
-        #messageBox .message-close-btn:active {
-            transform: scale(0.95);
-        }
 
-        /* Professional Sound Indicator */
-        #messageBox .sound-indicator {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            width: 16px;
-            height: 16px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8px;
-            color: var(--white);
-            opacity: 0.7;
-            animation: soundPulse 2s ease-in-out infinite;
-        }
 
-        @keyframes soundPulse {
-            0%, 100% { 
-                transform: scale(1);
-                opacity: 0.7;
-            }
-            50% { 
-                transform: scale(1.2);
-                opacity: 1;
-            }
-        }
 
-        /* Professional Message Queue System */
-        #messageBox.queued {
-            animation: messageBoxQueue 0.3s ease-out;
-        }
 
-        @keyframes messageBoxQueue {
-            0% {
-                transform: translateX(-50%) translateY(-10px) scale(0.95);
-                opacity: 0;
-            }
-            100% {
-                transform: translateX(-50%) translateY(0) scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes messageBoxQueueMobile {
-            0% {
-                transform: translateY(-10px) scale(0.95);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-        }
-
-        /* Message Box Focus States */
-        #messageBox:focus-within {
-            box-shadow: 
-                0 20px 40px rgba(0, 0, 0, 0.4),
-                0 8px 16px rgba(0, 0, 0, 0.3),
-                0 0 0 3px rgba(0, 213, 255, 0.3);
-        }
-
-        /* Accessibility Improvements */
-        #messageBox[aria-hidden="true"] {
-            display: none !important;
-        }
-
-        #messageBox[aria-live="polite"] {
-            outline: none;
-        }
 
 
 
@@ -5989,7 +5575,7 @@
     </main>
 
     <!-- Custom Message Box (reused from Home.html) -->
-    <div id="messageBox"></div>
+
 
     <!-- Floating Contact Icon - Bottom Left -->
     <div id="contactIcon" class="contact-icon" title="Need Help? Contact Us!">
@@ -6619,7 +6205,7 @@
                         }
                         showEnhancedSmartSuccess('Cover updated!', 'update');
                     } catch (e) {
-                        showMessageBox('Failed to update cover.', 'error');
+                        console.error('Failed to update cover.');
                     }
                 }
 
@@ -6677,224 +6263,18 @@
          * @param {boolean} [isPersistent=false] - If true, message stays until explicitly cleared or replaced.
          * @param {number} [durationMs=3000] - Duration in milliseconds for the message to display if not persistent.
          */
-        function showMessageBox(message, type, isPersistent = false, durationMs = 3000) {
-            if (!messageBox) { console.error("JCHAT_ERROR: messageBox element not found."); return; }
-            if (messageBox.timeoutId) {
-                clearTimeout(messageBox.timeoutId);
-            }
 
-            // Professional HTML structure with close button and sound indicator
-            let progressBar = '';
-            let closeButton = '';
-            let soundIndicator = '';
-            
-            if (type === 'success') {
-                progressBar = '<div class="success-progress"></div>';
-                soundIndicator = '<div class="sound-indicator">🔊</div>';
-            }
-            
-            if (!isPersistent) {
-                closeButton = '<button class="message-close-btn" aria-label="Close message">×</button>';
-            }
-
-            messageBox.innerHTML = `
-                ${closeButton}
-                <i id="messageBoxIcon"></i>
-                <span id="messageBoxText"></span>
-                ${progressBar}
-                ${soundIndicator}
-            `;
-            
-            const messageBoxIcon = document.getElementById('messageBoxIcon');
-            const messageBoxText = document.getElementById('messageBoxText');
-
-            messageBoxText.textContent = message;
-            messageBox.className = 'message-box show ' + type; // Add type class for styling
-
-            // Enhanced icon handling with better classes
-            if (type === 'success') {
-                messageBoxIcon.classList.add('fas', 'fa-check-circle');
-                // Add success sound effect
-                playSuccessSound();
-            } else if (type === 'error') {
-                messageBoxIcon.classList.add('fas', 'fa-times-circle');
-            } else if (type === 'info') {
-                messageBoxIcon.classList.add('fas', 'fa-info-circle');
-            } else if (type === 'warning') {
-                 messageBoxIcon.classList.add('fas', 'fa-exclamation-triangle');
-            } else if (type === 'loading') {
-                 messageBoxIcon.classList.add('fas', 'fa-spinner', 'fa-spin'); // Spinner for loading
-            } else {
-                messageBoxIcon.className = ''; // No specific icon
-            }
-
-            // Professional display with smooth animations
-            messageBox.style.display = 'flex';
-            messageBox.style.opacity = '1';
-
-            // Add entrance animation class
-            messageBox.classList.add('fade-in-up');
-
-            // Add close button functionality
-            const closeBtn = messageBox.querySelector('.message-close-btn');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', () => {
-                    hideMessageBox();
-                });
-            }
-
-            if (!isPersistent) {
-                messageBox.timeoutId = setTimeout(() => {
-                    // Enhanced exit animation
-                    messageBox.style.opacity = '0';
-                    messageBox.style.transform = 'translateY(-20px) scale(0.95)';
-                    
-                    messageBox.addEventListener('transitionend', function handler() {
-                        messageBox.style.display = 'none';
-                        messageBox.style.transform = 'translateY(0) scale(1)';
-                        messageBox.classList.remove('fade-in-up');
-                        messageBox.removeEventListener('transitionend', handler);
-                    }, { once: true });
-                }, durationMs);
-            }
-
-            // Log success messages for analytics
-            if (type === 'success') {
-                console.log(`🎉 Success: ${message}`);
-            }
-        }
 
         /**
          * Professional message box hiding function
          */
-        function hideMessageBox() {
-            if (!messageBox) return;
-            
-            // Clear any existing timeout
-            if (messageBox.timeoutId) {
-                clearTimeout(messageBox.timeoutId);
-                messageBox.timeoutId = null;
-            }
 
-            // Add hiding class for exit animation
-            messageBox.classList.add('hiding');
-            
-            // Wait for animation to complete then hide
-            setTimeout(() => {
-                messageBox.style.display = 'none';
-                messageBox.classList.remove('hiding', 'show', 'fade-in-up');
-                messageBox.style.opacity = '0';
-                messageBox.style.transform = '';
-            }, 300);
-        }
 
-        /**
-         * Professional message queue system
-         */
-        let messageQueue = [];
-        let isShowingMessage = false;
 
-        function queueMessage(message, type, isPersistent = false, durationMs = 3000, priority = 'normal') {
-            const messageItem = { message, type, isPersistent, durationMs, priority };
-            
-            if (priority === 'high') {
-                messageQueue.unshift(messageItem); // Add to front for high priority
-            } else {
-                messageQueue.push(messageItem); // Add to back for normal priority
-            }
-            
-            if (!isShowingMessage) {
-                showNextMessage();
-            }
-        }
 
-        function showNextMessage() {
-            if (messageQueue.length === 0) {
-                isShowingMessage = false;
-                return;
-            }
 
-            isShowingMessage = true;
-            const { message, type, isPersistent, durationMs, priority } = messageQueue.shift();
-            
-            // Add queued animation class
-            if (messageBox) {
-                messageBox.classList.add('queued');
-            }
-            
-            // Log message analytics
-            logMessageAnalytics(type, priority);
-            
-            showMessageBox(message, type, isPersistent, durationMs);
-            
-            // Remove queued class after animation
-            setTimeout(() => {
-                if (messageBox) {
-                    messageBox.classList.remove('queued');
-                }
-            }, 300);
-        }
 
-        /**
-         * Professional message analytics system
-         */
-        function logMessageAnalytics(type, priority) {
-            const timestamp = new Date().toISOString();
-            const analytics = {
-                timestamp,
-                type,
-                priority,
-                userAgent: navigator.userAgent,
-                screenSize: `${window.innerWidth}x${window.innerHeight}`,
-                viewport: `${window.visualViewport?.width || 'unknown'}x${window.visualViewport?.height || 'unknown'}`
-            };
-            
-            console.log('📊 Message Analytics:', analytics);
-            
-            // Store analytics in localStorage for performance tracking
-            try {
-                const existingAnalytics = JSON.parse(localStorage.getItem('jchat_message_analytics') || '[]');
-                existingAnalytics.push(analytics);
-                
-                // Keep only last 100 entries
-                if (existingAnalytics.length > 100) {
-                    existingAnalytics.splice(0, existingAnalytics.length - 100);
-                }
-                
-                localStorage.setItem('jchat_message_analytics', JSON.stringify(existingAnalytics));
-            } catch (error) {
-                console.log('Analytics storage failed:', error);
-            }
-        }
 
-        /**
-         * Professional message performance optimization
-         */
-        function optimizeMessagePerformance() {
-            // Debounce rapid message calls
-            let messageDebounceTimer;
-            
-            return function(message, type, isPersistent = false, durationMs = 3000, priority = 'normal') {
-                clearTimeout(messageDebounceTimer);
-                
-                messageDebounceTimer = setTimeout(() => {
-                    // Check if message is already showing
-                    if (messageBox && messageBox.style.display === 'flex') {
-                        // Queue the message instead of showing immediately
-                        queueMessage(message, type, isPersistent, durationMs, priority);
-                    } else {
-                        // Show message immediately
-                        showMessageBox(message, type, isPersistent, durationMs);
-                    }
-                }, 100); // 100ms debounce
-            };
-        }
-
-        // Create optimized message functions
-        const showOptimizedMessage = optimizeMessagePerformance();
-        const showOptimizedSuccess = (message, style = 'default', duration = 4000) => {
-            showOptimizedMessage(message, 'success', false, duration, 'high');
-        };
 
         /**
          * 🚀 SMART SUCCESS MESSAGE PANEL SYSTEM
@@ -7289,7 +6669,7 @@
          */
         async function handleProfilePicChange(event) {
             if (!currentUser || !isAuthReady || displayedUserId !== currentUser.uid) {
-                showMessageBox("You can only change your own profile picture.", 'warning');
+                console.warn("You can only change your own profile picture.");
                 return;
             }
 
@@ -7299,16 +6679,16 @@
             }
 
             if (!file.type.startsWith('image/')) {
-                showMessageBox("Please select an image file.", "warning");
+                console.warn("Please select an image file.");
                 return;
             }
             if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                showMessageBox("Image size too large. Max 5MB.", "warning");
+                console.warn("Image size too large. Max 5MB.");
                 return;
             }
 
 
-            showMessageBox("Uploading profile picture...", 'info');
+            console.log("Uploading profile picture...");
 
             try {
                 // 1. Resize and compress image
