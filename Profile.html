@@ -8747,13 +8747,20 @@
                     const bio = document.getElementById('bioValue').textContent;
                     const interests = document.getElementById('interestsValue').textContent;
 
-                    // Populate form fields (only if not "Not set")
-                    document.getElementById('editDisplayName').value = displayName !== 'Not set' ? displayName : '';
-                    document.getElementById('editLocation').value = location !== 'Not set' ? location : '';
-                    document.getElementById('editSchool').value = school !== 'Not set' ? school : '';
-                    document.getElementById('editWork').value = work !== 'Not set' ? work : '';
-                    document.getElementById('editBio').value = bio !== 'Not set' ? bio : '';
-                    document.getElementById('editInterests').value = interests !== 'Not set' ? interests : '';
+                    // Populate form fields (only if not "Not set") with null checks
+                    const editDisplayName = document.getElementById('editDisplayName');
+                    const editLocation = document.getElementById('editLocation');
+                    const editSchool = document.getElementById('editSchool');
+                    const editWork = document.getElementById('editWork');
+                    const editBio = document.getElementById('editBio');
+                    const editInterests = document.getElementById('editInterests');
+                    
+                    if (editDisplayName) editDisplayName.value = displayName !== 'Not set' ? displayName : '';
+                    if (editLocation) editLocation.value = location !== 'Not set' ? location : '';
+                    if (editSchool) editSchool.value = school !== 'Not set' ? school : '';
+                    if (editWork) editWork.value = work !== 'Not set' ? work : '';
+                    if (editBio) editBio.value = bio !== 'Not set' ? bio : '';
+                    if (editInterests) editInterests.value = interests !== 'Not set' ? interests : '';
                 } catch (error) {
                     console.error('Error populating edit form:', error);
                 }
@@ -8765,13 +8772,20 @@
                     const user = auth.currentUser;
                     if (!user) return;
 
-                    // Get form values
-                    const displayName = document.getElementById('editDisplayName').value.trim();
-                    const location = document.getElementById('editLocation').value.trim();
-                    const school = document.getElementById('editSchool').value.trim();
-                    const work = document.getElementById('editWork').value.trim();
-                    const bio = document.getElementById('editBio').value.trim();
-                    const interests = document.getElementById('editInterests').value.trim();
+                    // Get form values with null checks
+                    const editDisplayNameEl = document.getElementById('editDisplayName');
+                    const editLocationEl = document.getElementById('editLocation');
+                    const editSchoolEl = document.getElementById('editSchool');
+                    const editWorkEl = document.getElementById('editWork');
+                    const editBioEl = document.getElementById('editBio');
+                    const editInterestsEl = document.getElementById('editInterests');
+                    
+                    const displayName = editDisplayNameEl ? editDisplayNameEl.value.trim() : '';
+                    const location = editLocationEl ? editLocationEl.value.trim() : '';
+                    const school = editSchoolEl ? editSchoolEl.value.trim() : '';
+                    const work = editWorkEl ? editWorkEl.value.trim() : '';
+                    const bio = editBioEl ? editBioEl.value.trim() : '';
+                    const interests = editInterestsEl ? editInterestsEl.value.trim() : '';
 
                     // Update user document
                     await updateDoc(doc(db, 'users', user.uid), {
@@ -8796,11 +8810,11 @@
                     toggleEditMode(false);
 
                     // Show success message
-                    showMessage('Profile updated successfully!', 'success');
+                    showMessageBox('Profile updated successfully!', 'success');
 
                 } catch (error) {
                     console.error('Error saving user info:', error);
-                    showMessage('Error updating profile. Please try again.', 'error');
+                    showMessageBox('Error updating profile. Please try again.', 'error');
                 }
             }
         }
