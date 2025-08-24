@@ -8716,12 +8716,14 @@
                     const user = auth.currentUser;
                     if (!user) return;
 
-                    const userDoc = await getDoc(doc(db, 'users', user.uid));
+                    // Use the same data source as profileUsername for consistency
+                    const privateProfileDocRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
+                    const userDoc = await getDoc(privateProfileDocRef);
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
                         
-                        // Update display values
-                        document.getElementById('displayNameValue').textContent = userData.displayName || 'Not set';
+                        // Update display values using the same field names as profileUsername
+                        document.getElementById('displayNameValue').textContent = userData.username || 'Not set';
                         document.getElementById('locationValue').textContent = userData.location || 'Not set';
                         document.getElementById('schoolValue').textContent = userData.school || 'Not set';
                         document.getElementById('workValue').textContent = userData.work || 'Not set';
@@ -8787,9 +8789,10 @@
                     const bio = editBioEl ? editBioEl.value.trim() : '';
                     const interests = editInterestsEl ? editInterestsEl.value.trim() : '';
 
-                    // Update user document
-                    await updateDoc(doc(db, 'users', user.uid), {
-                        displayName: displayName || null,
+                    // Update user document in the same location as profileUsername data
+                    const privateProfileDocRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
+                    await updateDoc(privateProfileDocRef, {
+                        username: displayName || null,  // Use 'username' field to match profileUsername
                         location: location || null,
                         school: school || null,
                         work: work || null,
