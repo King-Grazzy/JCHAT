@@ -898,51 +898,58 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* SMART MESSAGE BOX SYSTEM - Enhanced Styles */
+        /* ===== NEW MODERN MESSAGE BOX SYSTEM ===== */
         #messageBox {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: var(--card-background-color);
-            color: var(--text-color-primary);
-            padding: 0;
+            top: 20px;
+            right: 20px;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            padding: 0;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
             z-index: 1000;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-            min-width: 280px;
-            max-width: 90%;
+            max-width: 450px;
+            width: 90%;
             text-align: left;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0;
             overflow: hidden;
             box-sizing: border-box;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateX(500px);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: block;
+            opacity: 1;
         }
 
-        /* Smart Message Header */
+        #messageBox.show {
+            transform: translateX(0);
+        }
+
+        #messageBox.hide {
+            transform: translateX(500px);
+        }
+
+        /* ===== MODERN MESSAGE HEADER ===== */
         .message-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem 1.5rem 1rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .message-type-label {
-            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            opacity: 0.8;
+            color: var(--white);
         }
 
         .message-close-btn {
@@ -997,6 +1004,79 @@
         .message-action-btn:hover {
             background: rgba(255, 255, 255, 0.1);
             border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===== MODERN PROGRESS BAR ===== */
+        .message-progress-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .message-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pink), var(--blue));
+            border-radius: 2px;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+
+        .message-progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* ===== MESSAGE TYPE SPECIFIC STYLING ===== */
+        #messageBox.success {
+            border-color: rgba(76, 175, 80, 0.3);
+            background: linear-gradient(135deg, 
+                rgba(26, 26, 46, 0.95), 
+                rgba(15, 15, 31, 0.95));
+        }
+
+        #messageBox.success .message-type-label {
+            color: #4CAF50;
+        }
+
+        #messageBox.success .message-progress-fill {
+            background: linear-gradient(90deg, #4CAF50, #66BB6A);
+        }
+
+        #messageBox.error {
+            border-color: rgba(244, 67, 54, 0.3);
+        }
+
+        #messageBox.error .message-type-label {
+            color: #f44336;
+        }
+
+        #messageBox.error .message-progress-fill {
+            background: linear-gradient(90deg, #f44336, #ef5350);
+        }
+
+        #messageBox.info {
+            border-color: rgba(33, 150, 243, 0.3);
+        }
+
+        #messageBox.info .message-type-label {
+            color: #2196F3;
+        }
+
+        #messageBox.info .message-progress-fill {
+            background: linear-gradient(90deg, #2196F3, #42A5F5);
         }
 
         /* Progress Bar for Smart Dismissal */
@@ -1393,48 +1473,114 @@
             font-size: 0.9rem;
         }
 
-        /* New Feature Grid Styles */
+        /* ===== NEW MODERN DESIGN SYSTEM ===== */
+        
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .glass-card:hover::before {
+            left: 100%;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Modern Feature Grid */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
         .feature-card {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 1.5rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2rem;
             text-align: center;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--pink), var(--blue));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover::after {
+            transform: scaleX(1);
         }
 
         .feature-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
             background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
         }
 
         .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
             display: block;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
 
         .feature-card h3 {
             color: var(--white);
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             margin-bottom: 1rem;
-            font-weight: 600;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
         }
 
         .feature-card p {
             color: var(--text-light);
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: 1rem;
+            line-height: 1.6;
+            font-weight: 400;
         }
 
         /* Special Features Styles */
@@ -1484,16 +1630,160 @@
             font-weight: bold;
         }
 
-        /* CTA Section Styles */
+        /* ===== HERO SECTION STYLES ===== */
+        .hero-section {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: linear-gradient(135deg, 
+                rgba(26, 26, 46, 0.8), 
+                rgba(15, 15, 31, 0.9));
+            border-radius: 30px;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 46, 146, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 213, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            font-family: 'Poppins', sans-serif;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+            line-height: 1.6;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
+        }
+
+        .hero-image:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        /* ===== MODERN BUTTON STYLES ===== */
+        .modern-btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .modern-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .modern-btn:hover::before {
+            left: 100%;
+        }
+
+        .modern-btn.primary {
+            background: linear-gradient(135deg, var(--pink), var(--blue));
+            box-shadow: 
+                0 8px 25px rgba(255, 46, 146, 0.4),
+                0 8px 25px rgba(0, 213, 255, 0.4);
+        }
+
+        .modern-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .modern-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 12px 35px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+        }
+
+        .modern-btn.primary:hover {
+            box-shadow: 
+                0 12px 35px rgba(255, 46, 146, 0.5),
+                0 12px 35px rgba(0, 213, 255, 0.5);
+        }
+
+        .modern-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===== CTA SECTION STYLES ===== */
         .cta-section {
             text-align: center;
-            margin-top: 2rem;
+            margin-top: 3rem;
         }
 
         .cta-section h3 {
             color: var(--white);
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
         }
 
         .cta-benefits {
@@ -1759,31 +2049,67 @@
                 font-size: 0.9rem;
             }
 
-            /* Mobile responsive for new features */
+            /* ===== MOBILE RESPONSIVE FOR NEW DESIGN ===== */
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+                padding: 0 1rem;
+            }
+
+            .hero-image {
+                width: 140px;
+                height: 140px;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
             .features-grid {
                 grid-template-columns: 1fr;
-                gap: 1rem;
+                gap: 1.5rem;
+                padding: 0 1rem;
+            }
+
+            .feature-card {
+                padding: 1.5rem;
             }
 
             .special-features {
                 grid-template-columns: 1fr;
                 gap: 1.5rem;
+                padding: 0 1rem;
             }
 
             .cta-benefits {
                 grid-template-columns: 1fr;
-                gap: 0.8rem;
+                gap: 1rem;
+                padding: 0 1rem;
             }
 
             .cta-buttons {
                 flex-direction: column;
                 align-items: center;
+                gap: 1rem;
             }
 
-            .cta-btn {
+            .modern-btn {
                 width: 100%;
                 max-width: 300px;
                 justify-content: center;
+                padding: 18px 24px;
+            }
+
+            #messageBox {
+                right: 10px;
+                left: 10px;
+                width: auto;
+                max-width: none;
             }
 
             #scrollToTopBtn {
@@ -1827,17 +2153,25 @@
         <!-- Welcome Screen (Initial view, contains About Us content) -->
         <div id="welcomeScreen" class="welcome-screen">
             <div class="welcome-content">
-                <h1>🚀 Welcome to JCHAT - Where Connections Come Alive!</h1>
-                <div class="flex justify-center mb-6">
-                    <img src="assets/security.png" alt="JCHAT - Your Social Hub" class="profile-image"
+                <div class="hero-section">
+                    <img src="assets/security.png" alt="JCHAT - Your Social Hub" class="hero-image"
                          onerror="this.onerror=null;this.src='https://placehold.co/200x200/1a1a2e/f0f0f0?text=JCHAT';">
+                    <h1 class="hero-title">🚀 Welcome to JCHAT</h1>
+                    <p class="hero-subtitle">
+                        Where Connections Come Alive! Join thousands of users creating meaningful connections, sharing moments, and building communities in a secure, engaging environment.
+                    </p>
+                    <div class="hero-actions">
+                        <button onclick="showLoginForm()" class="modern-btn primary">
+                            <i class="fas fa-sign-in-alt"></i> Sign In Now
+                        </button>
+                        <button onclick="showRegisterForm()" class="modern-btn secondary">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                    </div>
                 </div>
-                <p class="text-xl text-white font-medium text-center">
-                    Join thousands of users creating meaningful connections, sharing moments, and building communities in a secure, engaging environment! ✨
-                </p>
 
                 <!-- Section: Discover JCHAT's Power -->
-                <section class="section-card">
+                <section class="section-card glass-card">
                     <h2>🌟 Discover What Makes JCHAT Special</h2>
                     <p>
                         JCHAT isn't just another social platform – it's your gateway to meaningful connections, creative expression, and community building. Experience the difference that thoughtful design and user-focused features make.
@@ -1871,7 +2205,7 @@
                 </section>
 
                 <!-- Section: Real Features That Matter -->
-                <section class="section-card">
+                <section class="section-card glass-card">
                     <h2>🎯 Features That Actually Work</h2>
                     
                     <div class="special-features">
@@ -1908,7 +2242,7 @@
                 </section>
 
                 <!-- Section: See It In Action -->
-                <section class="section-card">
+                <section class="section-card glass-card">
                     <h2>🚀 Experience JCHAT Live</h2>
                     <p>Don't just take our word for it – try JCHAT's features right now and see the difference!</p>
                     
@@ -1953,7 +2287,7 @@
                 </section>
 
                 <!-- Section: Join the Community -->
-                <section class="section-card">
+                <section class="section-card glass-card">
                     <h2>🔥 Ready to Start Your JCHAT Journey?</h2>
                     <p>
                         Join thousands of users who've already discovered a better way to connect, share, and grow together. Your next great connection is just a click away.
@@ -1983,10 +2317,10 @@
                         <div class="cta-actions">
                             <p class="cta-text">Start building your social network today and discover what JCHAT can do for you!</p>
                             <div class="cta-buttons">
-                                <button onclick="showLoginForm()" class="cta-btn primary">
+                                <button onclick="showLoginForm()" class="modern-btn primary">
                                     <i class="fas fa-sign-in-alt"></i> Sign In Now
                                 </button>
-                                <button onclick="showRegisterForm()" class="cta-btn secondary">
+                                <button onclick="showRegisterForm()" class="modern-btn secondary">
                                     <i class="fas fa-user-plus"></i> Create Account
                                 </button>
                             </div>
