@@ -6218,28 +6218,8 @@
 
         /**
          * Plays a short notification sound.
-         * Uses Tone.js for more robust audio feedback.
+         * Uses ne.mp3 for audio feedback.
          */
-        const successSynth = new Tone.Synth().toDestination();
-        const errorSynth = new Tone.Synth().toDestination();
-        const infoSynth = new Tone.Synth().toDestination();
-
-        successSynth.oscillator.type = "sine";
-        successSynth.envelope.attack = 0.01;
-        successSynth.envelope.decay = 0.2;
-        successSynth.envelope.sustain = 0.0;
-        successSynth.envelope.release = 0.5;
-
-        errorSynth.oscillator.type = "sawtooth";
-        errorSynth.envelope.attack = 0.01;
-        errorSynth.envelope.decay = 0.3;
-        errorSynth.envelope.sustain = 0.0;
-        errorSynth.envelope.release = 0.5;
-        infoSynth.oscillator.type = "triangle";
-        infoSynth.envelope.attack = 0.01;
-        infoSynth.envelope.decay = 0.1;
-        infoSynth.envelope.sustain = 0.0;
-        infoSynth.envelope.release = 0.3;
 
         function playNotificationSound(type) {
             try {
@@ -6250,27 +6230,9 @@
                 // Play the notification sound
                 audio.play().catch(error => {
                     console.log('JCHAT_DEBUG: Could not play notification sound:', error);
-                    // Fallback to Tone.js if audio file fails
-                    Tone.start();
-                    if (type === 'success') {
-                        successSynth.triggerAttackRelease("C5", "8n");
-                    } else if (type === 'error') {
-                        errorSynth.triggerAttackRelease("C3", "8n");
-                    } else if (type === 'info') {
-                        infoSynth.triggerAttackRelease("E4", "16n");
-                    }
                 });
             } catch (error) {
                 console.log('JCHAT_DEBUG: Error playing notification sound:', error);
-                // Fallback to Tone.js
-                Tone.start();
-                if (type === 'success') {
-                    successSynth.triggerAttackRelease("C5", "8n");
-                } else if (type === 'error') {
-                    errorSynth.triggerAttackRelease("C3", "8n");
-                } else if (type === 'info') {
-                    infoSynth.triggerAttackRelease("E4", "16n");
-                }
             }
         }
         /**
