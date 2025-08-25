@@ -23,7 +23,6 @@ file,size_bytes,lines,title,has_doctype,has_meta_viewport,num_links,num_external
 ./Levels.html,59568,1278,JCHAT - User Levels,yes,yes,12,0,1,0,2,2
 ./Login.html,167961,4131,JCHAT - Welcome & Account Access,yes,yes,2,0,1,0,2,2
 ./Manage.html,229287,4538,JCHAT - Admin Dashboard,yes,yes,4,0,2,1,2,5
-./Message.html,74180,1761,JCHAT - Chat,yes,yes,11,0,1,0,2,3
 ./Privacy_Settings.html,79591,1715,JCHAT - Privacy Settings,yes,yes,2,0,2,1,2,2
 ./Profile.html,417175,9868,JCHAT - Profile,yes,yes,9,2,1,0,2,2
 ./Report.html,64582,1555,JCHAT - Report an Issue,yes,yes,5,0,2,1,2,2
