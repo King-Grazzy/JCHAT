@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCHAT - Chat</title>
+
+    <!-- Security Meta Tags -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
+        :root {
+            --pink: #ff2e92;
+            --blue: #00d5ff;
+            --radius: 20px;
+            --transition: .3s ease;
+            --white: #fff;
+            --text-light: rgba(255, 255, 255, .7);
+            --background-color-primary: #121212;
+            --header-background-color: #2c2c2c;
+            --content-background-color: #242424;
+            --card-background-color: #2c2c2c;
+            --text-color-primary: #ffffff;
+            --text-color-secondary: #bbbbbb;
+            --notification-badge-color: #ff2e92;
+            --border-color: #444444;
+            --input-background-color: #383838;
+            --button-background: linear-gradient(90deg, var(--blue), var(--pink));
+            --button-shadow: 0 4px 15px rgba(0, 213, 255, 0.4), 0 4px 15px rgba(255, 46, 146, 0.4);
+        }
+
+        body.theme-light-mode {
+            --background-color-primary: #f0f2f5;
+            --header-background-color: #ffffff;
+            --content-background-color: #f7f9fb;
+            --card-background-color: #ffffff;
+            --text-color-primary: #333333;
+            --text-color-secondary: #666666;
+            --border-color: #e0e0e0;
+            --input-background-color: #f0f0f0;
+        }
+
+        body.theme-glass-mode {
+            background-image: url('https://source.unsplash.com/random/1920x1080?abstract,blur') !important;
+            background-size: cover; background-attachment: fixed; background-position: center;
+            --card-background-color: rgba(25,25,40,0.7);
+            --text-color-primary: #e0e0e0;
+            --text-color-secondary: #b0b0d0;
+            --border-color: rgba(255,255,255,0.1);
+            --input-background-color: rgba(255,255,255,0.05);
+        }
+
+        body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji"; color: var(--text-color-primary); background: var(--background-color-primary); }
+
+        .app-header { position: sticky; top: 0; z-index: 10; background: var(--header-background-color); display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--border-color); }
+        .app-title { display: flex; gap: 10px; align-items: center; font-weight: 700; }
+        .app-actions { display: flex; gap: 8px; align-items: center; }
+        .icon-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-color-primary); border-radius: 10px; padding: 8px 10px; cursor: pointer; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #777; display: inline-block; }
+
+        .chat-layout { display: grid; grid-template-columns: 320px 1fr 340px; gap: 12px; padding: 12px; height: calc(100vh - 56px); }
+        .panel { background: var(--card-background-color); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+
+        .conversations-header { padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; gap: 8px; }
+        .search { flex: 1; background: var(--input-background-color); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 10px; color: var(--text-color-primary); }
+        .conversation-list { overflow: auto; }
+        .conversation-item { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer; }
+        .conversation-item.active { background: rgba(0,0,0,0.08); }
+        .name { font-weight: 600; }
+        .last-message { color: var(--text-color-secondary); font-size: 13px; }
+        .badge { background: var(--notification-badge-color); color: white; border-radius: 999px; padding: 2px 8px; font-size: 12px; height: fit-content; }
+
+        .thread-header { padding: 12px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px; }
+        .thread-messages { flex: 1; overflow: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 70%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-color); word-wrap: break-word; }
+        .incoming { background: rgba(255,255,255,0.05); align-self: flex-start; }
+        .outgoing { background: linear-gradient(90deg, var(--blue), var(--pink)); color: #fff; align-self: flex-end; border: none; }
+        .timestamp { font-size: 11px; opacity: 0.8; margin-top: 4px; }
+
+        .composer { border-top: 1px solid var(--border-color); padding: 10px; display: grid; grid-template-columns: auto 1fr auto; gap: 8px; }
+        .composer input[type="text"] { background: var(--input-background-color); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 12px; color: var(--text-color-primary); }
+        .send-btn { background: var(--button-background); color: white; border: none; border-radius: 12px; padding: 10px 14px; cursor: pointer; box-shadow: var(--button-shadow); }
+
+        .info-header { padding: 12px; border-bottom: 1px solid var(--border-color); font-weight: 600; }
+        .info-content { padding: 12px; overflow: auto; }
+
+        @media (max-width: 1100px) { .chat-layout { grid-template-columns: 300px 1fr; } .info-panel { display: none; } }
+        @media (max-width: 720px) { .chat-layout { grid-template-columns: 1fr; } .conversations { display: none; } }
+    </style>
+</head>
+<body class="theme-dark-mode">
+    <header class="app-header">
+        <div class="app-title">
+            <i class="fa-solid fa-comments"></i>
+            <span>JCHAT</span>
+        </div>
+        <div class="app-actions">
+            <button class="icon-btn" id="themeToggle" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
+            <img class="avatar" id="headerProfilePic" alt="You" src="" />
+        </div>
+    </header>
+
+    <main class="chat-layout">
+        <section class="panel conversations">
+            <div class="conversations-header">
+                <input class="search" id="conversationSearch" placeholder="Search conversations" autocomplete="off" />
+                <button class="icon-btn" id="newChatBtn" title="New chat"><i class="fa-solid fa-pen"></i></button>
+            </div>
+            <div class="conversation-list" id="conversationList" role="listbox" aria-label="Conversations"></div>
+        </section>
+
+        <section class="panel thread">
+            <div class="thread-header" id="threadHeader">
+                <span class="name" id="threadTitle">Select a conversation</span>
+            </div>
+            <div class="thread-messages" id="messageList" aria-live="polite"></div>
+            <div class="composer">
+                <button class="icon-btn" id="attachBtn" title="Attach file"><i class="fa-solid fa-paperclip"></i></button>
+                <input type="text" id="messageInput" placeholder="Type a message" />
+                <button class="send-btn" id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+                <input type="file" id="fileInput" style="display:none" />
+            </div>
+        </section>
+
+        <aside class="panel info-panel">
+            <div class="info-header">Conversation Info</div>
+            <div class="info-content" id="infoContent">
+                <div>Participants: <span id="infoParticipants">-</span></div>
+                <div>Status: <span id="infoStatus">-</span></div>
+            </div>
+        </aside>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, limit, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+        // --- Firebase & Environment Configuration ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebasestorage.app",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Cloudinary Configuration (reused)
+        const cloudinaryConfig = { cloudName: "dxld01rcp", uploadPreset: "Storage_preset" };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Elements
+        const conversationListEl = document.getElementById('conversationList');
+        const messageListEl = document.getElementById('messageList');
+        const threadTitleEl = document.getElementById('threadTitle');
+        const messageInputEl = document.getElementById('messageInput');
+        const sendBtnEl = document.getElementById('sendBtn');
+        const attachBtnEl = document.getElementById('attachBtn');
+        const fileInputEl = document.getElementById('fileInput');
+        const conversationSearchEl = document.getElementById('conversationSearch');
+        const infoParticipantsEl = document.getElementById('infoParticipants');
+        const themeToggleEl = document.getElementById('themeToggle');
+        const headerProfilePic = document.getElementById('headerProfilePic');
+
+        // State
+        let currentUser = null;
+        let currentChatId = null;
+        let unsubscribeChats = null;
+        let unsubscribeMessages = null;
+        let allChats = [];
+
+        function formatTime(ts) {
+            if (!ts) return '';
+            try {
+                const d = ts.toDate ? ts.toDate() : new Date(ts);
+                return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } catch { return ''; }
+        }
+
+        function renderChats(list) {
+            conversationListEl.innerHTML = '';
+            list.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = 'conversation-item' + (chat.id === currentChatId ? ' active' : '');
+                const other = chat.otherMember || {};
+                item.innerHTML = `
+                    <img class="avatar" src="${other.profilePicUrl || ''}" alt="${other.username || 'User'}" />
+                    <div>
+                        <div class="name">${other.username || 'User'}</div>
+                        <div class="last-message">${chat.lastMessage ? chat.lastMessage : ''}</div>
+                    </div>
+                    <div>${chat.unreadCount ? `<span class=\"badge\">${chat.unreadCount}</span>` : ''}</div>
+                `;
+                item.addEventListener('click', () => selectChat(chat.id));
+                conversationListEl.appendChild(item);
+            });
+        }
+
+        function renderMessages(messages) {
+            messageListEl.innerHTML = '';
+            messages.forEach(msg => {
+                const isOutgoing = msg.senderId === currentUser?.uid;
+                const el = document.createElement('div');
+                el.className = 'message ' + (isOutgoing ? 'outgoing' : 'incoming');
+                const content = msg.type === 'media' && msg.mediaUrl ? `<a href="${msg.mediaUrl}" target="_blank" rel="noopener">${msg.mediaUrl}</a>` : (msg.text || '');
+                el.innerHTML = `
+                    <div>${content}</div>
+                    <div class="timestamp">${formatTime(msg.timestamp)}</div>
+                `;
+                messageListEl.appendChild(el);
+            });
+            messageListEl.scrollTop = messageListEl.scrollHeight;
+        }
+
+        async function selectChat(chatId) {
+            if (unsubscribeMessages) { unsubscribeMessages(); unsubscribeMessages = null; }
+            currentChatId = chatId;
+            const chat = allChats.find(c => c.id === chatId);
+            threadTitleEl.textContent = chat?.otherMember?.username || 'Chat';
+            infoParticipantsEl.textContent = (chat?.membersUsernames || []).join(', ');
+
+            const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+            const q = query(messagesRef, orderBy("timestamp"), limit(200));
+            unsubscribeMessages = onSnapshot(q, (snapshot) => {
+                const messages = [];
+                snapshot.forEach(docSnap => messages.push({ id: docSnap.id, ...docSnap.data() }));
+                renderMessages(messages);
+            }, (error) => console.error('JCHAT_ERROR: messages listener failed', error));
+        }
+
+        async function sendMessage() {
+            const text = messageInputEl.value.trim();
+            if (!text || !currentChatId || !currentUser) return;
+            const messagesRef = collection(db, "artifacts", appId, "chats", currentChatId, "messages");
+            await addDoc(messagesRef, { senderId: currentUser.uid, text, type: 'text', timestamp: serverTimestamp() });
+            const chatDocRef = doc(db, "artifacts", appId, "chats", currentChatId);
+            await updateDoc(chatDocRef, { lastMessage: text, lastMessageTimestamp: serverTimestamp() });
+            messageInputEl.value = '';
+        }
+
+        async function uploadToCloudinary(file) {
+            const url = `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/auto/upload`;
+            const form = new FormData();
+            form.append('file', file);
+            form.append('upload_preset', cloudinaryConfig.uploadPreset);
+            const res = await fetch(url, { method: 'POST', body: form });
+            if (!res.ok) throw new Error('Cloudinary upload failed');
+            const data = await res.json();
+            return data.secure_url;
+        }
+
+        async function sendAttachment(file) {
+            if (!file || !currentChatId || !currentUser) return;
+            try {
+                const mediaUrl = await uploadToCloudinary(file);
+                const messagesRef = collection(db, "artifacts", appId, "chats", currentChatId, "messages");
+                await addDoc(messagesRef, { senderId: currentUser.uid, type: 'media', mediaUrl, timestamp: serverTimestamp() });
+                const chatDocRef = doc(db, "artifacts", appId, "chats", currentChatId);
+                await updateDoc(chatDocRef, { lastMessage: '[attachment]', lastMessageTimestamp: serverTimestamp() });
+            } catch (e) {
+                console.error('JCHAT_ERROR: attachment failed', e);
+            }
+        }
+
+        function listenForChats() {
+            if (unsubscribeChats) { unsubscribeChats(); unsubscribeChats = null; }
+            const chatsRef = collection(db, "artifacts", appId, "chats");
+            const q = query(chatsRef, where("members", "array-contains", currentUser.uid));
+            unsubscribeChats = onSnapshot(q, async (snapshot) => {
+                const chats = [];
+                for (const docSnap of snapshot.docs) {
+                    const cdata = docSnap.data();
+                    const otherId = (cdata.members || []).find(id => id !== currentUser.uid) || null;
+                    let otherMember = {};
+                    if (otherId) {
+                        try {
+                            const otherDoc = await getDoc(doc(db, "artifacts", appId, "public", "data", "users", otherId));
+                            if (otherDoc.exists()) {
+                                const u = otherDoc.data();
+                                otherMember = {
+                                    username: u.username || u.displayName || 'User',
+                                    profilePicUrl: u.profilePicId ? `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/w_80,h_80,c_fill,g_face,r_max/${u.profilePicId}` : ''
+                                };
+                            }
+                        } catch {}
+                    }
+                    chats.push({ id: docSnap.id, otherMember, lastMessage: cdata.lastMessage || '', lastMessageTimestamp: cdata.lastMessageTimestamp, membersUsernames: cdata.membersUsernames || [], unreadCount: cdata[`unread_${currentUser.uid}`] || 0 });
+                }
+                // Sort newest first
+                chats.sort((a, b) => (b.lastMessageTimestamp?.toMillis?.() || 0) - (a.lastMessageTimestamp?.toMillis?.() || 0));
+                allChats = chats;
+                const qstr = (conversationSearchEl.value || '').toLowerCase();
+                const filtered = qstr ? chats.filter(c => (c.otherMember.username || '').toLowerCase().includes(qstr)) : chats;
+                renderChats(filtered);
+                if (!currentChatId && chats.length > 0) { selectChat(chats[0].id); }
+            }, (error) => console.error('JCHAT_ERROR: chats listener failed', error));
+        }
+
+        function debounce(fn, delay) { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); }; }
+
+        // Events
+        conversationSearchEl.addEventListener('input', debounce(() => {
+            const qstr = (conversationSearchEl.value || '').toLowerCase();
+            const filtered = qstr ? allChats.filter(c => (c.otherMember.username || '').toLowerCase().includes(qstr)) : allChats;
+            renderChats(filtered);
+        }, 200));
+        sendBtnEl.addEventListener('click', sendMessage);
+        messageInputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
+        attachBtnEl.addEventListener('click', () => fileInputEl.click());
+        fileInputEl.addEventListener('change', () => { if (fileInputEl.files.length) { sendAttachment(fileInputEl.files[0]); fileInputEl.value = ''; } });
+
+        themeToggleEl.addEventListener('click', () => {
+            const themes = ['theme-light-mode','theme-dark-mode','theme-glass-mode'];
+            const current = themes.find(t => document.body.classList.contains(t)) || 'theme-dark-mode';
+            const next = themes[(themes.indexOf(current) + 1) % themes.length];
+            document.body.classList.remove(...themes);
+            document.body.classList.add(next);
+            localStorage.setItem('jchat-theme', next);
+        });
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'jchat-theme') {
+                const newTheme = event.newValue || 'theme-dark-mode';
+                const themes = ['theme-light-mode', 'theme-dark-mode', 'theme-glass-mode'];
+                if (themes.includes(newTheme)) {
+                    document.body.classList.remove(...themes);
+                    document.body.classList.add(newTheme);
+                }
+            }
+        });
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = '/Login.html';
+                return;
+            }
+            currentUser = user;
+            // Try to set header avatar from public users collection if available
+            try {
+                const udoc = await getDoc(doc(db, "artifacts", appId, "public", "data", "users", user.uid));
+                if (udoc.exists()) {
+                    const u = udoc.data();
+                    if (u.profilePicId) {
+                        headerProfilePic.src = `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/w_80,h_80,c_fill,g_face,r_max/${u.profilePicId}`;
+                    }
+                }
+            } catch {}
+            listenForChats();
+        });
+
+        const savedTheme = localStorage.getItem('jchat-theme');
+        if (savedTheme) { document.body.classList.remove('theme-dark-mode'); document.body.classList.add(savedTheme); }
+    </script>
+</body>
+</html>
+
