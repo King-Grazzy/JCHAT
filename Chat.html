@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Last updated: 2025-01-27T16:00:00Z -->
+    <!-- Last updated: 2025-01-27T20:00:00Z -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JCHAT - Chat</title>
@@ -62,6 +62,7 @@
             --chat-input-bg: var(--input-background);
         }
 
+        /* Theme Definitions */
         body.theme-dark-mode {
             --background-main: #1a1a2e;
             --background-gradient-1: #16213e;
@@ -254,21 +255,109 @@
         main {
             flex-grow: 1;
             display: flex;
-            flex-direction: column;
             padding-top: 55px;
             height: 100vh;
             overflow: hidden;
         }
 
-        .chat-container {
+        .chat-layout {
             display: flex;
-            flex-direction: column;
-            height: 100%;
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            width: 100%;
+            height: 100%;
+        }
+
+        .chat-sidebar {
+            width: 300px;
             background: var(--card-background);
             backdrop-filter: blur(10px) saturate(180%);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-light);
+            background: var(--header-background);
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background-image: linear-gradient(90deg, var(--blue), var(--pink));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .chat-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-light);
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .chat-item.active {
+            background: var(--accent-color);
+            color: var(--white);
+        }
+
+        .chat-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent-color);
+            margin-right: 12px;
+        }
+
+        .chat-avatar.default {
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .chat-info {
+            flex-grow: 1;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-color-primary);
+        }
+
+        .chat-last-message {
+            font-size: 0.9rem;
+            color: var(--text-color-secondary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--content-background-color);
         }
 
         .chat-header {
@@ -362,7 +451,6 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            background: var(--content-background-color);
         }
 
         .empty-chat-state {
@@ -525,203 +613,26 @@
 
         #mediaFileInput { display: none; }
 
-        /* Floating Friends Button */
-        .floating-friends-btn {
-            position: fixed;
-            bottom: 100px;
-            left: 20px;
-            width: 50px;
-            height: 50px;
-            background: var(--button-background);
-            border: none;
-            border-radius: 50%;
-            color: var(--white);
-            font-size: 1.3rem;
-            cursor: pointer;
-            box-shadow: var(--button-shadow);
-            transition: all 0.3s ease;
-            z-index: 100;
+        .no-chat-selected {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-        }
-
-        .floating-friends-btn:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 6px 20px rgba(0, 213, 255, 0.4), 0 6px 20px rgba(255, 46, 146, 0.4);
-        }
-
-        /* Friends Modal */
-        .friends-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            text-align: center;
+            color: var(--text-color-secondary);
         }
 
-        .friends-modal.show {
-            display: flex;
-            opacity: 1;
-        }
-
-        .friends-modal-content {
-            background: var(--card-background);
-            backdrop-filter: blur(10px) saturate(180%);
-            border: 1px solid var(--border-light);
-            border-radius: var(--radius);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
-        }
-
-        .friends-modal.show .friends-modal-content { transform: scale(1); }
-
-        .friends-modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .friends-modal-header h2 {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
+        .no-chat-selected i {
+            font-size: 4rem;
+            margin-bottom: 20px;
             background-image: linear-gradient(90deg, var(--blue), var(--pink));
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 1.8rem;
         }
 
-        .close-modal-btn {
-            background: none;
-            border: none;
-            color: var(--text-color-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .close-modal-btn:hover { color: var(--accent-color); }
-
-        .friends-search {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-light);
-            background-color: var(--input-background);
-            color: var(--text-color-primary);
-            font-size: 1rem;
-            outline: none;
-            margin-bottom: 20px;
-            transition: border-color 0.3s ease;
-        }
-
-        .friends-search::placeholder { color: var(--text-color-secondary); }
-        .friends-search:focus { border-color: var(--accent-color); }
-
-        .friends-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .friend-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--input-background);
-            border: 1px solid var(--border-light);
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .friend-item:hover {
-            border-color: var(--accent-color);
-            transform: translateY(-2px);
-        }
-
-        .friend-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--accent-color);
-        }
-
-        .friend-avatar.default {
-            background: linear-gradient(45deg, var(--blue), var(--pink));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: var(--white);
-        }
-
-        .friend-info { flex-grow: 1; }
-
-        .friend-name {
-            font-weight: 600;
-            color: var(--text-color-primary);
-            margin: 0 0 4px 0;
-            font-size: 1rem;
-        }
-
-        .friend-status {
-            font-size: 0.85rem;
-            color: var(--text-color-secondary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .no-friends-message {
-            text-align: center;
-            color: var(--text-color-secondary);
-            padding: 40px 20px;
-            font-style: italic;
-        }
-
-        .loading-message {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-color-secondary);
-            font-style: italic;
-            padding: 10px 0;
-        }
-
-        .loading-spinner {
-            border: 2px solid var(--border-light);
-            border-top: 2px solid var(--accent-color);
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
-        }
-
+        /* Message Box */
         #messageBox {
             position: fixed;
             top: 50%;
@@ -749,20 +660,14 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         @media (max-width: 768px) {
-            .floating-friends-btn {
-                bottom: 90px;
-                left: 15px;
-                width: 45px;
-                height: 45px;
-                font-size: 1.1rem;
+            .chat-layout {
+                flex-direction: column;
             }
-            .friends-modal-content { padding: 20px; margin: 20px; }
+            .chat-sidebar {
+                width: 100%;
+                height: 200px;
+            }
             .message-bubble { max-width: 85%; }
         }
     </style>
@@ -789,61 +694,57 @@
     </header>
 
     <main>
-        <div class="chat-container">
-            <div class="chat-header">
-                <div class="chat-partner-info">
-                    <img id="chatPartnerAvatar" class="chat-partner-avatar default" src="" alt="Partner Avatar" style="display: none;">
-                    <div id="chatPartnerAvatarDefault" class="chat-partner-avatar default"><i class="fas fa-user-circle"></i></div>
-                    <div class="chat-partner-details">
-                        <h3 id="chatPartnerName">Select a friend to chat</h3>
-                        <p class="chat-partner-status">
-                            <span class="status-indicator" id="chatPartnerStatus"></span>
-                            <span id="chatPartnerStatusText">Click the friends icon to start chatting</span>
-                        </p>
+        <div class="chat-layout">
+            <div class="chat-sidebar">
+                <div class="sidebar-header">
+                    <h2>Chats</h2>
+                </div>
+                <div class="chat-list" id="chatList">
+                    <div class="no-chat-selected">
+                        <i class="fas fa-comments"></i>
+                        <p>Loading chats...</p>
                     </div>
                 </div>
-                <div class="chat-actions">
-                    <button class="chat-action-btn" id="chatInfoBtn"><i class="fas fa-info-circle"></i></button>
-                    <button class="chat-action-btn" id="chatSettingsBtn"><i class="fas fa-cog"></i></button>
-                </div>
             </div>
 
-            <div class="messages-container" id="messagesContainer">
-                <div class="empty-chat-state" id="emptyChatState">
-                    <i class="fas fa-comments"></i>
-                    <h3>Welcome to JCHAT!</h3>
-                    <p>Select a friend from the friends list to start chatting.</p>
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-partner-info">
+                        <img id="chatPartnerAvatar" class="chat-partner-avatar default" src="" alt="Partner Avatar" style="display: none;">
+                        <div id="chatPartnerAvatarDefault" class="chat-partner-avatar default"><i class="fas fa-user-circle"></i></div>
+                        <div class="chat-partner-details">
+                            <h3 id="chatPartnerName">Select a chat to start messaging</h3>
+                            <p class="chat-partner-status">
+                                <span class="status-indicator" id="chatPartnerStatus"></span>
+                                <span id="chatPartnerStatusText">Choose a conversation from the left</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="chat-actions">
+                        <button class="chat-action-btn" id="chatInfoBtn"><i class="fas fa-info-circle"></i></button>
+                        <button class="chat-action-btn" id="chatSettingsBtn"><i class="fas fa-cog"></i></button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="chat-input-container">
-                <div class="chat-input-wrapper">
-                    <textarea id="chatInput" class="chat-input" placeholder="Select a friend to start messaging..." rows="1" disabled></textarea>
-                    <button class="media-upload-btn" id="mediaUploadBtn" disabled><i class="fas fa-paperclip"></i></button>
-                    <input type="file" id="mediaFileInput" accept="image/*,video/*" multiple>
+                <div class="messages-container" id="messagesContainer">
+                    <div class="empty-chat-state" id="emptyChatState">
+                        <i class="fas fa-comments"></i>
+                        <h3>Welcome to JCHAT!</h3>
+                        <p>Select a conversation from the sidebar to start chatting.</p>
+                    </div>
                 </div>
-                <button class="send-btn" id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
+
+                <div class="chat-input-container">
+                    <div class="chat-input-wrapper">
+                        <textarea id="chatInput" class="chat-input" placeholder="Select a chat to start messaging..." rows="1" disabled></textarea>
+                        <button class="media-upload-btn" id="mediaUploadBtn" disabled><i class="fas fa-paperclip"></i></button>
+                        <input type="file" id="mediaFileInput" accept="image/*,video/*" multiple>
+                    </div>
+                    <button class="send-btn" id="sendBtn" disabled><i class="fas fa-paper-plane"></i></button>
+                </div>
             </div>
         </div>
     </main>
-
-    <button class="floating-friends-btn" id="floatingFriendsBtn" title="Select Friend to Chat"><i class="fas fa-user-friends"></i></button>
-
-    <div class="friends-modal" id="friendsModal">
-        <div class="friends-modal-content">
-            <div class="friends-modal-header">
-                <h2>Choose a Friend</h2>
-                <button class="close-modal-btn" id="closeModalBtn"><i class="fas fa-times"></i></button>
-            </div>
-            <input type="text" class="friends-search" id="friendsSearch" placeholder="Search friends...">
-            <div class="friends-list" id="friendsList">
-                <div class="loading-message" id="loadingFriends">
-                    <div class="loading-spinner"></div>
-                    <span>Loading friends...</span>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div id="messageBox"></div>
 
@@ -877,6 +778,7 @@
         const messageBox = document.getElementById('messageBox');
         const adminIconLink = document.getElementById('adminIconLink');
         const profileLink = document.getElementById('profileLink');
+        const chatList = document.getElementById('chatList');
         const chatPartnerAvatar = document.getElementById('chatPartnerAvatar');
         const chatPartnerAvatarDefault = document.getElementById('chatPartnerAvatarDefault');
         const chatPartnerName = document.getElementById('chatPartnerName');
@@ -888,25 +790,14 @@
         const sendBtn = document.getElementById('sendBtn');
         const mediaUploadBtn = document.getElementById('mediaUploadBtn');
         const mediaFileInput = document.getElementById('mediaFileInput');
-        const floatingFriendsBtn = document.getElementById('floatingFriendsBtn');
-        const friendsModal = document.getElementById('friendsModal');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const friendsSearch = document.getElementById('friendsSearch');
-        const friendsList = document.getElementById('friendsList');
-        const loadingFriends = document.getElementById('loadingFriends');
 
         // Global State
         let currentUser = null;
         let currentUserProfileData = null;
-        let chatPartnerId = null;
-        let chatPartnerData = null;
-        let chatId = null;
+        let currentChatId = null;
+        let currentChatData = null;
         let unsubscribeMessages = null;
-        let unsubscribeFriends = null;
-        let unsubscribePresence = null;
-        let currentUsersFriends = new Set();
-        let allFriendsData = [];
-        let userPresenceData = new Map(); // Store presence data for all users
+        let unsubscribeChats = null;
 
         // Tone.js setup
         const successSynth = new Tone.Synth().toDestination();
@@ -1002,363 +893,133 @@
             }
         }
 
-        function getChatId(uid1, uid2) {
-            return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
-        }
-
-        /**
-         * Sets up real-time presence system for the current user
-         */
-        async function setupPresenceSystem(userId) {
-            if (!userId) return;
-
-            try {
-                const presenceRef = doc(db, "artifacts", appId, "presence", userId);
-                
-                // Set user as online
-                await setDoc(presenceRef, {
-                    status: 'online',
-                    lastSeen: serverTimestamp(),
-                    userId: userId
-                });
-
-                // Set up disconnect handler to mark user as offline when they leave
-                window.addEventListener('beforeunload', async () => {
-                    try {
-                        await setDoc(presenceRef, {
-                            status: 'offline',
-                            lastSeen: serverTimestamp(),
-                            userId: userId
-                        });
-                    } catch (error) {
-                        console.error("Error updating presence on disconnect:", error);
-                    }
-                });
-
-                // Update presence every 30 seconds to show user is still active
-                setInterval(async () => {
-                    try {
-                        await setDoc(presenceRef, {
-                            status: 'online',
-                            lastSeen: serverTimestamp(),
-                            userId: userId
-                        }, { merge: true });
-                    } catch (error) {
-                        console.error("Error updating presence:", error);
-                    }
-                }, 30000); // Update every 30 seconds
-
-                console.log("JCHAT_DEBUG: Presence system set up for user:", userId);
-            } catch (error) {
-                console.error("JCHAT_ERROR: Error setting up presence system:", error);
+        async function fetchChatList() {
+            if (!currentUser) {
+                chatList.innerHTML = `<div class="no-chat-selected"><i class="fas fa-comments"></i><p>Please log in to see your chats.</p></div>`;
+                return;
             }
-        }
 
-        /**
-         * Sets up real-time presence listener for all users
-         */
-        function setupPresenceListener() {
-            if (unsubscribePresence) unsubscribePresence();
+            console.log("JCHAT_DEBUG: Fetching chat list for user:", currentUser.uid);
 
-            const presenceCollectionRef = collection(db, "artifacts", appId, "presence");
-            
-            unsubscribePresence = onSnapshot(presenceCollectionRef, (snapshot) => {
-                console.log("JCHAT_DEBUG: Presence snapshot received, changes:", snapshot.docChanges().length);
+            // Use the same path as working Message.html
+            const chatsCollectionRef = collection(db, "artifacts", appId, "chats");
+            const q = query(chatsCollectionRef, where("members", "array-contains", currentUser.uid));
+
+            unsubscribeChats = onSnapshot(q, async (snapshot) => {
+                console.log("JCHAT_DEBUG: Chat list snapshot received, docs count:", snapshot.size);
                 
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === "added" || change.type === "modified") {
-                        const presenceData = change.doc.data();
-                        const userId = change.doc.id;
-                        
-                        // Store presence data
-                        userPresenceData.set(userId, {
-                            status: presenceData.status,
-                            lastSeen: presenceData.lastSeen,
-                            userId: userId
-                        });
-
-                        // Update UI if this user is currently being displayed
-                        updateUserStatusInUI(userId, presenceData);
-                    } else if (change.type === "removed") {
-                        const userId = change.doc.id;
-                        userPresenceData.delete(userId);
-                        updateUserStatusInUI(userId, { status: 'offline', lastSeen: null });
-                    }
-                });
-            }, (error) => {
-                console.error("JCHAT_ERROR: Error in presence listener:", error);
-            });
-        }
-
-        /**
-         * Updates user status in the UI (friends list, chat header)
-         */
-        function updateUserStatusInUI(userId, presenceData) {
-            // Update in friends list
-            const friendItem = document.querySelector(`[data-friend-id="${userId}"]`);
-            if (friendItem) {
-                const statusIndicator = friendItem.querySelector('.status-indicator');
-                const statusText = friendItem.querySelector('.friend-status span:last-child');
-                
-                if (statusIndicator && statusText) {
-                    updateStatusElements(statusIndicator, statusText, presenceData);
+                chatList.innerHTML = ''; // Clear existing chat list
+                if (snapshot.empty) {
+                    chatList.innerHTML = `<div class="no-chat-selected"><i class="fas fa-comments"></i><p>No chats found. Start a conversation from a user's profile!</p></div>`;
+                    return;
                 }
-            }
 
-            // Update in chat header if this is the current chat partner
-            if (chatPartnerId === userId) {
-                const chatStatusIndicator = document.getElementById('chatPartnerStatus');
-                const chatStatusText = document.getElementById('chatPartnerStatusText');
-                
-                if (chatStatusIndicator && chatStatusText) {
-                    updateStatusElements(chatStatusIndicator, chatStatusText, presenceData);
+                const chats = [];
+                for (const docSnap of snapshot.docs) {
+                    const chatData = docSnap.data();
+                    const chatId = docSnap.id;
+
+                    console.log("JCHAT_DEBUG: Processing chat:", chatId, "with members:", chatData.members);
+
+                    // Determine the other member's info
+                    const otherMemberId = chatData.members.find(memberId => memberId !== currentUser.uid);
+                    let otherMemberUsername = chatData.memberUsernames?.[otherMemberId] || "Unknown User";
+                    let otherMemberProfilePicId = null;
+
+                    // Fetch public profile for other member to get latest info
+                    try {
+                        const publicProfileSnap = await getDoc(doc(db, "artifacts", appId, "public", "data", "users", otherMemberId));
+                        if (publicProfileSnap.exists()) {
+                            const publicProfileData = publicProfileSnap.data();
+                            otherMemberUsername = publicProfileData.username || otherMemberUsername;
+                            otherMemberProfilePicId = publicProfileData.profilePicId || null;
+                        }
+                    } catch (error) {
+                        console.warn(`JCHAT_WARNING: Could not fetch public profile for ${otherMemberId}:`, error);
+                    }
+
+                    chats.push({
+                        id: chatId,
+                        data: chatData,
+                        otherMemberId: otherMemberId,
+                        otherMemberUsername: otherMemberUsername,
+                        otherMemberProfilePicId: otherMemberProfilePicId,
+                        lastMessage: chatData.lastMessage,
+                        lastMessageTimestamp: chatData.lastMessageTimestamp ? chatData.lastMessageTimestamp.toDate() : null
+                    });
                 }
-            }
-        }
 
-        /**
-         * Updates status indicator and text elements
-         */
-        function updateStatusElements(indicator, textElement, presenceData) {
-            // Clear existing status classes
-            indicator.classList.remove('online', 'offline', 'away');
-            
-            if (presenceData.status === 'online') {
-                indicator.classList.add('online');
-                textElement.textContent = 'Online';
-            } else {
-                indicator.classList.add('offline');
-                
-                // Show last seen time if available
-                if (presenceData.lastSeen) {
-                    const lastSeenDate = presenceData.lastSeen.toDate ? presenceData.lastSeen.toDate() : new Date(presenceData.lastSeen);
-                    const now = new Date();
-                    const diffMs = now - lastSeenDate;
-                    const diffMins = Math.floor(diffMs / (1000 * 60));
-                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                // Sort chats by last message timestamp (most recent first)
+                chats.sort((a, b) => (b.lastMessageTimestamp?.getTime() || 0) - (a.lastMessageTimestamp?.getTime() || 0));
 
-                    let lastSeenText = '';
-                    if (diffMins < 1) {
-                        lastSeenText = 'Just now';
-                    } else if (diffMins < 60) {
-                        lastSeenText = `${diffMins}m ago`;
-                    } else if (diffHours < 24) {
-                        lastSeenText = `${diffHours}h ago`;
-                    } else if (diffDays < 7) {
-                        lastSeenText = `${diffDays}d ago`;
+                chats.forEach(chat => {
+                    const chatItem = document.createElement('div');
+                    chatItem.classList.add('chat-item');
+                    chatItem.dataset.chatId = chat.id;
+                    chatItem.dataset.otherMemberId = chat.otherMemberId;
+
+                    let avatarHtml = '';
+                    if (chat.otherMemberProfilePicId) {
+                        const imageUrl = getCloudinaryImageUrl(chat.otherMemberProfilePicId, "w_90,h_90,c_fill,g_face,r_max");
+                        avatarHtml = `<img class="chat-avatar" src="${imageUrl}" alt="${chat.otherMemberUsername}'s Avatar" onerror="this.outerHTML='<div class=\\'chat-avatar default\\'><i class=\\'fas fa-user-circle\\'></i></div>';">`;
                     } else {
-                        lastSeenText = lastSeenDate.toLocaleDateString();
+                        avatarHtml = `<div class="chat-avatar default"><i class="fas fa-user-circle"></i></div>`;
                     }
-                    
-                    textElement.textContent = `Last seen ${lastSeenText}`;
-                } else {
-                    textElement.textContent = 'Offline';
-                }
-            }
-        }
 
-        /**
-         * Gets user presence status
-         */
-        function getUserPresenceStatus(userId) {
-            return userPresenceData.get(userId) || { status: 'offline', lastSeen: null };
-        }
+                    const lastMessageText = chat.lastMessage || 'No messages yet';
+                    const timeText = chat.lastMessageTimestamp ? 
+                        chat.lastMessageTimestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
 
-        function createFriendItem(friendId, friendData) {
-            const friendItem = document.createElement('div');
-            friendItem.classList.add('friend-item');
-            friendItem.setAttribute('data-friend-id', friendId);
+                    chatItem.innerHTML = `
+                        ${avatarHtml}
+                        <div class="chat-info">
+                            <div class="chat-name">${chat.otherMemberUsername}</div>
+                            <div class="chat-last-message">${lastMessageText}</div>
+                        </div>
+                    `;
 
-            const username = friendData.username || `User_${friendId.substring(0, 8)}`;
-            const profilePicId = friendData.profilePicId || null;
-
-            let avatarHtml = '';
-            if (profilePicId && friendData.visibility?.profilePic !== false) {
-                const imageUrl = getCloudinaryImageUrl(profilePicId, "w_80,h_80,c_fill,g_face,r_max");
-                avatarHtml = `<img class="friend-avatar" src="${imageUrl}" alt="${username}'s Avatar" onerror="this.outerHTML='<div class=\\'friend-avatar default\\'><i class=\\'fas fa-user-circle\\'></i></div>';">`;
-            } else {
-                avatarHtml = `<div class="friend-avatar default"><i class="fas fa-user-circle"></i></div>`;
-            }
-
-            // Get real presence status for this friend
-            const presenceStatus = getUserPresenceStatus(friendId);
-            const statusClass = presenceStatus.status === 'online' ? 'online' : 'offline';
-            let statusText = presenceStatus.status === 'online' ? 'Online' : 'Offline';
-            
-            // If offline, show last seen time
-            if (presenceStatus.status !== 'online' && presenceStatus.lastSeen) {
-                const lastSeenDate = presenceStatus.lastSeen.toDate ? presenceStatus.lastSeen.toDate() : new Date(presenceStatus.lastSeen);
-                const now = new Date();
-                const diffMs = now - lastSeenDate;
-                const diffMins = Math.floor(diffMs / (1000 * 60));
-                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-                if (diffMins < 1) {
-                    statusText = 'Just now';
-                } else if (diffMins < 60) {
-                    statusText = `${diffMins}m ago`;
-                } else if (diffHours < 24) {
-                    statusText = `${diffHours}h ago`;
-                } else if (diffDays < 7) {
-                    statusText = `${diffDays}d ago`;
-                } else {
-                    statusText = lastSeenDate.toLocaleDateString();
-                }
-                statusText = `Last seen ${statusText}`;
-            }
-
-            friendItem.innerHTML = `
-                ${avatarHtml}
-                <div class="friend-info">
-                    <div class="friend-name">${friendData.visibility?.displayName !== false ? username : 'Anonymous User'}</div>
-                    <div class="friend-status">
-                        <span class="status-indicator ${statusClass}"></span>
-                        <span>${statusText}</span>
-                    </div>
-                </div>
-            `;
-
-            friendItem.addEventListener('click', () => {
-                startChatWithFriend(friendId, friendData);
-                closeFriendsModal();
-            });
-
-            return friendItem;
-        }
-
-        async function fetchAndDisplayFriends() {
-            if (!currentUser) return;
-
-            friendsList.innerHTML = '';
-            loadingFriends.style.display = 'flex';
-
-            try {
-                if (unsubscribeFriends) unsubscribeFriends();
-
-                const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
-                const publicUsersRef = collection(db, "artifacts", appId, "public", "data", "users");
-
-                unsubscribeFriends = onSnapshot(publicFriendsRef, async (snapshot) => {
-                    currentUsersFriends.clear();
-                    allFriendsData = [];
-
-                    const friendPromises = [];
-                    snapshot.forEach(docSnap => {
-                        const friendData = docSnap.data();
-                        let friendId = null;
-                        
-                        if (friendData.user1Id === currentUser.uid) {
-                            friendId = friendData.user2Id;
-                        } else if (friendData.user2Id === currentUser.uid) {
-                            friendId = friendData.user1Id;
-                        }
-
-                        if (friendId) {
-                            currentUsersFriends.add(friendId);
-                            const friendProfileRef = doc(publicUsersRef, friendId);
-                            friendPromises.push(
-                                getDoc(friendProfileRef).then(friendDoc => {
-                                    if (friendDoc.exists()) {
-                                        return { friendId, ...friendDoc.data() };
-                                    }
-                                    return null;
-                                })
-                            );
-                        }
+                    chatItem.addEventListener('click', () => {
+                        selectChat(chat.id, chat.data, chat.otherMemberId, chat.otherMemberUsername, chat.otherMemberProfilePicId);
                     });
 
-                    const friendsProfiles = await Promise.all(friendPromises);
-                    allFriendsData = friendsProfiles.filter(profile => profile !== null);
-
-                    renderFriendsList(allFriendsData);
-                    loadingFriends.style.display = 'none';
-                }, (error) => {
-                    console.error("Error fetching friends:", error);
-                    loadingFriends.style.display = 'none';
-                    friendsList.innerHTML = '<div class="no-friends-message">Failed to load friends.</div>';
+                    chatList.appendChild(chatItem);
                 });
 
-            } catch (error) {
-                console.error("Error setting up friends listener:", error);
-                loadingFriends.style.display = 'none';
-            }
+                console.log("JCHAT_DEBUG: Chat list rendered with", chats.length, "chats");
+            }, (error) => {
+                console.error("JCHAT_ERROR: Error fetching chat list:", error);
+                chatList.innerHTML = `<div class="no-chat-selected"><i class="fas fa-exclamation-triangle"></i><p>Error loading chats: ${error.message}</p></div>`;
+            });
         }
 
-        function renderFriendsList(friendsToRender, searchQuery = '') {
-            friendsList.innerHTML = '';
+        function selectChat(chatId, chatData, otherMemberId, otherMemberUsername, otherMemberProfilePicId) {
+            console.log("JCHAT_DEBUG: Selecting chat:", chatId, "with user:", otherMemberUsername);
+            
+            if (currentChatId === chatId) return; // Already selected
 
-            let filteredFriends = friendsToRender;
-            if (searchQuery) {
-                const lowerCaseQuery = searchQuery.toLowerCase();
-                filteredFriends = friendsToRender.filter(friend =>
-                    (friend.username && friend.username.toLowerCase().includes(lowerCaseQuery))
-                );
+            // Unsubscribe from previous chat messages if any
+            if (unsubscribeMessages) {
+                unsubscribeMessages();
+                unsubscribeMessages = null;
             }
 
-            if (filteredFriends.length === 0) {
-                const noFriendsMsg = document.createElement('div');
-                noFriendsMsg.classList.add('no-friends-message');
-                noFriendsMsg.textContent = searchQuery ? 
-                    `No friends found matching "${searchQuery}".` : 
-                    "No friends yet. Add some friends to start chatting!";
-                friendsList.appendChild(noFriendsMsg);
-            } else {
-                filteredFriends.forEach(friend => {
-                    friendsList.appendChild(createFriendItem(friend.friendId, friend));
-                });
-            }
-        }
+            currentChatId = chatId;
+            currentChatData = chatData;
 
-        function startChatWithFriend(friendId, friendData) {
-            chatPartnerId = friendId;
-            chatPartnerData = friendData;
-            chatId = getChatId(currentUser.uid, friendId);
-
-            const partnerName = friendData.username || `User_${friendId.substring(0, 8)}`;
-            chatPartnerName.textContent = partnerName;
-            
-            // Set real presence status in chat header
-            const presenceStatus = getUserPresenceStatus(friendId);
-            chatPartnerStatus.classList.remove('online', 'offline', 'away');
-            
-            if (presenceStatus.status === 'online') {
-                chatPartnerStatus.classList.add('online');
-                chatPartnerStatusText.textContent = "Online";
-            } else {
-                chatPartnerStatus.classList.add('offline');
-                
-                // Show last seen time if available
-                if (presenceStatus.lastSeen) {
-                    const lastSeenDate = presenceStatus.lastSeen.toDate ? presenceStatus.lastSeen.toDate() : new Date(presenceStatus.lastSeen);
-                    const now = new Date();
-                    const diffMs = now - lastSeenDate;
-                    const diffMins = Math.floor(diffMs / (1000 * 60));
-                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-                    let lastSeenText = '';
-                    if (diffMins < 1) {
-                        lastSeenText = 'Just now';
-                    } else if (diffMins < 60) {
-                        lastSeenText = `${diffMins}m ago`;
-                    } else if (diffHours < 24) {
-                        lastSeenText = `${diffHours}h ago`;
-                    } else if (diffDays < 7) {
-                        lastSeenText = `${diffDays}d ago`;
-                    } else {
-                        lastSeenText = lastSeenDate.toLocaleDateString();
-                    }
-                    
-                    chatPartnerStatusText.textContent = `Last seen ${lastSeenText}`;
-                } else {
-                    chatPartnerStatusText.textContent = "Offline";
+            // Update active state in chat list
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.chatId === chatId) {
+                    item.classList.add('active');
                 }
-            }
+            });
 
-            if (friendData.profilePicId && friendData.visibility?.profilePic !== false) {
-                const imageUrl = getCloudinaryImageUrl(friendData.profilePicId, "w_90,h_90,c_fill,g_face,r_max");
+            // Update chat header
+            chatPartnerName.textContent = otherMemberUsername;
+            chatPartnerStatusText.textContent = "Online"; // TODO: Implement presence
+
+            if (otherMemberProfilePicId) {
+                const imageUrl = getCloudinaryImageUrl(otherMemberProfilePicId, "w_90,h_90,c_fill,g_face,r_max");
                 chatPartnerAvatar.src = imageUrl;
                 chatPartnerAvatar.style.display = 'block';
                 chatPartnerAvatarDefault.style.display = 'none';
@@ -1372,14 +1033,53 @@
                 chatPartnerAvatarDefault.style.display = 'flex';
             }
 
+            // Enable input
             chatInput.disabled = false;
-            chatInput.placeholder = `Message ${partnerName}...`;
+            chatInput.placeholder = `Message ${otherMemberUsername}...`;
             mediaUploadBtn.disabled = false;
             updateSendButtonState();
 
+            // Hide empty state and load messages
             emptyChatState.style.display = 'none';
-            fetchAndDisplayMessages();
+            loadMessages();
             playNotificationSound('success');
+        }
+
+        function loadMessages() {
+            if (!currentUser || !currentChatId) return;
+
+            console.log("JCHAT_DEBUG: Loading messages for chat:", currentChatId);
+
+            messagesContainer.innerHTML = '';
+
+            // Use the same path as working Message.html
+            const messagesRef = collection(db, "artifacts", appId, "chats", currentChatId, "messages");
+            const q = query(messagesRef, orderBy("timestamp"), limit(100));
+
+            unsubscribeMessages = onSnapshot(q, (snapshot) => {
+                console.log("JCHAT_DEBUG: Messages snapshot received, changes count:", snapshot.docChanges().length);
+                
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added") {
+                        const messageData = change.doc.data();
+                        const messageId = change.doc.id;
+                        
+                        if (!messageData.text) return;
+                        
+                        const messageElement = createMessageElement(messageData, messageId);
+                        messagesContainer.appendChild(messageElement);
+                        
+                        if (messageData.senderId !== currentUser.uid) {
+                            playNotificationSound('message');
+                        }
+                    }
+                });
+
+                setTimeout(scrollToBottom, 100);
+            }, (error) => {
+                console.error("JCHAT_ERROR: Error loading messages:", error);
+                showMessageBox(`Error loading messages: ${error.message}`, 'error');
+            });
         }
 
         function createMessageElement(messageData, messageId) {
@@ -1412,65 +1112,38 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        function fetchAndDisplayMessages() {
-            if (!currentUser || !chatId) return;
-
-            messagesContainer.innerHTML = '';
-
-            const messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatId, "messages");
-            const q = query(messagesRef, orderBy("timestamp", "asc"), limit(50));
-
-            unsubscribeMessages = onSnapshot(q, (snapshot) => {
-                snapshot.docChanges().forEach((change) => {
-                    if (change.type === "added") {
-                        const messageData = change.doc.data();
-                        const messageId = change.doc.id;
-                        
-                        if (!messageData.text) return;
-                        
-                        const messageElement = createMessageElement(messageData, messageId);
-                        messagesContainer.appendChild(messageElement);
-                        
-                        if (messageData.senderId !== currentUser.uid) {
-                            playNotificationSound('message');
-                        }
-                    }
-                });
-
-                setTimeout(scrollToBottom, 100);
-            });
-        }
-
-        async function sendTextMessage(content) {
-            if (!currentUser || !chatId || !content.trim()) {
+        async function sendMessage() {
+            const content = chatInput.value.trim();
+            if (!currentUser || !currentChatId || !content) {
                 console.log("JCHAT_DEBUG: Cannot send message - missing requirements:", { 
                     currentUser: !!currentUser, 
-                    chatId: !!chatId, 
-                    content: !!content.trim() 
+                    currentChatId: !!currentChatId, 
+                    content: !!content 
                 });
                 return;
             }
 
-            console.log("JCHAT_DEBUG: Sending message:", { chatId, content: content.trim() });
+            console.log("JCHAT_DEBUG: Sending message to chat:", currentChatId, "content:", content);
 
             try {
-                const messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatId, "messages");
+                // Use the same path as working Message.html
+                const messagesRef = collection(db, "artifacts", appId, "chats", currentChatId, "messages");
                 
                 const messageData = {
                     senderId: currentUser.uid,
-                    text: content.trim(),
+                    text: content,
                     timestamp: serverTimestamp()
                 };
 
                 console.log("JCHAT_DEBUG: Message data:", messageData);
                 
-                const docRef = await addDoc(messagesRef, messageData);
-                console.log("JCHAT_DEBUG: Message added with ID:", docRef.id);
+                await addDoc(messagesRef, messageData);
+                console.log("JCHAT_DEBUG: Message added successfully");
 
-                // Update chat metadata
-                const chatRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId);
+                // Update chat metadata - use the same path as working Message.html
+                const chatRef = doc(db, "artifacts", appId, "chats", currentChatId);
                 await setDoc(chatRef, {
-                    lastMessage: content.trim(),
+                    lastMessage: content,
                     lastMessageTimestamp: serverTimestamp()
                 }, { merge: true });
 
@@ -1484,7 +1157,6 @@
             } catch (error) {
                 console.error("JCHAT_ERROR: Error sending message:", error);
                 showMessageBox(`Failed to send message: ${error.message}`, 'error');
-                playNotificationSound('error');
             }
         }
 
@@ -1494,18 +1166,6 @@
             sendBtn.disabled = !isEnabled;
         }
 
-        function openFriendsModal() {
-            friendsModal.classList.add('show');
-            fetchAndDisplayFriends();
-            friendsSearch.focus();
-        }
-
-        function closeFriendsModal() {
-            friendsModal.classList.remove('show');
-            friendsSearch.value = '';
-            renderFriendsList(allFriendsData);
-        }
-
         // Authentication
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -1513,15 +1173,7 @@
                 console.log("JCHAT_DEBUG: User authenticated in Chat:", user.uid);
                 await fetchAndDisplayHeaderProfile(user);
                 fetchNotificationCount(user.uid);
-                
-                // Set up presence system for current user
-                await setupPresenceSystem(user.uid);
-                
-                // Set up presence listener for all users
-                setupPresenceListener();
-                
-                // Fetch friends after presence system is ready
-                fetchAndDisplayFriends();
+                fetchChatList();
             } else {
                 console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
                 try {
@@ -1560,29 +1212,11 @@
             chatInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    const content = chatInput.value.trim();
-                    if (content && !chatInput.disabled) {
-                        sendTextMessage(content);
-                    }
+                    sendMessage();
                 }
             });
 
-            sendBtn.addEventListener('click', () => {
-                const content = chatInput.value.trim();
-                if (content && !chatInput.disabled) {
-                    sendTextMessage(content);
-                }
-            });
-
-            floatingFriendsBtn.addEventListener('click', openFriendsModal);
-            closeModalBtn.addEventListener('click', closeFriendsModal);
-            friendsModal.addEventListener('click', (e) => {
-                if (e.target === friendsModal) closeFriendsModal();
-            });
-
-            friendsSearch.addEventListener('input', (e) => {
-                renderFriendsList(allFriendsData, e.target.value);
-            });
+            sendBtn.addEventListener('click', sendMessage);
 
             updateSendButtonState();
         });
@@ -1600,8 +1234,7 @@
 
         window.addEventListener('beforeunload', () => {
             if (unsubscribeMessages) unsubscribeMessages();
-            if (unsubscribeFriends) unsubscribeFriends();
-            if (unsubscribePresence) unsubscribePresence();
+            if (unsubscribeChats) unsubscribeChats();
         });
     </script>
 </body>
