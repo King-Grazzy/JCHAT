@@ -533,13 +533,17 @@
             text-align: center;
         }
 
-        /* Main Chat Area */
+        /* Main Chat Area - Full Screen */
         .chat-main {
             flex: 1;
             display: flex;
             flex-direction: column;
             background: var(--chat-background);
             position: relative;
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
         }
 
         /* Chat Header */
@@ -587,6 +591,23 @@
             gap: 10px;
         }
 
+        /* Default Avatar Styling (matching Find_Friends.html) */
+        .default-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 1.5rem;
+        }
+
+        .default-avatar i {
+            color: var(--white);
+        }
+
         .chat-action-btn {
             background: none;
             border: none;
@@ -603,7 +624,7 @@
             color: var(--white);
         }
 
-        /* Messages Area */
+        /* Messages Area - Full Screen */
         .messages-container {
             flex: 1;
             overflow-y: auto;
@@ -611,6 +632,9 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            width: 100%;
+            height: calc(100vh - 120px); /* Full height minus header and input */
+            margin: 0;
         }
 
         .message {
@@ -1557,6 +1581,9 @@
 
             .chat-main {
                 width: 100%;
+                height: 100vh;
+                margin: 0;
+                padding: 0;
             }
 
             .message {
@@ -1570,6 +1597,9 @@
             .messages-container {
                 padding: 15px;
                 gap: 12px;
+                width: 100%;
+                height: calc(100vh - 100px); /* Mobile height adjustment */
+                margin: 0;
             }
 
             .message-input-container {
@@ -2398,11 +2428,19 @@
             }
         }
 
-        // Get Cloudinary Image URL (matching Home.html/Profile.html)
-        function getCloudinaryImageUrl(publicId, transformations = '') {
-            if (!publicId) return null;
-            const baseUrl = `https://res.cloudinary.com/${cloudinary.cloudName}/image/upload`;
-            return transformations ? `${baseUrl}/${transformations}/${publicId}` : `${baseUrl}/${publicId}`;
+        // Get Cloudinary Image URL (matching Find_Friends.html exactly)
+        function getCloudinaryImageUrl(urlOrPublicId, transformations = "w_auto,f_auto,q_auto") {
+            if (!urlOrPublicId) return null;
+            if (urlOrPublicId.startsWith('http://') || urlOrPublicId.startsWith('https://')) {
+                if (urlOrPublicId.includes('res.cloudinary.com')) {
+                    const parts = urlOrPublicId.split('/upload/');
+                    if (parts.length === 2) {
+                        return `${parts[0]}/upload/${transformations}/${parts[1]}`;
+                    }
+                }
+                return urlOrPublicId;
+            }
+            return `https://res.cloudinary.com/${cloudinary.cloudName}/image/upload/${transformations}/${urlOrPublicId}`;
         }
 
         // Hide loader function
@@ -2754,7 +2792,8 @@
                             isUser: true,
                             userId: user.userId,
                             name: user.username || 'User',
-                            profilePicId: user.profilePicId, // Use profilePicId like Home.html/Profile.html
+                            profilePicId: user.profilePicId, // Use profilePicId like Find_Friends.html
+                            visibility: user.visibility, // Include visibility data like Find_Friends.html
                             isFriend: currentUsersFriends.has(user.userId),
                             hasRequest: sentRequests.has(user.userId) || receivedRequests.has(user.userId)
                         }));
@@ -2833,12 +2872,12 @@
                 chatName = chat.name || chat.id;
             } else if (chat.type === 'direct') {
                 if (chat.isUser) {
-                    // This is a user from the users list - show profile picture if available
-                    if (chat.profilePicId) {
-                        const userImageUrl = getCloudinaryImageUrl(chat.profilePicId, "w_50,h_50,c_fill,g_face,r_max");
-                        avatarContent = `<img src="${userImageUrl}" alt="${chat.name}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">`;
+                    // This is a user from the users list - show profile picture if available (matching Find_Friends.html)
+                    if (chat.profilePicId && chat.visibility?.profilePic !== false) {
+                        const imageUrl = getCloudinaryImageUrl(chat.profilePicId, "w_120,h_120,c_fill,g_face,r_max");
+                        avatarContent = `<img src="${imageUrl}" alt="${chat.name}'s Profile Picture" onerror="this.onerror=null;this.src='https://placehold.co/60x60/CCCCCC/000000?text=${chat.name.charAt(0).toUpperCase()}';">`;
                     } else {
-                        avatarContent = '<i class="fas fa-user"></i>';
+                        avatarContent = `<div class="default-avatar"><i class="fas fa-user-circle"></i></div>`;
                     }
                     chatName = chat.name || 'User';
                 } else {
@@ -2950,12 +2989,12 @@
                     chatHeaderName.textContent = otherUserData?.username || 'Direct Chat';
                     chatHeaderStatus.textContent = onlineUsers.has(otherUserId) ? 'Online' : 'Last seen recently';
                     
-                    // Display profile picture if available (matching Home.html/Profile.html)
-                    if (otherUserData?.profilePicId) {
-                        const headerImageUrl = getCloudinaryImageUrl(otherUserData.profilePicId, "w_40,h_40,c_fill,g_face,r_max");
-                        chatHeaderAvatar.innerHTML = `<img src="${headerImageUrl}" alt="${otherUserData.username}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">`;
+                    // Display profile picture if available (matching Find_Friends.html)
+                    if (otherUserData?.profilePicId && otherUserData.visibility?.profilePic !== false) {
+                        const imageUrl = getCloudinaryImageUrl(otherUserData.profilePicId, "w_120,h_120,c_fill,g_face,r_max");
+                        chatHeaderAvatar.innerHTML = `<img src="${imageUrl}" alt="${otherUserData.username}'s Profile Picture" onerror="this.onerror=null;this.src='https://placehold.co/40x40/CCCCCC/000000?text=${otherUserData.username.charAt(0).toUpperCase()}';">`;
                     } else {
-                        chatHeaderAvatar.innerHTML = '<i class="fas fa-user"></i>';
+                        chatHeaderAvatar.innerHTML = '<div class="default-avatar"><i class="fas fa-user-circle"></i></div>';
                     }
                 } else if (chatType === 'group') {
                     const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", chatId);
