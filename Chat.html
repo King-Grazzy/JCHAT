@@ -19,7 +19,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
-    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 
     <style>
         *, *::before, *::after { box-sizing: border-box; }
@@ -292,15 +291,36 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Resolve peer/user from URL or default
+    // Derive appId similar to Home/Profile
+    const appId = (typeof __app_id !== 'undefined' && __app_id) || (window.firebaseConfig && (window.firebaseConfig.projectId || window.firebaseConfig.appId)) || 'default-app-id';
+
+    // Resolve partner (peer) from URL and then fetch details from Firestore like Home/Profile
     const urlParams = new URLSearchParams(location.search);
-    const peer = {
-        id: urlParams.get('peerId') || (window.defaultPeer && window.defaultPeer.id) || 'demo-peer',
-        name: urlParams.get('peerName') || (window.defaultPeer && window.defaultPeer.name) || 'Contact',
-        avatar: urlParams.get('peerAvatar') || (window.defaultPeer && window.defaultPeer.avatar) || 'assets/icon2.png'
-    };
-    document.getElementById('chatPeerName').textContent = peer.name;
-    document.getElementById('chatPeerAvatar').src = peer.avatar;
+    const partnerId = urlParams.get('partner') || urlParams.get('peerId') || (window.defaultPeer && window.defaultPeer.id) || '';
+    const peer = { id: partnerId, name: 'Contact', avatar: 'assets/icon2.png' };
+
+    async function loadPeerProfile() {
+        if (!peer.id) return;
+        try {
+            const docRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('users').doc(peer.id);
+            const snap = await docRef.get();
+            if (snap.exists) {
+                const data = snap.data();
+                peer.name = data.username || peer.name;
+                const pic = data.profilePicId || data.photoURL || null;
+                if (pic) {
+                    // If full URL use as-is; else assume Cloudinary public ID
+                    peer.avatar = pic.startsWith('http') ? pic : `https://res.cloudinary.com/${(window.cloudinaryConfig && window.cloudinaryConfig.cloudName) || 'demo'}/image/upload/w_70,h_70,c_fill,g_face,r_max/${pic}`;
+                }
+            }
+        } catch (e) {
+            console.error('Failed to load peer profile', e);
+        }
+        document.getElementById('chatPeerName').textContent = peer.name;
+        document.getElementById('chatPeerAvatar').src = peer.avatar;
+        document.getElementById('peerName').textContent = peer.name;
+    }
+    loadPeerProfile();
 
     // Sign in (anonymous if not already)
     let currentUser = null;
@@ -313,29 +333,29 @@
         }
     });
 
-    // Create deterministic room id between two users (anonymous uid + peer id)
+    // Create deterministic room id between two users
     function getRoomId(uid, peerId) {
         const a = String(uid);
         const b = String(peerId);
         return [a, b].sort().join('__');
     }
 
-    function messageDoc(roomId) {
+    function messageCol(roomId) {
         return db.collection('rooms').doc(roomId).collection('messages');
     }
 
     function startChat() {
+        if (!peer.id) return;
         const roomId = getRoomId(currentUser.uid, peer.id);
         subscribeMessages(roomId);
         setupComposer(roomId);
-        document.getElementById('peerName').textContent = peer.name;
     }
 
     function subscribeMessages(roomId) {
         messagesEl.innerHTML = '';
-        messageDoc(roomId)
+        messageCol(roomId)
             .orderBy('createdAt', 'asc')
-            .limit(200)
+            .limit(500)
             .onSnapshot((snap) => {
                 messagesEl.innerHTML = '';
                 snap.forEach((doc) => renderMessage(doc.data()));
@@ -385,10 +405,6 @@
             fileInputEl.value = '';
         });
 
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            // In a real app, query Firestore for recent conversations. Hidden for simplicity here.
-        });
-
         textInputEl.addEventListener('input', showTyping);
     }
 
@@ -399,32 +415,35 @@
             ...payload,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         };
-        await messageDoc(roomId).add(doc);
+        await messageCol(roomId).add(doc);
     }
 
     async function uploadWithCloudinary(roomId, file) {
         const cloud = window.cloudinaryConfig || {};
-        if (!cloud.cloudName || !cloud.unsignedUploadPreset) {
+        const cloudName = cloud.cloudName;
+        const uploadPreset = cloud.uploadPreset || cloud.unsignedUploadPreset;
+        if (!cloudName || !uploadPreset) {
             alert('Cloudinary config missing');
             return;
         }
-        return new Promise((resolve, reject) => {
-            const widget = cloudinary.createUploadWidget({
-                cloudName: cloud.cloudName,
-                uploadPreset: cloud.unsignedUploadPreset,
-                multiple: false,
-                sources: ['local','url','camera']
-            }, async (error, result) => {
-                if (error) return reject(error);
-                if (result && result.event === 'success') {
-                    const info = result.info;
-                    await sendMessage(roomId, { type: 'image', url: info.secure_url, name: info.original_filename });
-                    try { await Tone.start(); soundSend.triggerAttackRelease('E5', '8n'); } catch(_) {}
-                    resolve(info);
-                }
-            });
-            widget.open();
-        });
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', uploadPreset);
+            const resourceType = file.type.startsWith('video/') ? 'video' : 'image';
+            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data && data.secure_url) {
+                await sendMessage(roomId, { type: 'image', url: data.secure_url, name: data.original_filename });
+                try { await Tone.start(); soundSend.triggerAttackRelease('E5', '8n'); } catch(_) {}
+            } else {
+                console.error('Cloudinary upload failed', data);
+                alert('Upload failed');
+            }
+        } catch (e) {
+            console.error('Cloudinary upload error', e);
+            alert('Upload error');
+        }
     }
 
     function populateEmojiPanel() {
