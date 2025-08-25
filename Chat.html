@@ -1940,9 +1940,26 @@
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app, auth, db;
+        try {
+            console.log('JCHAT_DEBUG: Initializing Firebase...');
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log('JCHAT_DEBUG: Firebase initialized successfully');
+        } catch (error) {
+            console.error('JCHAT_DEBUG: Firebase initialization error:', error);
+            // Show error on page instead of crashing
+            document.body.innerHTML = `
+                <div style="padding: 20px; text-align: center; color: white; background: #1a1a2e;">
+                    <h2>Firebase Configuration Error</h2>
+                    <p>Failed to initialize Firebase. Please check the console for details.</p>
+                    <p>Error: ${error.message}</p>
+                    <button onclick="location.reload()" style="padding: 10px 20px; background: #ff2e92; border: none; color: white; border-radius: 5px; cursor: pointer;">Reload Page</button>
+                </div>
+            `;
+            throw error;
+        }
 
         // Cloudinary Configuration
         const cloudinary = {
@@ -2023,25 +2040,49 @@
 
         // Initialize App
         function initializeChatApp() {
-            setTimeout(() => {
-                loader.classList.add('hidden');
-            }, 1500);
+            console.log('JCHAT_DEBUG: Initializing Chat App...');
+            
+            try {
+                // Add error handling to prevent immediate redirect
+                setTimeout(() => {
+                    if (loader) {
+                        loader.classList.add('hidden');
+                    }
+                }, 1500);
 
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    currentUser = user;
-                    loadUserProfile();
-                    setupChatInterface();
-                    setupNotifications();
-                } else {
-                    window.location.href = '/Login.html';
-                }
-            });
+                console.log('JCHAT_DEBUG: Setting up auth state listener...');
+                onAuthStateChanged(auth, (user) => {
+                    console.log('JCHAT_DEBUG: Auth state changed:', user ? 'User logged in' : 'No user');
+                    
+                    if (user) {
+                        console.log('JCHAT_DEBUG: User authenticated:', user.uid);
+                        currentUser = user;
+                        loadUserProfile();
+                        setupChatInterface();
+                        setupNotifications();
+                    } else {
+                        console.log('JCHAT_DEBUG: No user, redirecting to login...');
+                        // Add delay to prevent immediate redirect
+                        setTimeout(() => {
+                            window.location.href = '/Login.html';
+                        }, 2000);
+                    }
+                }, (error) => {
+                    console.error('JCHAT_DEBUG: Auth state change error:', error);
+                    // Don't redirect on auth error, just log it
+                });
 
-            setupEventListeners();
-            applySavedTheme();
-            initializeEmojiPicker();
-            setupFileUpload();
+                setupEventListeners();
+                applySavedTheme();
+                initializeEmojiPicker();
+                setupFileUpload();
+                
+                console.log('JCHAT_DEBUG: Chat App initialization complete');
+            } catch (error) {
+                console.error('JCHAT_DEBUG: Error initializing Chat App:', error);
+                // Prevent immediate redirect on error
+                showNotification('Error', 'Failed to initialize chat. Please refresh the page.', 'error');
+            }
         }
 
         // Load User Profile
@@ -3525,6 +3566,31 @@
                 console.error('Error logging out:', error);
             }
         }
+
+        // Global error handler to prevent crashes
+        window.addEventListener('error', (event) => {
+            console.error('JCHAT_DEBUG: Global error caught:', event.error);
+            console.error('JCHAT_DEBUG: Error details:', {
+                message: event.error?.message,
+                stack: event.error?.stack,
+                filename: event.filename,
+                lineno: event.lineno
+            });
+            
+            // Prevent default error handling
+            event.preventDefault();
+            
+            // Show error notification instead of crashing
+            if (typeof showNotification === 'function') {
+                showNotification('Error', 'An error occurred. Check console for details.', 'error');
+            }
+        });
+
+        // Unhandled promise rejection handler
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('JCHAT_DEBUG: Unhandled promise rejection:', event.reason);
+            event.preventDefault();
+        });
 
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', initializeChatApp);
