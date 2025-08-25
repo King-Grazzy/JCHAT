@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JCHAT - Profile</title>
+    <title>JCHAT - Chat</title>
     
     <!-- Security Meta Tags -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -70,7 +70,7 @@
             --card-background-color: #2a2a4a;
             --text-color-primary: #e0e0e0;
             --text-color-secondary: #b0b0d0;
-            --notification-badge-color: #ff2e92;
+
             --status-online: #4CAF50;
             --status-offline: #6c757d;
             --status-away: #FFC107;
@@ -113,7 +113,7 @@
             --button-background: #e9ecef;
             --button-hover-background: #dee2e6;
             --active-item-background: rgba(0, 123, 255, 0.1);
-            --notification-badge-color: #dc3545;
+
             --status-online: #28a745;
             --status-offline: #6c757d;
             --status-away: #ffc107;
@@ -151,7 +151,7 @@
             --button-background: #383838;
             --button-hover-background: #505050;
             --active-item-background: rgba(187, 134, 252, 0.2);
-            --notification-badge-color: #cf6679;
+
             --delete-button-color: #f44336;
             --warning-color: #ffeb3b;
         }
@@ -519,135 +519,7 @@
             width: 100%;
         }
 
-        /* Cool Notification Icon Styling (from Home.html) */
-        .notification-icon-wrapper {
-            position: relative;
-            margin-right: 15px;
-        }
 
-        .notification-icon-wrapper a {
-            text-decoration: none;
-            color: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .notification-icon-wrapper a::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .notification-icon-wrapper a:hover::before {
-            left: 100%;
-        }
-
-        .notification-icon-wrapper a:hover {
-            transform: translateY(-2px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(0, 213, 255, 0.3);
-            border-color: var(--blue);
-        }
-
-        .notification-icon-wrapper i {
-            font-size: 1.3rem;
-            background: linear-gradient(45deg, var(--blue), var(--pink));
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: transparent;
-            transition: all 0.3s ease;
-            z-index: 1;
-            position: relative;
-        }
-
-        .notification-icon-wrapper a:hover i {
-            transform: rotate(15deg) scale(1.1);
-            background: linear-gradient(45deg, var(--pink), var(--blue));
-            background-clip: text;
-            -webkit-background-clip: text;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: linear-gradient(45deg, #ff4757, #ff3742);
-            color: var(--white);
-            border-radius: 50%;
-            padding: 4px 8px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            min-width: 22px;
-            height: 22px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--background-main);
-            animation: pulse-notification 2s infinite;
-            z-index: 2;
-        }
-
-        @keyframes pulse-notification {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .notification-badge:empty {
-            display: none;
-        }
-
-        /* Additional cool effects for notification icon */
-        .notification-icon-wrapper a:active {
-            transform: scale(0.95);
-        }
-
-        /* Glow effect when there are notifications */
-        .notification-icon-wrapper.has-notifications a {
-            box-shadow: 0 0 20px rgba(255, 71, 87, 0.3);
-        }
-
-        .notification-icon-wrapper.has-notifications a:hover {
-            box-shadow: 0 0 30px rgba(255, 71, 87, 0.5);
-        }
-
-        /* Shaking animation for notification bell when there are unread notifications */
-        .notification-icon-wrapper.has-notifications i {
-            animation: bell-shake 2s ease-in-out infinite, subtle-shake 3s ease-in-out infinite 1s;
-            transform-origin: top;
-        }
-
-        @keyframes bell-shake {
-            0%, 100% { transform: rotate(0deg); }
-            5%, 15%, 25%, 35% { transform: rotate(8deg); }
-            10%, 20%, 30% { transform: rotate(-8deg); }
-            40%, 100% { transform: rotate(0deg); }
-        }
-
-        @keyframes subtle-shake {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(2deg); }
-        }
-
-        /* Pause shaking on hover */
-        .notification-icon-wrapper.has-notifications a:hover i {
             animation-play-state: paused;
         }
 
@@ -757,19 +629,9 @@
             }
         }
 
-        /* Notification Icon Styling (from Home.html) */
-        .notification-icon-wrapper {
-            position: relative;
-            margin-right: 15px; /* Space between notification and profile */
-        }
 
-        .notification-icon-wrapper a {
-            text-decoration: none; /* Remove underline from link */
-            color: inherit; /* Inherit color from parent */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+
+
         .notification-icon-wrapper i {
             font-size: 1.5rem; /* Adjust size as needed */
             /* Apply gradient to icons */
@@ -2145,98 +2007,7 @@
             }
         }
 
-        /* Floating Scroll Toggle Button - Pink and Blue Theme */
-        .scroll-toggle-btn {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, var(--pink), var(--blue));
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.3), 0 4px 15px rgba(0, 213, 255, 0.3);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 9999;
-            overflow: hidden;
-            font-size: 1.1rem;
-            color: white;
-            font-weight: 600;
-            opacity: 0.7;
-        }
 
-        .scroll-toggle-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, var(--blue), var(--pink));
-            border-radius: 50%;
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .scroll-toggle-btn:hover {
-            transform: translateY(-3px) scale(1.1);
-            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.5), 0 8px 25px rgba(0, 213, 255, 0.5);
-            opacity: 1;
-        }
-
-        .scroll-toggle-btn:hover::before {
-            opacity: 1;
-        }
-
-        .scroll-toggle-btn:active {
-            transform: translateY(-2px) scale(1.05);
-        }
-
-        .scroll-toggle-btn i {
-            position: relative;
-            z-index: 2;
-            transition: all 0.3s ease;
-        }
-
-        .scroll-toggle-btn:hover i {
-            transform: scale(1.2);
-        }
-
-        /* Scroll to Top state */
-        .scroll-toggle-btn.scroll-to-top {
-            background: linear-gradient(135deg, var(--blue), var(--pink));
-        }
-
-        .scroll-toggle-btn.scroll-to-top::before {
-            background: linear-gradient(135deg, var(--pink), var(--blue));
-        }
-
-
-
-        /* Mobile responsive adjustments */
-        @media (max-width: 768px) {
-            .scroll-toggle-btn {
-                bottom: 20px;
-                right: 20px;
-                width: 40px;
-                height: 40px;
-                font-size: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .scroll-toggle-btn {
-                bottom: 15px;
-                right: 15px;
-                width: 35px;
-                height: 35px;
-                font-size: 0.9rem;
-            }
-        }
 
         /* Floating Contact Icon - Bottom Left */
         .contact-icon {
@@ -4411,18 +4182,7 @@
                 padding: 0 15px;
             }
 
-            .notification-icon-wrapper {
-                margin-right: 10px;
-            }
 
-            .notification-icon-wrapper a {
-                width: 35px;
-                height: 35px;
-            }
-
-            .notification-icon-wrapper i {
-                font-size: 1.1rem;
-            }
 
             .user-profile-header span {
                 font-size: 0.9rem;
@@ -4494,14 +4254,7 @@
                 padding: 0 10px;
             }
 
-            .notification-icon-wrapper a {
-                width: 32px;
-                height: 32px;
-            }
 
-            .notification-icon-wrapper i {
-                font-size: 1rem;
-            }
 
             .user-profile-header span {
                 font-size: 0.8rem;
@@ -5099,41 +4852,16 @@
                 </ul>
             </nav>
             <div class="user-profile-header">
-                <!-- NEW: Admin Icon Link (hidden by default) -->
+                <!-- Admin Icon Link (hidden by default) -->
                 <a href="/gas_management.html" id="adminIconLink" aria-label="Admin Dashboard">
                     <i class="fas fa-user-cog"></i>
                 </a>
-                <!-- Notification Icon with Badge -->
-                <div class="notification-icon-wrapper">
-                    <a href="/notifications.html" aria-label="Notifications">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge" id="notificationCount" style="display: none;">0</span>
-                    </a>
-                </div>
-
-
-
-
-                    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                <!-- Profile Link with Picture -->
+                <a href="Profile.html" id="profileLink">
+                    <img id="headerProfilePic" src="" alt="Profile Picture" style="display: none;">
+                    <i id="headerAvatarIcon" class="fas fa-user-circle"></i>
+                    <span id="headerDisplayName">Loading...</span>
+                </a>
             </div>
         </div>
     </header>
@@ -5250,10 +4978,7 @@
         </div>
     </div>
 
-    <!-- Floating Scroll Toggle Button - Pink and Blue Theme -->
-    <div id="scrollToggleButton" class="scroll-toggle-btn" title="Scroll to Bottom">
-        <i class="fas fa-chevron-down" id="scrollToggleIcon"></i>
-    </div>
+
 
     <!-- Select Friend Modal (exactly like Chat.html) -->
     <div id="selectFriendModal" class="modal-overlay">
@@ -5447,7 +5172,7 @@
         const headerProfilePic = document.getElementById('headerProfilePic');
         const headerAvatarIcon = document.getElementById('headerAvatarIcon');
         const headerDisplayName = document.getElementById('headerDisplayName');
-        const notificationCountElement = document.getElementById('notificationCount');
+
 
         // const headerNavLinkProfile = document.getElementById('profileLink'); // Removed - element doesn't exist
         const adminIconLink = document.getElementById('adminIconLink');
@@ -5491,23 +5216,7 @@
         const profileTimezone = document.getElementById('profileTimezone');
         const timezoneText = document.getElementById('timezoneText');
 
-        // --- Notification Badge Management ---
-        function updateNotificationBadge(count) {
-            const notificationWrapper = document.querySelector('.notification-icon-wrapper');
-            const notificationBadge = document.getElementById('notificationCount');
-            if (notificationBadge && notificationWrapper) {
-                if (count > 0) {
-                    notificationBadge.textContent = count > 99 ? '99+' : count.toString();
-                    notificationBadge.style.display = 'flex';
-                    notificationWrapper.classList.add('has-notifications');
-                    console.log('🔔 Notification badge updated:', count, 'notifications');
-                } else {
-                    notificationBadge.style.display = 'none';
-                    notificationWrapper.classList.remove('has-notifications');
-                    console.log('🔕 No notifications, badge hidden');
-                }
-            }
-        }
+
 
         // NEW: User Info Display Elements
         const profileSchool = document.getElementById('profileSchool');
@@ -7297,32 +7006,7 @@
                 console.error(`Error loading header profile: ${error.message}`);
             }
         }
-        /**
-         * Fetches and displays the notification count for the current user.
-         * @param {string} userId - The UID of the current user.
-         */
-        async function fetchNotificationCount(userId) {
-            try {
-                const notificationsCollectionRef = collection(db, "artifacts", appId, "users", userId, "notifications");
-                const q = query(notificationsCollectionRef, where("read", "==", false));
-                const querySnapshot = await getDocs(q);
-                const unreadCount = querySnapshot.size;
 
-                if (unreadCount > 0) {
-                    if (notificationCountElement) { // Null check
-                        notificationCountElement.textContent = unreadCount;
-                        notificationCountElement.style.display = 'flex';
-                    }
-                } else {
-                    if (notificationCountElement) { // Null check
-                        notificationCountElement.style.display = 'none';
-                    }
-                }
-            } catch (error) {
-                console.error("JCHAT_ERROR: Error fetching notification count:", error);
-                if (notificationCountElement) notificationCountElement.style.display = 'none'; // Null check
-            }
-        }
 
         // --- Profile Page Specific Functions ---
 
@@ -8720,7 +8404,7 @@
 
                     // Fetch and display user profile after header profile is ready
                     await fetchAndDisplayUserProfile(displayedUserId);
-                    fetchNotificationCount(user.uid); // Fetch notification count
+    
                     
                     // Hide loader after profile is fully loaded
                     hideLoader();
@@ -8796,87 +8480,7 @@
             console.log("JCHAT_DEBUG: Authentication flow complete");
         }
         });
-        // --- Scroll Toggle Button Functionality ---
-        function initializeScrollToggle() {
-            const scrollToggleBtn = document.getElementById('scrollToggleButton');
-            const scrollToggleIcon = document.getElementById('scrollToggleIcon');
-            let isAtTop = true;
 
-            if (!scrollToggleBtn || !scrollToggleIcon) return;
-
-            // Function to scroll to bottom
-            function scrollToBottom() {
-                window.scrollTo({
-                    top: document.documentElement.scrollHeight,
-                    behavior: 'smooth'
-                });
-                isAtTop = false;
-                updateScrollToggleState();
-            }
-
-            // Function to scroll to top
-            function scrollToTop() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-                isAtTop = true;
-                updateScrollToggleState();
-            }
-
-            // Function to update button state and icon
-            function updateScrollToggleState() {
-                if (isAtTop) {
-                    scrollToggleBtn.classList.remove('scroll-to-top');
-
-                    scrollToggleIcon.className = 'fas fa-chevron-down';
-                    scrollToggleBtn.title = 'Scroll to Bottom';
-                } else {
-                    scrollToggleBtn.classList.add('scroll-to-top');
-
-                    scrollToggleIcon.className = 'fas fa-chevron-up';
-                    scrollToggleBtn.title = 'Scroll to Top';
-                }
-            }
-
-            // Add click event listener
-            scrollToggleBtn.addEventListener('click', () => {
-                if (isAtTop) {
-                    scrollToBottom();
-                } else {
-                    scrollToTop();
-                }
-            });
-
-            // Update state on scroll
-            let scrollTimeout;
-            window.addEventListener('scroll', () => {
-                if (scrollTimeout) {
-                    clearTimeout(scrollTimeout);
-                }
-                scrollTimeout = setTimeout(() => {
-                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    const windowHeight = window.innerHeight;
-                    const documentHeight = document.documentElement.scrollHeight;
-                    
-                    // Check if we're at top or bottom
-                    if (scrollTop < 100) {
-                        if (!isAtTop) {
-                            isAtTop = true;
-                            updateScrollToggleState();
-                        }
-                    } else if (scrollTop + windowHeight >= documentHeight - 100) {
-                        if (isAtTop) {
-                            isAtTop = false;
-                            updateScrollToggleState();
-                        }
-                    }
-                }, 150); // Increased timeout for better performance
-            }, { passive: true });
-
-            // Initialize button state
-            updateScrollToggleState();
-        }
 
         // --- User Information Toggle Functionality ---
         function initializeUserInfoToggle() {
