@@ -2145,6 +2145,274 @@
             }
         }
 
+        /* NEW: Friends List Section Styles */
+        .friends-list-section {
+            background: var(--card-background);
+            border: 1px solid var(--glass-blue);
+            backdrop-filter: blur(10px) saturate(180%);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, .3);
+            padding: 2rem;
+            width: 90%;
+            max-width: 700px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .friends-list-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .friends-list-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, .4);
+        }
+
+        .friends-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .friends-section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(90deg, var(--blue), var(--pink));
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .friends-count {
+            font-size: 1rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .toggle-friends-btn {
+            background: linear-gradient(45deg, var(--pink), var(--blue));
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 46, 146, 0.3), 0 4px 15px rgba(0, 213, 255, 0.3);
+        }
+
+        .toggle-friends-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 46, 146, 0.4), 0 8px 25px rgba(0, 213, 255, 0.4);
+        }
+
+        .friends-search-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .friends-search-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            background-color: var(--input-background);
+            color: var(--white);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .friends-search-input::placeholder {
+            color: var(--text-light);
+        }
+
+        .friends-search-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(0, 213, 255, 0.3);
+        }
+
+        .friends-search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1.2rem;
+        }
+
+        .clear-search-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .clear-search-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        .friends-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            width: 100%;
+        }
+
+        .friend-card {
+            background: var(--glass-blue);
+            border: 1px solid var(--blue);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+        }
+
+        .friend-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 213, 255, 0.3);
+            background-color: rgba(0, 213, 255, 0.25);
+        }
+
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--pink);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            flex-shrink: 0;
+        }
+
+        .friend-avatar-placeholder {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--blue), var(--pink));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .friend-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .friend-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--white);
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .friend-status {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 5px 0 0 0;
+        }
+
+        .loading-friends-message,
+        .no-friends-message {
+            text-align: center;
+            color: var(--text-light);
+            padding: 40px 20px;
+            width: 100%;
+            grid-column: 1 / -1;
+        }
+
+        .loading-friends-message i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--blue);
+        }
+
+        .no-friends-message i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+
+        .no-friends-message p {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* Mobile responsive for friends section */
+        @media (max-width: 768px) {
+            .friends-list-section {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .friends-section-title {
+                font-size: 1.5rem;
+            }
+
+            .friends-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .friend-card {
+                padding: 12px;
+            }
+
+            .friend-avatar,
+            .friend-avatar-placeholder {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .friend-name {
+                font-size: 1rem;
+            }
+        }
+
         /* Floating Scroll Toggle Button - Pink and Blue Theme */
         .scroll-toggle-btn {
             position: fixed;
@@ -5568,7 +5836,40 @@
                     </div>
                 </div>
 
-
+            <!-- NEW: Friends List Section with Toggle and Search -->
+            <div class="friends-list-section" id="friendsListSection" style="display: none;">
+                <div class="friends-section-header">
+                    <h3 class="friends-section-title">
+                        <i class="fas fa-users"></i>
+                        Friends
+                        <span id="friendsCountDisplay" class="friends-count">(0)</span>
+                    </h3>
+                    <button id="toggleFriendsListBtn" class="toggle-friends-btn" title="Toggle Friends List">
+                        <i class="fas fa-eye" id="friendsToggleIcon"></i>
+                    </button>
+                </div>
+                
+                <div class="friends-list-content" id="friendsListContent" style="display: none;">
+                    <div class="friends-search-container">
+                        <i class="fas fa-search friends-search-icon"></i>
+                        <input type="text" id="friendsSearchInput" placeholder="Search friends..." class="friends-search-input">
+                        <button id="clearFriendsSearch" class="clear-search-btn" style="display: none;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="friends-grid" id="friendsGrid">
+                        <div class="loading-friends-message" id="loadingFriendsMessage">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading friends...
+                        </div>
+                        <div class="no-friends-message" id="noFriendsMessage" style="display: none;">
+                            <i class="fas fa-user-friends"></i>
+                            <p>No friends found.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             </div>
         </div>
@@ -6070,9 +6371,16 @@
         const unlockedRewardsSection = document.getElementById('unlockedRewardsSection');
         const unlockedRewardsGrid = document.getElementById('unlockedRewardsGrid');
         const noRewardsMessage = document.getElementById('noRewardsMessage');
-        // NEW: Friends Snippet Section
-        const friendsSnippetSection = document.getElementById('friendsSnippetSection');
-        const friendsSnippetGrid = document.getElementById('friendsSnippetGrid');
+        // NEW: Friends List Section with Toggle
+        const friendsListSection = document.getElementById('friendsListSection');
+        const toggleFriendsListBtn = document.getElementById('toggleFriendsListBtn');
+        const friendsToggleIcon = document.getElementById('friendsToggleIcon');
+        const friendsListContent = document.getElementById('friendsListContent');
+        const friendsSearchInput = document.getElementById('friendsSearchInput');
+        const clearFriendsSearch = document.getElementById('clearFriendsSearch');
+        const friendsGrid = document.getElementById('friendsGrid');
+        const friendsCountDisplay = document.getElementById('friendsCountDisplay');
+        const loadingFriendsMessage = document.getElementById('loadingFriendsMessage');
         const noFriendsMessage = document.getElementById('noFriendsMessage');
 
                     // NEW: Recent Activity Section
