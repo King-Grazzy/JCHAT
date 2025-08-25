@@ -15,6 +15,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 
+    <script src="config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore-compat.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         :root {
@@ -279,11 +285,147 @@
 
     let typingTimeoutId = null;
 
-    const conversations = [
-        { id: 'u1', name: 'Jane Doe', avatar: 'assets/icon2.png', last: 'See you soon!', time: '3m' },
-        { id: 'u2', name: 'John Smith', avatar: 'assets/icon1.png', last: 'Let\'s meet at 5', time: '1h' },
-        { id: 'u3', name: 'Alex Kim', avatar: 'assets/icon2.png', last: 'Got it, thanks!', time: 'Yesterday' }
-    ];
+    // Firebase init
+    if (!window.firebaseApp) {
+        window.firebaseApp = firebase.initializeApp(window.firebaseConfig || {});
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // Resolve peer/user from URL or default
+    const urlParams = new URLSearchParams(location.search);
+    const peer = {
+        id: urlParams.get('peerId') || (window.defaultPeer && window.defaultPeer.id) || 'demo-peer',
+        name: urlParams.get('peerName') || (window.defaultPeer && window.defaultPeer.name) || 'Contact',
+        avatar: urlParams.get('peerAvatar') || (window.defaultPeer && window.defaultPeer.avatar) || 'assets/icon2.png'
+    };
+    document.getElementById('chatPeerName').textContent = peer.name;
+    document.getElementById('chatPeerAvatar').src = peer.avatar;
+
+    // Sign in (anonymous if not already)
+    let currentUser = null;
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            startChat();
+        } else {
+            await auth.signInAnonymously();
+        }
+    });
+
+    // Create deterministic room id between two users (anonymous uid + peer id)
+    function getRoomId(uid, peerId) {
+        const a = String(uid);
+        const b = String(peerId);
+        return [a, b].sort().join('__');
+    }
+
+    function messageDoc(roomId) {
+        return db.collection('rooms').doc(roomId).collection('messages');
+    }
+
+    function startChat() {
+        const roomId = getRoomId(currentUser.uid, peer.id);
+        subscribeMessages(roomId);
+        setupComposer(roomId);
+        document.getElementById('peerName').textContent = peer.name;
+    }
+
+    function subscribeMessages(roomId) {
+        messagesEl.innerHTML = '';
+        messageDoc(roomId)
+            .orderBy('createdAt', 'asc')
+            .limit(200)
+            .onSnapshot((snap) => {
+                messagesEl.innerHTML = '';
+                snap.forEach((doc) => renderMessage(doc.data()));
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+                updateScrollButtonVisibility();
+            });
+    }
+
+    function renderMessage(data) {
+        const isMe = data.senderId === (currentUser && currentUser.uid);
+        const row = document.createElement('div');
+        row.className = 'msg-row' + (isMe ? ' sent' : '');
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        const text = document.createElement('div');
+        text.className = 'text';
+        if (data.type === 'image' && data.url) {
+            const img = document.createElement('img');
+            img.src = data.url;
+            img.alt = data.name || 'image';
+            img.style.maxWidth = '280px';
+            img.style.borderRadius = '12px';
+            text.appendChild(img);
+        } else {
+            text.textContent = data.text || '';
+        }
+        bubble.appendChild(text);
+        row.appendChild(bubble);
+        messagesEl.appendChild(row);
+    }
+
+    function setupComposer(roomId) {
+        composerEl.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const text = textInputEl.value.trim();
+            if (!text) return;
+            textInputEl.value = '';
+            await sendMessage(roomId, { type: 'text', text });
+            try { await Tone.start(); soundSend.triggerAttackRelease('C6', '8n'); } catch (_) {}
+        });
+
+        document.getElementById('attachBtn').addEventListener('click', () => fileInputEl.click());
+        fileInputEl.addEventListener('change', async () => {
+            const file = fileInputEl.files && fileInputEl.files[0];
+            if (!file) return;
+            await uploadWithCloudinary(roomId, file);
+            fileInputEl.value = '';
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            // In a real app, query Firestore for recent conversations. Hidden for simplicity here.
+        });
+
+        textInputEl.addEventListener('input', showTyping);
+    }
+
+    async function sendMessage(roomId, payload) {
+        const doc = {
+            senderId: currentUser.uid,
+            senderAvatar: '',
+            ...payload,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        await messageDoc(roomId).add(doc);
+    }
+
+    async function uploadWithCloudinary(roomId, file) {
+        const cloud = window.cloudinaryConfig || {};
+        if (!cloud.cloudName || !cloud.unsignedUploadPreset) {
+            alert('Cloudinary config missing');
+            return;
+        }
+        return new Promise((resolve, reject) => {
+            const widget = cloudinary.createUploadWidget({
+                cloudName: cloud.cloudName,
+                uploadPreset: cloud.unsignedUploadPreset,
+                multiple: false,
+                sources: ['local','url','camera']
+            }, async (error, result) => {
+                if (error) return reject(error);
+                if (result && result.event === 'success') {
+                    const info = result.info;
+                    await sendMessage(roomId, { type: 'image', url: info.secure_url, name: info.original_filename });
+                    try { await Tone.start(); soundSend.triggerAttackRelease('E5', '8n'); } catch(_) {}
+                    resolve(info);
+                }
+            });
+            widget.open();
+        });
+    }
 
     function populateEmojiPanel() {
         const emojis = ['😀','😁','😂','🤣','😊','😍','😘','😎','🤔','🙄','😴','🤯','👍','👎','👏','🙏','🔥','💯','✨','🎉','❤️','💙','💚','💛','💜','🧡','🤍','🤝','👋','🙌','🤌','👌','✌️','🤞','🤟','👉','👈','☕','🍕','🍔','🍟'];
@@ -330,95 +472,6 @@
         }
     });
 
-    textInputEl.addEventListener('input', showTyping);
-
-    function renderConversations(list) {
-        conversationListEl.innerHTML = '';
-        for (const c of list) {
-            const item = document.createElement('div');
-            item.className = 'conversation-item';
-            item.dataset.id = c.id;
-            item.innerHTML = `
-                <img src="${c.avatar}" alt="${c.name}">
-                <div class="meta">
-                    <div class="username">${c.name}</div>
-                    <div class="last">${c.last}</div>
-                </div>
-                <div class="time">${c.time}</div>
-            `;
-            item.addEventListener('click', () => selectConversation(c.id));
-            conversationListEl.appendChild(item);
-        }
-        if (list.length) selectConversation(list[0].id);
-    }
-
-    function setActiveConversation(conversationId) {
-        document.querySelectorAll('.conversation-item').forEach(el => {
-            el.classList.toggle('active', el.dataset.id === conversationId);
-        });
-    }
-
-    function selectConversation(conversationId) {
-        const convo = conversations.find(c => c.id === conversationId);
-        if (!convo) return;
-        document.getElementById('chatPeerName').textContent = convo.name;
-        document.getElementById('chatPeerAvatar').src = convo.avatar;
-        setActiveConversation(conversationId);
-        renderMessagesSeed(convo);
-    }
-
-    function renderMessagesSeed(convo) {
-        const seed = [
-            { from: 'peer', text: `Hi, I\'m ${convo.name}.` },
-            { from: 'me', text: 'Hey! Great to connect.' },
-            { from: 'peer', text: 'How is your day going?' }
-        ];
-        messagesEl.innerHTML = '';
-        for (const m of seed) {
-            appendMessage(m.from === 'me', m.text);
-        }
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-
-    function appendMessage(isMe, text) {
-        const row = document.createElement('div');
-        row.className = 'msg-row' + (isMe ? ' sent' : '');
-        const bubble = document.createElement('div');
-        bubble.className = 'msg-bubble';
-        bubble.innerHTML = `<div class="text"></div>`;
-        bubble.querySelector('.text').textContent = text;
-        row.appendChild(bubble);
-        messagesEl.appendChild(row);
-        messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
-
-    composerEl.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const text = textInputEl.value.trim();
-        if (!text) return;
-        appendMessage(true, text);
-        textInputEl.value = '';
-        try { await Tone.start(); soundSend.triggerAttackRelease('C6', '8n'); } catch (_) {}
-        window.setTimeout(async () => {
-            appendMessage(false, 'Received: ' + text);
-            try { await Tone.start(); soundReceive.triggerAttackRelease('C2', '8n'); } catch (_) {}
-        }, 600);
-    });
-
-    document.getElementById('attachBtn').addEventListener('click', () => fileInputEl.click());
-    fileInputEl.addEventListener('change', () => {
-        if (fileInputEl.files && fileInputEl.files[0]) {
-            appendMessage(true, '📎 ' + fileInputEl.files[0].name);
-        }
-    });
-
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        const q = e.target.value.toLowerCase();
-        const filtered = conversations.filter(c => c.name.toLowerCase().includes(q));
-        renderConversations(filtered);
-    });
-
-    renderConversations(conversations);
 })();
 </script>
 </body>
