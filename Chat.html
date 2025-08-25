@@ -339,6 +339,20 @@
         .sidebar.collapsed {
             transform: translateX(-100%);
         }
+        
+        /* Auto-collapse sidebar on larger screens when chat is active */
+        @media (min-width: 769px) {
+            .sidebar.collapsed {
+                transform: translateX(-300px);
+                width: 20px;
+                overflow: hidden;
+            }
+            
+            .sidebar.collapsed:hover {
+                transform: translateX(0);
+                width: var(--sidebar-width);
+            }
+        }
 
         .sidebar-header {
             padding: 20px;
@@ -635,6 +649,7 @@
             width: 100%;
             height: calc(100vh - 120px); /* Full height minus header and input */
             margin: 0;
+            margin-top: 10px; /* Small spacing between header and messages */
         }
 
         .message {
@@ -2525,12 +2540,15 @@
             return allUsersData.find(user => user.userId === userId) || null;
         }
 
-        // Start direct chat with a user
+        // Start direct chat with a user (enhanced for friends)
         async function startDirectChatWithUser(userId) {
             try {
                 console.log('JCHAT_DEBUG: Starting direct chat with user:', userId);
                 
-                // Check if chat already exists
+                // Auto-close sidebar on any screen size when starting chat
+                sidebar.classList.add('collapsed');
+                
+                // Check if chat already exists (try both possible ID combinations)
                 const existingChatId = `${currentUser.uid}_${userId}`;
                 const altChatId = `${userId}_${currentUser.uid}`;
                 
@@ -2540,7 +2558,9 @@
                     const chatDoc = await getDoc(chatRef);
                     
                     if (chatDoc.exists()) {
+                        console.log('JCHAT_DEBUG: Found existing chat:', existingChatId);
                         selectChat(existingChatId, 'direct');
+                        showNotification('Chat', 'Continuing conversation with friend', 'info');
                         return;
                     }
                 } catch (error) {
@@ -2552,30 +2572,38 @@
                     const altChatDoc = await getDoc(altChatRef);
                     
                     if (altChatDoc.exists()) {
+                        console.log('JCHAT_DEBUG: Found existing alternate chat:', altChatId);
                         selectChat(altChatId, 'direct');
+                        showNotification('Chat', 'Continuing conversation with friend', 'info');
                         return;
                     }
                 } catch (error) {
                     console.log('JCHAT_DEBUG: No alternate chat found');
                 }
                 
-                // Create new chat
+                // Create new private chat with friend
                 const newChatId = existingChatId;
                 const chatRef = doc(db, "artifacts", appId, "public", "data", "chats", newChatId);
+                
+                // Get friend's data
+                const friendData = getUserDataFromCache(userId);
                 
                 await setDoc(chatRef, {
                     members: [currentUser.uid, userId],
                     createdAt: serverTimestamp(),
+                    displayName: friendData?.username || 'Friend',
+                    chatType: 'private',
                     lastMessage: null,
                     lastMessageTimestamp: null
                 });
                 
-                console.log('JCHAT_DEBUG: New direct chat created:', newChatId);
+                console.log('JCHAT_DEBUG: New private chat created with friend:', newChatId);
                 selectChat(newChatId, 'direct');
+                showNotification('Success', `Started private chat with ${friendData?.username || 'friend'}`, 'success');
                 
             } catch (error) {
                 console.error('JCHAT_DEBUG: Error starting direct chat:', error);
-                showNotification('Error', 'Failed to start chat', 'error');
+                showNotification('Error', 'Failed to start chat with friend', 'error');
             }
         }
 
@@ -2763,10 +2791,12 @@
             }
         }
 
-        // Load Direct Chats
+        // Load Direct Chats - Show Friends Only (like Profile.html Friends Stats)
         async function loadDirectChats() {
             try {
-                // First try to load from Firestore
+                console.log('JCHAT_DEBUG: Loading friends for direct chats...');
+                
+                // First try to load existing chats from Firestore
                 const chatsRef = collection(db, "artifacts", appId, "public", "data", "chats");
                 const q = query(
                     chatsRef,
@@ -2774,32 +2804,56 @@
                 );
                 
                 const snapshot = await getDocs(q);
-                return snapshot.docs.map(doc => ({
+                const existingChats = snapshot.docs.map(doc => ({
                     id: doc.id,
                     type: 'direct',
                     ...doc.data()
                 }));
-            } catch (error) {
-                console.log('JCHAT_DEBUG: No direct chats found or collection doesn\'t exist yet:', error.message);
                 
-                // If no chats exist, show available users to start chats with
+                // Get friends list (matching Profile.html logic)
+                const friendsList = [];
+                if (allUsersData.length > 0) {
+                    allUsersData
+                        .filter(user => user.userId !== currentUser.uid && currentUsersFriends.has(user.userId))
+                        .forEach(user => {
+                            friendsList.push({
+                                id: `friend_${user.userId}`,
+                                type: 'direct',
+                                isFriend: true,
+                                userId: user.userId,
+                                name: user.username || 'Friend',
+                                profilePicId: user.profilePicId,
+                                visibility: user.visibility,
+                                status: 'Friends since ' + new Date().toLocaleDateString() // Could be enhanced with actual friend date
+                            });
+                        });
+                }
+                
+                console.log('JCHAT_DEBUG: Found', friendsList.length, 'friends for direct chats');
+                
+                // Combine existing chats with friends list, prioritizing existing chats
+                return [...existingChats, ...friendsList];
+                
+            } catch (error) {
+                console.log('JCHAT_DEBUG: Error loading direct chats:', error.message);
+                
+                // Fallback: show friends only
                 if (allUsersData.length > 0) {
                     return allUsersData
-                        .filter(user => user.userId !== currentUser.uid)
+                        .filter(user => user.userId !== currentUser.uid && currentUsersFriends.has(user.userId))
                         .map(user => ({
-                            id: `user_${user.userId}`,
+                            id: `friend_${user.userId}`,
                             type: 'direct',
-                            isUser: true,
+                            isFriend: true,
                             userId: user.userId,
-                            name: user.username || 'User',
-                            profilePicId: user.profilePicId, // Use profilePicId like Find_Friends.html
-                            visibility: user.visibility, // Include visibility data like Find_Friends.html
-                            isFriend: currentUsersFriends.has(user.userId),
-                            hasRequest: sentRequests.has(user.userId) || receivedRequests.has(user.userId)
+                            name: user.username || 'Friend',
+                            profilePicId: user.profilePicId,
+                            visibility: user.visibility,
+                            status: 'Friends since ' + new Date().toLocaleDateString()
                         }));
                 }
                 
-                return []; // Return empty array if collection doesn't exist and no users
+                return [];
             }
         }
 
@@ -2845,11 +2899,18 @@
                 item.addEventListener('click', () => {
                     const chatId = item.dataset.chatId;
                     const chatType = item.dataset.chatType;
+                    const userId = item.dataset.userId;
                     
-                    // Handle user selection for direct chats
-                    if (chatType === 'direct' && chatId.startsWith('user_')) {
-                        const userId = chatId.replace('user_', '');
-                        startDirectChatWithUser(userId);
+                    // Auto-close sidebar when friend is selected (mobile responsive)
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.add('collapsed');
+                    }
+                    
+                    // Handle friend selection for direct chats
+                    if (chatType === 'direct' && (chatId.startsWith('friend_') || chatId.startsWith('user_'))) {
+                        const targetUserId = userId || chatId.replace('friend_', '').replace('user_', '');
+                        console.log('JCHAT_DEBUG: Starting private chat with friend:', targetUserId);
+                        startDirectChatWithUser(targetUserId);
                     } else {
                         selectChat(chatId, chatType);
                     }
@@ -2871,7 +2932,23 @@
                 avatarContent = '<i class="fas fa-hashtag"></i>';
                 chatName = chat.name || chat.id;
             } else if (chat.type === 'direct') {
-                if (chat.isUser) {
+                if (chat.isFriend) {
+                    // This is a friend - show profile picture like Profile.html Friends Stats
+                    if (chat.profilePicId && chat.visibility?.profilePic !== false) {
+                        const imageUrl = getCloudinaryImageUrl(chat.profilePicId, "w_60,h_60,c_fill,g_face,r_max");
+                        avatarContent = `<img src="${imageUrl}" alt="${chat.name}'s Profile Picture" onerror="this.onerror=null;this.src='https://placehold.co/60x60/CCCCCC/000000?text=${chat.name.charAt(0).toUpperCase()}';">`;
+                    } else {
+                        avatarContent = `<div class="default-avatar"><i class="fas fa-user-circle"></i></div>`;
+                    }
+                    chatName = chat.name || 'Friend';
+                    
+                    // Show online status for friends
+                    if (onlineUsers.has(chat.userId)) {
+                        statusIndicator = '<div class="status-indicator online"></div>';
+                    } else {
+                        statusIndicator = '<div class="status-indicator offline"></div>';
+                    }
+                } else if (chat.isUser) {
                     // This is a user from the users list - show profile picture if available (matching Find_Friends.html)
                     if (chat.profilePicId && chat.visibility?.profilePic !== false) {
                         const imageUrl = getCloudinaryImageUrl(chat.profilePicId, "w_120,h_120,c_fill,g_face,r_max");
@@ -2897,18 +2974,31 @@
                 chatName = chat.name || 'Group Chat';
             }
 
+            // Determine status message for friends
+            let statusMessage = '';
+            if (chat.isFriend) {
+                statusMessage = '👥 Friend';
+                if (chat.status) {
+                    statusMessage = `👥 ${chat.status}`;
+                }
+            } else if (chat.isUser) {
+                statusMessage = chat.isFriend ? '👥 Friend' : chat.hasRequest ? '📨 Request Pending' : '🆕 New User';
+            } else {
+                statusMessage = formatLastMessage(lastMessage);
+            }
+
             return `
-                <div class="chat-item ${isActive ? 'active' : ''}" data-chat-id="${chat.id}" data-chat-type="${chat.type}">
+                <div class="chat-item ${isActive ? 'active' : ''}" data-chat-id="${chat.id}" data-chat-type="${chat.type}" data-user-id="${chat.userId || ''}">
                     <div class="chat-avatar">
                         ${avatarContent}
                         ${statusIndicator}
                     </div>
                     <div class="chat-info">
                         <h4 class="chat-name">${chatName}</h4>
-                        <p class="chat-last-message">${chat.isUser ? (chat.isFriend ? '👥 Friend' : chat.hasRequest ? '📨 Request Pending' : '🆕 New User') : formatLastMessage(lastMessage)}</p>
+                        <p class="chat-last-message">${statusMessage}</p>
                     </div>
                     <div class="chat-meta">
-                        <span class="chat-time">${chat.isUser ? '' : formatTime(lastMessage.timestamp)}</span>
+                        <span class="chat-time">${chat.isFriend || chat.isUser ? '' : formatTime(lastMessage.timestamp)}</span>
                         ${unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : ''}
                     </div>
                 </div>
