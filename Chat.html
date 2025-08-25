@@ -902,8 +902,10 @@
         let chatId = null;
         let unsubscribeMessages = null;
         let unsubscribeFriends = null;
+        let unsubscribePresence = null;
         let currentUsersFriends = new Set();
         let allFriendsData = [];
+        let userPresenceData = new Map(); // Store presence data for all users
 
         // Tone.js setup
         const successSynth = new Tone.Synth().toDestination();
@@ -1003,6 +1005,165 @@
             return uid1 < uid2 ? `${uid1}_${uid2}` : `${uid2}_${uid1}`;
         }
 
+        /**
+         * Sets up real-time presence system for the current user
+         */
+        async function setupPresenceSystem(userId) {
+            if (!userId) return;
+
+            try {
+                const presenceRef = doc(db, "artifacts", appId, "presence", userId);
+                
+                // Set user as online
+                await setDoc(presenceRef, {
+                    status: 'online',
+                    lastSeen: serverTimestamp(),
+                    userId: userId
+                });
+
+                // Set up disconnect handler to mark user as offline when they leave
+                window.addEventListener('beforeunload', async () => {
+                    try {
+                        await setDoc(presenceRef, {
+                            status: 'offline',
+                            lastSeen: serverTimestamp(),
+                            userId: userId
+                        });
+                    } catch (error) {
+                        console.error("Error updating presence on disconnect:", error);
+                    }
+                });
+
+                // Update presence every 30 seconds to show user is still active
+                setInterval(async () => {
+                    try {
+                        await setDoc(presenceRef, {
+                            status: 'online',
+                            lastSeen: serverTimestamp(),
+                            userId: userId
+                        }, { merge: true });
+                    } catch (error) {
+                        console.error("Error updating presence:", error);
+                    }
+                }, 30000); // Update every 30 seconds
+
+                console.log("JCHAT_DEBUG: Presence system set up for user:", userId);
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error setting up presence system:", error);
+            }
+        }
+
+        /**
+         * Sets up real-time presence listener for all users
+         */
+        function setupPresenceListener() {
+            if (unsubscribePresence) unsubscribePresence();
+
+            const presenceCollectionRef = collection(db, "artifacts", appId, "presence");
+            
+            unsubscribePresence = onSnapshot(presenceCollectionRef, (snapshot) => {
+                console.log("JCHAT_DEBUG: Presence snapshot received, changes:", snapshot.docChanges().length);
+                
+                snapshot.docChanges().forEach((change) => {
+                    if (change.type === "added" || change.type === "modified") {
+                        const presenceData = change.doc.data();
+                        const userId = change.doc.id;
+                        
+                        // Store presence data
+                        userPresenceData.set(userId, {
+                            status: presenceData.status,
+                            lastSeen: presenceData.lastSeen,
+                            userId: userId
+                        });
+
+                        // Update UI if this user is currently being displayed
+                        updateUserStatusInUI(userId, presenceData);
+                    } else if (change.type === "removed") {
+                        const userId = change.doc.id;
+                        userPresenceData.delete(userId);
+                        updateUserStatusInUI(userId, { status: 'offline', lastSeen: null });
+                    }
+                });
+            }, (error) => {
+                console.error("JCHAT_ERROR: Error in presence listener:", error);
+            });
+        }
+
+        /**
+         * Updates user status in the UI (friends list, chat header)
+         */
+        function updateUserStatusInUI(userId, presenceData) {
+            // Update in friends list
+            const friendItem = document.querySelector(`[data-friend-id="${userId}"]`);
+            if (friendItem) {
+                const statusIndicator = friendItem.querySelector('.status-indicator');
+                const statusText = friendItem.querySelector('.friend-status span:last-child');
+                
+                if (statusIndicator && statusText) {
+                    updateStatusElements(statusIndicator, statusText, presenceData);
+                }
+            }
+
+            // Update in chat header if this is the current chat partner
+            if (chatPartnerId === userId) {
+                const chatStatusIndicator = document.getElementById('chatPartnerStatus');
+                const chatStatusText = document.getElementById('chatPartnerStatusText');
+                
+                if (chatStatusIndicator && chatStatusText) {
+                    updateStatusElements(chatStatusIndicator, chatStatusText, presenceData);
+                }
+            }
+        }
+
+        /**
+         * Updates status indicator and text elements
+         */
+        function updateStatusElements(indicator, textElement, presenceData) {
+            // Clear existing status classes
+            indicator.classList.remove('online', 'offline', 'away');
+            
+            if (presenceData.status === 'online') {
+                indicator.classList.add('online');
+                textElement.textContent = 'Online';
+            } else {
+                indicator.classList.add('offline');
+                
+                // Show last seen time if available
+                if (presenceData.lastSeen) {
+                    const lastSeenDate = presenceData.lastSeen.toDate ? presenceData.lastSeen.toDate() : new Date(presenceData.lastSeen);
+                    const now = new Date();
+                    const diffMs = now - lastSeenDate;
+                    const diffMins = Math.floor(diffMs / (1000 * 60));
+                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                    let lastSeenText = '';
+                    if (diffMins < 1) {
+                        lastSeenText = 'Just now';
+                    } else if (diffMins < 60) {
+                        lastSeenText = `${diffMins}m ago`;
+                    } else if (diffHours < 24) {
+                        lastSeenText = `${diffHours}h ago`;
+                    } else if (diffDays < 7) {
+                        lastSeenText = `${diffDays}d ago`;
+                    } else {
+                        lastSeenText = lastSeenDate.toLocaleDateString();
+                    }
+                    
+                    textElement.textContent = `Last seen ${lastSeenText}`;
+                } else {
+                    textElement.textContent = 'Offline';
+                }
+            }
+        }
+
+        /**
+         * Gets user presence status
+         */
+        function getUserPresenceStatus(userId) {
+            return userPresenceData.get(userId) || { status: 'offline', lastSeen: null };
+        }
+
         function createFriendItem(friendId, friendData) {
             const friendItem = document.createElement('div');
             friendItem.classList.add('friend-item');
@@ -1019,13 +1180,41 @@
                 avatarHtml = `<div class="friend-avatar default"><i class="fas fa-user-circle"></i></div>`;
             }
 
+            // Get real presence status for this friend
+            const presenceStatus = getUserPresenceStatus(friendId);
+            const statusClass = presenceStatus.status === 'online' ? 'online' : 'offline';
+            let statusText = presenceStatus.status === 'online' ? 'Online' : 'Offline';
+            
+            // If offline, show last seen time
+            if (presenceStatus.status !== 'online' && presenceStatus.lastSeen) {
+                const lastSeenDate = presenceStatus.lastSeen.toDate ? presenceStatus.lastSeen.toDate() : new Date(presenceStatus.lastSeen);
+                const now = new Date();
+                const diffMs = now - lastSeenDate;
+                const diffMins = Math.floor(diffMs / (1000 * 60));
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                if (diffMins < 1) {
+                    statusText = 'Just now';
+                } else if (diffMins < 60) {
+                    statusText = `${diffMins}m ago`;
+                } else if (diffHours < 24) {
+                    statusText = `${diffHours}h ago`;
+                } else if (diffDays < 7) {
+                    statusText = `${diffDays}d ago`;
+                } else {
+                    statusText = lastSeenDate.toLocaleDateString();
+                }
+                statusText = `Last seen ${statusText}`;
+            }
+
             friendItem.innerHTML = `
                 ${avatarHtml}
                 <div class="friend-info">
                     <div class="friend-name">${friendData.visibility?.displayName !== false ? username : 'Anonymous User'}</div>
                     <div class="friend-status">
-                        <span class="status-indicator online"></span>
-                        <span>Online</span>
+                        <span class="status-indicator ${statusClass}"></span>
+                        <span>${statusText}</span>
                     </div>
                 </div>
             `;
@@ -1128,8 +1317,44 @@
 
             const partnerName = friendData.username || `User_${friendId.substring(0, 8)}`;
             chatPartnerName.textContent = partnerName;
-            chatPartnerStatusText.textContent = "Online";
-            chatPartnerStatus.classList.add('online');
+            
+            // Set real presence status in chat header
+            const presenceStatus = getUserPresenceStatus(friendId);
+            chatPartnerStatus.classList.remove('online', 'offline', 'away');
+            
+            if (presenceStatus.status === 'online') {
+                chatPartnerStatus.classList.add('online');
+                chatPartnerStatusText.textContent = "Online";
+            } else {
+                chatPartnerStatus.classList.add('offline');
+                
+                // Show last seen time if available
+                if (presenceStatus.lastSeen) {
+                    const lastSeenDate = presenceStatus.lastSeen.toDate ? presenceStatus.lastSeen.toDate() : new Date(presenceStatus.lastSeen);
+                    const now = new Date();
+                    const diffMs = now - lastSeenDate;
+                    const diffMins = Math.floor(diffMs / (1000 * 60));
+                    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                    let lastSeenText = '';
+                    if (diffMins < 1) {
+                        lastSeenText = 'Just now';
+                    } else if (diffMins < 60) {
+                        lastSeenText = `${diffMins}m ago`;
+                    } else if (diffHours < 24) {
+                        lastSeenText = `${diffHours}h ago`;
+                    } else if (diffDays < 7) {
+                        lastSeenText = `${diffDays}d ago`;
+                    } else {
+                        lastSeenText = lastSeenDate.toLocaleDateString();
+                    }
+                    
+                    chatPartnerStatusText.textContent = `Last seen ${lastSeenText}`;
+                } else {
+                    chatPartnerStatusText.textContent = "Offline";
+                }
+            }
 
             if (friendData.profilePicId && friendData.visibility?.profilePic !== false) {
                 const imageUrl = getCloudinaryImageUrl(friendData.profilePicId, "w_90,h_90,c_fill,g_face,r_max");
@@ -1270,6 +1495,14 @@
                 currentUser = user;
                 await fetchAndDisplayHeaderProfile(user);
                 fetchNotificationCount(user.uid);
+                
+                // Set up presence system for current user
+                await setupPresenceSystem(user.uid);
+                
+                // Set up presence listener for all users
+                setupPresenceListener();
+                
+                // Fetch friends after presence system is ready
                 fetchAndDisplayFriends();
             } else {
                 try {
@@ -1333,6 +1566,7 @@
         window.addEventListener('beforeunload', () => {
             if (unsubscribeMessages) unsubscribeMessages();
             if (unsubscribeFriends) unsubscribeFriends();
+            if (unsubscribePresence) unsubscribePresence();
         });
     </script>
 </body>
