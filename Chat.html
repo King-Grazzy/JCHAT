@@ -2195,14 +2195,17 @@
                         const userData = userDoc.data();
                         console.log('JCHAT_DEBUG: Fetched real user profile:', userData);
                         
-                        // Update sidebar profile
+                        // Update sidebar profile (matching Home.html/Profile.html)
                         if (profileUsername) {
                             profileUsername.textContent = userData.username || 'User';
                         }
                         
-                        if (userData.profilePicture) {
+                        // Handle profile picture using same logic as Home.html/Profile.html
+                        if (userData.profilePicId) {
                             if (profilePic) {
-                                profilePic.src = userData.profilePicture;
+                                // Use Cloudinary transformations for sidebar profile
+                                const sidebarImageUrl = getCloudinaryImageUrl(userData.profilePicId, "w_60,h_60,c_fill,g_face,r_max");
+                                profilePic.src = sidebarImageUrl;
                                 profilePic.style.display = 'block';
                             }
                             if (profileIcon) {
@@ -2218,7 +2221,7 @@
                             }
                         }
                         
-                        // Update header profile elements (matching Home.html)
+                        // Update header profile elements (matching Home.html/Profile.html exactly)
                         if (headerProfilePic && headerAvatarIcon && headerDisplayName) {
                             const usernameInitial = (userData.username || 'U').charAt(0).toUpperCase();
                             displayProfilePicture(headerProfilePic, headerAvatarIcon, userData.profilePicId, usernameInitial, "w_70,h_70,c_fill,g_face,r_max");
@@ -2226,7 +2229,7 @@
                         }
                     } else {
                         console.log('JCHAT_DEBUG: No profile found, using defaults');
-                        // Set default profile data
+                        // Set default profile data (matching Home.html/Profile.html)
                         if (profileUsername) {
                             profileUsername.textContent = user.displayName || 'User';
                         }
@@ -2237,7 +2240,7 @@
                             profilePic.style.display = 'none';
                         }
                         
-                        // Update header profile elements
+                        // Update header profile elements (matching Home.html/Profile.html)
                         if (headerProfilePic && headerAvatarIcon && headerDisplayName) {
                             const usernameInitial = (user.displayName || 'U').charAt(0).toUpperCase();
                             displayProfilePicture(headerProfilePic, headerAvatarIcon, null, usernameInitial, "w_70,h_70,c_fill,g_face,r_max");
@@ -2246,7 +2249,7 @@
                     }
                 } catch (firestoreError) {
                     console.log('JCHAT_DEBUG: Firestore profile load failed, using defaults:', firestoreError.message);
-                    // Set default profile data on error
+                    // Set default profile data on error (matching Home.html/Profile.html)
                     if (profileUsername) {
                         profileUsername.textContent = user.displayName || 'User';
                     }
@@ -2257,7 +2260,7 @@
                         profilePic.style.display = 'none';
                     }
                     
-                    // Update header profile elements
+                    // Update header profile elements (matching Home.html/Profile.html)
                     if (headerProfilePic && headerAvatarIcon && headerDisplayName) {
                         const usernameInitial = (user.displayName || 'U').charAt(0).toUpperCase();
                         displayProfilePicture(headerProfilePic, headerAvatarIcon, null, usernameInitial, "w_70,h_70,c_fill,g_face,r_max");
@@ -2268,7 +2271,7 @@
                 console.log('JCHAT_DEBUG: Real user profile loaded successfully');
             } catch (error) {
                 console.error('JCHAT_DEBUG: Error loading real user profile:', error);
-                // Fallback to defaults
+                // Fallback to defaults (matching Home.html/Profile.html)
                 if (profileUsername) {
                     profileUsername.textContent = user.displayName || 'User';
                 }
@@ -2277,6 +2280,13 @@
                 }
                 if (profilePic) {
                     profilePic.style.display = 'none';
+                }
+                
+                // Update header profile elements (matching Home.html/Profile.html)
+                if (headerProfilePic && headerAvatarIcon && headerDisplayName) {
+                    const usernameInitial = (user.displayName || 'U').charAt(0).toUpperCase();
+                    displayProfilePicture(headerProfilePic, headerAvatarIcon, null, usernameInitial, "w_70,h_70,c_fill,g_face,r_max");
+                    headerDisplayName.textContent = user.displayName || 'JCHAT User';
                 }
             }
         }
@@ -2722,7 +2732,7 @@
                             isUser: true,
                             userId: user.userId,
                             name: user.username || 'User',
-                            profilePicId: user.profilePicId,
+                            profilePicId: user.profilePicId, // Use profilePicId like Home.html/Profile.html
                             isFriend: currentUsersFriends.has(user.userId),
                             hasRequest: sentRequests.has(user.userId) || receivedRequests.has(user.userId)
                         }));
@@ -2801,8 +2811,13 @@
                 chatName = chat.name || chat.id;
             } else if (chat.type === 'direct') {
                 if (chat.isUser) {
-                    // This is a user from the users list
-                    avatarContent = '<i class="fas fa-user"></i>';
+                    // This is a user from the users list - show profile picture if available
+                    if (chat.profilePicId) {
+                        const userImageUrl = getCloudinaryImageUrl(chat.profilePicId, "w_50,h_50,c_fill,g_face,r_max");
+                        avatarContent = `<img src="${userImageUrl}" alt="${chat.name}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">`;
+                    } else {
+                        avatarContent = '<i class="fas fa-user"></i>';
+                    }
                     chatName = chat.name || 'User';
                 } else {
                     // This is an existing chat
@@ -2912,7 +2927,14 @@
                     
                     chatHeaderName.textContent = otherUserData?.username || 'Direct Chat';
                     chatHeaderStatus.textContent = onlineUsers.has(otherUserId) ? 'Online' : 'Last seen recently';
-                    chatHeaderAvatar.innerHTML = '<i class="fas fa-user"></i>';
+                    
+                    // Display profile picture if available (matching Home.html/Profile.html)
+                    if (otherUserData?.profilePicId) {
+                        const headerImageUrl = getCloudinaryImageUrl(otherUserData.profilePicId, "w_40,h_40,c_fill,g_face,r_max");
+                        chatHeaderAvatar.innerHTML = `<img src="${headerImageUrl}" alt="${otherUserData.username}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">`;
+                    } else {
+                        chatHeaderAvatar.innerHTML = '<i class="fas fa-user"></i>';
+                    }
                 } else if (chatType === 'group') {
                     const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", chatId);
                     const groupDoc = await getDoc(groupRef);
@@ -2929,9 +2951,16 @@
             }
         }
 
-        // Get User Data
+        // Get User Data (matching Home.html/Profile.html path)
         async function getUserData(userId) {
             try {
+                // First try to get from local cache (same as Find_Friends.html)
+                const cachedUser = getUserDataFromCache(userId);
+                if (cachedUser) {
+                    return cachedUser;
+                }
+                
+                // Fallback to Firestore if not in cache
                 const userRef = doc(db, "artifacts", appId, "users", userId, "profiles", "user_profile");
                 const userDoc = await getDoc(userRef);
                 return userDoc.exists() ? userDoc.data() : null;
