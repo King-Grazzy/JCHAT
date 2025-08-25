@@ -1962,7 +1962,7 @@
         let typingTimeouts = new Map();
         let onlineUsers = new Set();
         let selectedUsers = new Set();
-        let replyToMessage = null;
+        let replyToMessageData = null;
         let isRecording = false;
         let mediaRecorder = null;
         let audioChunks = [];
@@ -2652,8 +2652,8 @@
                 };
 
                 // Add reply data if replying
-                if (replyToMessage) {
-                    messageData.replyTo = replyToMessage;
+                if (replyToMessageData) {
+                    messageData.replyTo = replyToMessageData;
                     clearReply();
                 }
 
@@ -2819,8 +2819,8 @@
                     };
 
                     // Add reply data if replying
-                    if (replyToMessage) {
-                        messageData.replyTo = replyToMessage;
+                    if (replyToMessageData) {
+                        messageData.replyTo = replyToMessageData;
                         clearReply();
                     }
 
@@ -2920,8 +2920,8 @@
                     };
 
                     // Add reply data if replying
-                    if (replyToMessage) {
-                        messageData.replyTo = replyToMessage;
+                    if (replyToMessageData) {
+                        messageData.replyTo = replyToMessageData;
                         clearReply();
                     }
 
@@ -2970,7 +2970,7 @@
 
         // Reply Functions
         function replyToMessage(messageId, senderName, text) {
-            replyToMessage = { messageId, senderName, text };
+            replyToMessageData = { messageId, senderName, text };
             
             document.getElementById('replyToSender').textContent = senderName;
             document.getElementById('replyToText').textContent = text;
@@ -2980,7 +2980,7 @@
         }
 
         function clearReply() {
-            replyToMessage = null;
+            replyToMessageData = null;
             replyPreview.style.display = 'none';
         }
 
