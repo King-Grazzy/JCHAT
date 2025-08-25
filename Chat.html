@@ -528,7 +528,7 @@
         /* Floating Friends Button */
         .floating-friends-btn {
             position: fixed;
-            top: 70px;
+            bottom: 100px;
             left: 20px;
             width: 50px;
             height: 50px;
@@ -756,7 +756,7 @@
 
         @media (max-width: 768px) {
             .floating-friends-btn {
-                top: 65px;
+                bottom: 90px;
                 left: 15px;
                 width: 45px;
                 height: 45px;
@@ -850,9 +850,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, query, onSnapshot, getDocs, serverTimestamp, where, addDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, query, onSnapshot, getDocs, writeBatch, deleteDoc, serverTimestamp, updateDoc, where, addDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        const firebaseConfig = {
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
             authDomain: "jchat-1.firebaseapp.com",
             projectId: "jchat-1",
@@ -861,7 +861,8 @@
             appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
             measurementId: "G-S6Z9GG0R9P"
         };
-        const appId = 'default-app-id';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         const cloudinaryConfig = { cloudName: "dxld01rcp", uploadPreset: "Storage_preset" };
 
         const app = initializeApp(firebaseConfig);
@@ -1441,20 +1442,35 @@
         }
 
         async function sendTextMessage(content) {
-            if (!currentUser || !chatId || !content.trim()) return;
+            if (!currentUser || !chatId || !content.trim()) {
+                console.log("JCHAT_DEBUG: Cannot send message - missing requirements:", { 
+                    currentUser: !!currentUser, 
+                    chatId: !!chatId, 
+                    content: !!content.trim() 
+                });
+                return;
+            }
+
+            console.log("JCHAT_DEBUG: Sending message:", { chatId, content: content.trim() });
 
             try {
                 const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
                 
-                await addDoc(messagesRef, {
+                const messageData = {
                     senderId: currentUser.uid,
                     receiverId: chatPartnerId,
                     content: content.trim(),
                     type: 'text',
                     timestamp: serverTimestamp(),
                     read: false
-                });
+                };
 
+                console.log("JCHAT_DEBUG: Message data:", messageData);
+                
+                const docRef = await addDoc(messagesRef, messageData);
+                console.log("JCHAT_DEBUG: Message added with ID:", docRef.id);
+
+                // Update chat metadata
                 const chatRef = doc(db, "artifacts", appId, "chats", chatId);
                 await setDoc(chatRef, {
                     participants: [currentUser.uid, chatPartnerId],
@@ -1463,11 +1479,17 @@
                     lastMessageSender: currentUser.uid
                 }, { merge: true });
 
+                console.log("JCHAT_DEBUG: Chat metadata updated");
+
+                // Clear input and update UI
                 chatInput.value = '';
                 updateSendButtonState();
+                
+                showMessageBox("Message sent!", 'success', false, 1000);
             } catch (error) {
-                console.error("Error sending message:", error);
+                console.error("JCHAT_ERROR: Error sending message:", error);
                 showMessageBox(`Failed to send message: ${error.message}`, 'error');
+                playNotificationSound('error');
             }
         }
 
@@ -1493,6 +1515,7 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
+                console.log("JCHAT_DEBUG: User authenticated in Chat:", user.uid);
                 await fetchAndDisplayHeaderProfile(user);
                 fetchNotificationCount(user.uid);
                 
@@ -1505,11 +1528,28 @@
                 // Fetch friends after presence system is ready
                 fetchAndDisplayFriends();
             } else {
+                console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
                 try {
-                    await signInAnonymously(auth);
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                        console.log("JCHAT_DEBUG: Signed in with custom token.");
+                    } else {
+                        await signInAnonymously(auth);
+                        console.log("JCHAT_DEBUG: Signed in anonymously.");
+                    }
                 } catch (error) {
-                    showMessageBox("Authentication failed", 'error');
-                    setTimeout(() => window.location.href = '/login.html', 2000);
+                    console.error("JCHAT_ERROR: Error during authentication:", error);
+                    if (!auth.currentUser) {
+                        currentUser = null;
+                        if (headerDisplayName) headerDisplayName.textContent = "Guest";
+                        if (headerProfilePic) headerProfilePic.style.display = 'none';
+                        if (headerAvatarIcon) headerAvatarIcon.style.display = 'block';
+                        if (adminIconLink) adminIconLink.style.display = 'none';
+                        showMessageBox("You must be logged in to access chat.", 'error', true);
+                        setTimeout(() => {
+                            window.location.href = '/login.html';
+                        }, 2000);
+                    }
                 }
             }
         });
