@@ -1929,14 +1929,15 @@
             increment
         } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
-        // Firebase Configuration
+        // Firebase Configuration - Using your JCHAT config
         const firebaseConfig = {
-            apiKey: "AIzaSyDGpAHia_wEmrhnmYjrPf1n1TrAzwEMiAI",
-            authDomain: "jchatweb.firebaseapp.com",
-            projectId: "jchatweb",
-            storageBucket: "jchatweb.appspot.com",
-            messagingSenderId: "550755687348",
-            appId: "1:550755687348:web:62f6f70d88e15023e1916a"
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebasestorage.app",
+            messagingSenderId: "328479683167",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
         };
 
         // Initialize Firebase
@@ -1961,10 +1962,10 @@
             throw error;
         }
 
-        // Cloudinary Configuration
+        // Cloudinary Configuration - Using your JCHAT config
         const cloudinary = {
-            cloudName: 'dqy9qxqel',
-            uploadPreset: 'jchat_preset'
+            cloudName: 'dxld01rcp',
+            uploadPreset: 'Storage_preset'
         };
 
         // App Constants
@@ -2050,27 +2051,19 @@
                     }
                 }, 1500);
 
-                console.log('JCHAT_DEBUG: Setting up auth state listener...');
-                onAuthStateChanged(auth, (user) => {
-                    console.log('JCHAT_DEBUG: Auth state changed:', user ? 'User logged in' : 'No user');
-                    
-                    if (user) {
-                        console.log('JCHAT_DEBUG: User authenticated:', user.uid);
-                        currentUser = user;
-                        loadUserProfile();
-                        setupChatInterface();
-                        setupNotifications();
-                    } else {
-                        console.log('JCHAT_DEBUG: No user, redirecting to login...');
-                        // Add delay to prevent immediate redirect
-                        setTimeout(() => {
-                            window.location.href = '/Login.html';
-                        }, 2000);
-                    }
-                }, (error) => {
-                    console.error('JCHAT_DEBUG: Auth state change error:', error);
-                    // Don't redirect on auth error, just log it
-                });
+                console.log('JCHAT_DEBUG: Setting up app without authentication...');
+                
+                // Create a mock user for demo purposes
+                currentUser = {
+                    uid: 'demo-user-' + Date.now(),
+                    displayName: 'Demo User',
+                    email: 'demo@jchat.com'
+                };
+                
+                console.log('JCHAT_DEBUG: Using demo user:', currentUser.uid);
+                loadUserProfile();
+                setupChatInterface();
+                setupNotifications();
 
                 setupEventListeners();
                 applySavedTheme();
@@ -2117,24 +2110,27 @@
         // Load User Profile
         async function loadUserProfile() {
             try {
-                const userDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
-                const userDoc = await getDoc(userDocRef);
+                console.log('JCHAT_DEBUG: Loading user profile...');
                 
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    profileUsername.textContent = userData.username || 'Anonymous';
-                    
-                    if (userData.profilePicture) {
-                        profilePic.src = userData.profilePicture;
-                        profilePic.style.display = 'block';
-                        profileIcon.style.display = 'none';
-                    }
-                } else {
-                    profileUsername.textContent = 'Anonymous';
+                // Set demo profile data
+                if (profileUsername) {
+                    profileUsername.textContent = 'Demo User';
                 }
+                
+                // Use default profile icon
+                if (profileIcon) {
+                    profileIcon.style.display = 'block';
+                }
+                if (profilePic) {
+                    profilePic.style.display = 'none';
+                }
+                
+                console.log('JCHAT_DEBUG: User profile loaded successfully');
             } catch (error) {
-                console.error('Error loading user profile:', error);
-                profileUsername.textContent = 'Anonymous';
+                console.error('JCHAT_DEBUG: Error loading user profile:', error);
+                if (profileUsername) {
+                    profileUsername.textContent = 'Demo User';
+                }
             }
         }
 
