@@ -1900,13 +1900,14 @@
 
     <!-- Firebase SDKs and JavaScript -->
     <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        // Import Firebase modules - Using same version as Groups.html
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
         import { 
             getAuth, 
             onAuthStateChanged, 
-            signOut 
-        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+            signOut,
+            signInAnonymously
+        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
         import { 
             getFirestore, 
             doc, 
@@ -1927,7 +1928,7 @@
             arrayUnion,
             arrayRemove,
             increment
-        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
         // Firebase Configuration - Using your JCHAT config
         const firebaseConfig = {
@@ -1968,8 +1969,8 @@
             uploadPreset: 'Storage_preset'
         };
 
-        // App Constants
-        const appId = "jchat_app";
+        // App Constants - Using same approach as Groups.html
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // Global Variables
         let currentUser = null;
@@ -2051,19 +2052,31 @@
                     }
                 }, 1500);
 
-                console.log('JCHAT_DEBUG: Setting up app without authentication...');
+                console.log('JCHAT_DEBUG: Setting up app with anonymous authentication...');
                 
-                // Create a mock user for demo purposes
-                currentUser = {
-                    uid: 'demo-user-' + Date.now(),
-                    displayName: 'Demo User',
-                    email: 'demo@jchat.com'
-                };
-                
-                console.log('JCHAT_DEBUG: Using demo user:', currentUser.uid);
-                loadUserProfile();
-                setupChatInterface();
-                setupNotifications();
+                // Use anonymous authentication like Groups.html
+                try {
+                    const userCredential = await signInAnonymously(auth);
+                    currentUser = userCredential.user;
+                    console.log('JCHAT_DEBUG: Anonymous user created:', currentUser.uid);
+                    
+                    loadUserProfile();
+                    setupChatInterface();
+                    setupNotifications();
+                } catch (error) {
+                    console.error('JCHAT_DEBUG: Anonymous auth error:', error);
+                    // Fallback to demo user if anonymous auth fails
+                    currentUser = {
+                        uid: 'demo-user-' + Date.now(),
+                        displayName: 'Demo User',
+                        email: 'demo@jchat.com'
+                    };
+                    console.log('JCHAT_DEBUG: Using fallback demo user:', currentUser.uid);
+                    
+                    loadUserProfile();
+                    setupChatInterface();
+                    setupNotifications();
+                }
 
                 setupEventListeners();
                 applySavedTheme();
@@ -2107,37 +2120,91 @@
             }
         }
 
-        // Load User Profile
+        // Load User Profile - Using same approach as Groups.html
         async function loadUserProfile() {
             try {
                 console.log('JCHAT_DEBUG: Loading user profile...');
                 
-                // Set demo profile data
-                if (profileUsername) {
-                    profileUsername.textContent = 'Demo User';
+                // Try to load from Firestore first (same path as Groups.html)
+                try {
+                    const userDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
+                    const userDoc = await getDoc(userDocRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        if (profileUsername) {
+                            profileUsername.textContent = userData.username || 'Anonymous';
+                        }
+                        
+                        if (userData.profilePicture) {
+                            if (profilePic) {
+                                profilePic.src = userData.profilePicture;
+                                profilePic.style.display = 'block';
+                            }
+                            if (profileIcon) {
+                                profileIcon.style.display = 'none';
+                            }
+                        } else {
+                            // Use default profile icon
+                            if (profileIcon) {
+                                profileIcon.style.display = 'block';
+                            }
+                            if (profilePic) {
+                                profilePic.style.display = 'none';
+                            }
+                        }
+                    } else {
+                        // Set default profile data
+                        if (profileUsername) {
+                            profileUsername.textContent = 'Anonymous';
+                        }
+                        if (profileIcon) {
+                            profileIcon.style.display = 'block';
+                        }
+                        if (profilePic) {
+                            profilePic.style.display = 'none';
+                        }
+                    }
+                } catch (firestoreError) {
+                    console.log('JCHAT_DEBUG: Firestore profile load failed, using defaults:', firestoreError.message);
+                    // Set default profile data on error
+                    if (profileUsername) {
+                        profileUsername.textContent = 'Anonymous';
+                    }
+                    if (profileIcon) {
+                        profileIcon.style.display = 'block';
+                    }
+                    if (profilePic) {
+                        profilePic.style.display = 'none';
+                    }
                 }
                 
-                // Use default profile icon
+                console.log('JCHAT_DEBUG: User profile loaded successfully');
+            } catch (error) {
+                console.error('JCHAT_DEBUG: Error loading user profile:', error);
+                // Fallback to defaults
+                if (profileUsername) {
+                    profileUsername.textContent = 'Anonymous';
+                }
                 if (profileIcon) {
                     profileIcon.style.display = 'block';
                 }
                 if (profilePic) {
                     profilePic.style.display = 'none';
                 }
-                
-                console.log('JCHAT_DEBUG: User profile loaded successfully');
-            } catch (error) {
-                console.error('JCHAT_DEBUG: Error loading user profile:', error);
-                if (profileUsername) {
-                    profileUsername.textContent = 'Demo User';
-                }
             }
         }
 
-        // Setup Chat Interface
+        // Setup Chat Interface - Using same approach as Groups.html
         function setupChatInterface() {
-            loadChatList(activeTab);
-            setupPresenceSystem();
+            console.log('JCHAT_DEBUG: Setting up chat interface...');
+            try {
+                loadChatList(activeTab);
+                setupPresenceSystem();
+                console.log('JCHAT_DEBUG: Chat interface setup complete');
+            } catch (error) {
+                console.error('JCHAT_DEBUG: Error setting up chat interface:', error);
+            }
         }
 
         // Setup Event Listeners
