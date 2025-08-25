@@ -1,0 +1,50 @@
+file,size_bytes,lines,title,has_doctype,has_meta_viewport,num_links,num_external_links,num_scripts,num_scripts_with_src,num_stylesheets,num_images
+./About_Chat.html,24231,519,JCHAT - User Guide,yes,yes,1,0,1,0,2,0
+./About_Us.html,41253,817,JCHAT - About Us,yes,yes,5,0,0,0,2,2
+./Admin.html,56224,1264,JCHAT - Main Admin Dashboard,yes,yes,11,0,2,1,2,2
+./Admin_Reports.html,84894,2027,JCHAT - Admin Reports,yes,yes,3,0,2,1,2,3
+./Admin_Settings.html,78427,1818,JCHAT - System Settings,yes,yes,13,0,2,1,2,2
+./Analytics.html,75107,1661,JCHAT - Admin Panel - Analytics,yes,yes,12,0,3,1,2,2
+./Analytics_ashboard.html,51130,1257,JCHAT - Admin: Analytics Dashboard,yes,yes,11,0,1,0,2,2
+./Coin_management.html,146008,3087,JCHAT - Admin Dashboard,yes,yes,4,0,2,1,2,3
+./Community_guidelines.html,55350,1127,JCHAT - Community Guidelines,yes,yes,9,0,2,1,2,2
+./Content_Moderation.html,91756,2069,JCHAT - Admin Panel - Content Moderation,yes,yes,14,0,2,0,2,2
+./Developer.html,298825,5723,JCHAT - Admin Dashboard,yes,yes,8,0,2,1,2,8
+./Find_Friends.html,89395,1981,JCHAT - Users,yes,yes,4,0,2,1,2,3
+./Friends.html,74815,1653,JCHAT - My Friends,yes,yes,4,0,2,1,2,4
+./Friends_list.html,78705,1765,JCHAT - My Friends,yes,yes,9,0,2,1,2,3
+./Gas.html,225642,4487,JCHAT - Admin Dashboard,yes,yes,4,0,2,1,2,5
+./Group_Chat.html,85924,1980,GROUPS - Group Chat,yes,yes,3,0,2,1,2,5
+./Groups.html,199236,4465,JCHAT - Groups,yes,yes,5,0,1,0,2,6
+./Guide.html,77708,1588,JCHAT - User Guide,yes,yes,33,0,2,1,2,2
+./Home.html,502722,10430,JCHAT - Home,yes,yes,28,0,2,1,2,11
+./JCoin.html,3560,57,JCHAT - JCoin,yes,yes,2,0,0,0,2,1
+./Levels.html,59568,1278,JCHAT - User Levels,yes,yes,12,0,1,0,2,2
+./Login.html,167961,4131,JCHAT - Welcome & Account Access,yes,yes,2,0,1,0,2,2
+./Manage.html,229287,4538,JCHAT - Admin Dashboard,yes,yes,4,0,2,1,2,5
+./Message.html,74180,1761,JCHAT - Chat,yes,yes,11,0,1,0,2,3
+./Privacy_Settings.html,79591,1715,JCHAT - Privacy Settings,yes,yes,2,0,2,1,2,2
+./Profile.html,417175,9868,JCHAT - Profile,yes,yes,9,2,1,0,2,2
+./Report.html,64582,1555,JCHAT - Report an Issue,yes,yes,5,0,2,1,2,2
+./Settings.html,97396,2058,JCHAT - Settings,yes,yes,3,1,2,1,2,1
+./Shop.html,5776,95,JCHAT - JCoin Shop,yes,yes,2,0,1,0,2,1
+./Swap.html,62881,1477,JCHAT - Token Swap,yes,yes,4,0,2,1,2,2
+./System_Settings.html,54734,1321,JCHAT - Admin: System Settings,yes,yes,11,0,1,0,2,2
+./User_management.html,86643,1937,JCHAT - Admin Management,yes,yes,2,0,1,0,2,3
+./Wallet.html,99060,2581,JCHAT - My Wallet,yes,yes,5,0,1,0,1,2
+./admin_groups.html,83056,1975,JCHAT Admin - Group Management,yes,yes,11,0,2,1,2,2
+./admin_logs.html,69611,1587,JCHAT - Admin Panel - Activity Logs,yes,yes,13,0,2,0,2,2
+./analytics_dashboard.html,51130,1257,JCHAT - Admin: Analytics Dashboard,yes,yes,11,0,1,0,2,2
+./auth/github/callback.html,23221,690,GitHub Authentication - JCHAT,yes,yes,0,0,1,0,1,0
+./auth/github/welcome.html,25161,774,Welcome to JCHAT - GitHub Integration Complete,yes,yes,0,0,1,0,1,1
+./auth/google/callback.html,23268,678,Google Authentication - JCHAT,yes,yes,0,0,1,0,1,0
+./auth/google/welcome.html,26064,793,Welcome to JCHAT - Google Integration Complete,yes,yes,0,0,1,0,1,1
+./coin_requests_admin.html,60916,1450,JCHAT - Admin: Coin Requests,yes,yes,10,0,1,0,2,2
+./google-login-test.html,9215,235,Google Login Test - JCHAT,yes,yes,0,0,1,0,0,0
+./group_settings.html,106212,2379,JCHAT - Group Settings,yes,yes,4,0,1,0,2,4
+./jg_link_management.html,50263,1175,JCHAT - J/G Link Management,yes,yes,4,0,2,1,2,2
+./notifications.html,105277,2460,JCHAT - Enhanced Notifications,yes,yes,9,0,2,1,2,2
+./premium_admin.html,38041,958,JCHAT - Premium Admin Dashboard,yes,yes,11,0,2,1,2,2
+./premium_subscriptions.html,43687,1097,JCHAT - Premium Subscriptions,yes,yes,7,0,2,0,2,1
+./premium_themes.html,51133,1308,JCHAT - Premium Themes Marketplace,yes,yes,6,0,2,0,2,2
+./solution_center.html,74410,1601,JCHAT - Solution Center,yes,yes,17,2,2,1,2,2
