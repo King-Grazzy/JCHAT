@@ -528,11 +528,73 @@
             text-decoration: none;
             color: inherit;
             position: relative;
+            overflow: hidden;
         }
 
         .group-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .group-card.promoted {
+            border: 2px solid var(--pink);
+            background: linear-gradient(135deg, var(--input-background), rgba(255, 46, 146, 0.05));
+        }
+        
+        .group-card.trending {
+            border: 2px solid #FF6B35;
+            background: linear-gradient(135deg, var(--input-background), rgba(255, 107, 53, 0.05));
+        }
+        
+        .group-card.new {
+            border: 2px solid #4ECDC4;
+            background: linear-gradient(135deg, var(--input-background), rgba(78, 205, 196, 0.05));
+        }
+        
+        /* Activity Indicators */
+        .group-activity-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--status-offline);
+            border: 2px solid var(--white);
+            transition: all 0.3s ease;
+        }
+        
+        .group-activity-indicator.high {
+            background: var(--status-online);
+            animation: pulse 2s infinite;
+        }
+        
+        .group-activity-indicator.medium {
+            background: var(--status-away);
+        }
+        
+        .group-activity-indicator.low {
+            background: var(--status-offline);
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        
+        /* Member Online Status */
+        .group-members-online {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            color: var(--status-online);
+            margin-top: 5px;
+        }
+        
+        .group-members-online i {
+            color: var(--status-online);
         }
 
         .group-card .group-avatar {
@@ -708,16 +770,26 @@
             width: 100%;
         }
 
-        .search-container {
+        /* Enhanced Search Styles */
+        .advanced-search-container {
             width: 100%;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
+            margin-bottom: 25px;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-
-        .search-container input {
-            width: 100%;
-            max-width: 500px;
+        
+        .search-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .search-row input {
+            flex: 1;
             padding: 12px 15px;
             border: 1px solid var(--border-color);
             border-radius: 10px;
@@ -727,10 +799,172 @@
             outline: none;
             transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
-
-        .search-container input:focus {
+        
+        .search-row input:focus {
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px rgba(0, 213, 255, 0.2);
+        }
+        
+        .filter-toggle-btn {
+            padding: 12px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--input-background);
+            color: var(--text-color-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        
+        .filter-toggle-btn:hover {
+            background: var(--accent-color);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+        
+        .search-filters-panel {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .search-filters-panel.active {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-color-secondary);
+        }
+        
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--input-background);
+            color: var(--text-color-primary);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .filter-group select:focus {
+            border-color: var(--accent-color);
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .secondary-btn, .primary-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+        }
+        
+        .secondary-btn {
+            background: var(--input-background);
+            color: var(--text-color-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .secondary-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .primary-btn {
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            color: var(--white);
+        }
+        
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Discovery Tabs */
+        .discovery-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+        
+        .discovery-tab {
+            padding: 10px 15px;
+            border: none;
+            background: transparent;
+            color: var(--text-color-secondary);
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .discovery-tab:hover {
+            background: var(--input-background);
+            color: var(--text-color-primary);
+        }
+        
+        .discovery-tab.active {
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            color: var(--white);
+        }
+        
+        .discovery-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid var(--pink);
+        }
+        
+        /* Enhanced Group List */
+        .group-list-container.enhanced {
+            position: relative;
         }
 
         /* JCoin Feature Cards (reused from previous) */
@@ -1477,9 +1711,31 @@
                 padding: 8px 15px;
                 font-size: 0.9rem;
             }
-            .search-container input {
+            .advanced-search-container {
+                padding: 15px;
+            }
+            
+            .search-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .filter-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .filter-actions {
+                justify-content: center;
+            }
+            
+            .discovery-tabs {
+                gap: 5px;
+            }
+            
+            .discovery-tab {
+                padding: 8px 12px;
                 font-size: 0.9rem;
-                padding: 10px 12px;
             }
             #createGroupFab {
                 width: 50px;
@@ -1613,11 +1869,100 @@
                 </div>
 
                 <h2>Discover Groups</h2>
-                <div class="search-container">
-                    <input type="text" id="searchGroupInput" placeholder="Search public groups...">
+                
+                <!-- Enhanced Search with Filters -->
+                <div class="advanced-search-container">
+                    <div class="search-row">
+                        <input type="text" id="searchGroupInput" placeholder="Search groups by name, description, or tags...">
+                        <button id="searchFiltersToggle" class="filter-toggle-btn">
+                            <i class="fas fa-filter"></i> Filters
+                        </button>
+                    </div>
+                    
+                    <div id="searchFiltersPanel" class="search-filters-panel">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label for="categoryFilter">Category:</label>
+                                <select id="categoryFilter">
+                                    <option value="">All Categories</option>
+                                    <option value="gaming">Gaming</option>
+                                    <option value="tech">Technology</option>
+                                    <option value="study">Study & Education</option>
+                                    <option value="music">Music</option>
+                                    <option value="art">Art & Design</option>
+                                    <option value="sports">Sports</option>
+                                    <option value="food">Food & Cooking</option>
+                                    <option value="travel">Travel</option>
+                                    <option value="books">Books & Literature</option>
+                                    <option value="movies">Movies & TV</option>
+                                    <option value="fitness">Fitness & Health</option>
+                                    <option value="business">Business</option>
+                                    <option value="social">Social</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="memberCountFilter">Member Count:</label>
+                                <select id="memberCountFilter">
+                                    <option value="">Any Size</option>
+                                    <option value="small">Small (1-10)</option>
+                                    <option value="medium">Medium (11-50)</option>
+                                    <option value="large">Large (51-200)</option>
+                                    <option value="huge">Huge (200+)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="activityFilter">Activity Level:</label>
+                                <select id="activityFilter">
+                                    <option value="">Any Activity</option>
+                                    <option value="high">Very Active</option>
+                                    <option value="medium">Moderately Active</option>
+                                    <option value="low">Low Activity</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label for="sortByFilter">Sort By:</label>
+                                <select id="sortByFilter">
+                                    <option value="members">Most Members</option>
+                                    <option value="recent">Recently Created</option>
+                                    <option value="activity">Most Active</option>
+                                    <option value="promoted">Promoted First</option>
+                                    <option value="alphabetical">Alphabetical</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="filter-actions">
+                            <button id="clearFiltersBtn" class="secondary-btn">
+                                <i class="fas fa-times"></i> Clear Filters
+                            </button>
+                            <button id="applyFiltersBtn" class="primary-btn">
+                                <i class="fas fa-search"></i> Apply Filters
+                            </button>
+                        </div>
+                    </div>
                 </div>
+                
+                <!-- Discovery Tabs -->
+                <div class="discovery-tabs">
+                    <button class="discovery-tab active" data-tab="all">
+                        <i class="fas fa-globe"></i> All Groups
+                    </button>
+                    <button class="discovery-tab" data-tab="trending">
+                        <i class="fas fa-fire"></i> Trending
+                    </button>
+                    <button class="discovery-tab" data-tab="recommended">
+                        <i class="fas fa-star"></i> Recommended
+                    </button>
+                    <button class="discovery-tab" data-tab="new">
+                        <i class="fas fa-sparkles"></i> New Groups
+                    </button>
+                </div>
+                
                 <p class="no-groups-message" id="loadingDiscoverGroupsMessage">Loading public groups...</p>
-                <div id="discoverGroupsList" class="group-list-container">
+                <div id="discoverGroupsList" class="group-list-container enhanced">
                     <!-- Discoverable groups will be loaded here -->
                 </div>
             </div>
@@ -2031,6 +2376,15 @@
         const discoverGroupsList = document.getElementById('discoverGroupsList');
         const loadingDiscoverGroupsMessage = document.getElementById('loadingDiscoverGroupsMessage');
         const searchGroupInput = document.getElementById('searchGroupInput');
+        const searchFiltersToggle = document.getElementById('searchFiltersToggle');
+        const searchFiltersPanel = document.getElementById('searchFiltersPanel');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const memberCountFilter = document.getElementById('memberCountFilter');
+        const activityFilter = document.getElementById('activityFilter');
+        const sortByFilter = document.getElementById('sortByFilter');
+        const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+        const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+        const discoveryTabs = document.querySelectorAll('.discovery-tab');
         const createGroupFab = document.getElementById('createGroupFab');
 
         const createGroupModal = document.getElementById('createGroupModal');
@@ -2118,8 +2472,16 @@
         let currentUserProfileData = null; // Stores the authenticated user's own profile data
         let myGroupsData = []; // Stores groups the current user is a member of
         let allPublicGroupsData = []; // Stores all publicly discoverable groups
+        let filteredGroupsData = []; // Stores filtered groups for current view
         let activeQuests = []; // Stores active quests
         let selectedCustomizationOption = null; // For customization modal
+        let currentDiscoveryTab = 'all'; // Current discovery tab
+        let searchFilters = {
+            category: '',
+            memberCount: '',
+            activity: '',
+            sortBy: 'members'
+        };
 
         // --- Economy Constants ---
         const DAILY_CHECKIN_JCOINS = 5;
@@ -2437,7 +2799,7 @@
         }
 
         /**
-         * Renders a single group card.
+         * Renders a single group card with enhanced features.
          * @param {object} groupData - The group data.
          * @param {boolean} isMember - True if the current user is a member of this group.
          */
@@ -2446,12 +2808,27 @@
             groupCard.classList.add('group-card');
             groupCard.dataset.groupId = groupData.id;
 
+            // Add special styling for promoted/trending/new groups
+            if (groupData.isPromoted && groupData.promotionEndDate && new Date(groupData.promotionEndDate.toDate()) > new Date()) {
+                groupCard.classList.add('promoted');
+            }
+            if (isGroupTrending(groupData)) {
+                groupCard.classList.add('trending');
+            }
+            if (isGroupNew(groupData)) {
+                groupCard.classList.add('new');
+            }
+
             const groupInitial = (groupData.name || "G").charAt(0).toUpperCase();
             const actionText = isMember ? 'Enter Chat' : 'Join Group';
             const actionIcon = isMember ? 'fas fa-comments' : 'fas fa-user-plus';
             const actionLink = isMember ? `/group_chat.html?groupId=${groupData.id}` : '#'; // Link to chat if member
 
             const isGroupAdmin = currentUser && groupData.admin === currentUser.uid;
+            
+            // Calculate activity level and online members
+            const activityLevel = calculateGroupActivity(groupData);
+            const onlineMembers = Math.floor((groupData.members?.length || 0) * 0.3); // Simulate online members
 
             // Group Vault Display
             const groupJCoins = groupData.groupJCoinBalance || 0;
@@ -2481,12 +2858,16 @@
             const tagsHtml = (groupData.tags||[]).slice(0,5).map(t=>`<span class="tag-chip">${t}</span>`).join(' ');
 
             groupCard.innerHTML = `
+                <div class="group-activity-indicator ${activityLevel}"></div>
                 <img src="" alt="Group Avatar" class="group-avatar" id="group-avatar-${groupData.id}" style="display: none;">
                 <i class="fas fa-users group-avatar-icon" id="group-avatar-icon-${groupData.id}"></i>
                 <h3>${groupData.name || 'Unnamed Group'}</h3>
                 <p>${groupData.description || 'No description provided.'}</p>
                 <div class="tags-container">${tagsHtml}</div>
                 <span class="member-count"><i class="fas fa-users"></i> ${groupData.members?.length || 0} Members</span>
+                <div class="group-members-online">
+                    <i class="fas fa-circle"></i> ${onlineMembers} online
+                </div>
                 ${vaultHtml}
                 ${statusTagsHtml}
                 <div class="action-button-container">
@@ -2540,6 +2921,48 @@
             }
 
             return groupCard;
+        }
+        
+        /**
+         * Determines if a group is trending based on recent activity.
+         * @param {object} groupData - The group data.
+         * @returns {boolean} True if the group is trending.
+         */
+        function isGroupTrending(groupData) {
+            const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            const lastActivity = groupData.lastActivity ? new Date(groupData.lastActivity.toDate()) : new Date(0);
+            const memberCount = groupData.members?.length || 0;
+            
+            // A group is trending if it has good activity in the last week and decent member count
+            return lastActivity > oneWeekAgo && memberCount >= 5;
+        }
+        
+        /**
+         * Determines if a group is new (created within the last 2 weeks).
+         * @param {object} groupData - The group data.
+         * @returns {boolean} True if the group is new.
+         */
+        function isGroupNew(groupData) {
+            const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+            const createdAt = groupData.createdAt ? new Date(groupData.createdAt.toDate()) : new Date(0);
+            
+            return createdAt > twoWeeksAgo;
+        }
+        
+        /**
+         * Calculates the activity level of a group.
+         * @param {object} groupData - The group data.
+         * @returns {string} Activity level: 'high', 'medium', or 'low'.
+         */
+        function calculateGroupActivity(groupData) {
+            const now = new Date();
+            const lastActivity = groupData.lastActivity ? new Date(groupData.lastActivity.toDate()) : new Date(0);
+            const timeDiff = now - lastActivity;
+            const hoursDiff = timeDiff / (1000 * 60 * 60);
+            
+            if (hoursDiff <= 2) return 'high';
+            if (hoursDiff <= 24) return 'medium';
+            return 'low';
         }
 
         /**
@@ -2620,20 +3043,94 @@
         }
 
         /**
-         * Filters and displays discoverable groups based on search input.
+         * Applies all filters and displays the filtered groups.
          */
         function filterAndDisplayDiscoverGroups() {
             const searchTerm = searchGroupInput.value.toLowerCase().trim();
             discoverGroupsList.innerHTML = ''; // Clear current list
 
-            const filteredGroups = allPublicGroupsData.filter(group =>
+            // Start with all groups or specific tab data
+            let baseGroups = [];
+            switch (currentDiscoveryTab) {
+                case 'trending':
+                    baseGroups = allPublicGroupsData.filter(group => isGroupTrending(group));
+                    break;
+                case 'new':
+                    baseGroups = allPublicGroupsData.filter(group => isGroupNew(group));
+                    break;
+                case 'recommended':
+                    baseGroups = getRecommendedGroups();
+                    break;
+                default:
+                    baseGroups = [...allPublicGroupsData];
+            }
+
+            // Apply search filter
+            let filteredGroups = baseGroups.filter(group =>
                 group.name.toLowerCase().includes(searchTerm) ||
                 (group.description && group.description.toLowerCase().includes(searchTerm)) ||
                 (group.tags && group.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
             );
 
+            // Apply category filter
+            if (searchFilters.category) {
+                filteredGroups = filteredGroups.filter(group =>
+                    group.tags && group.tags.some(tag => 
+                        tag.toLowerCase().includes(searchFilters.category.toLowerCase())
+                    )
+                );
+            }
+
+            // Apply member count filter
+            if (searchFilters.memberCount) {
+                filteredGroups = filteredGroups.filter(group => {
+                    const memberCount = group.members?.length || 0;
+                    switch (searchFilters.memberCount) {
+                        case 'small': return memberCount <= 10;
+                        case 'medium': return memberCount > 10 && memberCount <= 50;
+                        case 'large': return memberCount > 50 && memberCount <= 200;
+                        case 'huge': return memberCount > 200;
+                        default: return true;
+                    }
+                });
+            }
+
+            // Apply activity filter
+            if (searchFilters.activity) {
+                filteredGroups = filteredGroups.filter(group => {
+                    const activityLevel = calculateGroupActivity(group);
+                    return activityLevel === searchFilters.activity;
+                });
+            }
+
+            // Apply sorting
+            filteredGroups.sort((a, b) => {
+                switch (searchFilters.sortBy) {
+                    case 'members':
+                        return (b.members?.length || 0) - (a.members?.length || 0);
+                    case 'recent':
+                        const aTime = a.createdAt ? a.createdAt.toDate().getTime() : 0;
+                        const bTime = b.createdAt ? b.createdAt.toDate().getTime() : 0;
+                        return bTime - aTime;
+                    case 'activity':
+                        const aActivity = a.lastActivity ? a.lastActivity.toDate().getTime() : 0;
+                        const bActivity = b.lastActivity ? b.lastActivity.toDate().getTime() : 0;
+                        return bActivity - aActivity;
+                    case 'promoted':
+                        const aPromoted = a.isPromoted && a.promotionEndDate && new Date(a.promotionEndDate.toDate()) > new Date();
+                        const bPromoted = b.isPromoted && b.promotionEndDate && new Date(b.promotionEndDate.toDate()) > new Date();
+                        return bPromoted - aPromoted;
+                    case 'alphabetical':
+                        return (a.name || '').localeCompare(b.name || '');
+                    default:
+                        return 0;
+                }
+            });
+
+            filteredGroupsData = filteredGroups; // Store for later use
+
             if (filteredGroups.length === 0) {
-                discoverGroupsList.innerHTML = '<p class="no-groups-message">No groups found matching your search.</p>';
+                discoverGroupsList.innerHTML = '<p class="no-groups-message">No groups found matching your criteria.</p>';
                 return;
             }
 
@@ -2642,6 +3139,110 @@
                 const isMember = myGroupsData.some(myGroup => myGroup.id === group.id);
                 discoverGroupsList.appendChild(renderGroupCard(group, isMember));
             });
+        }
+        
+        /**
+         * Gets recommended groups based on user's current groups and interests.
+         * @returns {Array} Array of recommended groups.
+         */
+        function getRecommendedGroups() {
+            if (!currentUser || myGroupsData.length === 0) {
+                // If no user groups, return trending groups
+                return allPublicGroupsData.filter(group => isGroupTrending(group)).slice(0, 10);
+            }
+
+            // Get tags from user's current groups
+            const userTags = new Set();
+            myGroupsData.forEach(group => {
+                if (group.tags) {
+                    group.tags.forEach(tag => userTags.add(tag.toLowerCase()));
+                }
+            });
+
+            // Find groups with similar tags that user isn't already in
+            const recommended = allPublicGroupsData.filter(group => {
+                if (myGroupsData.some(myGroup => myGroup.id === group.id)) {
+                    return false; // Skip groups user is already in
+                }
+                
+                if (!group.tags || group.tags.length === 0) {
+                    return false;
+                }
+                
+                // Check if group has any matching tags
+                return group.tags.some(tag => userTags.has(tag.toLowerCase()));
+            });
+
+            // Sort by member count and return top 20
+            return recommended
+                .sort((a, b) => (b.members?.length || 0) - (a.members?.length || 0))
+                .slice(0, 20);
+        }
+        
+        /**
+         * Toggles the search filters panel.
+         */
+        function toggleSearchFilters() {
+            const isActive = searchFiltersPanel.classList.contains('active');
+            if (isActive) {
+                searchFiltersPanel.classList.remove('active');
+                searchFiltersToggle.innerHTML = '<i class="fas fa-filter"></i> Filters';
+            } else {
+                searchFiltersPanel.classList.add('active');
+                searchFiltersToggle.innerHTML = '<i class="fas fa-filter"></i> Hide Filters';
+            }
+        }
+        
+        /**
+         * Clears all search filters.
+         */
+        function clearSearchFilters() {
+            searchFilters = {
+                category: '',
+                memberCount: '',
+                activity: '',
+                sortBy: 'members'
+            };
+            
+            categoryFilter.value = '';
+            memberCountFilter.value = '';
+            activityFilter.value = '';
+            sortByFilter.value = 'members';
+            searchGroupInput.value = '';
+            
+            filterAndDisplayDiscoverGroups();
+        }
+        
+        /**
+         * Applies the current filter settings.
+         */
+        function applySearchFilters() {
+            searchFilters.category = categoryFilter.value;
+            searchFilters.memberCount = memberCountFilter.value;
+            searchFilters.activity = activityFilter.value;
+            searchFilters.sortBy = sortByFilter.value;
+            
+            filterAndDisplayDiscoverGroups();
+        }
+        
+        /**
+         * Switches discovery tab.
+         * @param {string} tabName - The name of the tab to switch to.
+         */
+        function switchDiscoveryTab(tabName) {
+            currentDiscoveryTab = tabName;
+            
+            // Update tab UI
+            discoveryTabs.forEach(tab => {
+                if (tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Refresh the displayed groups
+            filterAndDisplayDiscoverGroups();
         }
 
         /**
@@ -3066,7 +3667,7 @@
                 const optionGift = document.createElement('option');
                 optionGift.value = group.id;
                 optionGift.textContent = group.name;
-                giftGroupSelect.appendChild(option);
+                giftGroupSelect.appendChild(optionGift);
             });
 
             // Enable/disable buttons based on admin status
@@ -3893,7 +4494,24 @@
                 createGroupCostDisplay.textContent = GROUP_CREATION_COST.toLocaleString();
             }
 
+            // Enhanced search and filter event listeners
             searchGroupInput.addEventListener('input', filterAndDisplayDiscoverGroups);
+            searchFiltersToggle.addEventListener('click', toggleSearchFilters);
+            clearFiltersBtn.addEventListener('click', clearSearchFilters);
+            applyFiltersBtn.addEventListener('click', applySearchFilters);
+            
+            // Discovery tab event listeners
+            discoveryTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    switchDiscoveryTab(tabName);
+                });
+            });
+            
+            // Auto-apply filters when changed
+            [categoryFilter, memberCountFilter, activityFilter, sortByFilter].forEach(filter => {
+                filter.addEventListener('change', applySearchFilters);
+            });
             createGroupFab.addEventListener('click', () => {
                 if (!currentUser || !currentUserProfileData) {
                     showMessageBox("Please log in to create a group.", "error");
