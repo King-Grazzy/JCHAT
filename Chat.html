@@ -1417,7 +1417,7 @@
 
             messagesContainer.innerHTML = '';
 
-            const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+            const messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatId, "messages");
             const q = query(messagesRef, orderBy("timestamp", "asc"), limit(50));
 
             unsubscribeMessages = onSnapshot(q, (snapshot) => {
@@ -1454,7 +1454,7 @@
             console.log("JCHAT_DEBUG: Sending message:", { chatId, content: content.trim() });
 
             try {
-                const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+                const messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatId, "messages");
                 
                 const messageData = {
                     senderId: currentUser.uid,
@@ -1468,7 +1468,7 @@
                 console.log("JCHAT_DEBUG: Message added with ID:", docRef.id);
 
                 // Update chat metadata
-                const chatRef = doc(db, "artifacts", appId, "chats", chatId);
+                const chatRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId);
                 await setDoc(chatRef, {
                     lastMessage: content.trim(),
                     lastMessageTimestamp: serverTimestamp()
