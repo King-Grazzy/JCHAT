@@ -1394,7 +1394,7 @@
             const timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             
             messageBubble.innerHTML = `
-                <div class="message-content">${escapeHtml(messageData.content)}</div>
+                <div class="message-content">${escapeHtml(messageData.text)}</div>
                 <div class="message-timestamp">${timeString}</div>
             `;
 
@@ -1426,7 +1426,7 @@
                         const messageData = change.doc.data();
                         const messageId = change.doc.id;
                         
-                        if (!messageData.content) return;
+                        if (!messageData.text) return;
                         
                         const messageElement = createMessageElement(messageData, messageId);
                         messagesContainer.appendChild(messageElement);
@@ -1458,11 +1458,8 @@
                 
                 const messageData = {
                     senderId: currentUser.uid,
-                    receiverId: chatPartnerId,
-                    content: content.trim(),
-                    type: 'text',
-                    timestamp: serverTimestamp(),
-                    read: false
+                    text: content.trim(),
+                    timestamp: serverTimestamp()
                 };
 
                 console.log("JCHAT_DEBUG: Message data:", messageData);
@@ -1473,10 +1470,8 @@
                 // Update chat metadata
                 const chatRef = doc(db, "artifacts", appId, "chats", chatId);
                 await setDoc(chatRef, {
-                    participants: [currentUser.uid, chatPartnerId],
                     lastMessage: content.trim(),
-                    lastMessageTime: serverTimestamp(),
-                    lastMessageSender: currentUser.uid
+                    lastMessageTimestamp: serverTimestamp()
                 }, { merge: true });
 
                 console.log("JCHAT_DEBUG: Chat metadata updated");
