@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Last updated: 2025-08-25T00:00:00Z -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCHAT - Private Chat</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        :root {
+            --pink: #ff2e92;
+            --blue: #00d5ff;
+            --radius: 20px;
+            --transition: .3s ease;
+
+            --white: #fff;
+            --text-light: rgba(255, 255, 255, .7);
+            --background-main: rgba(10, 10, 10, .75);
+            --background-gradient-1: #00d5ff;
+            --background-gradient-2: #ff2e92;
+            --card-background: linear-gradient(145deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .01));
+            --header-background: linear-gradient(135deg, rgba(10, 10, 10, .85), rgba(10, 10, 10, .75));
+            --border-light: rgba(255, 255, 255, .05);
+            --input-background: rgba(255, 255, 255, 0.05);
+            --button-background: linear-gradient(90deg, var(--blue), var(--pink));
+            --button-shadow: 0 4px 15px var(--blue), 0 4px 15px var(--pink);
+
+            --background-color-primary: #1a1a2e;
+            --background-color-secondary: #0f0f1f;
+            --header-background-color: #2a2a4a;
+            --footer-background-color: #2a2a4a;
+            --content-background-color: #20203a;
+            --card-background-color: #2a2a4a;
+            --text-color-primary: #e0e0e0;
+            --text-color-secondary: #b0b0d0;
+            --accent-color: #00d5ff;
+            --accent-color-dark: #00aaff;
+            --border-color: #3a3a5a;
+
+            --message-received-bg: rgba(255, 255, 255, 0.1);
+            --message-sent-bg: #4A90E2;
+        }
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+            color: var(--white);
+            background: radial-gradient(1200px 800px at -10% -10%, var(--background-gradient-1), transparent 40%),
+                        radial-gradient(1200px 800px at 110% 110%, var(--background-gradient-2), transparent 40%),
+                        var(--background-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        header {
+            background: var(--header-background);
+            border-bottom: 1px solid var(--border-light);
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        header .back-btn {
+            color: var(--white);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            transition: var(--transition);
+        }
+        header .back-btn:hover { background: rgba(255,255,255,0.06); }
+        header .peer {
+            display: flex; align-items: center; gap: 12px;
+        }
+        header .peer img {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.15);
+        }
+        header .peer .name { font-weight: 600; }
+        header .peer .status { font-size: 12px; color: var(--text-light); }
+
+        .chat-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 18px;
+            padding: 18px;
+        }
+        .sidebar {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar .search {
+            display: flex; gap: 8px; margin-bottom: 12px;
+        }
+        .sidebar .search input {
+            flex: 1; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-color);
+            background: var(--input-background); color: var(--white);
+        }
+        .sidebar .search button {
+            padding: 10px 12px; border-radius: 10px; border: 0; color: #fff;
+            background: var(--button-background);
+            box-shadow: var(--button-shadow);
+            cursor: pointer;
+        }
+        .conversation-list { overflow: auto; display: flex; flex-direction: column; gap: 8px; }
+        .conversation-item {
+            display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center;
+            padding: 10px; border-radius: 12px; border: 1px solid var(--border-light);
+            background: rgba(255,255,255,0.02);
+            cursor: pointer; transition: var(--transition);
+        }
+        .conversation-item:hover { background: rgba(255,255,255,0.05); }
+        .conversation-item img { width: 44px; height: 44px; border-radius: 50%; }
+        .conversation-item .meta { display: flex; flex-direction: column; gap: 2px; }
+        .conversation-item .meta .username { font-weight: 600; }
+        .conversation-item .meta .last { color: var(--text-light); font-size: 12px; }
+        .conversation-item .time { color: var(--text-light); font-size: 12px; }
+        .conversation-item.active { outline: 2px solid var(--accent-color); }
+
+        .chat-card {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            display: grid; grid-template-rows: auto 1fr auto;
+            overflow: hidden;
+        }
+        .chat-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 16px; border-bottom: 1px solid var(--border-light);
+        }
+        .chat-header .title { display: flex; align-items: center; gap: 10px; }
+        .chat-header .title img { width: 36px; height: 36px; border-radius: 50%; }
+        .chat-header .actions { display: flex; gap: 8px; }
+        .chat-header .actions button {
+            padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border-light); background: transparent; color: var(--white);
+            cursor: pointer; transition: var(--transition);
+        }
+        .chat-header .actions button:hover { background: rgba(255,255,255,0.06); }
+
+        .messages {
+            padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+        }
+        .msg-row { display: flex; gap: 10px; align-items: flex-end; }
+        .msg-row.sent { justify-content: flex-end; }
+        .msg-bubble {
+            max-width: 70%; padding: 10px 12px; border-radius: 14px; border: 1px solid var(--border-light);
+            background: var(--message-received-bg); color: var(--white);
+        }
+        .msg-row.sent .msg-bubble { background: var(--message-sent-bg); border-color: transparent; }
+        .msg-bubble .meta { display: flex; gap: 8px; align-items: center; margin-bottom: 4px; font-size: 12px; color: var(--text-light); }
+        .msg-bubble .text { white-space: pre-wrap; word-wrap: break-word; }
+
+        .composer { display: grid; grid-template-columns: auto 1fr auto auto; gap: 8px; padding: 10px; border-top: 1px solid var(--border-light); }
+        .composer button, .composer input[type="file"]::file-selector-button {
+            padding: 10px 12px; border-radius: 10px; border: 0; color: #fff; background: var(--button-background); box-shadow: var(--button-shadow); cursor: pointer;
+        }
+        .composer input[type="text"] {
+            padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-background); color: var(--white);
+        }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+        @media (max-width: 1024px) {
+            .chat-layout { grid-template-columns: 1fr; }
+            .sidebar { display: none; }
+        }
+    </style>
+</head>
+<body class="theme-dark-mode">
+<header>
+    <a href="Home.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back</a>
+    <div class="peer">
+        <img src="assets/icon1.png" alt="Peer">
+        <div>
+            <div class="name" id="peerName">Jane Doe</div>
+            <div class="status" id="peerStatus">Online</div>
+        </div>
+    </div>
+</header>
+
+<main class="chat-layout">
+    <aside class="sidebar">
+        <div class="search">
+            <input id="searchInput" placeholder="Search conversations" autocomplete="off" />
+            <button id="newChatBtn"><i class="fas fa-plus"></i></button>
+        </div>
+        <div id="conversationList" class="conversation-list"></div>
+    </aside>
+
+    <section class="chat-card" aria-live="polite">
+        <div class="chat-header">
+            <div class="title">
+                <img id="chatPeerAvatar" src="assets/icon2.png" alt="Avatar">
+                <div>
+                    <div id="chatPeerName">Jane Doe</div>
+                    <small class="text-light" id="chatPeerPresence">Typing…</small>
+                </div>
+            </div>
+            <div class="actions">
+                <button id="callBtn" title="Start call"><i class="fas fa-phone"></i></button>
+                <button id="videoBtn" title="Start video"><i class="fas fa-video"></i></button>
+                <button id="moreBtn" title="More"><i class="fas fa-ellipsis-h"></i></button>
+            </div>
+        </div>
+
+        <div id="messages" class="messages"></div>
+
+        <form id="composer" class="composer" autocomplete="off">
+            <button id="attachBtn" type="button" title="Attach file"><i class="fas fa-paperclip"></i></button>
+            <input id="textInput" type="text" placeholder="Type a message" aria-label="Message" />
+            <input id="fileInput" type="file" class="sr-only" />
+            <button id="sendBtn" type="submit" title="Send"><i class="fas fa-paper-plane"></i></button>
+        </form>
+    </section>
+</main>
+
+<script>
+(function() {
+    "use strict";
+
+    const messagesEl = document.getElementById('messages');
+    const composerEl = document.getElementById('composer');
+    const textInputEl = document.getElementById('textInput');
+    const fileInputEl = document.getElementById('fileInput');
+    const conversationListEl = document.getElementById('conversationList');
+
+    const soundSend = new Tone.Synth().toDestination();
+    const soundReceive = new Tone.MembraneSynth().toDestination();
+
+    const conversations = [
+        { id: 'u1', name: 'Jane Doe', avatar: 'assets/icon2.png', last: 'See you soon!', time: '3m' },
+        { id: 'u2', name: 'John Smith', avatar: 'assets/icon1.png', last: 'Let\'s meet at 5', time: '1h' },
+        { id: 'u3', name: 'Alex Kim', avatar: 'assets/icon2.png', last: 'Got it, thanks!', time: 'Yesterday' }
+    ];
+
+    function renderConversations(list) {
+        conversationListEl.innerHTML = '';
+        for (const c of list) {
+            const item = document.createElement('div');
+            item.className = 'conversation-item';
+            item.dataset.id = c.id;
+            item.innerHTML = `
+                <img src="${c.avatar}" alt="${c.name}">
+                <div class="meta">
+                    <div class="username">${c.name}</div>
+                    <div class="last">${c.last}</div>
+                </div>
+                <div class="time">${c.time}</div>
+            `;
+            item.addEventListener('click', () => selectConversation(c.id));
+            conversationListEl.appendChild(item);
+        }
+        if (list.length) selectConversation(list[0].id);
+    }
+
+    function setActiveConversation(conversationId) {
+        document.querySelectorAll('.conversation-item').forEach(el => {
+            el.classList.toggle('active', el.dataset.id === conversationId);
+        });
+    }
+
+    function selectConversation(conversationId) {
+        const convo = conversations.find(c => c.id === conversationId);
+        if (!convo) return;
+        document.getElementById('chatPeerName').textContent = convo.name;
+        document.getElementById('chatPeerAvatar').src = convo.avatar;
+        setActiveConversation(conversationId);
+        renderMessagesSeed(convo);
+    }
+
+    function renderMessagesSeed(convo) {
+        const seed = [
+            { from: 'peer', text: `Hi, I\'m ${convo.name}.` },
+            { from: 'me', text: 'Hey! Great to connect.' },
+            { from: 'peer', text: 'How is your day going?' }
+        ];
+        messagesEl.innerHTML = '';
+        for (const m of seed) {
+            appendMessage(m.from === 'me', m.text);
+        }
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function appendMessage(isMe, text) {
+        const row = document.createElement('div');
+        row.className = 'msg-row' + (isMe ? ' sent' : '');
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        bubble.innerHTML = `<div class="text"></div>`;
+        bubble.querySelector('.text').textContent = text;
+        row.appendChild(bubble);
+        messagesEl.appendChild(row);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    composerEl.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = textInputEl.value.trim();
+        if (!text) return;
+        appendMessage(true, text);
+        textInputEl.value = '';
+        try { await Tone.start(); soundSend.triggerAttackRelease('C6', '8n'); } catch (_) {}
+        window.setTimeout(async () => {
+            appendMessage(false, 'Received: ' + text);
+            try { await Tone.start(); soundReceive.triggerAttackRelease('C2', '8n'); } catch (_) {}
+        }, 600);
+    });
+
+    document.getElementById('attachBtn').addEventListener('click', () => fileInputEl.click());
+    fileInputEl.addEventListener('change', () => {
+        if (fileInputEl.files && fileInputEl.files[0]) {
+            appendMessage(true, '📎 ' + fileInputEl.files[0].name);
+        }
+    });
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        const filtered = conversations.filter(c => c.name.toLowerCase().includes(q));
+        renderConversations(filtered);
+    });
+
+    renderConversations(conversations);
+})();
+</script>
+</body>
+</html>
