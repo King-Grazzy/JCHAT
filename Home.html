@@ -3,7 +3,7 @@
 <head>
     <!-- Last updated: 2025-08-21T18:19:29Z -->
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>JCHAT - Home</title>
     <link rel="canonical" href="https://jchat.app/Home.html">
     <link rel="manifest" href="/manifest.webmanifest">
@@ -44,7 +44,7 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <!-- Tone.js for audio notifications -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 
     <style>
         /* Universal box-sizing for consistent layout */
@@ -1109,6 +1109,18 @@
             animation-play-state: paused !important;
         }
 
+        /* Respect OS-level reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition: none !important;
+            }
+            body[class*="theme-"] {
+                animation: none !important;
+            }
+        }
+
         body {
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
@@ -1412,13 +1424,6 @@
             color: var(--white);
         }
 
-            position: relative;
-        }
-
-            color: var(--white);
-            transform: scale(1.05);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-        }
 
         .no-notifications {
             text-align: center;
@@ -2031,16 +2036,6 @@
             margin-left: 10px;
         }
 
-        .post-creation-section .media-preview {
-            max-width: 100px;
-            max-height: 100px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid var(--border-light);
-            display: none;
-            margin-left: 10px;
-        }
-
         .post-creation-section .post-actions {
             display: flex;
             justify-content: flex-end;
@@ -2633,10 +2628,7 @@
             display: none;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        /* duplicate keyframes removed */
 
         /* Premium Request Button */
         .premium-request-btn {
