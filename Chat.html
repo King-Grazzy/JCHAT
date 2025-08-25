@@ -1986,6 +1986,14 @@
         let mediaRecorder = null;
         let audioChunks = [];
         let searchResults = new Map();
+        
+        // User data management (same as Find_Friends.html)
+        let allUsersData = []; // Store all fetched users for client-side operations
+        let unsubscribeUsers = null;
+        let unsubscribeFriendStatus = null;
+        let sentRequests = new Set();
+        let receivedRequests = new Set();
+        let currentUsersFriends = new Set();
 
         // DOM Elements
         const loader = document.getElementById('jchatLoader');
@@ -2300,6 +2308,9 @@
                     chatMain.style.display = 'block';
                 }
                 
+                // Load users data (same as Find_Friends.html)
+                fetchAndDisplayUsers();
+                
                 // Load real chat data (this will work with your security rules)
                 loadChatList(activeTab);
                 setupPresenceSystem();
@@ -2373,6 +2384,129 @@
             if (!publicId) return null;
             const baseUrl = `https://res.cloudinary.com/${cloudinary.cloudName}/image/upload`;
             return transformations ? `${baseUrl}/${transformations}/${publicId}` : `${baseUrl}/${publicId}`;
+        }
+
+        // User loading functions (same as Find_Friends.html)
+        async function fetchAndDisplayUsers() {
+            if (!currentUser) {
+                console.log("JCHAT_DEBUG: No user logged in, cannot fetch users.");
+                return;
+            }
+
+            console.log("JCHAT_DEBUG: Fetching users and friend statuses.");
+            
+            // Unsubscribe previous listeners to prevent memory leaks
+            if (unsubscribeUsers) unsubscribeUsers();
+            if (unsubscribeFriendStatus) unsubscribeFriendStatus();
+
+            const publicUsersCollectionRef = collection(db, "artifacts", appId, "public", "data", "users");
+            const publicFriendRequestsRef = collection(db, "artifacts", appId, "public", "data", "friend_requests");
+            const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
+
+            // Listen for changes in friend status
+            unsubscribeFriendStatus = onSnapshot(publicFriendRequestsRef, (snapshot) => {
+                sentRequests.clear();
+                receivedRequests.clear();
+                snapshot.forEach(docSnap => {
+                    const reqData = docSnap.data();
+                    if (reqData.status === 'pending') {
+                        if (reqData.senderId === currentUser.uid) {
+                            sentRequests.add(reqData.receiverId);
+                        } else if (reqData.receiverId === currentUser.uid) {
+                            receivedRequests.add(reqData.senderId);
+                        }
+                    }
+                });
+                console.log('JCHAT_DEBUG: Friend requests updated');
+            }, (error) => {
+                console.error("JCHAT_DEBUG: Error fetching friend requests:", error);
+            });
+
+            onSnapshot(publicFriendsRef, (snapshot) => {
+                currentUsersFriends.clear();
+                snapshot.forEach(docSnap => {
+                    const friendData = docSnap.data();
+                    if (friendData.user1Id === currentUser.uid) {
+                        currentUsersFriends.add(friendData.user2Id);
+                    } else if (friendData.user2Id === currentUser.uid) {
+                        currentUsersFriends.add(friendData.user1Id);
+                    }
+                });
+                console.log('JCHAT_DEBUG: Friends list updated');
+            }, (error) => {
+                console.error("JCHAT_DEBUG: Error fetching confirmed friends:", error);
+            });
+
+            // Listen for changes in the general public user list
+            unsubscribeUsers = onSnapshot(publicUsersCollectionRef, (snapshot) => {
+                allUsersData = []; // Reset global users data
+                snapshot.docs.forEach(docSnap => {
+                    const userData = docSnap.data();
+                    allUsersData.push({ userId: docSnap.id, ...userData });
+                });
+                console.log('JCHAT_DEBUG: Users list updated, total users:', allUsersData.length);
+            }, (error) => {
+                console.error("JCHAT_DEBUG: Error fetching public users:", error);
+            });
+        }
+
+        // Get user data from local cache (same as Find_Friends.html)
+        function getUserDataFromCache(userId) {
+            return allUsersData.find(user => user.userId === userId) || null;
+        }
+
+        // Start direct chat with a user
+        async function startDirectChatWithUser(userId) {
+            try {
+                console.log('JCHAT_DEBUG: Starting direct chat with user:', userId);
+                
+                // Check if chat already exists
+                const existingChatId = `${currentUser.uid}_${userId}`;
+                const altChatId = `${userId}_${currentUser.uid}`;
+                
+                // Try to find existing chat
+                try {
+                    const chatRef = doc(db, "artifacts", appId, "public", "data", "chats", existingChatId);
+                    const chatDoc = await getDoc(chatRef);
+                    
+                    if (chatDoc.exists()) {
+                        selectChat(existingChatId, 'direct');
+                        return;
+                    }
+                } catch (error) {
+                    console.log('JCHAT_DEBUG: No existing chat found');
+                }
+                
+                try {
+                    const altChatRef = doc(db, "artifacts", appId, "public", "data", "chats", altChatId);
+                    const altChatDoc = await getDoc(altChatRef);
+                    
+                    if (altChatDoc.exists()) {
+                        selectChat(altChatId, 'direct');
+                        return;
+                    }
+                } catch (error) {
+                    console.log('JCHAT_DEBUG: No alternate chat found');
+                }
+                
+                // Create new chat
+                const newChatId = existingChatId;
+                const chatRef = doc(db, "artifacts", appId, "public", "data", "chats", newChatId);
+                
+                await setDoc(chatRef, {
+                    members: [currentUser.uid, userId],
+                    createdAt: serverTimestamp(),
+                    lastMessage: null,
+                    lastMessageTimestamp: null
+                });
+                
+                console.log('JCHAT_DEBUG: New direct chat created:', newChatId);
+                selectChat(newChatId, 'direct');
+                
+            } catch (error) {
+                console.error('JCHAT_DEBUG: Error starting direct chat:', error);
+                showNotification('Error', 'Failed to start chat', 'error');
+            }
         }
 
         // Setup Event Listeners
@@ -2529,7 +2663,16 @@
                 renderChatList(chats, type);
             } catch (error) {
                 console.error('Error loading chat list:', error);
-                chatList.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-light);">Error loading chats</div>';
+                chatList.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: var(--text-light);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        <p>No ${type} found yet</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">This is normal for new accounts</p>
+                        <button class="quick-action-btn" onclick="window.showModal('${type === 'rooms' ? 'roomModal' : type === 'direct' ? 'directChatModal' : 'groupChatModal'}')" style="margin-top: 10px;">
+                            <i class="fas fa-plus"></i> Create ${type.slice(0, -1)}
+                        </button>
+                    </div>
+                `;
             }
         }
 
@@ -2553,6 +2696,7 @@
         // Load Direct Chats
         async function loadDirectChats() {
             try {
+                // First try to load from Firestore
                 const chatsRef = collection(db, "artifacts", appId, "public", "data", "chats");
                 const q = query(
                     chatsRef,
@@ -2567,7 +2711,24 @@
                 }));
             } catch (error) {
                 console.log('JCHAT_DEBUG: No direct chats found or collection doesn\'t exist yet:', error.message);
-                return []; // Return empty array if collection doesn't exist
+                
+                // If no chats exist, show available users to start chats with
+                if (allUsersData.length > 0) {
+                    return allUsersData
+                        .filter(user => user.userId !== currentUser.uid)
+                        .map(user => ({
+                            id: `user_${user.userId}`,
+                            type: 'direct',
+                            isUser: true,
+                            userId: user.userId,
+                            name: user.username || 'User',
+                            profilePicId: user.profilePicId,
+                            isFriend: currentUsersFriends.has(user.userId),
+                            hasRequest: sentRequests.has(user.userId) || receivedRequests.has(user.userId)
+                        }));
+                }
+                
+                return []; // Return empty array if collection doesn't exist and no users
             }
         }
 
@@ -2613,7 +2774,14 @@
                 item.addEventListener('click', () => {
                     const chatId = item.dataset.chatId;
                     const chatType = item.dataset.chatType;
-                    selectChat(chatId, chatType);
+                    
+                    // Handle user selection for direct chats
+                    if (chatType === 'direct' && chatId.startsWith('user_')) {
+                        const userId = chatId.replace('user_', '');
+                        startDirectChatWithUser(userId);
+                    } else {
+                        selectChat(chatId, chatType);
+                    }
                 });
             });
         }
@@ -2632,18 +2800,25 @@
                 avatarContent = '<i class="fas fa-hashtag"></i>';
                 chatName = chat.name || chat.id;
             } else if (chat.type === 'direct') {
-                const otherUserId = chat.members?.find(id => id !== currentUser.uid);
-                avatarContent = '<i class="fas fa-user"></i>';
-                chatName = chat.displayName || 'Direct Chat';
-                
-                if (onlineUsers.has(otherUserId)) {
-                    statusIndicator = '<div class="status-indicator online"></div>';
+                if (chat.isUser) {
+                    // This is a user from the users list
+                    avatarContent = '<i class="fas fa-user"></i>';
+                    chatName = chat.name || 'User';
                 } else {
-                    statusIndicator = '<div class="status-indicator offline"></div>';
+                    // This is an existing chat
+                    const otherUserId = chat.members?.find(id => id !== currentUser.uid);
+                    avatarContent = '<i class="fas fa-user"></i>';
+                    chatName = chat.displayName || 'Direct Chat';
+                    
+                    if (onlineUsers.has(otherUserId)) {
+                        statusIndicator = '<div class="status-indicator online"></div>';
+                    } else {
+                        statusIndicator = '<div class="status-indicator offline"></div>';
+                    }
                 }
             } else if (chat.type === 'group') {
                 avatarContent = '<i class="fas fa-users"></i>';
-                chatName = chat.info?.name || 'Group Chat';
+                chatName = chat.name || 'Group Chat';
             }
 
             return `
@@ -2654,10 +2829,10 @@
                     </div>
                     <div class="chat-info">
                         <h4 class="chat-name">${chatName}</h4>
-                        <p class="chat-last-message">${formatLastMessage(lastMessage)}</p>
+                        <p class="chat-last-message">${chat.isUser ? (chat.isFriend ? '👥 Friend' : chat.hasRequest ? '📨 Request Pending' : '🆕 New User') : formatLastMessage(lastMessage)}</p>
                     </div>
                     <div class="chat-meta">
-                        <span class="chat-time">${formatTime(lastMessage.timestamp)}</span>
+                        <span class="chat-time">${chat.isUser ? '' : formatTime(lastMessage.timestamp)}</span>
                         ${unreadCount > 0 ? `<span class="unread-badge">${unreadCount}</span>` : ''}
                     </div>
                 </div>
