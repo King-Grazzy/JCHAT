@@ -2057,14 +2057,12 @@
         async function initializeChatApp() {
             console.log('JCHAT_DEBUG: Initializing Chat App...');
             
+            // Fallback: hide loader after 10 seconds to prevent it from being stuck
+            setTimeout(() => {
+                hideLoader();
+            }, 10000);
+            
             try {
-                // Add error handling to prevent immediate redirect
-                setTimeout(() => {
-                    if (loader) {
-                        loader.classList.add('hidden');
-                    }
-                }, 1500);
-
                 console.log('JCHAT_DEBUG: Setting up app with authentication listener...');
                 
                 // Set up authentication state listener to handle demo -> real user transition
@@ -2080,6 +2078,9 @@
                         await loadRealUserProfile(user);
                         setupRealChatInterface();
                         setupNotifications();
+                        
+                        // Hide loader after real user interface is ready
+                        hideLoader();
                         
                         // Show success message
                         showNotification('Success', 'Successfully logged in!', 'success');
@@ -2097,6 +2098,9 @@
                         loadUserProfile();
                         setupChatInterface();
                         setupNotifications();
+                        
+                        // Hide loader after demo interface is ready
+                        hideLoader();
                     }
                 });
 
@@ -2105,9 +2109,14 @@
                 initializeEmojiPicker();
                 setupFileUpload();
                 
+                // Hide loader after all initialization is complete
+                hideLoader();
+                
                 console.log('JCHAT_DEBUG: Chat App initialization complete');
             } catch (error) {
                 console.error('JCHAT_DEBUG: Error initializing Chat App:', error);
+                // Hide loader even on error
+                hideLoader();
                 // Prevent immediate redirect on error
                 showNotification('Error', 'Failed to initialize chat. Please refresh the page.', 'error');
             }
@@ -2394,6 +2403,19 @@
             if (!publicId) return null;
             const baseUrl = `https://res.cloudinary.com/${cloudinary.cloudName}/image/upload`;
             return transformations ? `${baseUrl}/${transformations}/${publicId}` : `${baseUrl}/${publicId}`;
+        }
+
+        // Hide loader function
+        function hideLoader() {
+            if (loader) {
+                loader.classList.add('hidden');
+                // Force remove after transition
+                setTimeout(() => {
+                    if (loader && loader.classList.contains('hidden')) {
+                        loader.style.display = 'none';
+                    }
+                }, 500);
+            }
         }
 
         // User loading functions (same as Find_Friends.html)
