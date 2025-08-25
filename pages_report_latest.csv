@@ -6,6 +6,7 @@ file,size_bytes,lines,title,has_doctype,has_meta_viewport,num_links,num_external
 ./Admin_Settings.html,78427,1818,JCHAT - System Settings,yes,yes,13,0,2,1,2,2
 ./Analytics.html,75107,1661,JCHAT - Admin Panel - Analytics,yes,yes,12,0,3,1,2,2
 ./Analytics_ashboard.html,51130,1257,JCHAT - Admin: Analytics Dashboard,yes,yes,11,0,1,0,2,2
+./Chat.html,391904,9435,JCHAT - Profile,yes,yes,8,2,1,0,2,1
 ./Coin_management.html,146008,3087,JCHAT - Admin Dashboard,yes,yes,4,0,2,1,2,3
 ./Community_guidelines.html,55350,1127,JCHAT - Community Guidelines,yes,yes,9,0,2,1,2,2
 ./Content_Moderation.html,91756,2069,JCHAT - Admin Panel - Content Moderation,yes,yes,14,0,2,0,2,2
