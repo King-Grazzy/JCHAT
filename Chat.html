@@ -2085,6 +2085,35 @@
             }
         }
 
+        // Setup File Upload
+        function setupFileUpload() {
+            console.log('JCHAT_DEBUG: Setting up file upload...');
+            try {
+                // Create file input elements if they don't exist
+                if (!document.getElementById('fileInput')) {
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.id = 'fileInput';
+                    fileInput.accept = '*/*';
+                    fileInput.style.display = 'none';
+                    document.body.appendChild(fileInput);
+                }
+                
+                if (!document.getElementById('imageInput')) {
+                    const imageInput = document.createElement('input');
+                    imageInput.type = 'file';
+                    imageInput.id = 'imageInput';
+                    imageInput.accept = 'image/*';
+                    imageInput.style.display = 'none';
+                    document.body.appendChild(imageInput);
+                }
+                
+                console.log('JCHAT_DEBUG: File upload setup complete');
+            } catch (error) {
+                console.error('JCHAT_DEBUG: Error setting up file upload:', error);
+            }
+        }
+
         // Load User Profile
         async function loadUserProfile() {
             try {
