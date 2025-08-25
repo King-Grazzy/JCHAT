@@ -2005,6 +2005,11 @@
         const profileUsername = document.getElementById('profileUsername');
         const profilePic = document.getElementById('profilePic');
         const profileIcon = document.getElementById('profileIcon');
+        
+        // Header Profile Elements (matching Home.html/Profile.html)
+        const headerProfilePic = document.getElementById('headerProfilePic');
+        const headerAvatarIcon = document.getElementById('headerAvatarIcon');
+        const headerDisplayName = document.getElementById('headerDisplayName');
 
         // Button elements
         const tabButtons = document.querySelectorAll('.tab-button');
@@ -2052,22 +2057,40 @@
                     }
                 }, 1500);
 
-                console.log('JCHAT_DEBUG: Setting up app with demo mode...');
+                console.log('JCHAT_DEBUG: Setting up app with authentication listener...');
                 
-                // Since anonymous auth is disabled, use demo mode that works with your security rules
-                // Create a demo user that can access public read-only data
-                currentUser = {
-                    uid: 'demo-user-' + Date.now(),
-                    displayName: 'Demo User',
-                    email: 'demo@jchat.com'
-                };
-                console.log('JCHAT_DEBUG: Using demo user:', currentUser.uid);
-                
-                // For demo mode, we'll only show UI elements and won't try to access Firestore
-                // This prevents permission errors while still showing the chat interface
-                loadUserProfile();
-                setupChatInterface();
-                setupNotifications();
+                // Set up authentication state listener to handle demo -> real user transition
+                onAuthStateChanged(auth, async (user) => {
+                    console.log('JCHAT_DEBUG: Auth state changed:', user ? 'User logged in' : 'No user');
+                    
+                    if (user) {
+                        // Real user authenticated - transition from demo mode
+                        console.log('JCHAT_DEBUG: Real user authenticated:', user.uid);
+                        currentUser = user;
+                        
+                        // Load real user profile and update header
+                        await loadRealUserProfile(user);
+                        setupRealChatInterface();
+                        setupNotifications();
+                        
+                        // Show success message
+                        showNotification('Success', 'Successfully logged in!', 'success');
+                    } else {
+                        // No user - use demo mode
+                        console.log('JCHAT_DEBUG: No user, using demo mode');
+                        currentUser = {
+                            uid: 'demo-user-' + Date.now(),
+                            displayName: 'Demo User',
+                            email: 'demo@jchat.com'
+                        };
+                        console.log('JCHAT_DEBUG: Using demo user:', currentUser.uid);
+                        
+                        // Show demo interface
+                        loadUserProfile();
+                        setupChatInterface();
+                        setupNotifications();
+                    }
+                });
 
                 setupEventListeners();
                 applySavedTheme();
@@ -2128,12 +2151,118 @@
                     profilePic.style.display = 'none';
                 }
                 
+                // Update header profile elements for demo mode
+                if (headerProfilePic && headerAvatarIcon && headerDisplayName) {
+                    headerDisplayName.textContent = 'Demo User';
+                    displayProfilePicture(headerProfilePic, headerAvatarIcon, null, 'D', "w_70,h_70,c_fill,g_face,r_max");
+                }
+                
                 console.log('JCHAT_DEBUG: Demo user profile loaded successfully');
             } catch (error) {
                 console.error('JCHAT_DEBUG: Error loading demo user profile:', error);
                 // Fallback to defaults
                 if (profileUsername) {
                     profileUsername.textContent = 'Demo User';
+                }
+                if (profileIcon) {
+                    profileIcon.style.display = 'block';
+                }
+                if (profilePic) {
+                    profilePic.style.display = 'none';
+                }
+            }
+        }
+
+        // Load Real User Profile (matching Home.html logic)
+        async function loadRealUserProfile(user) {
+            try {
+                console.log('JCHAT_DEBUG: Loading real user profile for:', user.uid);
+                
+                // Try to load from Firestore using your security rules path
+                try {
+                    const userDocRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
+                    const userDoc = await getDoc(userDocRef);
+                    
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        console.log('JCHAT_DEBUG: Fetched real user profile:', userData);
+                        
+                        // Update sidebar profile
+                        if (profileUsername) {
+                            profileUsername.textContent = userData.username || 'User';
+                        }
+                        
+                        if (userData.profilePicture) {
+                            if (profilePic) {
+                                profilePic.src = userData.profilePicture;
+                                profilePic.style.display = 'block';
+                            }
+                            if (profileIcon) {
+                                profileIcon.style.display = 'none';
+                            }
+                        } else {
+                            // Use default profile icon
+                            if (profileIcon) {
+                                profileIcon.style.display = 'block';
+                            }
+                            if (profilePic) {
+                                profilePic.style.display = 'none';
+                            }
+                        }
+                        
+                        // Update header profile elements (matching Home.html)
+                        if (headerProfilePic && headerAvatarIcon && headerDisplayName) {
+                            const usernameInitial = (userData.username || 'U').charAt(0).toUpperCase();
+                            displayProfilePicture(headerProfilePic, headerAvatarIcon, userData.profilePicId, usernameInitial, "w_70,h_70,c_fill,g_face,r_max");
+                            headerDisplayName.textContent = userData.username || 'JCHAT User';
+                        }
+                    } else {
+                        console.log('JCHAT_DEBUG: No profile found, using defaults');
+                        // Set default profile data
+                        if (profileUsername) {
+                            profileUsername.textContent = user.displayName || 'User';
+                        }
+                        if (profileIcon) {
+                            profileIcon.style.display = 'block';
+                        }
+                        if (profilePic) {
+                            profilePic.style.display = 'none';
+                        }
+                        
+                        // Update header profile elements
+                        if (headerProfilePic && headerAvatarIcon && headerDisplayName) {
+                            const usernameInitial = (user.displayName || 'U').charAt(0).toUpperCase();
+                            displayProfilePicture(headerProfilePic, headerAvatarIcon, null, usernameInitial, "w_70,h_70,c_fill,g_face,r_max");
+                            headerDisplayName.textContent = user.displayName || 'JCHAT User';
+                        }
+                    }
+                } catch (firestoreError) {
+                    console.log('JCHAT_DEBUG: Firestore profile load failed, using defaults:', firestoreError.message);
+                    // Set default profile data on error
+                    if (profileUsername) {
+                        profileUsername.textContent = user.displayName || 'User';
+                    }
+                    if (profileIcon) {
+                        profileIcon.style.display = 'block';
+                    }
+                    if (profilePic) {
+                        profilePic.style.display = 'none';
+                    }
+                    
+                    // Update header profile elements
+                    if (headerProfilePic && headerAvatarIcon && headerDisplayName) {
+                        const usernameInitial = (user.displayName || 'U').charAt(0).toUpperCase();
+                        displayProfilePicture(headerProfilePic, headerAvatarIcon, null, usernameInitial, "w_70,h_70,c_fill,g_face,r_max");
+                        headerDisplayName.textContent = user.displayName || 'JCHAT User';
+                    }
+                }
+                
+                console.log('JCHAT_DEBUG: Real user profile loaded successfully');
+            } catch (error) {
+                console.error('JCHAT_DEBUG: Error loading real user profile:', error);
+                // Fallback to defaults
+                if (profileUsername) {
+                    profileUsername.textContent = user.displayName || 'User';
                 }
                 if (profileIcon) {
                     profileIcon.style.display = 'block';
@@ -2154,6 +2283,30 @@
                 console.log('JCHAT_DEBUG: Demo chat interface setup complete');
             } catch (error) {
                 console.error('JCHAT_DEBUG: Error setting up demo chat interface:', error);
+            }
+        }
+
+        // Setup Real Chat Interface for authenticated users
+        function setupRealChatInterface() {
+            console.log('JCHAT_DEBUG: Setting up real chat interface...');
+            try {
+                // Hide demo welcome screen
+                if (welcomeScreen) {
+                    welcomeScreen.style.display = 'none';
+                }
+                
+                // Show real chat interface
+                if (chatMain) {
+                    chatMain.style.display = 'block';
+                }
+                
+                // Load real chat data (this will work with your security rules)
+                loadChatList(activeTab);
+                setupPresenceSystem();
+                
+                console.log('JCHAT_DEBUG: Real chat interface setup complete');
+            } catch (error) {
+                console.error('JCHAT_DEBUG: Error setting up real chat interface:', error);
             }
         }
 
@@ -2191,6 +2344,35 @@
             }
             
             console.log('JCHAT_DEBUG: Demo chat interface displayed');
+        }
+
+        // Display Profile Picture Function (matching Home.html/Profile.html)
+        function displayProfilePicture(imgElement, iconElement, profilePicId, usernameInitial, transformations) {
+            if (imgElement) { // Ensure imgElement exists
+                if (profilePicId) {
+                    const imageUrl = getCloudinaryImageUrl(profilePicId, transformations);
+                    imgElement.src = imageUrl;
+                    imgElement.style.display = 'block';
+                    if (iconElement) iconElement.style.display = 'none'; // Null check for iconElement
+                    imgElement.onerror = () => {
+                        console.error(`JCHAT_ERROR: Failed to load profile picture: ${profilePicId}. Using placeholder.`);
+                        imgElement.src = `https://placehold.co/120x120/CCCCCC/000000?text=${usernameInitial}`;
+                        imgElement.style.display = 'block';
+                        if (iconElement) iconElement.style.display = 'none'; // Null check for iconElement
+                    };
+                } else {
+                    imgElement.src = '';
+                    imgElement.style.display = 'none';
+                    if (iconElement) iconElement.style.display = 'block'; // Null check for iconElement
+                }
+            }
+        }
+
+        // Get Cloudinary Image URL (matching Home.html/Profile.html)
+        function getCloudinaryImageUrl(publicId, transformations = '') {
+            if (!publicId) return null;
+            const baseUrl = `https://res.cloudinary.com/${cloudinary.cloudName}/image/upload`;
+            return transformations ? `${baseUrl}/${transformations}/${publicId}` : `${baseUrl}/${publicId}`;
         }
 
         // Setup Event Listeners
