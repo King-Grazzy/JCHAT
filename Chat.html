@@ -2535,46 +2535,61 @@
 
         // Load Public Rooms
         async function loadPublicRooms() {
-            const roomsRef = collection(db, "public", "data", "chat_rooms");
-            const snapshot = await getDocs(roomsRef);
-            
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                type: 'room',
-                ...doc.data()
-            }));
+            try {
+                const roomsRef = collection(db, "artifacts", appId, "public", "data", "chat_rooms");
+                const snapshot = await getDocs(roomsRef);
+                
+                return snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    type: 'room',
+                    ...doc.data()
+                }));
+            } catch (error) {
+                console.log('JCHAT_DEBUG: No chat rooms found or collection doesn\'t exist yet:', error.message);
+                return []; // Return empty array if collection doesn't exist
+            }
         }
 
         // Load Direct Chats
         async function loadDirectChats() {
-            const chatsRef = collection(db, "public", "data", "chats");
-            const q = query(
-                chatsRef,
-                where("participants", "array-contains", currentUser.uid)
-            );
-            
-            const snapshot = await getDocs(q);
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                type: 'direct',
-                ...doc.data()
-            }));
+            try {
+                const chatsRef = collection(db, "artifacts", appId, "public", "data", "chats");
+                const q = query(
+                    chatsRef,
+                    where("members", "array-contains", currentUser.uid)
+                );
+                
+                const snapshot = await getDocs(q);
+                return snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    type: 'direct',
+                    ...doc.data()
+                }));
+            } catch (error) {
+                console.log('JCHAT_DEBUG: No direct chats found or collection doesn\'t exist yet:', error.message);
+                return []; // Return empty array if collection doesn't exist
+            }
         }
 
         // Load Groups
         async function loadGroups() {
-            const groupsRef = collection(db, "public", "data", "groups");
-            const q = query(
-                groupsRef,
-                where("memberIds", "array-contains", currentUser.uid)
-            );
-            
-            const snapshot = await getDocs(q);
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                type: 'group',
-                ...doc.data()
-            }));
+            try {
+                const groupsRef = collection(db, "artifacts", appId, "public", "data", "groups");
+                const q = query(
+                    groupsRef,
+                    where("members", "array-contains", currentUser.uid)
+                );
+                
+                const snapshot = await getDocs(q);
+                return snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    type: 'group',
+                    ...doc.data()
+                }));
+            } catch (error) {
+                console.log('JCHAT_DEBUG: No groups found or collection doesn\'t exist yet:', error.message);
+                return []; // Return empty array if collection doesn't exist
+            }
         }
 
         // Render Chat List
@@ -2617,7 +2632,7 @@
                 avatarContent = '<i class="fas fa-hashtag"></i>';
                 chatName = chat.name || chat.id;
             } else if (chat.type === 'direct') {
-                const otherUserId = chat.participants?.find(id => id !== currentUser.uid);
+                const otherUserId = chat.members?.find(id => id !== currentUser.uid);
                 avatarContent = '<i class="fas fa-user"></i>';
                 chatName = chat.displayName || 'Direct Chat';
                 
@@ -2705,7 +2720,7 @@
                 let chatData;
                 
                 if (chatType === 'room') {
-                    const roomRef = doc(db, "public", "data", "chat_rooms", chatId);
+                    const roomRef = doc(db, "artifacts", appId, "public", "data", "chat_rooms", chatId);
                     const roomDoc = await getDoc(roomRef);
                     chatData = roomDoc.data();
                     
@@ -2713,23 +2728,23 @@
                     chatHeaderStatus.textContent = `Public Room • ${chatData?.memberCount || 0} members`;
                     chatHeaderAvatar.innerHTML = '<i class="fas fa-hashtag"></i>';
                 } else if (chatType === 'direct') {
-                    const chatRef = doc(db, "public", "data", "chats", chatId);
+                    const chatRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId);
                     const chatDoc = await getDoc(chatRef);
                     chatData = chatDoc.data();
                     
-                    const otherUserId = chatData?.participants.find(id => id !== currentUser.uid);
+                    const otherUserId = chatData?.members.find(id => id !== currentUser.uid);
                     const otherUserData = await getUserData(otherUserId);
                     
                     chatHeaderName.textContent = otherUserData?.username || 'Direct Chat';
                     chatHeaderStatus.textContent = onlineUsers.has(otherUserId) ? 'Online' : 'Last seen recently';
                     chatHeaderAvatar.innerHTML = '<i class="fas fa-user"></i>';
                 } else if (chatType === 'group') {
-                    const groupRef = doc(db, "public", "data", "groups", chatId);
+                    const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", chatId);
                     const groupDoc = await getDoc(groupRef);
                     chatData = groupDoc.data();
                     
-                    chatHeaderName.textContent = chatData?.info?.name || 'Group Chat';
-                    chatHeaderStatus.textContent = `${chatData?.memberIds?.length || 0} members`;
+                    chatHeaderName.textContent = chatData?.name || 'Group Chat';
+                    chatHeaderStatus.textContent = `${chatData?.members?.length || 0} members`;
                     chatHeaderAvatar.innerHTML = '<i class="fas fa-users"></i>';
                 }
             } catch (error) {
@@ -2759,11 +2774,11 @@
                 let messagesRef;
                 
                 if (chatType === 'room') {
-                    messagesRef = collection(db, "public", "data", "chat_rooms", chatId, "messages");
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "chat_rooms", chatId, "messages");
                 } else if (chatType === 'direct') {
-                    messagesRef = collection(db, "public", "data", "chats", chatId, "messages");
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatId, "messages");
                 } else if (chatType === 'group') {
-                    messagesRef = collection(db, "public", "data", "groups", chatId, "messages");
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", chatId, "messages");
                 }
 
                 const q = query(messagesRef, orderBy("timestamp", "asc"), limit(50));
@@ -2786,11 +2801,11 @@
             let messagesRef;
             
             if (chatType === 'room') {
-                messagesRef = collection(db, "public", "data", "chat_rooms", chatId, "messages");
+                messagesRef = collection(db, "artifacts", appId, "public", "data", "chat_rooms", chatId, "messages");
             } else if (chatType === 'direct') {
-                messagesRef = collection(db, "public", "data", "chats", chatId, "messages");
+                messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatId, "messages");
             } else if (chatType === 'group') {
-                messagesRef = collection(db, "public", "data", "groups", chatId, "messages");
+                messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", chatId, "messages");
             }
 
             const q = query(messagesRef, orderBy("timestamp", "desc"), limit(1));
@@ -2960,11 +2975,11 @@
 
                 let messagesRef;
                 if (currentChatType === 'room') {
-                    messagesRef = collection(db, "public", "data", "chat_rooms", currentChatId, "messages");
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "chat_rooms", currentChatId, "messages");
                 } else if (currentChatType === 'direct') {
-                    messagesRef = collection(db, "public", "data", "chats", currentChatId, "messages");
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", currentChatId, "messages");
                 } else if (currentChatType === 'group') {
-                    messagesRef = collection(db, "public", "data", "groups", currentChatId, "messages");
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages");
                 }
 
                 await addDoc(messagesRef, messageData);
@@ -2981,11 +2996,11 @@
             let docRef;
             
             if (chatType === 'room') {
-                docRef = doc(db, "public", "data", "chat_rooms", chatId);
+                docRef = doc(db, "artifacts", appId, "public", "data", "chat_rooms", chatId);
             } else if (chatType === 'direct') {
-                docRef = doc(db, "public", "data", "chats", chatId);
+                docRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId);
             } else if (chatType === 'group') {
-                docRef = doc(db, "public", "data", "groups", chatId);
+                docRef = doc(db, "artifacts", appId, "public", "data", "groups", chatId);
             }
 
             await updateDoc(docRef, {
@@ -3026,7 +3041,7 @@
         // Set Typing Status
         async function setTypingStatus(isTyping) {
             try {
-                const typingRef = doc(db, "public", "data", "typing", currentChatId, "users", currentUser.uid);
+                const typingRef = doc(db, "artifacts", appId, "public", "data", "typing", currentChatId, "users", currentUser.uid);
                 
                 if (isTyping) {
                     await setDoc(typingRef, {
@@ -3127,11 +3142,11 @@
 
                     let messagesRef;
                     if (currentChatType === 'room') {
-                        messagesRef = collection(db, "public", "data", "chat_rooms", currentChatId, "messages");
+                        messagesRef = collection(db, "artifacts", appId, "public", "data", "chat_rooms", currentChatId, "messages");
                     } else if (currentChatType === 'direct') {
-                        messagesRef = collection(db, "public", "data", "chats", currentChatId, "messages");
+                        messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", currentChatId, "messages");
                     } else if (currentChatType === 'group') {
-                        messagesRef = collection(db, "public", "data", "groups", currentChatId, "messages");
+                        messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages");
                     }
 
                     await addDoc(messagesRef, messageData);
@@ -3228,11 +3243,11 @@
 
                     let messagesRef;
                     if (currentChatType === 'room') {
-                        messagesRef = collection(db, "public", "data", "chat_rooms", currentChatId, "messages");
+                        messagesRef = collection(db, "artifacts", appId, "public", "data", "chat_rooms", currentChatId, "messages");
                     } else if (currentChatType === 'direct') {
-                        messagesRef = collection(db, "public", "data", "chats", currentChatId, "messages");
+                        messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", currentChatId, "messages");
                     } else if (currentChatType === 'group') {
-                        messagesRef = collection(db, "public", "data", "groups", currentChatId, "messages");
+                        messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages");
                     }
 
                     await addDoc(messagesRef, messageData);
@@ -3290,11 +3305,11 @@
             try {
                 let messagesRef;
                 if (currentChatType === 'room') {
-                    messagesRef = doc(db, "public", "data", "chat_rooms", currentChatId, "messages", messageId);
+                    messagesRef = doc(db, "artifacts", appId, "public", "data", "chat_rooms", currentChatId, "messages", messageId);
                 } else if (currentChatType === 'direct') {
-                    messagesRef = doc(db, "public", "data", "chats", currentChatId, "messages", messageId);
+                    messagesRef = doc(db, "artifacts", appId, "public", "data", "chats", currentChatId, "messages", messageId);
                 } else if (currentChatType === 'group') {
-                    messagesRef = doc(db, "public", "data", "groups", currentChatId, "messages", messageId);
+                    messagesRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages", messageId);
                 }
 
                 const messageDoc = await getDoc(messagesRef);
@@ -3358,7 +3373,7 @@
 
             try {
                 const roomId = roomName.toLowerCase().replace(/[^a-z0-9]/g, '_');
-                const roomRef = doc(db, "public", "data", "chat_rooms", roomId);
+                const roomRef = doc(db, "artifacts", appId, "public", "data", "chat_rooms", roomId);
                 const roomDoc = await getDoc(roomRef);
 
                 if (!roomDoc.exists()) {
@@ -3460,12 +3475,12 @@
             try {
                 const selectedUser = Array.from(selectedUsers)[0];
                 const chatId = [currentUser.uid, selectedUser.id].sort().join('_');
-                const chatRef = doc(db, "public", "data", "chats", chatId);
+                const chatRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId);
                 const chatDoc = await getDoc(chatRef);
 
                 if (!chatDoc.exists()) {
                     await setDoc(chatRef, {
-                        participants: [currentUser.uid, selectedUser.id],
+                        members: [currentUser.uid, selectedUser.id],
                         createdAt: serverTimestamp(),
                         displayName: selectedUser.username,
                         lastMessage: null
@@ -3565,14 +3580,14 @@
             }
 
             try {
-                const memberIds = [currentUser.uid, ...Array.from(selectedUsers).map(u => u.id)];
+                const members = [currentUser.uid, ...Array.from(selectedUsers).map(u => u.id)];
                 
-                const groupRef = await addDoc(collection(db, "public", "data", "groups"), {
+                const groupRef = await addDoc(collection(db, "artifacts", appId, "public", "data", "groups"), {
                     info: {
                         name: groupName,
                         description: groupDescription,
                         adminIds: [currentUser.uid],
-                        memberIds: memberIds,
+                        members: members,
                         createdAt: serverTimestamp(),
                         createdBy: currentUser.uid
                     },
@@ -3603,37 +3618,44 @@
         function setupPresenceSystem() {
             if (!currentUser) return;
             
-            const userPresenceRef = doc(db, "public", "data", "presence", currentUser.uid);
-            setDoc(userPresenceRef, {
-                online: true,
-                lastSeen: serverTimestamp(),
-                userId: currentUser.uid,
-                userName: profileUsername.textContent
-            });
-
-            // Listen for presence changes
-            const presenceRef = collection(db, "public", "data", "presence");
-            onSnapshot(presenceRef, (snapshot) => {
-                onlineUsers.clear();
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data.online) {
-                        onlineUsers.add(doc.id);
-                    }
-                });
-                
-                updateOnlineStatus();
-            });
-
-            // Set user as offline when leaving
-            window.addEventListener('beforeunload', () => {
+            try {
+                const userPresenceRef = doc(db, "artifacts", appId, "public", "data", "presence", currentUser.uid);
                 setDoc(userPresenceRef, {
-                    online: false,
+                    online: true,
                     lastSeen: serverTimestamp(),
                     userId: currentUser.uid,
                     userName: profileUsername.textContent
                 });
-            });
+
+                // Listen for presence changes
+                const presenceRef = collection(db, "artifacts", appId, "public", "data", "presence");
+                onSnapshot(presenceRef, (snapshot) => {
+                    onlineUsers.clear();
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.online) {
+                            onlineUsers.add(doc.id);
+                        }
+                    });
+                    
+                    updateOnlineStatus();
+                });
+
+                // Set user as offline when leaving
+                window.addEventListener('beforeunload', () => {
+                    setDoc(userPresenceRef, {
+                        online: false,
+                        lastSeen: serverTimestamp(),
+                        userId: currentUser.uid,
+                        userName: profileUsername.textContent
+                    });
+                });
+                
+                console.log('JCHAT_DEBUG: Presence system setup complete');
+            } catch (error) {
+                console.log('JCHAT_DEBUG: Presence system setup failed (collection may not exist yet):', error.message);
+                // Don't fail the entire setup if presence fails
+            }
         }
 
         // Update Online Status in UI
@@ -3769,11 +3791,11 @@
                 try {
                     let messageRef;
                     if (currentChatType === 'room') {
-                        messageRef = doc(db, "public", "data", "chat_rooms", currentChatId, "messages", messageId);
+                        messageRef = doc(db, "artifacts", appId, "public", "data", "chat_rooms", currentChatId, "messages", messageId);
                     } else if (currentChatType === 'direct') {
-                        messageRef = doc(db, "public", "data", "chats", currentChatId, "messages", messageId);
+                        messageRef = doc(db, "artifacts", appId, "public", "data", "chats", currentChatId, "messages", messageId);
                     } else if (currentChatType === 'group') {
-                        messageRef = doc(db, "public", "data", "groups", currentChatId, "messages", messageId);
+                        messageRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages", messageId);
                     }
                     
                     await deleteDoc(messageRef);
@@ -3812,7 +3834,7 @@
         async function handleLogout() {
             try {
                 // Set user as offline
-                const userPresenceRef = doc(db, "public", "data", "presence", currentUser.uid);
+                const userPresenceRef = doc(db, "artifacts", appId, "public", "data", "presence", currentUser.uid);
                 await setDoc(userPresenceRef, {
                     online: false,
                     lastSeen: serverTimestamp(),
