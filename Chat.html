@@ -5277,11 +5277,15 @@
             const bulkDeleteModal = document.getElementById('bulkDeleteModal');
             bulkDeleteModal.classList.add('active');
             
-            // Make messages selectable
+            // Make only own messages selectable
             const messages = document.querySelectorAll('.message-item');
             messages.forEach(message => {
-                message.classList.add('selectable');
-                message.addEventListener('click', toggleMessageSelection);
+                if (message.classList.contains('own-message')) {
+                    message.classList.add('selectable');
+                    message.addEventListener('click', toggleMessageSelection);
+                } else {
+                    message.classList.remove('selectable', 'selected');
+                }
             });
             
             // Add event listeners
@@ -5344,7 +5348,7 @@
         }
 
         function selectAllMessages() {
-            const messages = document.querySelectorAll('.message-item');
+            const messages = document.querySelectorAll('.message-item.own-message');
             selectedMessages.clear();
             
             messages.forEach(message => {
@@ -5385,7 +5389,7 @@
 
         function selectLastHour() {
             const oneHourAgo = Date.now() - (60 * 60 * 1000);
-            const messages = document.querySelectorAll('.message-item');
+            const messages = document.querySelectorAll('.message-item.own-message');
             selectedMessages.clear();
             
             messages.forEach(message => {
@@ -5406,7 +5410,7 @@
             today.setHours(0, 0, 0, 0);
             const todayTimestamp = today.getTime();
             
-            const messages = document.querySelectorAll('.message-item');
+            const messages = document.querySelectorAll('.message-item.own-message');
             selectedMessages.clear();
             
             messages.forEach(message => {
