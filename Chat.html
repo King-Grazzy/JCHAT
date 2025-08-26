@@ -4904,7 +4904,7 @@
             
             // Clear search results
             modal.querySelectorAll('.user-search-results').forEach(results => {
-                results.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">Type at least 2 characters to search...</p>';
+                results.innerHTML = '';
             });
             
             // Clear selected users display
@@ -5088,7 +5088,7 @@
             }
 
             if (query.length < 2) {
-                resultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">Type at least 2 characters to search your friends...</p>';
+                resultsContainer.innerHTML = '';
                 return;
             }
 
