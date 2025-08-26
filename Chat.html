@@ -3883,7 +3883,7 @@
                         </div>
                         ${reactionsHTML}
                         <div class="message-actions">
-                            <button class="message-action-btn" onclick="replyToMessage('${message.id}', '${message.senderName}', '${escapeHTML(message.text || message.type)}')">
+                            <button class="message-action-btn" onclick="replyToMessage('${message.id}', ${JSON.stringify(message.senderName || '')}, ${JSON.stringify((message.text || message.type) || '')})">
                                 <i class="fas fa-reply"></i>
                             </button>
                             <button class="message-action-btn" onclick="showReactionPicker('${message.id}')">
