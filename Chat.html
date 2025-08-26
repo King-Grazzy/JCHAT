@@ -5269,7 +5269,7 @@
         }
 
         // Bulk Delete functionality
-        function showBulkDeleteModal() {
+        window.showBulkDeleteModal = function showBulkDeleteModal() {
             isBulkDeleteMode = true;
             selectedMessages.clear();
             
@@ -5492,15 +5492,15 @@
                 dropdown.id = 'chatMoreDropdown';
                 dropdown.className = 'chat-more-dropdown';
                 dropdown.innerHTML = `
-                    <div class="dropdown-item" onclick="showBulkDeleteModal()">
+                    <div class="dropdown-item" onclick="window.showBulkDeleteModal()">
                         <i class="fas fa-check-square"></i>
                         <span>Bulk Delete Messages</span>
                     </div>
-                    <div class="dropdown-item" onclick="exportChat()">
+                    <div class="dropdown-item" onclick="window.exportChat()">
                         <i class="fas fa-download"></i>
                         <span>Export Chat</span>
                     </div>
-                    <div class="dropdown-item" onclick="showChatSettings()">
+                    <div class="dropdown-item" onclick="window.showChatSettings()">
                         <i class="fas fa-cog"></i>
                         <span>Chat Settings</span>
                     </div>
@@ -5525,7 +5525,7 @@
         }
 
         // Export Chat functionality
-        function exportChat() {
+        window.exportChat = function exportChat() {
             if (!currentChatId || !currentChatType) return;
             
             const messages = document.querySelectorAll('.message-item');
@@ -5557,7 +5557,7 @@
         }
 
         // Chat Settings (placeholder)
-        function showChatSettings() {
+        window.showChatSettings = function showChatSettings() {
             showNotification('Info', 'Chat settings coming soon!', 'info');
             document.getElementById('chatMoreDropdown').classList.remove('active');
         }
