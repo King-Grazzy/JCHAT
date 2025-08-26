@@ -63,7 +63,8 @@
             --message-bg-sent: linear-gradient(135deg, var(--blue), var(--pink));
             --message-bg-received: rgba(255, 255, 255, 0.1);
             --online-status: #4CAF50;
-            --offline-status: #6c757d;
+            --away-status: #FFC107;
+            --offline-status: #2c2c2c;
             --typing-status: #FFC107;
             --unread-badge: var(--pink);
             --reaction-bg: rgba(255, 255, 255, 0.1);
@@ -493,6 +494,11 @@
             background: var(--online-status);
         }
 
+        .status-indicator.away {
+            background: var(--away-status);
+            animation: awayPulse 3s ease-in-out infinite;
+        }
+
         .status-indicator.offline {
             background: var(--offline-status);
         }
@@ -500,6 +506,18 @@
         .status-indicator.typing {
             background: var(--typing-status);
             animation: pulse 2s infinite;
+        }
+
+        /* Away status animation */
+        @keyframes awayPulse {
+            0%, 100% { 
+                opacity: 0.6; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.05);
+            }
         }
 
         /* Real-time Connection Indicator Styles */
@@ -1116,14 +1134,16 @@
         .message-input-container {
             padding: 15px 20px;
             border-top: 1px solid var(--border-light);
-            background: rgba(255, 255, 255, 0.02);
+            background: rgba(255, 255, 255, 0.05);
             position: sticky;
             bottom: 0;
-            z-index: 10;
-            backdrop-filter: blur(10px);
+            z-index: 1000;
+            backdrop-filter: blur(15px);
             flex-shrink: 0;
             display: block !important;
             min-height: 80px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px 15px 0 0;
         }
 
         .reply-preview {
@@ -2006,7 +2026,6 @@
                 <button class="sidebar-toggle" id="sidebarToggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <a href="/" class="logo">JCHAT</a>
             </div>
             
             <div class="header-actions">
@@ -2376,6 +2395,9 @@
         let messageListeners = new Map();
         let typingTimeouts = new Map();
         let onlineUsers = new Set();
+        let awayUsers = new Set();
+        let offlineUsers = new Set();
+        let userLastSeen = new Map(); // Track when users were last seen
         let selectedUsers = new Set();
         let replyToMessageData = null;
         let isRecording = false;
@@ -3332,12 +3354,9 @@
                     }
                     chatName = chat.name || 'Friend';
                     
-                    // Show online status for friends
-                    if (onlineUsers.has(chat.userId)) {
-                        statusIndicator = '<div class="status-indicator online"></div>';
-                    } else {
-                        statusIndicator = '<div class="status-indicator offline"></div>';
-                    }
+                    // Show status for friends
+                    const status = getUserStatus(chat.userId);
+                    statusIndicator = `<div class="status-indicator ${status}"></div>`;
                 } else if (chat.isUser) {
                     // This is a user from the users list - show profile picture if available (matching Find_Friends.html)
                     if (chat.profilePicId && chat.visibility?.profilePic !== false) {
@@ -3363,11 +3382,8 @@
                     // Use actual username instead of "Direct Chat"
                     chatName = otherUserData?.username || chat.displayName || 'Friend';
                     
-                    if (onlineUsers.has(otherUserId)) {
-                        statusIndicator = '<div class="status-indicator online"></div>';
-                    } else {
-                        statusIndicator = '<div class="status-indicator offline"></div>';
-                    }
+                    const status = getUserStatus(otherUserId);
+                    statusIndicator = `<div class="status-indicator ${status}"></div>`;
                 }
             } else if (chat.type === 'group') {
                 avatarContent = '<i class="fas fa-users"></i>';
@@ -4426,6 +4442,7 @@
         let connectionCheckInterval = null;
         let presenceListener = null;
         let presenceHeartbeatInterval = null;
+        let statusCheckInterval = null;
         
         // Setup Presence System
         async function setupPresenceSystem() {
@@ -4451,16 +4468,43 @@
                 presenceListener = onSnapshot(presenceRef, (snapshot) => {
                     console.log('JCHAT_DEBUG: Presence update received, snapshot size:', snapshot.size);
                     
+                    // Clear all status sets
                     onlineUsers.clear();
+                    awayUsers.clear();
+                    offlineUsers.clear();
+                    
+                    const now = Date.now();
+                    
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        console.log(`JCHAT_DEBUG: User ${doc.id} presence:`, data);
+                        const userId = doc.id;
+                        console.log(`JCHAT_DEBUG: User ${userId} presence:`, data);
+                        
                         if (data.online) {
-                            onlineUsers.add(doc.id);
+                            onlineUsers.add(userId);
+                            userLastSeen.set(userId, now);
+                        } else {
+                            // User is not online, check last seen time
+                            const lastSeen = data.lastSeen ? 
+                                (data.lastSeen.toDate ? data.lastSeen.toDate().getTime() : data.lastSeen) : 
+                                userLastSeen.get(userId) || now;
+                            
+                            userLastSeen.set(userId, lastSeen);
+                            const timeSinceLastSeen = now - lastSeen;
+                            
+                            if (timeSinceLastSeen < 5 * 60 * 1000) { // Less than 5 minutes
+                                awayUsers.add(userId);
+                            } else {
+                                offlineUsers.add(userId);
+                            }
                         }
                     });
                     
-                    console.log('JCHAT_DEBUG: Updated online users:', Array.from(onlineUsers));
+                    console.log('JCHAT_DEBUG: Updated user states:');
+                    console.log('  Online:', Array.from(onlineUsers));
+                    console.log('  Away:', Array.from(awayUsers));
+                    console.log('  Offline:', Array.from(offlineUsers));
+                    
                     updateOnlineStatus();
                     updateConnectionStatus('connected');
                 }, (error) => {
@@ -4493,6 +4537,9 @@
                 
                 // Start presence heartbeat to keep user online
                 startPresenceHeartbeat(userPresenceRef);
+                
+                // Start periodic status checking
+                startStatusChecking();
                 
                 console.log('JCHAT_DEBUG: Presence system setup complete');
             } catch (error) {
@@ -4612,10 +4659,29 @@
                 presenceHeartbeatInterval = null;
             }
             
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+                statusCheckInterval = null;
+            }
+            
             if (presenceListener) {
                 presenceListener();
                 presenceListener = null;
             }
+        }
+
+        // Get User Status
+        function getUserStatus(userId) {
+            if (onlineUsers.has(userId)) return 'online';
+            if (awayUsers.has(userId)) return 'away';
+            return 'offline';
+        }
+        
+        // Get User Status Text
+        function getUserStatusText(userId) {
+            if (onlineUsers.has(userId)) return 'Online';
+            if (awayUsers.has(userId)) return 'Away';
+            return 'Last seen recently';
         }
 
         // Update Online Status in UI
@@ -4626,9 +4692,9 @@
                 const userId = chatItem?.dataset.userId;
                 
                 if (chatType === 'direct' && userId) {
-                    // Update based on individual user's online status
-                    const isOnline = onlineUsers.has(userId);
-                    indicator.className = 'status-indicator ' + (isOnline ? 'online' : 'offline');
+                    // Update based on individual user's status
+                    const status = getUserStatus(userId);
+                    indicator.className = 'status-indicator ' + status;
                 }
             });
             
@@ -4646,8 +4712,7 @@
                     const otherUserId = activeItem?.dataset.userId;
                     
                     if (otherUserId) {
-                        const isOnline = onlineUsers.has(otherUserId);
-                        chatHeaderStatus.textContent = isOnline ? 'Online' : 'Last seen recently';
+                        chatHeaderStatus.textContent = getUserStatusText(otherUserId);
                     }
                 }
             }
@@ -4659,17 +4724,17 @@
             if (activeTab !== 'direct') return;
             
             console.log('JCHAT_DEBUG: Refreshing Direct tab status indicators...');
-            console.log('JCHAT_DEBUG: Online users:', Array.from(onlineUsers));
+            console.log('JCHAT_DEBUG: User states - Online:', Array.from(onlineUsers), 'Away:', Array.from(awayUsers), 'Offline:', Array.from(offlineUsers));
             
             chatList.querySelectorAll('.chat-item[data-chat-type="direct"]').forEach(item => {
                 const userId = item.dataset.userId;
                 const statusIndicator = item.querySelector('.status-indicator');
                 
                 if (userId && statusIndicator) {
-                    const isOnline = onlineUsers.has(userId);
-                    statusIndicator.className = 'status-indicator ' + (isOnline ? 'online' : 'offline');
+                    const status = getUserStatus(userId);
+                    statusIndicator.className = 'status-indicator ' + status;
                     
-                    console.log(`JCHAT_DEBUG: User ${userId} is ${isOnline ? 'online' : 'offline'}`);
+                    console.log(`JCHAT_DEBUG: User ${userId} is ${status}`);
                 }
             });
         }
@@ -4695,6 +4760,30 @@
                     console.log('JCHAT_DEBUG: Presence heartbeat failed:', error);
                 }
             }, 30000); // Every 30 seconds
+        }
+        
+        // Start Status Checking
+        function startStatusChecking() {
+            // Check user statuses every minute to move away users to offline
+            statusCheckInterval = setInterval(() => {
+                const now = Date.now();
+                let statusChanged = false;
+                
+                // Check away users to see if they should be moved to offline
+                Array.from(awayUsers).forEach(userId => {
+                    const lastSeen = userLastSeen.get(userId);
+                    if (lastSeen && (now - lastSeen) >= 5 * 60 * 1000) { // 5 minutes
+                        awayUsers.delete(userId);
+                        offlineUsers.add(userId);
+                        statusChanged = true;
+                        console.log(`JCHAT_DEBUG: User ${userId} moved from away to offline`);
+                    }
+                });
+                
+                if (statusChanged) {
+                    updateOnlineStatus();
+                }
+            }, 60000); // Every minute
         }
 
         // Setup Notifications - Demo mode
