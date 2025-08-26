@@ -687,6 +687,26 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
         }
+        
+        .enter-group-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .enter-group-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
 
         .chat-time {
             font-size: 0.8rem;
@@ -3432,31 +3452,33 @@
                     };
                 });
                 
-                // Load public groups user can join (limit to 10 to avoid performance issues)
+                // Load ALL public groups (limit to 20 to avoid performance issues)
                 const publicGroupsQuery = query(
                     groupsRef,
                     where("info.isPublic", "==", true),
-                    limit(10)
+                    limit(20)
                 );
                 
                 const publicGroupsSnapshot = await getDocs(publicGroupsQuery);
                 const publicGroups = publicGroupsSnapshot.docs
-                    .filter(doc => !userGroups.some(userGroup => userGroup.id === doc.id)) // Exclude user's groups
                     .map(doc => {
                         const data = doc.data();
+                        const members = data.members || data.info?.members || [];
+                        const isMember = members.includes(currentUser.uid);
+                        
                         return {
                             id: doc.id,
                             type: 'group',
                             name: data.info?.name || data.name || 'Group Chat',
                             description: data.info?.description || data.description || '',
-                            members: data.members || data.info?.members || [],
-                            memberCount: data.info?.memberCount || (data.members || data.info?.members || []).length,
+                            members: members,
+                            memberCount: data.info?.memberCount || members.length,
                             lastMessage: data.lastMessage,
                             adminIds: data.info?.adminIds || data.adminIds || [],
                             createdAt: data.info?.createdAt || data.createdAt,
                             createdBy: data.info?.createdBy || data.createdBy,
                             isPublic: true,
-                            isMember: false
+                            isMember: isMember
                         };
                     });
                 
@@ -3566,8 +3588,13 @@
                 avatarContent = '<i class="fas fa-users"></i>';
                 chatName = chat.name || 'Group Chat';
                 
-                // Show join button for public groups user is not a member of
-                if (chat.isPublic && !chat.isMember) {
+                // Show different buttons based on membership status
+                if (chat.isPublic) {
+                    const isMember = chat.isMember;
+                    const buttonText = isMember ? 'Enter' : 'Join';
+                    const buttonClass = isMember ? 'enter-group-btn' : 'join-group-btn';
+                    const buttonIcon = isMember ? 'fas fa-sign-in-alt' : 'fas fa-plus';
+                    
                     return `
                         <div class="chat-item ${isActive ? 'active' : ''}" data-chat-id="${chat.id}" data-chat-type="${chat.type}">
                             <div class="chat-avatar">
@@ -3579,8 +3606,8 @@
                             </div>
                             <div class="chat-meta">
                                 <span class="chat-time">${chat.memberCount || 0} members</span>
-                                <button class="join-group-btn" onclick="joinGroup('${chat.id}', '${chat.name}')">
-                                    <i class="fas fa-plus"></i> Join
+                                <button class="${buttonClass}" onclick="${isMember ? 'selectChat(\'' + chat.id + '\', \'group\')' : 'joinGroup(\'' + chat.id + '\', \'' + chat.name + '\')'}">
+                                    <i class="${buttonIcon}"></i> ${buttonText}
                                 </button>
                             </div>
                         </div>
