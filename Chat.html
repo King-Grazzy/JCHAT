@@ -2472,7 +2472,7 @@
                         
                         // Load real user profile and update header
                         await loadRealUserProfile(user);
-                        setupRealChatInterface();
+                        await setupRealChatInterface();
                         setupNotifications();
                         
                         // Hide loader after real user interface is ready
@@ -2710,7 +2710,7 @@
         }
 
         // Setup Real Chat Interface for authenticated users
-        function setupRealChatInterface() {
+        async function setupRealChatInterface() {
             console.log('JCHAT_DEBUG: Setting up real chat interface...');
             try {
                 // Hide demo welcome screen
@@ -2728,7 +2728,7 @@
                 
                 // Load real chat data (this will work with your security rules)
                 loadChatList(activeTab);
-                setupPresenceSystem();
+                await setupPresenceSystem();
                 
                 console.log('JCHAT_DEBUG: Real chat interface setup complete');
             } catch (error) {
@@ -4420,12 +4420,12 @@
         let presenceListener = null;
         
         // Setup Presence System
-        function setupPresenceSystem() {
+        async function setupPresenceSystem() {
             if (!currentUser) return;
             
             try {
                 const userPresenceRef = doc(db, "artifacts", appId, "public", "data", "presence", currentUser.uid);
-                setDoc(userPresenceRef, {
+                await setDoc(userPresenceRef, {
                     online: true,
                     lastSeen: serverTimestamp(),
                     userId: currentUser.uid,
@@ -4452,12 +4452,22 @@
 
                 // Set user as offline when leaving
                 window.addEventListener('beforeunload', () => {
-                    setDoc(userPresenceRef, {
-                        online: false,
-                        lastSeen: serverTimestamp(),
-                        userId: currentUser.uid,
-                        userName: profileUsername.textContent
-                    });
+                    // Use sendBeacon for more reliable offline status update
+                    navigator.sendBeacon && navigator.sendBeacon('/offline-status', JSON.stringify({
+                        userId: currentUser.uid
+                    }));
+                    
+                    // Fallback to synchronous setDoc (best effort)
+                    try {
+                        setDoc(userPresenceRef, {
+                            online: false,
+                            lastSeen: serverTimestamp(),
+                            userId: currentUser.uid,
+                            userName: profileUsername.textContent
+                        });
+                    } catch (error) {
+                        console.log('JCHAT_DEBUG: Error setting offline status on beforeunload:', error);
+                    }
                 });
                 
                 // Start connection monitoring
