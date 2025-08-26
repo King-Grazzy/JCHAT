@@ -795,24 +795,35 @@
 
         .chat-header-actions {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
             align-items: center;
+            max-width: 100%;
+            overflow-x: auto;
+            padding: 5px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .chat-header-actions::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
 
         .group-features {
             display: flex;
             align-items: center;
-            gap: 6px;
-            margin-right: 10px;
-            padding-right: 10px;
+            gap: 4px;
+            margin-right: 8px;
+            padding-right: 8px;
             border-right: 1px solid var(--border-light);
+            flex-shrink: 0;
         }
 
         .general-features {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
+            flex-shrink: 0;
         }
 
         /* Default Avatar Styling (matching Find_Friends.html) */
@@ -836,12 +847,17 @@
             background: none;
             border: none;
             color: var(--text-light);
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             cursor: pointer;
-            padding: 8px;
+            padding: 6px;
             border-radius: 50%;
             transition: all 0.3s ease;
             position: relative;
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .chat-action-btn:hover {
@@ -1789,6 +1805,15 @@
             background: #c82333;
         }
 
+        .transfer-btn {
+            background: #fd7e14;
+            color: white;
+        }
+
+        .transfer-btn:hover {
+            background: #e8690b;
+        }
+
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -2244,6 +2269,16 @@
         .role-badge.owner {
             background: rgba(220, 53, 69, 0.2);
             color: #dc3545;
+        }
+
+        .owner-badge {
+            background: linear-gradient(135deg, #dc3545, #fd7e14);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.6rem;
+            font-weight: bold;
+            margin-left: 8px;
         }
 
         .member-role {
@@ -6289,6 +6324,7 @@
                         category: groupCategory,
                         privacy: groupPrivacy,
                         adminIds: [currentUser.uid],
+                        ownerId: currentUser.uid, // Creator is owner
                         members: members,
                         memberProfiles: memberProfiles,
                         createdAt: serverTimestamp(),
@@ -7941,7 +7977,7 @@
                 const info = groupData.info || {};
                 const settings = groupData.settings || {};
                 const isAdmin = info.adminIds?.includes(currentUser.uid);
-                const isOwner = info.createdBy === currentUser.uid;
+                const isOwner = info.ownerId === currentUser.uid || info.createdBy === currentUser.uid;
                 
                 if (!isAdmin && !isOwner) {
                     showNotification('Error', 'Only group admins can access settings', 'error');
@@ -7970,15 +8006,15 @@
                                     <div class="settings-section">
                                         <h4>📝 Group Profile</h4>
                                         <div class="form-group">
-                                            <label>Group Name</label>
+                                            <label>Group Name ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}</label>
                                             <input type="text" id="groupNameSetting" value="${info.name || ''}" ${!isOwner ? 'disabled' : ''}>
                                         </div>
                                         <div class="form-group">
-                                            <label>Description</label>
+                                            <label>Description ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}</label>
                                             <textarea id="groupDescriptionSetting" rows="3" ${!isOwner ? 'disabled' : ''}>${info.description || ''}</textarea>
                                         </div>
                                         <div class="form-group">
-                                            <label>Category</label>
+                                            <label>Category ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}</label>
                                             <select id="groupCategorySetting" ${!isOwner ? 'disabled' : ''}>
                                                 <option value="general" ${info.category === 'general' ? 'selected' : ''}>General</option>
                                                 <option value="gaming" ${info.category === 'gaming' ? 'selected' : ''}>Gaming</option>
@@ -7989,14 +8025,14 @@
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label>Privacy</label>
+                                            <label>Privacy ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}</label>
                                             <select id="groupPrivacySetting" ${!isOwner ? 'disabled' : ''}>
                                                 <option value="public" ${info.isPublic ? 'selected' : ''}>Public</option>
                                                 <option value="private" ${!info.isPublic ? 'selected' : ''}>Private</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
-                                            <label>Tags (comma separated)</label>
+                                            <label>Tags (comma separated) ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}</label>
                                             <input type="text" id="groupTagsSetting" value="${(info.tags || []).join(', ')}" ${!isOwner ? 'disabled' : ''}>
                                         </div>
                                     </div>
@@ -8006,25 +8042,25 @@
                                         <div class="form-group">
                                             <label class="checkbox-label">
                                                 <input type="checkbox" id="allowMemberInvitesSetting" ${settings.allowMemberInvites ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
-                                                Allow members to invite others
+                                                Allow members to invite others ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}
                                             </label>
                                         </div>
                                         <div class="form-group">
                                             <label class="checkbox-label">
                                                 <input type="checkbox" id="allowFileSharingSetting" ${settings.allowFileSharing ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
-                                                Allow file sharing
+                                                Allow file sharing ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}
                                             </label>
                                         </div>
                                         <div class="form-group">
                                             <label class="checkbox-label">
                                                 <input type="checkbox" id="allowVoiceMessagesSetting" ${settings.allowVoiceMessages ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
-                                                Allow voice messages
+                                                Allow voice messages ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}
                                             </label>
                                         </div>
                                         <div class="form-group">
                                             <label class="checkbox-label">
                                                 <input type="checkbox" id="allowPollsSetting" ${settings.allowPolls ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
-                                                Allow polls and surveys
+                                                Allow polls and surveys ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}
                                             </label>
                                         </div>
                                     </div>
@@ -8053,15 +8089,26 @@
                                             <div class="member-list" id="settingsMemberList">
                                                 ${(info.memberProfiles || []).map(member => {
                                                     const isMemberAdmin = info.adminIds?.includes(member.uid);
+                                                    const isMemberOwner = info.ownerId === member.uid || info.createdBy === member.uid;
                                                     const isCurrentUser = member.uid === currentUser.uid;
-                                                    const role = isMemberAdmin ? 'Admin' : 'Member';
+                                                    let role = 'Member';
+                                                    let roleClass = 'member';
+                                                    
+                                                    if (isMemberOwner) {
+                                                        role = 'Owner';
+                                                        roleClass = 'owner';
+                                                    } else if (isMemberAdmin) {
+                                                        role = 'Admin';
+                                                        roleClass = 'admin';
+                                                    }
+                                                    
                                                     return `
                                                         <div class="member-item">
                                                             <div class="member-info">
                                                                 <span class="member-name">${member.username} ${isCurrentUser ? '(You)' : ''}</span>
-                                                                <span class="member-role ${isMemberAdmin ? 'admin' : 'member'}">${role}</span>
+                                                                <span class="member-role ${roleClass}">${role}</span>
                                                             </div>
-                                                            ${(isAdmin || isOwner) && !isCurrentUser ? `
+                                                            ${(isAdmin || isOwner) && !isCurrentUser && !isMemberOwner ? `
                                                                 <div class="member-actions">
                                                                     ${!isMemberAdmin ? `
                                                                         <button onclick="promoteUserToAdmin('${currentChatId}', '${info.name}', '${member.uid}', '${member.username}')" class="action-btn promote-btn">Promote</button>
@@ -8069,6 +8116,11 @@
                                                                         <button onclick="demoteAdminToMember('${currentChatId}', '${info.name}', '${member.uid}', '${member.username}')" class="action-btn demote-btn">Demote</button>
                                                                     `}
                                                                     <button onclick="removeUserFromGroup('${currentChatId}', '${info.name}', '${member.uid}', '${member.username}')" class="action-btn remove-btn">Remove</button>
+                                                                </div>
+                                                            ` : ''}
+                                                            ${isOwner && !isCurrentUser && isMemberOwner ? `
+                                                                <div class="member-actions">
+                                                                    <button onclick="transferOwnership('${currentChatId}', '${info.name}', '${member.uid}', '${member.username}')" class="action-btn transfer-btn">Transfer Ownership</button>
                                                                 </div>
                                                             ` : ''}
                                                         </div>
@@ -8138,17 +8190,17 @@
                                         <div class="form-group">
                                             <label class="checkbox-label">
                                                 <input type="checkbox" id="slowModeSetting" ${settings.slowMode ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
-                                                Enable Slow Mode
+                                                Enable Slow Mode ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}
                                             </label>
                                         </div>
                                         <div class="form-group">
-                                            <label>Slow Mode Interval (seconds)</label>
+                                            <label>Slow Mode Interval (seconds) ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}</label>
                                             <input type="number" id="slowModeIntervalSetting" value="${settings.slowModeInterval || 0}" min="0" max="3600" ${!isOwner ? 'disabled' : ''}>
                                         </div>
                                         <div class="form-group">
                                             <label class="checkbox-label">
                                                 <input type="checkbox" id="requireApprovalSetting" ${settings.requireApproval ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
-                                                Require message approval
+                                                Require message approval ${isOwner ? '<span class="owner-badge">Owner Only</span>' : ''}
                                             </label>
                                         </div>
                                         <div class="moderation-actions">
@@ -8715,7 +8767,7 @@
                 
                 const groupData = groupDoc.data();
                 const isAdmin = groupData.info?.adminIds?.includes(currentUser.uid);
-                const isOwner = groupData.info?.createdBy === currentUser.uid;
+                const isOwner = groupData.info?.ownerId === currentUser.uid || groupData.info?.createdBy === currentUser.uid;
                 
                 if (!isAdmin && !isOwner) {
                     showNotification('Error', 'Only admins can pin messages', 'error');
@@ -9892,6 +9944,67 @@
         
         window.showChatThemePicker = function showChatThemePicker() {
             showNotification('Info', 'Chat theme picker coming soon!', 'info');
+        }
+        
+        // Transfer Ownership Function
+        window.transferOwnership = async function transferOwnership(groupId, groupName, newOwnerId, newOwnerUsername) {
+            try {
+                if (!currentUser) {
+                    showNotification('Error', 'You must be logged in to transfer ownership', 'error');
+                    return;
+                }
+                
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", groupId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const isOwner = groupData.info?.ownerId === currentUser.uid || groupData.info?.createdBy === currentUser.uid;
+                
+                if (!isOwner) {
+                    showNotification('Error', 'Only the group owner can transfer ownership', 'error');
+                    return;
+                }
+                
+                // Confirm ownership transfer
+                const confirmed = confirm(`Are you sure you want to transfer ownership of "${groupName}" to ${newOwnerUsername}? This action cannot be undone.`);
+                
+                if (!confirmed) {
+                    return;
+                }
+                
+                // Update group with new owner
+                await updateDoc(groupRef, {
+                    'info.ownerId': newOwnerId,
+                    'info.adminIds': arrayUnion(newOwnerId), // Ensure new owner is also admin
+                    'stats.lastActivity': serverTimestamp()
+                });
+                
+                // Add system message about ownership transfer
+                const messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", groupId, "messages");
+                await addDoc(messagesRef, {
+                    text: `👑 Group ownership transferred to ${newOwnerUsername} by ${profileUsername.textContent}.`,
+                    timestamp: serverTimestamp(),
+                    senderId: 'system',
+                    senderName: 'System',
+                    type: 'system'
+                });
+                
+                showNotification('Success', `Ownership transferred to ${newOwnerUsername}!`, 'success');
+                
+                // Refresh the group settings if open
+                if (document.getElementById('groupSettingsModal')) {
+                    showGroupSettings();
+                }
+                
+            } catch (error) {
+                console.error('Error transferring ownership:', error);
+                showNotification('Error', `Failed to transfer ownership: ${error.message}`, 'error');
+            }
         }
 
         // Theme Management
