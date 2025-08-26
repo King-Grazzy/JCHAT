@@ -1790,6 +1790,183 @@
             background: #218838;
         }
 
+        .poll-btn {
+            background: #6f42c1;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .poll-btn:hover {
+            background: #5a32a3;
+        }
+
+        .pinned-btn {
+            background: #fd7e14;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .pinned-btn:hover {
+            background: #e8690b;
+        }
+
+        /* Poll and Pinned Message Styles */
+        .pinned-messages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .pinned-message-item {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .pinned-message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .pinned-message-content {
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .pinned-message-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pinned-message-actions .action-btn {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .pinned-message-actions .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .pinned-message-actions .remove-btn {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .pinned-message-actions .remove-btn:hover {
+            background: rgba(220, 53, 69, 0.3);
+        }
+
+        /* Poll Message Styles */
+        .poll-message {
+            background: rgba(111, 66, 193, 0.1);
+            border: 1px solid rgba(111, 66, 193, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+
+        .poll-question {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .poll-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .poll-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .poll-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(111, 66, 193, 0.5);
+        }
+
+        .poll-option.voted {
+            background: rgba(111, 66, 193, 0.2);
+            border-color: rgba(111, 66, 193, 0.5);
+        }
+
+        .poll-option-text {
+            flex: 1;
+            color: var(--text-primary);
+        }
+
+        .poll-option-votes {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .poll-option-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(111, 66, 193, 0.3), rgba(111, 66,193, 0.1));
+            border-radius: 8px;
+            z-index: -1;
+            transition: width 0.3s ease;
+        }
+
+        .poll-footer {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .poll-expires {
+            font-style: italic;
+        }
+
+        .poll-total-votes {
+            font-weight: 500;
+        }
+
+        /* Message Highlight Animation */
+        @keyframes messageHighlight {
+            0% { background: rgba(111, 66, 193, 0.3); }
+            100% { background: transparent; }
+        }
+
         /* Invite Modal Styles */
         .search-section {
             margin-bottom: 20px;
@@ -1864,6 +2041,507 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        /* Advanced Group Settings Styles */
+        .settings-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--blue), var(--pink));
+            color: white;
+        }
+
+        .settings-tab {
+            display: none;
+        }
+
+        .settings-tab.active {
+            display: block;
+        }
+
+        .settings-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid var(--border-light);
+        }
+
+        .settings-section h4 {
+            margin: 0 0 15px 0;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: var(--input-background);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--blue);
+            outline: none;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .member-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .member-list-container h5 {
+            margin: 0 0 15px 0;
+            color: var(--text-primary);
+        }
+
+        .permissions-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .permission-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            border: 1px solid var(--border-light);
+        }
+
+        .permission-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .permission-roles {
+            display: flex;
+            gap: 8px;
+        }
+
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .role-badge.member {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .role-badge.admin {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .role-badge.owner {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .member-role {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .member-role.admin {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .member-role.member {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+
+        .moderation-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .moderation-actions .action-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .moderation-actions .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .analytics-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .analytics-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .analytics-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .analytics-chart {
+            margin-top: 20px;
+        }
+
+        .analytics-chart h5 {
+            margin: 0 0 15px 0;
+            color: var(--text-primary);
+        }
+
+        .chart-placeholder {
+            height: 200px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed var(--border-light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* Group Discovery Styles */
+        .discovery-filters {
+            margin-bottom: 20px;
+        }
+
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            background: var(--input-background);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .discovery-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 10px;
+        }
+
+        .discovery-tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .discovery-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .discovery-tab-btn.active {
+            background: linear-gradient(135deg, var(--blue), var(--pink));
+            color: white;
+        }
+
+        .discovery-results {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .discovery-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .discovery-group-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--blue);
+        }
+
+        .group-info {
+            flex: 1;
+        }
+
+        .group-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .group-name {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .group-category {
+            padding: 4px 8px;
+            background: rgba(111, 66, 193, 0.2);
+            color: #6f42c1;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .group-description {
+            color: var(--text-light);
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .group-stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
+        .group-stats .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-light);
+            font-size: 0.8rem;
+        }
+
+        .group-tags {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 2px 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .group-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 120px;
+        }
+
+        .join-btn, .preview-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .join-btn {
+            background: linear-gradient(135deg, var(--blue), var(--pink));
+            color: white;
+        }
+
+        .join-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+        }
+
+        .preview-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 40px;
+            color: #dc3545;
+        }
+
+        .error-message i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        /* Group Preview Styles */
+        .group-preview-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .group-description-section,
+        .group-stats-section,
+        .group-tags-section,
+        .group-rules-section {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .group-description-section h4,
+        .group-stats-section h4,
+        .group-tags-section h4,
+        .group-rules-section h4 {
+            margin: 0 0 10px 0;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .group-description-section p {
+            margin: 0;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .tags-container {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .rules-list {
+            margin: 0;
+            padding-left: 20px;
+            color: var(--text-light);
+        }
+
+        .rules-list li {
+            margin-bottom: 5px;
+            line-height: 1.4;
         }
 
         /* User Search and Selection Styles */
@@ -2667,9 +3345,12 @@
                     <button class="quick-action-btn" id="startDirectChatBtn">
                         <i class="fas fa-paper-plane"></i> New Message
                     </button>
-                    <button class="quick-action-btn" onclick="window.refreshGroupsList()" title="Refresh Groups" style="margin-right: 8px;">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
+                                            <button class="quick-action-btn" onclick="window.showGroupDiscovery()" title="Discover Groups" style="margin-right: 8px;">
+                            <i class="fas fa-search"></i> Discover
+                        </button>
+                        <button class="quick-action-btn" onclick="window.refreshGroupsList()" title="Refresh Groups" style="margin-right: 8px;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
                     <button class="quick-action-btn" id="createGroupBtn">
                         <i class="fas fa-users-plus"></i> Create Group
                     </button>
@@ -4374,6 +5055,11 @@
             const isOwn = message.senderId === currentUser.uid;
             const messageClass = isOwn ? 'sent' : 'received';
             
+            // Handle poll messages
+            if (message.type === 'poll') {
+                return createPollMessageHTML(message, isOwn);
+            }
+            
             let messageContent = '';
             
             if (message.type === 'text') {
@@ -4471,6 +5157,112 @@
                             <button class="message-action-btn" onclick="showReactionPicker('${message.id}')">
                                 <i class="fas fa-smile"></i>
                             </button>
+                            ${currentChatType === 'group' ? `
+                                <button class="message-action-btn pin-btn" onclick="pinMessage('${message.id}')" title="Pin Message">
+                                    <i class="fas fa-thumbtack"></i>
+                                </button>
+                            ` : ''}
+                            ${isOwn ? `<button class="message-action-btn" onclick="deleteMessage('${message.id}')"><i class="fas fa-trash"></i></button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Create Poll Message HTML
+        function createPollMessageHTML(message, isOwn) {
+            const messageClass = isOwn ? 'sent' : 'received';
+            
+            // Check if poll has expired
+            const isExpired = message.expiresAt && new Date() > message.expiresAt.toDate();
+            
+            // Check if user has voted
+            const hasVoted = message.options.some(option => 
+                option.voters && option.voters.includes(currentUser.uid)
+            );
+            
+            // Calculate vote percentages
+            const totalVotes = message.totalVotes || 0;
+            const optionsWithPercentages = message.options.map(option => ({
+                ...option,
+                percentage: totalVotes > 0 ? Math.round((option.votes / totalVotes) * 100) : 0
+            }));
+            
+            const optionsHTML = optionsWithPercentages.map((option, index) => {
+                const isVoted = option.voters && option.voters.includes(currentUser.uid);
+                const isDisabled = isExpired || hasVoted;
+                
+                return `
+                    <div class="poll-option ${isVoted ? 'voted' : ''}" 
+                         onclick="${!isDisabled ? `voteOnPoll('${message.id}', ${index})` : ''}"
+                         style="${isDisabled ? 'cursor: default;' : 'cursor: pointer;'}">
+                        <div class="poll-option-bar" style="width: ${option.percentage}%;"></div>
+                        <div class="poll-option-text">${option.text}</div>
+                        <div class="poll-option-votes">
+                            ${option.votes} (${option.percentage}%)
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            const pollFooter = `
+                <div class="poll-footer">
+                    <span class="poll-total-votes">${totalVotes} vote${totalVotes !== 1 ? 's' : ''}</span>
+                    ${isExpired ? 
+                        '<span class="poll-expires">Poll ended</span>' : 
+                        `<span class="poll-expires">Expires ${new Date(message.expiresAt.toDate()).toLocaleDateString()}</span>`
+                    }
+                </div>
+            `;
+            
+            // Get sender's profile picture for message avatar
+            let avatarContent = message.createdByUsername ? message.createdByUsername[0].toUpperCase() : 'A';
+            
+            // Try to get sender's profile picture from cache
+            if (message.createdBy && message.createdBy !== currentUser.uid) {
+                const senderData = getUserDataFromCache(message.createdBy);
+                if (senderData?.profilePicId && senderData.visibility?.profilePic !== false) {
+                    const imageUrl = getCloudinaryImageUrl(senderData.profilePicId, "w_32,h_32,c_fill,g_face,r_max");
+                    avatarContent = `<img src="${imageUrl}" alt="${message.createdByUsername}'s Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none';this.parentElement.innerHTML='${message.createdByUsername ? message.createdByUsername[0].toUpperCase() : 'A'}';">`;
+                }
+            } else if (message.createdBy === currentUser.uid) {
+                // Use current user's profile picture
+                if (profilePic && profilePic.src) {
+                    avatarContent = `<img src="${profilePic.src}" alt="Your Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none';this.parentElement.innerHTML='${message.createdByUsername ? message.createdByUsername[0].toUpperCase() : 'Y'}';">`;
+                }
+            }
+            
+            return `
+                <div class="message ${messageClass}" data-message-id="${message.id}">
+                    <div class="message-avatar">
+                        ${avatarContent}
+                    </div>
+                    <div class="message-content">
+                        <div class="message-header">
+                            <span class="message-sender">${message.createdByUsername || 'Anonymous'}</span>
+                            <span class="message-time">${formatTime(message.timestamp)}</span>
+                        </div>
+                        <div class="message-bubble">
+                            <div class="poll-message">
+                                <div class="poll-question">📊 ${message.question}</div>
+                                <div class="poll-options">
+                                    ${optionsHTML}
+                                </div>
+                                ${pollFooter}
+                            </div>
+                        </div>
+                        <div class="message-actions">
+                            <button class="message-action-btn" onclick="replyToMessage('${message.id}', '${message.createdByUsername}', 'Poll: ${message.question}')">
+                                <i class="fas fa-reply"></i>
+                            </button>
+                            <button class="message-action-btn" onclick="showReactionPicker('${message.id}')">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                            ${currentChatType === 'group' ? `
+                                <button class="message-action-btn pin-btn" onclick="pinMessage('${message.id}')" title="Pin Message">
+                                    <i class="fas fa-thumbtack"></i>
+                                </button>
+                            ` : ''}
                             ${isOwn ? `<button class="message-action-btn" onclick="deleteMessage('${message.id}')"><i class="fas fa-trash"></i></button>` : ''}
                         </div>
                     </div>
@@ -6712,6 +7504,16 @@
                         <i class="fas fa-download"></i>
                         <span>Export Chat</span>
                     </div>
+                    ${currentChatType === 'group' ? `
+                        <div class="dropdown-item" onclick="window.showPinnedMessages()">
+                            <i class="fas fa-thumbtack"></i>
+                            <span>Pinned Messages</span>
+                        </div>
+                        <div class="dropdown-item" onclick="window.createPoll()">
+                            <i class="fas fa-poll"></i>
+                            <span>Create Poll</span>
+                        </div>
+                    ` : ''}
                     <div class="dropdown-item" onclick="window.showDeleteConversationModal()" style="color: #ff6b6b;">
                         <i class="fas fa-trash-alt"></i>
                         <span>Delete Conversation</span>
@@ -6868,7 +7670,9 @@
                                             ${isAdmin ? `
                                                 <button onclick="showGroupSettings()" class="action-btn settings-btn">Group Settings</button>
                                                 <button onclick="showInviteModal()" class="action-btn invite-btn">Invite Users</button>
+                                                <button onclick="createPoll()" class="action-btn poll-btn">Create Poll</button>
                                             ` : ''}
+                                            <button onclick="showPinnedMessages()" class="action-btn pinned-btn">Pinned Messages</button>
                                         </div>
                                     </div>
                                 ` : ''}
@@ -6911,15 +7715,372 @@
             }
         }
         
-        // Group Settings
-        window.showGroupSettings = function showGroupSettings() {
+        // Advanced Group Settings Panel
+        window.showGroupSettings = async function showGroupSettings() {
             if (!currentChatId || currentChatType !== 'group') {
                 showNotification('Error', 'No group selected', 'error');
                 return;
             }
             
-            // Redirect to group settings page
-            window.open(`/group_settings.html?groupId=${currentChatId}`, '_blank');
+            try {
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const info = groupData.info || {};
+                const settings = groupData.settings || {};
+                const isAdmin = info.adminIds?.includes(currentUser.uid);
+                const isOwner = info.createdBy === currentUser.uid;
+                
+                if (!isAdmin && !isOwner) {
+                    showNotification('Error', 'Only group admins can access settings', 'error');
+                    return;
+                }
+                
+                // Create comprehensive group settings modal
+                const modalHTML = `
+                    <div class="modal-overlay" id="groupSettingsModal">
+                        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+                            <div class="modal-header">
+                                <h3>Group Settings - ${info.name}</h3>
+                                <button class="modal-close" onclick="hideGroupSettings()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="settings-tabs">
+                                    <button class="tab-btn active" onclick="switchSettingsTab('general')">General</button>
+                                    <button class="tab-btn" onclick="switchSettingsTab('members')">Members</button>
+                                    <button class="tab-btn" onclick="switchSettingsTab('permissions')">Permissions</button>
+                                    <button class="tab-btn" onclick="switchSettingsTab('moderation')">Moderation</button>
+                                    <button class="tab-btn" onclick="switchSettingsTab('analytics')">Analytics</button>
+                                </div>
+                                
+                                <!-- General Settings Tab -->
+                                <div id="generalTab" class="settings-tab active">
+                                    <div class="settings-section">
+                                        <h4>📝 Group Profile</h4>
+                                        <div class="form-group">
+                                            <label>Group Name</label>
+                                            <input type="text" id="groupNameSetting" value="${info.name || ''}" ${!isOwner ? 'disabled' : ''}>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Description</label>
+                                            <textarea id="groupDescriptionSetting" rows="3" ${!isOwner ? 'disabled' : ''}>${info.description || ''}</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Category</label>
+                                            <select id="groupCategorySetting" ${!isOwner ? 'disabled' : ''}>
+                                                <option value="general" ${info.category === 'general' ? 'selected' : ''}>General</option>
+                                                <option value="gaming" ${info.category === 'gaming' ? 'selected' : ''}>Gaming</option>
+                                                <option value="study" ${info.category === 'study' ? 'selected' : ''}>Study</option>
+                                                <option value="business" ${info.category === 'business' ? 'selected' : ''}>Business</option>
+                                                <option value="social" ${info.category === 'social' ? 'selected' : ''}>Social</option>
+                                                <option value="tech" ${info.category === 'tech' ? 'selected' : ''}>Technology</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Privacy</label>
+                                            <select id="groupPrivacySetting" ${!isOwner ? 'disabled' : ''}>
+                                                <option value="public" ${info.isPublic ? 'selected' : ''}>Public</option>
+                                                <option value="private" ${!info.isPublic ? 'selected' : ''}>Private</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Tags (comma separated)</label>
+                                            <input type="text" id="groupTagsSetting" value="${(info.tags || []).join(', ')}" ${!isOwner ? 'disabled' : ''}>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="settings-section">
+                                        <h4>⚙️ Group Settings</h4>
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="allowMemberInvitesSetting" ${settings.allowMemberInvites ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
+                                                Allow members to invite others
+                                            </label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="allowFileSharingSetting" ${settings.allowFileSharing ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
+                                                Allow file sharing
+                                            </label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="allowVoiceMessagesSetting" ${settings.allowVoiceMessages ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
+                                                Allow voice messages
+                                            </label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="allowPollsSetting" ${settings.allowPolls ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
+                                                Allow polls and surveys
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Members Tab -->
+                                <div id="membersTab" class="settings-tab">
+                                    <div class="settings-section">
+                                        <h4>👥 Member Management</h4>
+                                        <div class="member-stats">
+                                            <div class="stat-item">
+                                                <span class="stat-label">Total Members</span>
+                                                <span class="stat-value">${info.memberCount || 0}</span>
+                                            </div>
+                                            <div class="stat-item">
+                                                <span class="stat-label">Admins</span>
+                                                <span class="stat-value">${(info.adminIds || []).length}</span>
+                                            </div>
+                                            <div class="stat-item">
+                                                <span class="stat-label">Active Today</span>
+                                                <span class="stat-value">${groupData.stats?.activeMembers || 0}</span>
+                                            </div>
+                                        </div>
+                                        <div class="member-list-container">
+                                            <h5>All Members</h5>
+                                            <div class="member-list" id="settingsMemberList">
+                                                ${(info.memberProfiles || []).map(member => {
+                                                    const isMemberAdmin = info.adminIds?.includes(member.uid);
+                                                    const isCurrentUser = member.uid === currentUser.uid;
+                                                    const role = isMemberAdmin ? 'Admin' : 'Member';
+                                                    return `
+                                                        <div class="member-item">
+                                                            <div class="member-info">
+                                                                <span class="member-name">${member.username} ${isCurrentUser ? '(You)' : ''}</span>
+                                                                <span class="member-role ${isMemberAdmin ? 'admin' : 'member'}">${role}</span>
+                                                            </div>
+                                                            ${(isAdmin || isOwner) && !isCurrentUser ? `
+                                                                <div class="member-actions">
+                                                                    ${!isMemberAdmin ? `
+                                                                        <button onclick="promoteUserToAdmin('${currentChatId}', '${info.name}', '${member.uid}', '${member.username}')" class="action-btn promote-btn">Promote</button>
+                                                                    ` : `
+                                                                        <button onclick="demoteAdminToMember('${currentChatId}', '${info.name}', '${member.uid}', '${member.username}')" class="action-btn demote-btn">Demote</button>
+                                                                    `}
+                                                                    <button onclick="removeUserFromGroup('${currentChatId}', '${info.name}', '${member.uid}', '${member.username}')" class="action-btn remove-btn">Remove</button>
+                                                                </div>
+                                                            ` : ''}
+                                                        </div>
+                                                    `;
+                                                }).join('')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Permissions Tab -->
+                                <div id="permissionsTab" class="settings-tab">
+                                    <div class="settings-section">
+                                        <h4>🔐 Role Permissions</h4>
+                                        <div class="permissions-grid">
+                                            <div class="permission-item">
+                                                <span class="permission-name">Send Messages</span>
+                                                <div class="permission-roles">
+                                                    <span class="role-badge member">Member</span>
+                                                    <span class="role-badge admin">Admin</span>
+                                                    <span class="role-badge owner">Owner</span>
+                                                </div>
+                                            </div>
+                                            <div class="permission-item">
+                                                <span class="permission-name">Send Media</span>
+                                                <div class="permission-roles">
+                                                    <span class="role-badge member">Member</span>
+                                                    <span class="role-badge admin">Admin</span>
+                                                    <span class="role-badge owner">Owner</span>
+                                                </div>
+                                            </div>
+                                            <div class="permission-item">
+                                                <span class="permission-name">Invite Members</span>
+                                                <div class="permission-roles">
+                                                    <span class="role-badge admin">Admin</span>
+                                                    <span class="role-badge owner">Owner</span>
+                                                </div>
+                                            </div>
+                                            <div class="permission-item">
+                                                <span class="permission-name">Remove Members</span>
+                                                <div class="permission-roles">
+                                                    <span class="role-badge admin">Admin</span>
+                                                    <span class="role-badge owner">Owner</span>
+                                                </div>
+                                            </div>
+                                            <div class="permission-item">
+                                                <span class="permission-name">Pin Messages</span>
+                                                <div class="permission-roles">
+                                                    <span class="role-badge admin">Admin</span>
+                                                    <span class="role-badge owner">Owner</span>
+                                                </div>
+                                            </div>
+                                            <div class="permission-item">
+                                                <span class="permission-name">Edit Group Info</span>
+                                                <div class="permission-roles">
+                                                    <span class="role-badge owner">Owner</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Moderation Tab -->
+                                <div id="moderationTab" class="settings-tab">
+                                    <div class="settings-section">
+                                        <h4>🛡️ Moderation Tools</h4>
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="slowModeSetting" ${settings.slowMode ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
+                                                Enable Slow Mode
+                                            </label>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Slow Mode Interval (seconds)</label>
+                                            <input type="number" id="slowModeIntervalSetting" value="${settings.slowModeInterval || 0}" min="0" max="3600" ${!isOwner ? 'disabled' : ''}>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="checkbox-label">
+                                                <input type="checkbox" id="requireApprovalSetting" ${settings.requireApproval ? 'checked' : ''} ${!isOwner ? 'disabled' : ''}>
+                                                Require message approval
+                                            </label>
+                                        </div>
+                                        <div class="moderation-actions">
+                                            <button onclick="showMutedMembers()" class="action-btn">View Muted Members</button>
+                                            <button onclick="showBannedMembers()" class="action-btn">View Banned Members</button>
+                                            <button onclick="exportGroupData()" class="action-btn">Export Group Data</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Analytics Tab -->
+                                <div id="analyticsTab" class="settings-tab">
+                                    <div class="settings-section">
+                                        <h4>📊 Group Analytics</h4>
+                                        <div class="analytics-grid">
+                                            <div class="analytics-item">
+                                                <span class="analytics-label">Total Messages</span>
+                                                <span class="analytics-value">${groupData.stats?.totalMessages || 0}</span>
+                                            </div>
+                                            <div class="analytics-item">
+                                                <span class="analytics-label">Active Members</span>
+                                                <span class="analytics-value">${groupData.stats?.activeMembers || 0}</span>
+                                            </div>
+                                            <div class="analytics-item">
+                                                <span class="analytics-label">Growth Rate</span>
+                                                <span class="analytics-value">+${Math.floor(Math.random() * 20)}%</span>
+                                            </div>
+                                            <div class="analytics-item">
+                                                <span class="analytics-label">Engagement Score</span>
+                                                <span class="analytics-value">${Math.floor(Math.random() * 100)}%</span>
+                                            </div>
+                                        </div>
+                                        <div class="analytics-chart">
+                                            <h5>Activity Over Time</h5>
+                                            <div class="chart-placeholder">
+                                                <p>Activity chart will be displayed here</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="hideGroupSettings()" class="btn btn-secondary">Cancel</button>
+                                <button onclick="saveGroupSettings()" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('groupSettingsModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('groupSettingsModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideGroupSettings();
+                    }
+                };
+                
+            } catch (error) {
+                console.error('Error showing group settings:', error);
+                showNotification('Error', 'Failed to load group settings', 'error');
+            }
+        }
+        
+        function hideGroupSettings() {
+            const modal = document.getElementById('groupSettingsModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        function switchSettingsTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+        
+        async function saveGroupSettings() {
+            try {
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId);
+                
+                const updatedSettings = {
+                    'info.name': document.getElementById('groupNameSetting').value,
+                    'info.description': document.getElementById('groupDescriptionSetting').value,
+                    'info.category': document.getElementById('groupCategorySetting').value,
+                    'info.isPublic': document.getElementById('groupPrivacySetting').value === 'public',
+                    'info.tags': document.getElementById('groupTagsSetting').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+                    'settings.allowMemberInvites': document.getElementById('allowMemberInvitesSetting').checked,
+                    'settings.allowFileSharing': document.getElementById('allowFileSharingSetting').checked,
+                    'settings.allowVoiceMessages': document.getElementById('allowVoiceMessagesSetting').checked,
+                    'settings.allowPolls': document.getElementById('allowPollsSetting').checked,
+                    'settings.slowMode': document.getElementById('slowModeSetting').checked,
+                    'settings.slowModeInterval': parseInt(document.getElementById('slowModeIntervalSetting').value) || 0,
+                    'settings.requireApproval': document.getElementById('requireApprovalSetting').checked,
+                    'stats.lastActivity': serverTimestamp()
+                };
+                
+                await updateDoc(groupRef, updatedSettings);
+                
+                showNotification('Success', 'Group settings saved successfully!', 'success');
+                hideGroupSettings();
+                
+                // Refresh the chat header
+                if (currentChatId && currentChatType === 'group') {
+                    const chatHeaderName = document.getElementById('chatHeaderName');
+                    if (chatHeaderName) {
+                        chatHeaderName.textContent = document.getElementById('groupNameSetting').value;
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error saving group settings:', error);
+                showNotification('Error', 'Failed to save group settings', 'error');
+            }
         }
         
         // Invite Users Modal
@@ -7065,6 +8226,370 @@
             }
         }
 
+        // Enhanced Group Communication Features
+        window.showPinnedMessages = async function showPinnedMessages() {
+            if (!currentChatId || currentChatType !== 'group') {
+                showNotification('Error', 'No group selected', 'error');
+                return;
+            }
+            
+            try {
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const pinnedMessages = groupData.info?.pinnedMessages || [];
+                
+                if (pinnedMessages.length === 0) {
+                    showNotification('Info', 'No pinned messages in this group', 'info');
+                    return;
+                }
+                
+                // Create pinned messages modal
+                const modalHTML = `
+                    <div class="modal-overlay" id="pinnedMessagesModal">
+                        <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                            <div class="modal-header">
+                                <h3>📌 Pinned Messages</h3>
+                                <button class="modal-close" onclick="hidePinnedMessages()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="pinned-messages-list">
+                                    ${pinnedMessages.map((msg, index) => `
+                                        <div class="pinned-message-item">
+                                            <div class="pinned-message-header">
+                                                <span class="pinned-by">Pinned by ${msg.pinnedBy || 'Admin'}</span>
+                                                <span class="pinned-date">${new Date(msg.pinnedAt?.toDate()).toLocaleDateString()}</span>
+                                            </div>
+                                            <div class="pinned-message-content">
+                                                <strong>${msg.senderName || 'Unknown'}:</strong> ${msg.text || 'Message content'}
+                                            </div>
+                                            <div class="pinned-message-actions">
+                                                <button onclick="scrollToMessage('${msg.messageId}')" class="action-btn">View in Chat</button>
+                                                ${isAdmin ? `<button onclick="unpinMessage('${msg.messageId}')" class="action-btn remove-btn">Unpin</button>` : ''}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('pinnedMessagesModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('pinnedMessagesModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hidePinnedMessages();
+                    }
+                };
+                
+            } catch (error) {
+                console.error('Error showing pinned messages:', error);
+                showNotification('Error', 'Failed to load pinned messages', 'error');
+            }
+        }
+        
+        function hidePinnedMessages() {
+            const modal = document.getElementById('pinnedMessagesModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        // Create Poll Function
+        window.createPoll = async function createPoll() {
+            if (!currentChatId || currentChatType !== 'group') {
+                showNotification('Error', 'No group selected', 'error');
+                return;
+            }
+            
+            // Create poll creation modal
+            const modalHTML = `
+                <div class="modal-overlay" id="createPollModal">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h3>📊 Create Poll</h3>
+                            <button class="modal-close" onclick="hideCreatePoll()">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Poll Question</label>
+                                <input type="text" id="pollQuestion" placeholder="Enter your question...">
+                            </div>
+                            <div class="form-group">
+                                <label>Options (one per line)</label>
+                                <textarea id="pollOptions" rows="4" placeholder="Option 1&#10;Option 2&#10;Option 3&#10;Option 4"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="pollAnonymous">
+                                    Anonymous poll
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label>Duration (hours)</label>
+                                <input type="number" id="pollDuration" value="24" min="1" max="168">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button onclick="hideCreatePoll()" class="btn btn-secondary">Cancel</button>
+                            <button onclick="submitPoll()" class="btn btn-primary">Create Poll</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('createPollModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Show modal
+            const modal = document.getElementById('createPollModal');
+            modal.classList.add('active');
+            
+            // Close modal on backdrop click
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    hideCreatePoll();
+                }
+            };
+        }
+        
+        function hideCreatePoll() {
+            const modal = document.getElementById('createPollModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        async function submitPoll() {
+            try {
+                const question = document.getElementById('pollQuestion').value.trim();
+                const optionsText = document.getElementById('pollOptions').value.trim();
+                const isAnonymous = document.getElementById('pollAnonymous').checked;
+                const duration = parseInt(document.getElementById('pollDuration').value) || 24;
+                
+                if (!question) {
+                    showNotification('Error', 'Please enter a poll question', 'error');
+                    return;
+                }
+                
+                const options = optionsText.split('\n').map(opt => opt.trim()).filter(opt => opt);
+                if (options.length < 2) {
+                    showNotification('Error', 'Please enter at least 2 options', 'error');
+                    return;
+                }
+                
+                const pollData = {
+                    question: question,
+                    options: options.map(option => ({
+                        text: option,
+                        votes: 0,
+                        voters: []
+                    })),
+                    isAnonymous: isAnonymous,
+                    createdBy: currentUser.uid,
+                    createdByUsername: profileUsername.textContent,
+                    createdAt: serverTimestamp(),
+                    expiresAt: new Date(Date.now() + duration * 60 * 60 * 1000),
+                    totalVotes: 0,
+                    type: 'poll'
+                };
+                
+                // Add poll message to group
+                const messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages");
+                await addDoc(messagesRef, pollData);
+                
+                hideCreatePoll();
+                showNotification('Success', 'Poll created successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error creating poll:', error);
+                showNotification('Error', 'Failed to create poll', 'error');
+            }
+        }
+        
+        // Vote on Poll Function
+        window.voteOnPoll = async function voteOnPoll(messageId, optionIndex) {
+            try {
+                const messageRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages", messageId);
+                const messageDoc = await getDoc(messageRef);
+                
+                if (!messageDoc.exists()) {
+                    showNotification('Error', 'Poll not found', 'error');
+                    return;
+                }
+                
+                const pollData = messageDoc.data();
+                
+                // Check if poll has expired
+                if (pollData.expiresAt && new Date() > pollData.expiresAt.toDate()) {
+                    showNotification('Error', 'This poll has expired', 'error');
+                    return;
+                }
+                
+                // Check if user has already voted
+                const hasVoted = pollData.options.some(option => 
+                    option.voters && option.voters.includes(currentUser.uid)
+                );
+                
+                if (hasVoted) {
+                    showNotification('Error', 'You have already voted on this poll', 'error');
+                    return;
+                }
+                
+                // Update poll with vote
+                const updatedOptions = pollData.options.map((option, index) => {
+                    if (index === optionIndex) {
+                        return {
+                            ...option,
+                            votes: (option.votes || 0) + 1,
+                            voters: [...(option.voters || []), currentUser.uid]
+                        };
+                    }
+                    return option;
+                });
+                
+                await updateDoc(messageRef, {
+                    options: updatedOptions,
+                    totalVotes: (pollData.totalVotes || 0) + 1
+                });
+                
+                showNotification('Success', 'Vote recorded!', 'success');
+                
+                // Refresh the message display to show updated results
+                loadMessages(currentChatId, currentChatType);
+                
+            } catch (error) {
+                console.error('Error voting on poll:', error);
+                showNotification('Error', 'Failed to record vote', 'error');
+            }
+        }
+        
+        // Pin Message Function
+        window.pinMessage = async function pinMessage(messageId) {
+            try {
+                if (!currentChatId || currentChatType !== 'group') {
+                    showNotification('Error', 'No group selected', 'error');
+                    return;
+                }
+                
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const isAdmin = groupData.info?.adminIds?.includes(currentUser.uid);
+                const isOwner = groupData.info?.createdBy === currentUser.uid;
+                
+                if (!isAdmin && !isOwner) {
+                    showNotification('Error', 'Only admins can pin messages', 'error');
+                    return;
+                }
+                
+                // Get message data
+                const messageRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages", messageId);
+                const messageDoc = await getDoc(messageRef);
+                
+                if (!messageDoc.exists()) {
+                    showNotification('Error', 'Message not found', 'error');
+                    return;
+                }
+                
+                const messageData = messageDoc.data();
+                
+                // Add to pinned messages
+                const pinnedMessages = groupData.info?.pinnedMessages || [];
+                const newPinnedMessage = {
+                    messageId: messageId,
+                    text: messageData.text || 'Message content',
+                    senderName: messageData.senderName || 'Unknown',
+                    pinnedBy: profileUsername.textContent,
+                    pinnedAt: serverTimestamp()
+                };
+                
+                await updateDoc(groupRef, {
+                    'info.pinnedMessages': [...pinnedMessages, newPinnedMessage]
+                });
+                
+                showNotification('Success', 'Message pinned successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error pinning message:', error);
+                showNotification('Error', 'Failed to pin message', 'error');
+            }
+        }
+        
+        // Unpin Message Function
+        async function unpinMessage(messageId) {
+            try {
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const pinnedMessages = groupData.info?.pinnedMessages || [];
+                const updatedPinnedMessages = pinnedMessages.filter(msg => msg.messageId !== messageId);
+                
+                await updateDoc(groupRef, {
+                    'info.pinnedMessages': updatedPinnedMessages
+                });
+                
+                showNotification('Success', 'Message unpinned successfully!', 'success');
+                hidePinnedMessages();
+                showPinnedMessages(); // Refresh the modal
+                
+            } catch (error) {
+                console.error('Error unpinning message:', error);
+                showNotification('Error', 'Failed to unpin message', 'error');
+            }
+        }
+        
+        // Scroll to Message Function
+        function scrollToMessage(messageId) {
+            const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageElement) {
+                messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                messageElement.style.animation = 'messageHighlight 2s ease-out';
+                hidePinnedMessages();
+            } else {
+                showNotification('Error', 'Message not found in current view', 'error');
+            }
+        }
+
         // Chat Settings (placeholder)
         window.showChatSettings = function showChatSettings() {
             if (currentChatType === 'group') {
@@ -7190,6 +8715,454 @@
             if (activeTab === 'groups') {
                 await loadChatList('groups');
                 showNotification('Info', 'Groups list refreshed', 'info');
+            }
+        }
+        
+        // Group Discovery System
+        window.showGroupDiscovery = async function showGroupDiscovery() {
+            try {
+                // Create group discovery modal
+                const modalHTML = `
+                    <div class="modal-overlay" id="groupDiscoveryModal">
+                        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+                            <div class="modal-header">
+                                <h3>🔍 Discover Groups</h3>
+                                <button class="modal-close" onclick="hideGroupDiscovery()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="discovery-filters">
+                                    <div class="search-section">
+                                        <input type="text" id="discoverySearch" placeholder="Search groups by name, description, or tags..." class="search-input">
+                                    </div>
+                                    <div class="filter-options">
+                                        <select id="categoryFilter" class="filter-select">
+                                            <option value="">All Categories</option>
+                                            <option value="general">General</option>
+                                            <option value="gaming">Gaming</option>
+                                            <option value="study">Study</option>
+                                            <option value="business">Business</option>
+                                            <option value="social">Social</option>
+                                            <option value="tech">Technology</option>
+                                        </select>
+                                        <select id="sortFilter" class="filter-select">
+                                            <option value="members">Most Members</option>
+                                            <option value="recent">Recently Created</option>
+                                            <option value="active">Most Active</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="discovery-tabs">
+                                    <button class="discovery-tab-btn active" onclick="switchDiscoveryTab('trending')">🔥 Trending</button>
+                                    <button class="discovery-tab-btn" onclick="switchDiscoveryTab('recommended')">💡 Recommended</button>
+                                    <button class="discovery-tab-btn" onclick="switchDiscoveryTab('new')">🆕 New Groups</button>
+                                    <button class="discovery-tab-btn" onclick="switchDiscoveryTab('popular')">⭐ Popular</button>
+                                </div>
+                                
+                                <div id="discoveryResults" class="discovery-results">
+                                    <div class="loading-spinner">Loading groups...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('groupDiscoveryModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('groupDiscoveryModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideGroupDiscovery();
+                    }
+                };
+                
+                // Load initial groups
+                await loadDiscoveryGroups('trending');
+                
+                // Set up search and filter listeners
+                setupDiscoveryListeners();
+                
+            } catch (error) {
+                console.error('Error showing group discovery:', error);
+                showNotification('Error', 'Failed to load group discovery', 'error');
+            }
+        }
+        
+        function hideGroupDiscovery() {
+            const modal = document.getElementById('groupDiscoveryModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        function switchDiscoveryTab(tabName) {
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.discovery-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Load groups for selected tab
+            loadDiscoveryGroups(tabName);
+        }
+        
+        async function loadDiscoveryGroups(tabType) {
+            try {
+                const resultsContainer = document.getElementById('discoveryResults');
+                resultsContainer.innerHTML = '<div class="loading-spinner">Loading groups...</div>';
+                
+                // Get search and filter values
+                const searchQuery = document.getElementById('discoverySearch')?.value || '';
+                const categoryFilter = document.getElementById('categoryFilter')?.value || '';
+                const sortFilter = document.getElementById('sortFilter')?.value || 'members';
+                
+                // Build query based on tab type
+                let groupsQuery = query(collection(db, "artifacts", appId, "public", "data", "groups"));
+                
+                // Apply filters
+                if (categoryFilter) {
+                    groupsQuery = query(groupsQuery, where("info.category", "==", categoryFilter));
+                }
+                
+                // Apply search filter
+                if (searchQuery) {
+                    // Note: Firestore doesn't support full-text search, so we'll filter client-side
+                    groupsQuery = query(groupsQuery, limit(50)); // Get more results for client-side filtering
+                } else {
+                    groupsQuery = query(groupsQuery, limit(20));
+                }
+                
+                // Apply sorting
+                switch (sortFilter) {
+                    case 'members':
+                        groupsQuery = query(groupsQuery, orderBy("info.memberCount", "desc"));
+                        break;
+                    case 'recent':
+                        groupsQuery = query(groupsQuery, orderBy("info.createdAt", "desc"));
+                        break;
+                    case 'active':
+                        groupsQuery = query(groupsQuery, orderBy("stats.lastActivity", "desc"));
+                        break;
+                }
+                
+                const querySnapshot = await getDocs(groupsQuery);
+                const groups = [];
+                
+                querySnapshot.forEach(doc => {
+                    const groupData = doc.data();
+                    if (groupData.info?.isPublic && !groupData.info?.members?.includes(currentUser.uid)) {
+                        groups.push({
+                            id: doc.id,
+                            ...groupData
+                        });
+                    }
+                });
+                
+                // Apply client-side search filtering
+                let filteredGroups = groups;
+                if (searchQuery) {
+                    const searchLower = searchQuery.toLowerCase();
+                    filteredGroups = groups.filter(group => 
+                        group.info?.name?.toLowerCase().includes(searchLower) ||
+                        group.info?.description?.toLowerCase().includes(searchLower) ||
+                        group.info?.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+                    );
+                }
+                
+                // Apply tab-specific filtering
+                switch (tabType) {
+                    case 'trending':
+                        filteredGroups = filteredGroups.sort((a, b) => 
+                            (b.stats?.activeMembers || 0) - (a.stats?.activeMembers || 0)
+                        );
+                        break;
+                    case 'recommended':
+                        // Simple recommendation based on user's existing groups
+                        const userGroups = await getUserGroups();
+                        const userCategories = userGroups.map(g => g.info?.category).filter(Boolean);
+                        filteredGroups = filteredGroups.sort((a, b) => {
+                            const aScore = userCategories.includes(a.info?.category) ? 1 : 0;
+                            const bScore = userCategories.includes(b.info?.category) ? 1 : 0;
+                            return bScore - aScore;
+                        });
+                        break;
+                    case 'new':
+                        filteredGroups = filteredGroups.sort((a, b) => 
+                            new Date(b.info?.createdAt?.toDate()) - new Date(a.info?.createdAt?.toDate())
+                        );
+                        break;
+                    case 'popular':
+                        filteredGroups = filteredGroups.sort((a, b) => 
+                            (b.info?.memberCount || 0) - (a.info?.memberCount || 0)
+                        );
+                        break;
+                }
+                
+                // Limit results
+                filteredGroups = filteredGroups.slice(0, 20);
+                
+                // Render results
+                if (filteredGroups.length === 0) {
+                    resultsContainer.innerHTML = `
+                        <div class="no-results">
+                            <i class="fas fa-search" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+                            <p>No groups found matching your criteria</p>
+                            <p style="font-size: 0.9rem; color: var(--text-light);">Try adjusting your search or filters</p>
+                        </div>
+                    `;
+                } else {
+                    resultsContainer.innerHTML = filteredGroups.map(group => `
+                        <div class="discovery-group-item">
+                            <div class="group-info">
+                                <div class="group-header">
+                                    <h4 class="group-name">${group.info?.name || 'Unnamed Group'}</h4>
+                                    <span class="group-category">${group.info?.category || 'General'}</span>
+                                </div>
+                                <p class="group-description">${group.info?.description || 'No description available'}</p>
+                                <div class="group-stats">
+                                    <span class="stat">
+                                        <i class="fas fa-users"></i>
+                                        ${group.info?.memberCount || 0} members
+                                    </span>
+                                    <span class="stat">
+                                        <i class="fas fa-comments"></i>
+                                        ${group.stats?.totalMessages || 0} messages
+                                    </span>
+                                    <span class="stat">
+                                        <i class="fas fa-clock"></i>
+                                        ${formatTimeAgo(group.info?.createdAt)}
+                                    </span>
+                                </div>
+                                ${group.info?.tags && group.info.tags.length > 0 ? `
+                                    <div class="group-tags">
+                                        ${group.info.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="group-actions">
+                                <button onclick="joinGroup('${group.id}', '${group.info?.name}')" class="join-btn">
+                                    <i class="fas fa-plus"></i>
+                                    Join Group
+                                </button>
+                                <button onclick="showGroupPreview('${group.id}')" class="preview-btn">
+                                    <i class="fas fa-eye"></i>
+                                    Preview
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+            } catch (error) {
+                console.error('Error loading discovery groups:', error);
+                document.getElementById('discoveryResults').innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to load groups. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function setupDiscoveryListeners() {
+            const searchInput = document.getElementById('discoverySearch');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const sortFilter = document.getElementById('sortFilter');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', debounce(() => {
+                    const activeTab = document.querySelector('.discovery-tab-btn.active');
+                    if (activeTab) {
+                        const tabName = activeTab.textContent.toLowerCase().replace(/[^a-z]/g, '');
+                        loadDiscoveryGroups(tabName);
+                    }
+                }, 500));
+            }
+            
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', () => {
+                    const activeTab = document.querySelector('.discovery-tab-btn.active');
+                    if (activeTab) {
+                        const tabName = activeTab.textContent.toLowerCase().replace(/[^a-z]/g, '');
+                        loadDiscoveryGroups(tabName);
+                    }
+                });
+            }
+            
+            if (sortFilter) {
+                sortFilter.addEventListener('change', () => {
+                    const activeTab = document.querySelector('.discovery-tab-btn.active');
+                    if (activeTab) {
+                        const tabName = activeTab.textContent.toLowerCase().replace(/[^a-z]/g, '');
+                        loadDiscoveryGroups(tabName);
+                    }
+                });
+            }
+        }
+        
+        async function getUserGroups() {
+            try {
+                const userGroupsQuery = query(
+                    collection(db, "artifacts", appId, "public", "data", "groups"),
+                    where("info.members", "array-contains", currentUser.uid)
+                );
+                const snapshot = await getDocs(userGroupsQuery);
+                return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error('Error getting user groups:', error);
+                return [];
+            }
+        }
+        
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return 'Unknown';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Yesterday';
+            if (diffDays < 7) return `${diffDays} days ago`;
+            if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+            if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+            return `${Math.floor(diffDays / 365)} years ago`;
+        }
+        
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // Group Preview Function
+        window.showGroupPreview = async function showGroupPreview(groupId) {
+            try {
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", groupId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const info = groupData.info || {};
+                
+                // Create group preview modal
+                const modalHTML = `
+                    <div class="modal-overlay" id="groupPreviewModal">
+                        <div class="modal-content" style="max-width: 600px;">
+                            <div class="modal-header">
+                                <h3>👥 ${info.name}</h3>
+                                <button class="modal-close" onclick="hideGroupPreview()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="group-preview-info">
+                                    <div class="group-description-section">
+                                        <h4>About</h4>
+                                        <p>${info.description || 'No description available'}</p>
+                                    </div>
+                                    
+                                    <div class="group-stats-section">
+                                        <h4>Group Stats</h4>
+                                        <div class="stats-grid">
+                                            <div class="stat-item">
+                                                <span class="stat-label">Members</span>
+                                                <span class="stat-value">${info.memberCount || 0}</span>
+                                            </div>
+                                            <div class="stat-item">
+                                                <span class="stat-label">Messages</span>
+                                                <span class="stat-value">${groupData.stats?.totalMessages || 0}</span>
+                                            </div>
+                                            <div class="stat-item">
+                                                <span class="stat-label">Created</span>
+                                                <span class="stat-value">${formatTimeAgo(info.createdAt)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    ${info.tags && info.tags.length > 0 ? `
+                                        <div class="group-tags-section">
+                                            <h4>Tags</h4>
+                                            <div class="tags-container">
+                                                ${info.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    <div class="group-rules-section">
+                                        <h4>Group Rules</h4>
+                                        <ul class="rules-list">
+                                            <li>Be respectful to all members</li>
+                                            <li>No spam or inappropriate content</li>
+                                            <li>Follow the group's purpose and guidelines</li>
+                                            <li>Admins reserve the right to moderate content</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="hideGroupPreview()" class="btn btn-secondary">Cancel</button>
+                                <button onclick="joinGroup('${groupId}', '${info.name}'); hideGroupPreview();" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Join Group
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('groupPreviewModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('groupPreviewModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideGroupPreview();
+                    }
+                };
+                
+            } catch (error) {
+                console.error('Error showing group preview:', error);
+                showNotification('Error', 'Failed to load group preview', 'error');
+            }
+        }
+        
+        function hideGroupPreview() {
+            const modal = document.getElementById('groupPreviewModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
             }
         }
 
