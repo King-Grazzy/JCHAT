@@ -502,6 +502,105 @@
             animation: pulse 2s infinite;
         }
 
+        /* Real-time Connection Indicator Styles */
+        .connection-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all var(--transition);
+            cursor: pointer;
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transition: all var(--transition);
+        }
+
+        .connection-text {
+            color: var(--white);
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        /* Connection States */
+        .connection-indicator.connected .connection-dot {
+            background: #4CAF50;
+            animation: connectedPulse 3s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+
+        .connection-indicator.connecting .connection-dot {
+            background: #FFC107;
+            animation: connectingFlash 1s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+
+        .connection-indicator.disconnected .connection-dot {
+            background: #f44336;
+            animation: disconnectedFade 2s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+        }
+
+        /* Connection Animations */
+        @keyframes connectedPulse {
+            0%, 100% { 
+                opacity: 0.7; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes connectingFlash {
+            0%, 100% { 
+                opacity: 0.5; 
+                transform: scale(0.9);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.2);
+            }
+        }
+
+        @keyframes disconnectedFade {
+            0%, 100% { 
+                opacity: 0.6; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.3; 
+                transform: scale(0.95);
+            }
+        }
+
+        /* Mobile Responsive Connection Indicator */
+        @media (max-width: 768px) {
+            .connection-indicator {
+                padding: 4px 8px;
+                gap: 6px;
+            }
+            
+            .connection-dot {
+                width: 6px;
+                height: 6px;
+            }
+            
+            .connection-text {
+                font-size: 0.75rem;
+            }
+        }
+
         .chat-info {
             flex: 1;
             min-width: 0;
@@ -1911,6 +2010,12 @@
             </div>
             
             <div class="header-actions">
+                <!-- Real-time Connection Indicator -->
+                <div class="connection-indicator" id="connectionIndicator" title="JCHAT Connection Status">
+                    <div class="connection-dot" id="connectionDot"></div>
+                    <span class="connection-text" id="connectionText">Connecting...</span>
+                </div>
+                
                 <button class="header-btn" id="searchBtn" title="Search">
                     <i class="fas fa-search"></i>
                 </button>
@@ -4310,6 +4415,10 @@
             }
         }
 
+        // Connection monitoring variables
+        let connectionCheckInterval = null;
+        let presenceListener = null;
+        
         // Setup Presence System
         function setupPresenceSystem() {
             if (!currentUser) return;
@@ -4325,7 +4434,7 @@
 
                 // Listen for presence changes
                 const presenceRef = collection(db, "artifacts", appId, "public", "data", "presence");
-                onSnapshot(presenceRef, (snapshot) => {
+                presenceListener = onSnapshot(presenceRef, (snapshot) => {
                     onlineUsers.clear();
                     snapshot.forEach(doc => {
                         const data = doc.data();
@@ -4335,6 +4444,10 @@
                     });
                     
                     updateOnlineStatus();
+                    updateConnectionStatus('connected');
+                }, (error) => {
+                    console.log('JCHAT_DEBUG: Presence listener error:', error);
+                    updateConnectionStatus('disconnected');
                 });
 
                 // Set user as offline when leaving
@@ -4347,10 +4460,125 @@
                     });
                 });
                 
+                // Start connection monitoring
+                startConnectionMonitoring();
+                
                 console.log('JCHAT_DEBUG: Presence system setup complete');
             } catch (error) {
                 console.log('JCHAT_DEBUG: Presence system setup failed (collection may not exist yet):', error.message);
-                // Don't fail the entire setup if presence fails
+                updateConnectionStatus('disconnected');
+            }
+        }
+
+        // Connection Status Management
+        function updateConnectionStatus(status) {
+            const indicator = document.getElementById('connectionIndicator');
+            const dot = document.getElementById('connectionDot');
+            const text = document.getElementById('connectionText');
+            
+            if (!indicator || !dot || !text) return;
+            
+            // Remove all status classes
+            indicator.classList.remove('connected', 'connecting', 'disconnected');
+            
+            switch (status) {
+                case 'connected':
+                    indicator.classList.add('connected');
+                    text.textContent = 'Connected';
+                    break;
+                case 'connecting':
+                    indicator.classList.add('connecting');
+                    text.textContent = 'Connecting...';
+                    break;
+                case 'disconnected':
+                    indicator.classList.add('disconnected');
+                    text.textContent = 'Disconnected';
+                    break;
+            }
+        }
+        
+        // Start Real-time Connection Monitoring
+        function startConnectionMonitoring() {
+            // Initial status
+            updateConnectionStatus('connecting');
+            
+            // Monitor browser online/offline events
+            window.addEventListener('online', () => {
+                console.log('JCHAT_DEBUG: Browser came online');
+                updateConnectionStatus('connecting');
+                testFirebaseConnection();
+            });
+            
+            window.addEventListener('offline', () => {
+                console.log('JCHAT_DEBUG: Browser went offline');
+                updateConnectionStatus('disconnected');
+            });
+            
+            // Periodic connection checks every 10 seconds
+            connectionCheckInterval = setInterval(() => {
+                if (navigator.onLine) {
+                    testFirebaseConnection();
+                } else {
+                    updateConnectionStatus('disconnected');
+                }
+            }, 10000);
+            
+            // Initial connection test
+            setTimeout(() => testFirebaseConnection(), 1000);
+        }
+        
+        // Test Firebase Connection
+        async function testFirebaseConnection() {
+            try {
+                updateConnectionStatus('connecting');
+                
+                // Test Firestore connectivity with timeout
+                const testPromise = new Promise(async (resolve, reject) => {
+                    try {
+                        const testRef = doc(db, "artifacts", appId, "public", "data", "connection-test", "test");
+                        await setDoc(testRef, { 
+                            timestamp: serverTimestamp(),
+                            userId: currentUser?.uid || 'anonymous'
+                        });
+                        resolve(true);
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+                
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Connection timeout')), 5000)
+                );
+                
+                await Promise.race([testPromise, timeoutPromise]);
+                
+                // If we get here, connection is good
+                updateConnectionStatus('connected');
+                console.log('JCHAT_DEBUG: Firebase connection test successful');
+                
+            } catch (error) {
+                console.log('JCHAT_DEBUG: Firebase connection test failed:', error.message);
+                updateConnectionStatus('disconnected');
+                
+                // Retry connection after delay
+                setTimeout(() => {
+                    if (navigator.onLine) {
+                        testFirebaseConnection();
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Cleanup connection monitoring
+        function cleanupConnectionMonitoring() {
+            if (connectionCheckInterval) {
+                clearInterval(connectionCheckInterval);
+                connectionCheckInterval = null;
+            }
+            
+            if (presenceListener) {
+                presenceListener();
+                presenceListener = null;
             }
         }
 
@@ -4359,13 +4587,29 @@
             chatList.querySelectorAll('.status-indicator').forEach(indicator => {
                 const chatItem = indicator.closest('.chat-item');
                 const chatType = chatItem?.dataset.chatType;
+                const userId = chatItem?.dataset.userId;
                 
-                if (chatType === 'direct') {
-                    // Update based on online status
-                    indicator.className = 'status-indicator ' + 
-                        (onlineUsers.size > 0 ? 'online' : 'offline');
+                if (chatType === 'direct' && userId) {
+                    // Update based on individual user's online status
+                    const isOnline = onlineUsers.has(userId);
+                    indicator.className = 'status-indicator ' + (isOnline ? 'online' : 'offline');
                 }
             });
+            
+            // Also update chat header status if viewing a direct chat
+            if (currentChatType === 'direct' && currentChatId) {
+                const chatHeaderStatus = document.getElementById('chatHeaderStatus');
+                if (chatHeaderStatus) {
+                    // Extract user ID from current chat
+                    const activeItem = document.querySelector(`.chat-item[data-chat-id="${currentChatId}"]`);
+                    const otherUserId = activeItem?.dataset.userId;
+                    
+                    if (otherUserId) {
+                        const isOnline = onlineUsers.has(otherUserId);
+                        chatHeaderStatus.textContent = isOnline ? 'Online' : 'Last seen recently';
+                    }
+                }
+            }
         }
 
         // Setup Notifications - Demo mode
@@ -4578,6 +4822,9 @@
         // Logout Handler
         async function handleLogout() {
             try {
+                // Cleanup connection monitoring
+                cleanupConnectionMonitoring();
+                
                 // Set user as offline
                 const userPresenceRef = doc(db, "artifacts", appId, "public", "data", "presence", currentUser.uid);
                 await setDoc(userPresenceRef, {
