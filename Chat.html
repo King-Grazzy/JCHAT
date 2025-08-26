@@ -2958,10 +2958,20 @@
                     }
                     chatName = chat.name || 'User';
                 } else {
-                    // This is an existing chat
+                    // This is an existing chat - get actual user data
                     const otherUserId = chat.members?.find(id => id !== currentUser.uid);
-                    avatarContent = '<i class="fas fa-user"></i>';
-                    chatName = chat.displayName || 'Direct Chat';
+                    const otherUserData = getUserDataFromCache(otherUserId);
+                    
+                    // Show real profile picture and username
+                    if (otherUserData?.profilePicId && otherUserData.visibility?.profilePic !== false) {
+                        const imageUrl = getCloudinaryImageUrl(otherUserData.profilePicId, "w_60,h_60,c_fill,g_face,r_max");
+                        avatarContent = `<img src="${imageUrl}" alt="${otherUserData.username}'s Profile Picture" onerror="this.onerror=null;this.src='https://placehold.co/60x60/CCCCCC/000000?text=${otherUserData.username?.charAt(0).toUpperCase() || 'U'}';">`;
+                    } else {
+                        avatarContent = '<i class="fas fa-user-circle"></i>';
+                    }
+                    
+                    // Use actual username instead of "Direct Chat"
+                    chatName = otherUserData?.username || chat.displayName || 'Friend';
                     
                     if (onlineUsers.has(otherUserId)) {
                         statusIndicator = '<div class="status-indicator online"></div>';
@@ -3074,17 +3084,25 @@
                     chatData = chatDoc.data();
                     
                     const otherUserId = chatData?.members.find(id => id !== currentUser.uid);
-                    const otherUserData = await getUserData(otherUserId);
                     
-                    chatHeaderName.textContent = otherUserData?.username || 'Direct Chat';
+                    // Get user data from cache first (faster and more reliable)
+                    let otherUserData = getUserDataFromCache(otherUserId);
+                    
+                    // Fallback to Firestore if not in cache
+                    if (!otherUserData) {
+                        otherUserData = await getUserData(otherUserId);
+                    }
+                    
+                    // Use actual username from user data
+                    chatHeaderName.textContent = otherUserData?.username || chatData?.displayName || 'Friend';
                     chatHeaderStatus.textContent = onlineUsers.has(otherUserId) ? 'Online' : 'Last seen recently';
                     
-                    // Display profile picture if available (matching Find_Friends.html)
+                    // Display real profile picture (matching Find_Friends.html)
                     if (otherUserData?.profilePicId && otherUserData.visibility?.profilePic !== false) {
-                        const imageUrl = getCloudinaryImageUrl(otherUserData.profilePicId, "w_120,h_120,c_fill,g_face,r_max");
-                        chatHeaderAvatar.innerHTML = `<img src="${imageUrl}" alt="${otherUserData.username}'s Profile Picture" onerror="this.onerror=null;this.src='https://placehold.co/40x40/CCCCCC/000000?text=${otherUserData.username.charAt(0).toUpperCase()}';">`;
+                        const imageUrl = getCloudinaryImageUrl(otherUserData.profilePicId, "w_40,h_40,c_fill,g_face,r_max");
+                        chatHeaderAvatar.innerHTML = `<img src="${imageUrl}" alt="${otherUserData.username}'s Profile Picture" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;" onerror="this.onerror=null;this.style.display='none';this.parentElement.innerHTML='<i class=\\"fas fa-user-circle\\" style=\\"font-size: 35px;\\"></i>';">`;
                     } else {
-                        chatHeaderAvatar.innerHTML = '<div class="default-avatar"><i class="fas fa-user-circle"></i></div>';
+                        chatHeaderAvatar.innerHTML = '<i class="fas fa-user-circle" style="font-size: 35px;"></i>';
                     }
                 } else if (chatType === 'group') {
                     const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", chatId);
