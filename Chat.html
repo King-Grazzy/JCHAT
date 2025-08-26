@@ -3868,7 +3868,7 @@
             }
 
             return `
-                <div class="message ${messageClass}" data-message-id="${message.id}">
+                <div class="message message-item ${messageClass} ${isOwn ? 'own-message' : ''}" data-message-id="${message.id}" data-timestamp="${(message.timestamp && message.timestamp.seconds) ? message.timestamp.seconds * 1000 : (message.timestamp && message.timestamp.toMillis ? message.timestamp.toMillis() : Date.now())}">
                     <div class="message-avatar">
                         ${avatarContent}
                     </div>
