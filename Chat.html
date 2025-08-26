@@ -2271,6 +2271,9 @@
                     <button class="quick-action-btn" id="startDirectChatBtn">
                         <i class="fas fa-paper-plane"></i> New Message
                     </button>
+                    <button class="quick-action-btn" onclick="window.refreshGroupsList()" title="Refresh Groups" style="margin-right: 8px;">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
                     <button class="quick-action-btn" id="createGroupBtn">
                         <i class="fas fa-users-plus"></i> Create Group
                     </button>
@@ -3452,16 +3455,24 @@
                     };
                 });
                 
-                // Load ALL public groups (limit to 20 to avoid performance issues)
-                const publicGroupsQuery = query(
-                    groupsRef,
-                    where("info.isPublic", "==", true),
-                    limit(20)
-                );
+                console.log('JCHAT_DEBUG: User groups found:', userGroups.length);
                 
-                const publicGroupsSnapshot = await getDocs(publicGroupsQuery);
-                const publicGroups = publicGroupsSnapshot.docs
-                    .map(doc => {
+                // Load ALL public groups (limit to 20 to avoid performance issues)
+                // Try multiple approaches to ensure we get all public groups
+                let publicGroups = [];
+                
+                try {
+                    // First try: Query by info.isPublic
+                    const publicGroupsQuery1 = query(
+                        groupsRef,
+                        where("info.isPublic", "==", true),
+                        limit(20)
+                    );
+                    
+                    const publicGroupsSnapshot1 = await getDocs(publicGroupsQuery1);
+                    console.log('JCHAT_DEBUG: Public groups query 1 found:', publicGroupsSnapshot1.docs.length);
+                    
+                    publicGroups = publicGroupsSnapshot1.docs.map(doc => {
                         const data = doc.data();
                         const members = data.members || data.info?.members || [];
                         const isMember = members.includes(currentUser.uid);
@@ -3481,6 +3492,88 @@
                             isMember: isMember
                         };
                     });
+                    
+                    // If we didn't find many groups, try a broader query
+                    if (publicGroups.length < 5) {
+                        console.log('JCHAT_DEBUG: Trying broader query for public groups...');
+                        
+                        // Get all groups and filter client-side
+                        const allGroupsQuery = query(groupsRef, limit(50));
+                        const allGroupsSnapshot = await getDocs(allGroupsQuery);
+                        
+                        const additionalGroups = allGroupsSnapshot.docs
+                            .filter(doc => {
+                                const data = doc.data();
+                                // Check if group is public (either in info.isPublic or by default)
+                                return data.info?.isPublic === true || 
+                                       (data.info && !data.info.hasOwnProperty('isPublic')); // Default to public if not specified
+                            })
+                            .filter(doc => !publicGroups.find(g => g.id === doc.id)) // Avoid duplicates
+                            .map(doc => {
+                                const data = doc.data();
+                                const members = data.members || data.info?.members || [];
+                                const isMember = members.includes(currentUser.uid);
+                                
+                                return {
+                                    id: doc.id,
+                                    type: 'group',
+                                    name: data.info?.name || data.name || 'Group Chat',
+                                    description: data.info?.description || data.description || '',
+                                    members: members,
+                                    memberCount: data.info?.memberCount || members.length,
+                                    lastMessage: data.lastMessage,
+                                    adminIds: data.info?.adminIds || data.adminIds || [],
+                                    createdAt: data.info?.createdAt || data.createdAt,
+                                    createdBy: data.info?.createdBy || data.createdBy,
+                                    isPublic: true,
+                                    isMember: isMember
+                                };
+                            });
+                        
+                        publicGroups = [...publicGroups, ...additionalGroups];
+                        console.log('JCHAT_DEBUG: Additional public groups found:', additionalGroups.length);
+                    }
+                    
+                } catch (publicError) {
+                    console.error('JCHAT_DEBUG: Error loading public groups:', publicError);
+                    // Fallback: try to get all groups and filter
+                    try {
+                        const allGroupsQuery = query(groupsRef, limit(50));
+                        const allGroupsSnapshot = await getDocs(allGroupsQuery);
+                        
+                        publicGroups = allGroupsSnapshot.docs
+                            .filter(doc => {
+                                const data = doc.data();
+                                return data.info?.isPublic === true || 
+                                       (data.info && !data.info.hasOwnProperty('isPublic'));
+                            })
+                            .map(doc => {
+                                const data = doc.data();
+                                const members = data.members || data.info?.members || [];
+                                const isMember = members.includes(currentUser.uid);
+                                
+                                return {
+                                    id: doc.id,
+                                    type: 'group',
+                                    name: data.info?.name || data.name || 'Group Chat',
+                                    description: data.info?.description || data.description || '',
+                                    members: members,
+                                    memberCount: data.info?.memberCount || members.length,
+                                    lastMessage: data.lastMessage,
+                                    adminIds: data.info?.adminIds || data.adminIds || [],
+                                    createdAt: data.info?.createdAt || data.createdAt,
+                                    createdBy: data.info?.createdBy || data.createdBy,
+                                    isPublic: true,
+                                    isMember: isMember
+                                };
+                            });
+                    } catch (fallbackError) {
+                        console.error('JCHAT_DEBUG: Fallback query also failed:', fallbackError);
+                    }
+                }
+                
+                console.log('JCHAT_DEBUG: Total public groups found:', publicGroups.length);
+                console.log('JCHAT_DEBUG: Total groups to return:', userGroups.length + publicGroups.length);
                 
                 return [...userGroups, ...publicGroups];
             } catch (error) {
@@ -4656,7 +4749,7 @@
             try {
                 const members = [currentUser.uid, ...Array.from(selectedUsers).map(u => u.id)];
                 
-                const groupRef = await addDoc(collection(db, "artifacts", appId, "public", "data", "groups"), {
+                const groupData = {
                     info: {
                         name: groupName,
                         description: groupDescription,
@@ -4673,15 +4766,24 @@
                         timestamp: serverTimestamp(),
                         senderId: 'system'
                     }
-                });
+                };
+                
+                console.log('JCHAT_DEBUG: Creating group with data:', groupData);
+                
+                const groupRef = await addDoc(collection(db, "artifacts", appId, "public", "data", "groups"), groupData);
+                
+                console.log('JCHAT_DEBUG: Group created successfully with ID:', groupRef.id);
 
                 hideModal('groupChatModal');
                 switchTab('groups');
+                
+                // Add a longer delay to ensure the group is indexed in Firestore
                 setTimeout(() => {
                     loadChatList('groups').then(() => {
+                        console.log('JCHAT_DEBUG: Chat list loaded after group creation');
                         selectChat(groupRef.id, 'group');
                     });
-                }, 500);
+                }, 1000); // Increased delay to 1 second
 
                 showNotification('Success', `Group "${groupName}" created!`, 'success');
 
@@ -5818,6 +5920,15 @@
                 const confirmBtn = document.getElementById('deleteConversationConfirm');
                 confirmBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete Conversation';
                 confirmBtn.disabled = false;
+            }
+        }
+
+        // Manual refresh function for debugging
+        window.refreshGroupsList = async function() {
+            console.log('JCHAT_DEBUG: Manually refreshing groups list...');
+            if (activeTab === 'groups') {
+                await loadChatList('groups');
+                showNotification('Info', 'Groups list refreshed', 'info');
             }
         }
 
