@@ -1609,6 +1609,249 @@
             font-size: 0.9rem;
         }
 
+        /* Group Management Styles */
+        .group-info-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .group-info-section h4 {
+            margin: 0 0 10px 0;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .members-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .member-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .admin-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #000;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .promote-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .promote-btn:hover {
+            background: #218838;
+        }
+
+        .demote-btn {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .demote-btn:hover {
+            background: #e0a800;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .remove-btn:hover {
+            background: #c82333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .leave-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .leave-btn:hover {
+            background: #c82333;
+        }
+
+        .settings-btn {
+            background: #17a2b8;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .settings-btn:hover {
+            background: #138496;
+        }
+
+        .invite-btn {
+            background: #28a745;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .invite-btn:hover {
+            background: #218838;
+        }
+
+        /* Invite Modal Styles */
+        .search-section {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .search-results {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .user-result {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .user-result:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .user-result-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .user-result-info {
+            flex: 1;
+        }
+
+        .user-result-name {
+            margin: 0;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .user-result-status {
+            margin: 0;
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        .invite-section h4 {
+            margin: 0 0 10px 0;
+            color: var(--text-primary);
+        }
+
+        .recent-users {
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         .delete-btn {
             padding: 15px 30px;
             border: none;
@@ -4735,6 +4978,8 @@
         async function handleCreateGroup() {
             const groupName = document.getElementById('groupNameInput').value.trim();
             const groupDescription = document.getElementById('groupDescriptionInput').value.trim();
+            const groupPrivacy = document.getElementById('groupPrivacySelect')?.value || 'public';
+            const groupCategory = document.getElementById('groupCategorySelect')?.value || 'general';
 
             if (!groupName) {
                 showNotification('Error', 'Please enter a group name', 'error');
@@ -4748,23 +4993,68 @@
 
             try {
                 const members = [currentUser.uid, ...Array.from(selectedUsers).map(u => u.id)];
+                const memberProfiles = await Promise.all(
+                    members.map(async (uid) => {
+                        try {
+                            const userRef = doc(db, "artifacts", appId, "users", uid);
+                            const userDoc = await getDoc(userRef);
+                            const userData = userDoc.data();
+                            return {
+                                uid: uid,
+                                username: userData?.profiles?.user_profile?.username || uid.substring(0, 8),
+                                joinedAt: serverTimestamp()
+                            };
+                        } catch (error) {
+                            return {
+                                uid: uid,
+                                username: uid.substring(0, 8),
+                                joinedAt: serverTimestamp()
+                            };
+                        }
+                    })
+                );
                 
                 const groupData = {
                     info: {
                         name: groupName,
                         description: groupDescription,
+                        category: groupCategory,
+                        privacy: groupPrivacy,
                         adminIds: [currentUser.uid],
                         members: members,
+                        memberProfiles: memberProfiles,
                         createdAt: serverTimestamp(),
                         createdBy: currentUser.uid,
-                        isPublic: true, // Make groups public by default
-                        joinRequests: [], // Track join requests
-                        memberCount: members.length
+                        isPublic: groupPrivacy === 'public',
+                        joinRequests: [],
+                        memberCount: members.length,
+                        maxMembers: 1000,
+                        rules: [],
+                        tags: [],
+                        avatar: null,
+                        banner: null,
+                        pinnedMessages: [],
+                        announcements: []
+                    },
+                    stats: {
+                        totalMessages: 0,
+                        activeMembers: members.length,
+                        lastActivity: serverTimestamp(),
+                        createdDate: serverTimestamp()
+                    },
+                    settings: {
+                        allowMemberInvites: true,
+                        requireAdminApproval: false,
+                        allowFileSharing: true,
+                        allowVoiceMessages: true,
+                        slowMode: false,
+                        slowModeInterval: 0
                     },
                     lastMessage: {
-                        text: `Welcome to ${groupName}!`,
+                        text: `Welcome to ${groupName}! Group created by ${profileUsername.textContent}`,
                         timestamp: serverTimestamp(),
-                        senderId: 'system'
+                        senderId: 'system',
+                        senderName: 'System'
                     }
                 };
                 
@@ -4773,6 +5063,40 @@
                 const groupRef = await addDoc(collection(db, "artifacts", appId, "public", "data", "groups"), groupData);
                 
                 console.log('JCHAT_DEBUG: Group created successfully with ID:', groupRef.id);
+
+                // Create initial welcome message
+                const welcomeMessage = {
+                    text: `🎉 Welcome to "${groupName}"! This group was created by ${profileUsername.textContent}. Feel free to introduce yourself and start chatting!`,
+                    timestamp: serverTimestamp(),
+                    senderId: 'system',
+                    senderName: 'System',
+                    type: 'system'
+                };
+                
+                const messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", groupRef.id, "messages");
+                await addDoc(messagesRef, welcomeMessage);
+
+                // Send notifications to all members
+                await Promise.all(members.map(async (uid) => {
+                    if (uid !== currentUser.uid) {
+                        try {
+                            const notificationRef = collection(db, "artifacts", appId, "users", uid, "notifications");
+                            await addDoc(notificationRef, {
+                                type: 'group_invite',
+                                title: 'Group Invitation',
+                                message: `You've been invited to join "${groupName}"`,
+                                groupId: groupRef.id,
+                                groupName: groupName,
+                                senderId: currentUser.uid,
+                                senderName: profileUsername.textContent,
+                                timestamp: serverTimestamp(),
+                                read: false
+                            });
+                        } catch (error) {
+                            console.error('Error sending notification to user:', uid, error);
+                        }
+                    }
+                }));
 
                 hideModal('groupChatModal');
                 switchTab('groups');
@@ -4783,9 +5107,9 @@
                         console.log('JCHAT_DEBUG: Chat list loaded after group creation');
                         selectChat(groupRef.id, 'group');
                     });
-                }, 1000); // Increased delay to 1 second
+                }, 1000);
 
-                showNotification('Success', `Group "${groupName}" created!`, 'success');
+                showNotification('Success', `Group "${groupName}" created successfully! All members have been notified.`, 'success');
 
             } catch (error) {
                 console.error('Error creating group:', error);
@@ -5276,7 +5600,13 @@
         window.selectUserForDirectChat = selectUserForDirectChat;
         window.toggleUserForGroup = toggleUserForGroup;
         window.insertEmoji = insertEmoji;
+        // Make group management functions globally available
         window.joinGroup = joinGroup;
+        window.leaveGroup = leaveGroup;
+        window.inviteUserToGroup = inviteUserToGroup;
+        window.removeUserFromGroup = removeUserFromGroup;
+        window.promoteUserToAdmin = promoteUserToAdmin;
+        window.demoteAdminToMember = demoteAdminToMember;
         
         // Join Group Function
         async function joinGroup(groupId, groupName) {
@@ -5299,19 +5629,53 @@
                     
                     const groupData = groupDoc.data();
                     const currentMembers = groupData.info?.members || groupData.members || [];
+                    const maxMembers = groupData.info?.maxMembers || 1000;
                     
                     if (currentMembers.includes(currentUser.uid)) {
                         showNotification('Info', 'You are already a member of this group', 'info');
                         return;
                     }
                     
+                    if (currentMembers.length >= maxMembers) {
+                        showNotification('Error', 'This group is full and cannot accept new members', 'error');
+                        return;
+                    }
+                    
+                    // Get user profile
+                    const userRef = doc(db, "artifacts", appId, "users", currentUser.uid);
+                    const userDoc = await getDoc(userRef);
+                    const userData = userDoc.data();
+                    const username = userData?.profiles?.user_profile?.username || profileUsername.textContent;
+                    
                     // Add user to group members
                     const updatedMembers = [...currentMembers, currentUser.uid];
-                    const updatedMemberCount = groupData.info?.memberCount || currentMembers.length + 1;
+                    const updatedMemberCount = updatedMembers.length;
+                    
+                    // Add user profile to memberProfiles
+                    const memberProfiles = groupData.info?.memberProfiles || [];
+                    const newMemberProfile = {
+                        uid: currentUser.uid,
+                        username: username,
+                        joinedAt: serverTimestamp()
+                    };
+                    const updatedMemberProfiles = [...memberProfiles, newMemberProfile];
                     
                     await updateDoc(groupRef, {
                         'info.members': updatedMembers,
-                        'info.memberCount': updatedMemberCount
+                        'info.memberCount': updatedMemberCount,
+                        'info.memberProfiles': updatedMemberProfiles,
+                        'stats.activeMembers': updatedMemberCount,
+                        'stats.lastActivity': serverTimestamp()
+                    });
+                    
+                    // Add join message to group chat
+                    const messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", groupId, "messages");
+                    await addDoc(messagesRef, {
+                        text: `👋 ${username} joined the group!`,
+                        timestamp: serverTimestamp(),
+                        senderId: 'system',
+                        senderName: 'System',
+                        type: 'system'
                     });
                     
                     showNotification('Success', `Successfully joined "${groupName}"!`, 'success');
@@ -5324,6 +5688,336 @@
             } catch (error) {
                 console.error('Error joining group:', error);
                 showNotification('Error', `Failed to join group: ${error.message}`, 'error');
+            }
+        }
+
+        // Leave Group Function
+        async function leaveGroup(groupId, groupName) {
+            try {
+                if (!currentUser) {
+                    showNotification('Error', 'You must be logged in to leave a group', 'error');
+                    return;
+                }
+                
+                if (confirm(`Do you want to leave "${groupName}"? This action cannot be undone.`)) {
+                    showNotification('Leaving', `Leaving "${groupName}"...`, 'info');
+                    
+                    const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", groupId);
+                    const groupDoc = await getDoc(groupRef);
+                    
+                    if (!groupDoc.exists()) {
+                        showNotification('Error', 'Group not found', 'error');
+                        return;
+                    }
+                    
+                    const groupData = groupDoc.data();
+                    const currentMembers = groupData.info?.members || groupData.members || [];
+                    const adminIds = groupData.info?.adminIds || [];
+                    
+                    if (!currentMembers.includes(currentUser.uid)) {
+                        showNotification('Info', 'You are not a member of this group', 'info');
+                        return;
+                    }
+                    
+                    // Check if user is the only admin
+                    if (adminIds.includes(currentUser.uid) && adminIds.length === 1 && currentMembers.length > 1) {
+                        const transferConfirmed = confirm('You are the only admin of this group. If you leave, the group will become unmanaged. Do you still want to leave?');
+                        if (!transferConfirmed) {
+                            return;
+                        }
+                    }
+                    
+                    // Remove user from group members
+                    const updatedMembers = currentMembers.filter(uid => uid !== currentUser.uid);
+                    const updatedMemberCount = updatedMembers.length;
+                    
+                    // Remove user from admin list if they are admin
+                    const updatedAdminIds = adminIds.filter(uid => uid !== currentUser.uid);
+                    
+                    // Remove user profile from memberProfiles
+                    const memberProfiles = groupData.info?.memberProfiles || [];
+                    const updatedMemberProfiles = memberProfiles.filter(profile => profile.uid !== currentUser.uid);
+                    
+                    await updateDoc(groupRef, {
+                        'info.members': updatedMembers,
+                        'info.memberCount': updatedMemberCount,
+                        'info.adminIds': updatedAdminIds,
+                        'info.memberProfiles': updatedMemberProfiles,
+                        'stats.activeMembers': updatedMemberCount,
+                        'stats.lastActivity': serverTimestamp()
+                    });
+                    
+                    // Add leave message to group chat
+                    const messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", groupId, "messages");
+                    await addDoc(messagesRef, {
+                        text: `👋 ${profileUsername.textContent} left the group.`,
+                        timestamp: serverTimestamp(),
+                        senderId: 'system',
+                        senderName: 'System',
+                        type: 'system'
+                    });
+                    
+                    showNotification('Success', `Successfully left "${groupName}"!`, 'success');
+                    
+                    // If this was the current chat, close it
+                    if (currentChatId === groupId) {
+                        closeChat();
+                    }
+                    
+                    // Refresh the groups list
+                    setTimeout(() => {
+                        loadChatList('groups');
+                    }, 1000);
+                }
+            } catch (error) {
+                console.error('Error leaving group:', error);
+                showNotification('Error', `Failed to leave group: ${error.message}`, 'error');
+            }
+        }
+
+        // Invite User to Group
+        async function inviteUserToGroup(groupId, groupName, userId, username) {
+            try {
+                if (!currentUser) {
+                    showNotification('Error', 'You must be logged in to invite users', 'error');
+                    return;
+                }
+                
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", groupId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const currentMembers = groupData.info?.members || groupData.members || [];
+                const adminIds = groupData.info?.adminIds || [];
+                
+                // Check if user has permission to invite
+                if (!adminIds.includes(currentUser.uid) && !groupData.settings?.allowMemberInvites) {
+                    showNotification('Error', 'You do not have permission to invite users to this group', 'error');
+                    return;
+                }
+                
+                if (currentMembers.includes(userId)) {
+                    showNotification('Info', 'User is already a member of this group', 'info');
+                    return;
+                }
+                
+                // Send invitation notification
+                const notificationRef = collection(db, "artifacts", appId, "users", userId, "notifications");
+                await addDoc(notificationRef, {
+                    type: 'group_invite',
+                    title: 'Group Invitation',
+                    message: `You've been invited to join "${groupName}" by ${profileUsername.textContent}`,
+                    groupId: groupId,
+                    groupName: groupName,
+                    senderId: currentUser.uid,
+                    senderName: profileUsername.textContent,
+                    timestamp: serverTimestamp(),
+                    read: false
+                });
+                
+                showNotification('Success', `Invitation sent to ${username}!`, 'success');
+                
+            } catch (error) {
+                console.error('Error inviting user:', error);
+                showNotification('Error', `Failed to invite user: ${error.message}`, 'error');
+            }
+        }
+
+        // Remove User from Group (Admin only)
+        async function removeUserFromGroup(groupId, groupName, userId, username) {
+            try {
+                if (!currentUser) {
+                    showNotification('Error', 'You must be logged in to remove users', 'error');
+                    return;
+                }
+                
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", groupId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const adminIds = groupData.info?.adminIds || [];
+                
+                // Check if user is admin
+                if (!adminIds.includes(currentUser.uid)) {
+                    showNotification('Error', 'Only group admins can remove members', 'error');
+                    return;
+                }
+                
+                if (userId === currentUser.uid) {
+                    showNotification('Error', 'You cannot remove yourself from the group', 'error');
+                    return;
+                }
+                
+                const currentMembers = groupData.info?.members || groupData.members || [];
+                if (!currentMembers.includes(userId)) {
+                    showNotification('Info', 'User is not a member of this group', 'info');
+                    return;
+                }
+                
+                // Remove user from group
+                const updatedMembers = currentMembers.filter(uid => uid !== userId);
+                const updatedMemberCount = updatedMembers.length;
+                
+                // Remove user profile from memberProfiles
+                const memberProfiles = groupData.info?.memberProfiles || [];
+                const updatedMemberProfiles = memberProfiles.filter(profile => profile.uid !== userId);
+                
+                await updateDoc(groupRef, {
+                    'info.members': updatedMembers,
+                    'info.memberCount': updatedMemberCount,
+                    'info.memberProfiles': updatedMemberProfiles,
+                    'stats.activeMembers': updatedMemberCount,
+                    'stats.lastActivity': serverTimestamp()
+                });
+                
+                // Add removal message to group chat
+                const messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", groupId, "messages");
+                await addDoc(messagesRef, {
+                    text: `🚫 ${username} was removed from the group by ${profileUsername.textContent}.`,
+                    timestamp: serverTimestamp(),
+                    senderId: 'system',
+                    senderName: 'System',
+                    type: 'system'
+                });
+                
+                showNotification('Success', `${username} has been removed from the group`, 'success');
+                
+            } catch (error) {
+                console.error('Error removing user:', error);
+                showNotification('Error', `Failed to remove user: ${error.message}`, 'error');
+            }
+        }
+
+        // Promote User to Admin
+        async function promoteUserToAdmin(groupId, groupName, userId, username) {
+            try {
+                if (!currentUser) {
+                    showNotification('Error', 'You must be logged in to promote users', 'error');
+                    return;
+                }
+                
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", groupId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const adminIds = groupData.info?.adminIds || [];
+                
+                // Check if user is admin
+                if (!adminIds.includes(currentUser.uid)) {
+                    showNotification('Error', 'Only group admins can promote members', 'error');
+                    return;
+                }
+                
+                if (adminIds.includes(userId)) {
+                    showNotification('Info', 'User is already an admin', 'info');
+                    return;
+                }
+                
+                const currentMembers = groupData.info?.members || groupData.members || [];
+                if (!currentMembers.includes(userId)) {
+                    showNotification('Error', 'User is not a member of this group', 'error');
+                    return;
+                }
+                
+                // Promote user to admin
+                const updatedAdminIds = [...adminIds, userId];
+                
+                await updateDoc(groupRef, {
+                    'info.adminIds': updatedAdminIds,
+                    'stats.lastActivity': serverTimestamp()
+                });
+                
+                // Add promotion message to group chat
+                const messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", groupId, "messages");
+                await addDoc(messagesRef, {
+                    text: `👑 ${username} was promoted to admin by ${profileUsername.textContent}.`,
+                    timestamp: serverTimestamp(),
+                    senderId: 'system',
+                    senderName: 'System',
+                    type: 'system'
+                });
+                
+                showNotification('Success', `${username} has been promoted to admin`, 'success');
+                
+            } catch (error) {
+                console.error('Error promoting user:', error);
+                showNotification('Error', `Failed to promote user: ${error.message}`, 'error');
+            }
+        }
+
+        // Demote Admin to Member
+        async function demoteAdminToMember(groupId, groupName, userId, username) {
+            try {
+                if (!currentUser) {
+                    showNotification('Error', 'You must be logged in to demote admins', 'error');
+                    return;
+                }
+                
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", groupId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const adminIds = groupData.info?.adminIds || [];
+                
+                // Check if user is admin
+                if (!adminIds.includes(currentUser.uid)) {
+                    showNotification('Error', 'Only group admins can demote other admins', 'error');
+                    return;
+                }
+                
+                if (userId === currentUser.uid) {
+                    showNotification('Error', 'You cannot demote yourself', 'error');
+                    return;
+                }
+                
+                if (!adminIds.includes(userId)) {
+                    showNotification('Info', 'User is not an admin', 'info');
+                    return;
+                }
+                
+                // Demote admin to member
+                const updatedAdminIds = adminIds.filter(uid => uid !== userId);
+                
+                await updateDoc(groupRef, {
+                    'info.adminIds': updatedAdminIds,
+                    'stats.lastActivity': serverTimestamp()
+                });
+                
+                // Add demotion message to group chat
+                const messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", groupId, "messages");
+                await addDoc(messagesRef, {
+                    text: `👤 ${username} was demoted from admin by ${profileUsername.textContent}.`,
+                    timestamp: serverTimestamp(),
+                    senderId: 'system',
+                    senderName: 'System',
+                    type: 'system'
+                });
+                
+                showNotification('Success', `${username} has been demoted from admin`, 'success');
+                
+            } catch (error) {
+                console.error('Error demoting admin:', error);
+                showNotification('Error', `Failed to demote admin: ${error.message}`, 'error');
             }
         }
         window.playVoiceMessage = function(url) {
@@ -5808,9 +6502,306 @@
             document.getElementById('chatMoreDropdown').classList.remove('active');
         }
 
+        // Group Info and Management
+        window.showGroupInfo = async function showGroupInfo() {
+            if (!currentChatId || currentChatType !== 'group') {
+                showNotification('Error', 'No group selected', 'error');
+                return;
+            }
+            
+            try {
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const info = groupData.info || {};
+                const stats = groupData.stats || {};
+                const settings = groupData.settings || {};
+                
+                const isAdmin = info.adminIds?.includes(currentUser.uid);
+                const isMember = info.members?.includes(currentUser.uid);
+                
+                // Create group info modal
+                const modalHTML = `
+                    <div class="modal-overlay" id="groupInfoModal">
+                        <div class="modal-content" style="max-width: 600px; max-height: 80vh; overflow-y: auto;">
+                            <div class="modal-header">
+                                <h3>${info.name || 'Group Info'}</h3>
+                                <button class="modal-close" onclick="hideGroupInfo()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="group-info-section">
+                                    <h4>📝 Description</h4>
+                                    <p>${info.description || 'No description available'}</p>
+                                </div>
+                                
+                                <div class="group-info-section">
+                                    <h4>📊 Statistics</h4>
+                                    <div class="stats-grid">
+                                        <div class="stat-item">
+                                            <span class="stat-label">Members</span>
+                                            <span class="stat-value">${info.memberCount || 0}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-label">Messages</span>
+                                            <span class="stat-value">${stats.totalMessages || 0}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-label">Created</span>
+                                            <span class="stat-value">${info.createdAt ? new Date(info.createdAt.toDate()).toLocaleDateString() : 'Unknown'}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-label">Privacy</span>
+                                            <span class="stat-value">${info.isPublic ? 'Public' : 'Private'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="group-info-section">
+                                    <h4>👥 Members (${info.memberCount || 0})</h4>
+                                    <div class="members-list">
+                                        ${(info.memberProfiles || []).map(member => {
+                                            const isMemberAdmin = info.adminIds?.includes(member.uid);
+                                            const isCurrentUser = member.uid === currentUser.uid;
+                                            return `
+                                                <div class="member-item">
+                                                    <div class="member-info">
+                                                        <span class="member-name">${member.username} ${isCurrentUser ? '(You)' : ''}</span>
+                                                        ${isMemberAdmin ? '<span class="admin-badge">👑 Admin</span>' : ''}
+                                                    </div>
+                                                    ${isAdmin && !isCurrentUser ? `
+                                                        <div class="member-actions">
+                                                            ${!isMemberAdmin ? `
+                                                                <button onclick="promoteUserToAdmin('${currentChatId}', '${info.name}', '${member.uid}', '${member.username}')" class="action-btn promote-btn">Promote</button>
+                                                            ` : `
+                                                                <button onclick="demoteAdminToMember('${currentChatId}', '${info.name}', '${member.uid}', '${member.username}')" class="action-btn demote-btn">Demote</button>
+                                                            `}
+                                                            <button onclick="removeUserFromGroup('${currentChatId}', '${info.name}', '${member.uid}', '${member.username}')" class="action-btn remove-btn">Remove</button>
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                                
+                                ${isMember ? `
+                                    <div class="group-info-section">
+                                        <h4>⚙️ Actions</h4>
+                                        <div class="action-buttons">
+                                            <button onclick="leaveGroup('${currentChatId}', '${info.name}')" class="action-btn leave-btn">Leave Group</button>
+                                            ${isAdmin ? `
+                                                <button onclick="showGroupSettings()" class="action-btn settings-btn">Group Settings</button>
+                                                <button onclick="showInviteModal()" class="action-btn invite-btn">Invite Users</button>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('groupInfoModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('groupInfoModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideGroupInfo();
+                    }
+                };
+                
+            } catch (error) {
+                console.error('Error showing group info:', error);
+                showNotification('Error', 'Failed to load group information', 'error');
+            }
+        }
+        
+        function hideGroupInfo() {
+            const modal = document.getElementById('groupInfoModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        // Group Settings
+        window.showGroupSettings = function showGroupSettings() {
+            if (!currentChatId || currentChatType !== 'group') {
+                showNotification('Error', 'No group selected', 'error');
+                return;
+            }
+            
+            // Redirect to group settings page
+            window.open(`/group_settings.html?groupId=${currentChatId}`, '_blank');
+        }
+        
+        // Invite Users Modal
+        window.showInviteModal = async function showInviteModal() {
+            if (!currentChatId || currentChatType !== 'group') {
+                showNotification('Error', 'No group selected', 'error');
+                return;
+            }
+            
+            try {
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (!groupDoc.exists()) {
+                    showNotification('Error', 'Group not found', 'error');
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                const info = groupData.info || {};
+                const isAdmin = info.adminIds?.includes(currentUser.uid);
+                
+                if (!isAdmin) {
+                    showNotification('Error', 'Only admins can invite users', 'error');
+                    return;
+                }
+                
+                // Create invite modal
+                const modalHTML = `
+                    <div class="modal-overlay" id="inviteModal">
+                        <div class="modal-content" style="max-width: 500px;">
+                            <div class="modal-header">
+                                <h3>Invite Users to ${info.name}</h3>
+                                <button class="modal-close" onclick="hideInviteModal()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="search-section">
+                                    <input type="text" id="inviteUserSearch" placeholder="Search users by username..." class="search-input">
+                                    <div id="inviteSearchResults" class="search-results"></div>
+                                </div>
+                                <div class="invite-section">
+                                    <h4>Recent Users</h4>
+                                    <div id="recentUsers" class="recent-users"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('inviteModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('inviteModal');
+                modal.classList.add('active');
+                
+                // Setup search functionality
+                const searchInput = document.getElementById('inviteUserSearch');
+                searchInput.addEventListener('input', handleInviteUserSearch);
+                
+                // Load recent users
+                loadRecentUsers();
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideInviteModal();
+                    }
+                };
+                
+            } catch (error) {
+                console.error('Error showing invite modal:', error);
+                showNotification('Error', 'Failed to load invite modal', 'error');
+            }
+        }
+        
+        function hideInviteModal() {
+            const modal = document.getElementById('inviteModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        async function handleInviteUserSearch(e) {
+            const query = e.target.value.trim();
+            const resultsContainer = document.getElementById('inviteSearchResults');
+            
+            if (query.length < 2) {
+                resultsContainer.innerHTML = '';
+                return;
+            }
+            
+            try {
+                const usersRef = collection(db, "artifacts", appId, "users");
+                const snapshot = await getDocs(usersRef);
+                
+                const users = [];
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const profile = userData.profiles?.user_profile;
+                    if (profile && profile.username && 
+                        profile.username.toLowerCase().includes(query.toLowerCase()) &&
+                        doc.id !== currentUser.uid) {
+                        users.push({
+                            id: doc.id,
+                            username: profile.username,
+                            email: profile.email || ''
+                        });
+                    }
+                });
+                
+                resultsContainer.innerHTML = users.map(user => `
+                    <div class="user-result" onclick="inviteUserToGroup('${currentChatId}', '${document.getElementById('chatHeaderName').textContent}', '${user.id}', '${user.username}'); hideInviteModal();">
+                        <div class="user-result-avatar">${user.username[0].toUpperCase()}</div>
+                        <div class="user-result-info">
+                            <p class="user-result-name">${user.username}</p>
+                            <p class="user-result-status">${user.email}</p>
+                        </div>
+                        <button class="invite-btn">Invite</button>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error searching users for invite:', error);
+            }
+        }
+        
+        async function loadRecentUsers() {
+            try {
+                const recentUsersContainer = document.getElementById('recentUsers');
+                // This would load recent users from chat history or contacts
+                // For now, we'll show a placeholder
+                recentUsersContainer.innerHTML = '<p style="text-align: center; color: var(--text-light);">Search for users to invite</p>';
+            } catch (error) {
+                console.error('Error loading recent users:', error);
+            }
+        }
+
         // Chat Settings (placeholder)
         window.showChatSettings = function showChatSettings() {
-            showNotification('Info', 'Chat settings coming soon!', 'info');
+            if (currentChatType === 'group') {
+                showGroupInfo();
+            } else {
+                showNotification('Info', 'Chat settings coming soon!', 'info');
+            }
             document.getElementById('chatMoreDropdown').classList.remove('active');
         }
 
