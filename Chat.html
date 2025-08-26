@@ -2799,10 +2799,10 @@
             </div>
             <div class="form-group">
                 <label class="form-label">Add Members</label>
-                <input type="text" class="form-input" id="groupMemberSearchInput" placeholder="Search users to add...">
+                <input type="text" class="form-input" id="groupMemberSearchInput" placeholder="Search your friends to add...">
                 <div class="user-search-results" id="groupMemberSearchResults"></div>
                 <div class="selected-users-display" id="selectedUsersDisplay">
-                    <p style="text-align: center; color: var(--text-light); padding: 10px;">No users selected</p>
+                    <p style="text-align: center; color: var(--text-light); padding: 10px;">No friends selected</p>
                 </div>
             </div>
             <div class="modal-actions">
@@ -4910,7 +4910,7 @@
             // Clear selected users display
             const selectedUsersDisplay = modal.querySelector('#selectedUsersDisplay');
             if (selectedUsersDisplay) {
-                selectedUsersDisplay.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">No users selected</p>';
+                selectedUsersDisplay.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">No friends selected</p>';
             }
             
             selectedUsers.clear();
@@ -5088,52 +5088,61 @@
             }
 
             if (query.length < 2) {
-                resultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">Type at least 2 characters to search...</p>';
+                resultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">Type at least 2 characters to search your friends...</p>';
                 return;
             }
 
             // Show loading state
-            resultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">Searching users...</p>';
+            resultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">Searching friends...</p>';
 
             try {
-                const usersRef = collection(db, "artifacts", appId, "users");
-                const snapshot = await getDocs(usersRef);
+                console.log('JCHAT_DEBUG: All users data length:', allUsersData.length);
+                console.log('JCHAT_DEBUG: Current user friends count:', currentUsersFriends.size);
                 
-                console.log('JCHAT_DEBUG: Found users in database:', snapshot.size);
-                
-                const users = [];
-                snapshot.forEach(doc => {
-                    const userData = doc.data();
-                    const profile = userData.profiles?.user_profile;
-                    console.log('JCHAT_DEBUG: User data for', doc.id, ':', userData);
+                // Filter friends based on query (same logic as Direct tab)
+                const filteredFriends = allUsersData.filter(user => {
+                    const isFriend = currentUsersFriends.has(user.userId);
+                    const matchesQuery = user.username && 
+                                       user.username.toLowerCase().includes(query.toLowerCase());
+                    const isNotCurrentUser = user.userId !== currentUser.uid;
                     
-                    if (profile && profile.username && 
-                        profile.username.toLowerCase().includes(query.toLowerCase()) &&
-                        doc.id !== currentUser.uid) {
-                        users.push({
-                            id: doc.id,
-                            username: profile.username,
-                            email: profile.email || ''
-                        });
-                    }
+                    return isFriend && matchesQuery && isNotCurrentUser;
                 });
+                
+                console.log('JCHAT_DEBUG: Filtered friends:', filteredFriends);
 
-                console.log('JCHAT_DEBUG: Filtered users:', users);
-
-                if (users.length === 0) {
-                    resultsContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">No users found matching "' + query + '"</p>';
+                if (filteredFriends.length === 0) {
+                    resultsContainer.innerHTML = `
+                        <p style="text-align: center; color: var(--text-light); padding: 10px;">
+                            No friends found matching "${query}"
+                        </p>
+                        <p style="text-align: center; color: var(--text-light); font-size: 0.8rem; padding: 5px;">
+                            Only your friends are shown here. Add more friends to invite them to groups.
+                        </p>
+                    `;
                     return;
                 }
 
-                resultsContainer.innerHTML = users.map(user => {
-                    const isSelected = Array.from(selectedUsers).some(u => u.id === user.id);
+                resultsContainer.innerHTML = filteredFriends.map(user => {
+                    const isSelected = Array.from(selectedUsers).some(u => u.id === user.userId);
                     return `
                         <div class="user-result ${isSelected ? 'selected' : ''}" 
-                             onclick="toggleUserForGroup('${user.id}', '${user.username}')">
-                            <div class="user-result-avatar">${user.username[0].toUpperCase()}</div>
+                             onclick="toggleUserForGroup('${user.userId}', '${user.username}')">
+                            <div class="user-result-avatar">
+                                ${user.profilePicId ? 
+                                    `<img src="${getCloudinaryImageUrl(user.profilePicId, 'w_40,h_40,c_fill,g_face,r_max')}" 
+                                          alt="${user.username}" 
+                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                          style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">` : 
+                                    ''
+                                }
+                                <div class="fallback-avatar" style="${user.profilePicId ? 'display: none;' : 'display: flex;'} width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, #667eea, #764ba2); align-items: center; justify-content: center; color: white; font-weight: bold;">
+                                    ${user.username ? user.username[0].toUpperCase() : '?'}
+                                </div>
+                            </div>
                             <div class="user-result-info">
-                                <p class="user-result-name">${user.username}</p>
-                                <p class="user-result-status">${user.email}</p>
+                                <p class="user-result-name">${user.username || 'Friend'}</p>
+                                <p class="user-result-status">👥 Your Friend</p>
                             </div>
                             <div class="user-result-action">
                                 <button class="add-user-btn ${isSelected ? 'selected' : ''}">
@@ -5145,8 +5154,8 @@
                 }).join('');
 
             } catch (error) {
-                console.error('Error searching users:', error);
-                resultsContainer.innerHTML = '<p style="text-align: center; color: #ff6b6b; padding: 10px;">Error searching users. Please try again.</p>';
+                console.error('Error searching friends:', error);
+                resultsContainer.innerHTML = '<p style="text-align: center; color: #ff6b6b; padding: 10px;">Error searching friends. Please try again.</p>';
             }
         }
 
@@ -5191,7 +5200,7 @@
             const selectedUsersContainer = document.getElementById('selectedUsersDisplay');
             if (selectedUsersContainer) {
                 if (selectedUsers.size === 0) {
-                    selectedUsersContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">No users selected</p>';
+                    selectedUsersContainer.innerHTML = '<p style="text-align: center; color: var(--text-light); padding: 10px;">No friends selected</p>';
                 } else {
                     selectedUsersContainer.innerHTML = Array.from(selectedUsers).map(user => `
                         <div class="selected-user-item">
