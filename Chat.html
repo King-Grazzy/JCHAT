@@ -796,6 +796,23 @@
         .chat-header-actions {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .group-features {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-right: 10px;
+            padding-right: 10px;
+            border-right: 1px solid var(--border-light);
+        }
+
+        .general-features {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         /* Default Avatar Styling (matching Find_Friends.html) */
@@ -824,11 +841,41 @@
             padding: 8px;
             border-radius: 50%;
             transition: all 0.3s ease;
+            position: relative;
         }
 
         .chat-action-btn:hover {
             background: rgba(255, 255, 255, 0.1);
             color: var(--white);
+            transform: translateY(-1px);
+        }
+
+        .group-feature-btn {
+            background: rgba(111, 66, 193, 0.1);
+            border: 1px solid rgba(111, 66, 193, 0.2);
+            color: #6f42c1;
+        }
+
+        .group-feature-btn:hover {
+            background: rgba(111, 66, 193, 0.2);
+            border-color: rgba(111, 66, 193, 0.4);
+            color: #5a32a3;
+        }
+
+        .feature-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: linear-gradient(135deg, var(--blue), var(--pink));
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 0.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
         }
 
         /* Messages Area - Full Screen */
@@ -2544,6 +2591,62 @@
             line-height: 1.4;
         }
 
+        /* New Group Features Styles */
+        .events-header,
+        .announcements-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .files-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .files-stats {
+            display: flex;
+            gap: 20px;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .files-filter select {
+            padding: 8px 12px;
+            background: var(--input-background);
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .no-events,
+        .no-files,
+        .no-announcements {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .no-events i,
+        .no-files i,
+        .no-announcements i {
+            margin-bottom: 15px;
+        }
+
+        .no-events p,
+        .no-files p,
+        .no-announcements p {
+            margin: 5px 0;
+        }
+
         /* User Search and Selection Styles */
         .user-search-results {
             max-height: 200px;
@@ -3369,24 +3472,63 @@
                     </div>
                 </div>
                 <div class="chat-header-actions">
-                    <button class="chat-action-btn" id="clearAllBtn" title="Clear All Messages" style="color: #ff6b6b;">
-                        <i class="fas fa-broom"></i>
-                    </button>
-                    <button class="chat-action-btn" id="voiceCallBtn" title="Voice Call">
-                        <i class="fas fa-phone"></i>
-                    </button>
-                    <button class="chat-action-btn" id="videoCallBtn" title="Video Call">
-                        <i class="fas fa-video"></i>
-                    </button>
-                    <button class="chat-action-btn" id="chatInfoBtn" title="Chat Info">
-                        <i class="fas fa-info-circle"></i>
-                    </button>
-                    <button class="chat-action-btn" id="chatSearchBtn" title="Search Messages">
-                        <i class="fas fa-search"></i>
-                    </button>
-                    <button class="chat-action-btn" id="chatMoreBtn" title="More Options">
-                        <i class="fas fa-ellipsis-v"></i>
-                    </button>
+                    <!-- Group-specific features -->
+                    <div class="group-features" id="groupFeatures" style="display: none;">
+                        <button class="chat-action-btn group-feature-btn" id="pinnedMessagesBtn" title="Pinned Messages">
+                            <i class="fas fa-thumbtack"></i>
+                            <span class="feature-badge" id="pinnedCount">0</span>
+                        </button>
+                        <button class="chat-action-btn group-feature-btn" id="groupPollsBtn" title="Create Poll">
+                            <i class="fas fa-poll"></i>
+                        </button>
+                        <button class="chat-action-btn group-feature-btn" id="groupEventsBtn" title="Group Events">
+                            <i class="fas fa-calendar-alt"></i>
+                        </button>
+                        <button class="chat-action-btn group-feature-btn" id="groupFilesBtn" title="Shared Files">
+                            <i class="fas fa-folder-open"></i>
+                        </button>
+                        <button class="chat-action-btn group-feature-btn" id="groupAnnouncementsBtn" title="Announcements">
+                            <i class="fas fa-bullhorn"></i>
+                        </button>
+                        <button class="chat-action-btn group-feature-btn" id="groupMembersBtn" title="View Members">
+                            <i class="fas fa-users"></i>
+                            <span class="feature-badge" id="memberCount">0</span>
+                        </button>
+                        <button class="chat-action-btn group-feature-btn" id="groupAnalyticsBtn" title="Group Analytics">
+                            <i class="fas fa-chart-line"></i>
+                        </button>
+                        <button class="chat-action-btn group-feature-btn" id="groupSettingsBtn" title="Group Settings">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- General chat features -->
+                    <div class="general-features">
+                        <button class="chat-action-btn" id="chatSearchBtn" title="Search Messages">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button class="chat-action-btn" id="chatTranslateBtn" title="Translate Messages">
+                            <i class="fas fa-language"></i>
+                        </button>
+                        <button class="chat-action-btn" id="chatBookmarkBtn" title="Bookmark Chat">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                        <button class="chat-action-btn" id="chatExportBtn" title="Export Chat">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="chat-action-btn" id="chatMuteBtn" title="Mute Notifications">
+                            <i class="fas fa-bell-slash"></i>
+                        </button>
+                        <button class="chat-action-btn" id="chatThemeBtn" title="Chat Theme">
+                            <i class="fas fa-palette"></i>
+                        </button>
+                        <button class="chat-action-btn" id="clearAllBtn" title="Clear All Messages" style="color: #ff6b6b;">
+                            <i class="fas fa-broom"></i>
+                        </button>
+                        <button class="chat-action-btn" id="chatMoreBtn" title="More Options">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -4261,12 +4403,67 @@
             themeToggle?.addEventListener('click', cycleTheme);
             logoutButton?.addEventListener('click', handleLogout);
 
-            // Delete functions
+            // Group-specific features
+            document.getElementById('pinnedMessagesBtn')?.addEventListener('click', () => {
+                if (currentChatType === 'group') {
+                    showPinnedMessages();
+                }
+            });
+            
+            document.getElementById('groupPollsBtn')?.addEventListener('click', () => {
+                if (currentChatType === 'group') {
+                    createPoll();
+                }
+            });
+            
+            document.getElementById('groupEventsBtn')?.addEventListener('click', () => {
+                if (currentChatType === 'group') {
+                    showGroupEvents();
+                }
+            });
+            
+            document.getElementById('groupFilesBtn')?.addEventListener('click', () => {
+                if (currentChatType === 'group') {
+                    showSharedFiles();
+                }
+            });
+            
+            document.getElementById('groupAnnouncementsBtn')?.addEventListener('click', () => {
+                if (currentChatType === 'group') {
+                    showAnnouncements();
+                }
+            });
+            
+            document.getElementById('groupMembersBtn')?.addEventListener('click', () => {
+                if (currentChatType === 'group') {
+                    showGroupMembers();
+                }
+            });
+            
+            document.getElementById('groupAnalyticsBtn')?.addEventListener('click', () => {
+                if (currentChatType === 'group') {
+                    showGroupAnalytics();
+                }
+            });
+            
+            document.getElementById('groupSettingsBtn')?.addEventListener('click', () => {
+                if (currentChatType === 'group') {
+                    showGroupSettings();
+                }
+            });
+
+            // General chat features
             document.getElementById('clearAllBtn')?.addEventListener('click', showClearAllModal);
             document.getElementById('chatMoreBtn')?.addEventListener('click', () => {
                 // Show dropdown menu for more options including bulk delete
                 showChatMoreOptions();
             });
+            document.getElementById('chatSearchBtn')?.addEventListener('click', showMessageSearch);
+            document.getElementById('chatTranslateBtn')?.addEventListener('click', showTranslateOptions);
+            document.getElementById('chatBookmarkBtn')?.addEventListener('click', toggleBookmark);
+            document.getElementById('chatExportBtn')?.addEventListener('click', exportChat);
+            document.getElementById('chatMuteBtn')?.addEventListener('click', toggleMuteNotifications);
+            document.getElementById('chatThemeBtn')?.addEventListener('click', showChatThemePicker);
 
             // Message input auto-resize
             messageInput?.addEventListener('input', autoResizeTextarea);
@@ -4933,6 +5130,15 @@
                     chatHeaderName.textContent = chatData?.name || 'Group Chat';
                     chatHeaderStatus.textContent = `${chatData?.members?.length || 0} members`;
                     chatHeaderAvatar.innerHTML = '<i class="fas fa-users"></i>';
+                    
+                    // Show group features
+                    const groupFeatures = document.getElementById('groupFeatures');
+                    if (groupFeatures) {
+                        groupFeatures.style.display = 'flex';
+                    }
+                    
+                    // Update group badges
+                    updateGroupBadges();
                 }
             } catch (error) {
                 console.error('Error loading chat header:', error);
@@ -8676,6 +8882,13 @@
                 if (chatHeader) {
                     chatHeader.style.display = 'none';
                 }
+                
+                // Hide group features
+                const groupFeatures = document.getElementById('groupFeatures');
+                if (groupFeatures) {
+                    groupFeatures.style.display = 'none';
+                }
+                
                 if (welcomeScreen) {
                     welcomeScreen.style.display = 'block';
                 }
@@ -8706,6 +8919,38 @@
                 const confirmBtn = document.getElementById('deleteConversationConfirm');
                 confirmBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete Conversation';
                 confirmBtn.disabled = false;
+            }
+        }
+
+        // Update group badges (pinned count, member count)
+        async function updateGroupBadges() {
+            try {
+                if (!currentChatId || currentChatType !== 'group') return;
+                
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId);
+                const groupDoc = await getDoc(groupRef);
+                
+                if (groupDoc.exists()) {
+                    const groupData = groupDoc.data();
+                    const info = groupData.info || {};
+                    
+                    // Update pinned count
+                    const pinnedCount = document.getElementById('pinnedCount');
+                    if (pinnedCount) {
+                        const pinnedMessages = info.pinnedMessages || [];
+                        pinnedCount.textContent = pinnedMessages.length;
+                        pinnedCount.style.display = pinnedMessages.length > 0 ? 'flex' : 'none';
+                    }
+                    
+                    // Update member count
+                    const memberCount = document.getElementById('memberCount');
+                    if (memberCount) {
+                        const memberCountValue = info.memberCount || 0;
+                        memberCount.textContent = memberCountValue;
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating group badges:', error);
             }
         }
 
@@ -9164,6 +9409,489 @@
                 modal.classList.remove('active');
                 setTimeout(() => modal.remove(), 300);
             }
+        }
+
+        // New Group Features Functions
+        window.showGroupEvents = async function showGroupEvents() {
+            try {
+                const modalHTML = `
+                    <div class="modal-overlay" id="groupEventsModal">
+                        <div class="modal-content" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+                            <div class="modal-header">
+                                <h3>📅 Group Events</h3>
+                                <button class="modal-close" onclick="hideGroupEvents()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="events-header">
+                                    <button onclick="createGroupEvent()" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> Create Event
+                                    </button>
+                                </div>
+                                <div class="events-list" id="eventsList">
+                                    <div class="loading-spinner">Loading events...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('groupEventsModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('groupEventsModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideGroupEvents();
+                    }
+                };
+                
+                // Load events
+                await loadGroupEvents();
+                
+            } catch (error) {
+                console.error('Error showing group events:', error);
+                showNotification('Error', 'Failed to load group events', 'error');
+            }
+        }
+        
+        function hideGroupEvents() {
+            const modal = document.getElementById('groupEventsModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        async function loadGroupEvents() {
+            try {
+                const eventsList = document.getElementById('eventsList');
+                eventsList.innerHTML = `
+                    <div class="no-events">
+                        <i class="fas fa-calendar-alt" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+                        <p>No events scheduled</p>
+                        <p style="font-size: 0.9rem; color: var(--text-light);">Create the first event for your group!</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+        
+        window.createGroupEvent = function createGroupEvent() {
+            const modalHTML = `
+                <div class="modal-overlay" id="createEventModal">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h3>📅 Create Event</h3>
+                            <button class="modal-close" onclick="hideCreateEvent()">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Event Title</label>
+                                <input type="text" id="eventTitle" placeholder="Enter event title...">
+                            </div>
+                            <div class="form-group">
+                                <label>Description</label>
+                                <textarea id="eventDescription" rows="3" placeholder="Enter event description..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Date & Time</label>
+                                <input type="datetime-local" id="eventDateTime">
+                            </div>
+                            <div class="form-group">
+                                <label>Location (optional)</label>
+                                <input type="text" id="eventLocation" placeholder="Enter location...">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button onclick="hideCreateEvent()" class="btn btn-secondary">Cancel</button>
+                            <button onclick="submitEvent()" class="btn btn-primary">Create Event</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('createEventModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Show modal
+            const modal = document.getElementById('createEventModal');
+            modal.classList.add('active');
+            
+            // Close modal on backdrop click
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    hideCreateEvent();
+                }
+            };
+        }
+        
+        function hideCreateEvent() {
+            const modal = document.getElementById('createEventModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        async function submitEvent() {
+            try {
+                const title = document.getElementById('eventTitle').value.trim();
+                const description = document.getElementById('eventDescription').value.trim();
+                const dateTime = document.getElementById('eventDateTime').value;
+                const location = document.getElementById('eventLocation').value.trim();
+                
+                if (!title || !dateTime) {
+                    showNotification('Error', 'Please fill in all required fields', 'error');
+                    return;
+                }
+                
+                const eventData = {
+                    title: title,
+                    description: description,
+                    dateTime: new Date(dateTime),
+                    location: location,
+                    createdBy: currentUser.uid,
+                    createdByUsername: profileUsername.textContent,
+                    createdAt: serverTimestamp(),
+                    attendees: [currentUser.uid],
+                    type: 'event'
+                };
+                
+                // Add event message to group
+                const messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages");
+                await addDoc(messagesRef, eventData);
+                
+                hideCreateEvent();
+                showNotification('Success', 'Event created successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error creating event:', error);
+                showNotification('Error', 'Failed to create event', 'error');
+            }
+        }
+        
+        window.showSharedFiles = async function showSharedFiles() {
+            try {
+                const modalHTML = `
+                    <div class="modal-overlay" id="sharedFilesModal">
+                        <div class="modal-content" style="max-width: 800px; max-height: 80vh; overflow-y: auto;">
+                            <div class="modal-header">
+                                <h3>📁 Shared Files</h3>
+                                <button class="modal-close" onclick="hideSharedFiles()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="files-header">
+                                    <div class="files-stats">
+                                        <span>Total Files: <strong id="totalFiles">0</strong></span>
+                                        <span>Total Size: <strong id="totalSize">0 MB</strong></span>
+                                    </div>
+                                    <div class="files-filter">
+                                        <select id="fileTypeFilter">
+                                            <option value="">All Types</option>
+                                            <option value="image">Images</option>
+                                            <option value="document">Documents</option>
+                                            <option value="video">Videos</option>
+                                            <option value="audio">Audio</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="files-list" id="filesList">
+                                    <div class="loading-spinner">Loading files...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('sharedFilesModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('sharedFilesModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideSharedFiles();
+                    }
+                };
+                
+                // Load files
+                await loadSharedFiles();
+                
+            } catch (error) {
+                console.error('Error showing shared files:', error);
+                showNotification('Error', 'Failed to load shared files', 'error');
+            }
+        }
+        
+        function hideSharedFiles() {
+            const modal = document.getElementById('sharedFilesModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        async function loadSharedFiles() {
+            try {
+                const filesList = document.getElementById('filesList');
+                filesList.innerHTML = `
+                    <div class="no-files">
+                        <i class="fas fa-folder-open" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+                        <p>No files shared yet</p>
+                        <p style="font-size: 0.9rem; color: var(--text-light);">Files shared in this group will appear here</p>
+                    </div>
+                `;
+                
+                document.getElementById('totalFiles').textContent = '0';
+                document.getElementById('totalSize').textContent = '0 MB';
+            } catch (error) {
+                console.error('Error loading files:', error);
+            }
+        }
+        
+        window.showAnnouncements = async function showAnnouncements() {
+            try {
+                const modalHTML = `
+                    <div class="modal-overlay" id="announcementsModal">
+                        <div class="modal-content" style="max-width: 700px; max-height: 80vh; overflow-y: auto;">
+                            <div class="modal-header">
+                                <h3>📢 Announcements</h3>
+                                <button class="modal-close" onclick="hideAnnouncements()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="announcements-header">
+                                    <button onclick="createAnnouncement()" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> New Announcement
+                                    </button>
+                                </div>
+                                <div class="announcements-list" id="announcementsList">
+                                    <div class="loading-spinner">Loading announcements...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('announcementsModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('announcementsModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideAnnouncements();
+                    }
+                };
+                
+                // Load announcements
+                await loadAnnouncements();
+                
+            } catch (error) {
+                console.error('Error showing announcements:', error);
+                showNotification('Error', 'Failed to load announcements', 'error');
+            }
+        }
+        
+        function hideAnnouncements() {
+            const modal = document.getElementById('announcementsModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        async function loadAnnouncements() {
+            try {
+                const announcementsList = document.getElementById('announcementsList');
+                announcementsList.innerHTML = `
+                    <div class="no-announcements">
+                        <i class="fas fa-bullhorn" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+                        <p>No announcements yet</p>
+                        <p style="font-size: 0.9rem; color: var(--text-light);">Create the first announcement for your group!</p>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading announcements:', error);
+            }
+        }
+        
+        window.createAnnouncement = function createAnnouncement() {
+            const modalHTML = `
+                <div class="modal-overlay" id="createAnnouncementModal">
+                    <div class="modal-content" style="max-width: 500px;">
+                        <div class="modal-header">
+                            <h3>📢 Create Announcement</h3>
+                            <button class="modal-close" onclick="hideCreateAnnouncement()">×</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Title</label>
+                                <input type="text" id="announcementTitle" placeholder="Enter announcement title...">
+                            </div>
+                            <div class="form-group">
+                                <label>Message</label>
+                                <textarea id="announcementMessage" rows="4" placeholder="Enter announcement message..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="announcementImportant">
+                                    Mark as important
+                                </label>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button onclick="hideCreateAnnouncement()" class="btn btn-secondary">Cancel</button>
+                            <button onclick="submitAnnouncement()" class="btn btn-primary">Post Announcement</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('createAnnouncementModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Show modal
+            const modal = document.getElementById('createAnnouncementModal');
+            modal.classList.add('active');
+            
+            // Close modal on backdrop click
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    hideCreateAnnouncement();
+                }
+            };
+        }
+        
+        function hideCreateAnnouncement() {
+            const modal = document.getElementById('createAnnouncementModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        async function submitAnnouncement() {
+            try {
+                const title = document.getElementById('announcementTitle').value.trim();
+                const message = document.getElementById('announcementMessage').value.trim();
+                const isImportant = document.getElementById('announcementImportant').checked;
+                
+                if (!title || !message) {
+                    showNotification('Error', 'Please fill in all required fields', 'error');
+                    return;
+                }
+                
+                const announcementData = {
+                    title: title,
+                    message: message,
+                    isImportant: isImportant,
+                    createdBy: currentUser.uid,
+                    createdByUsername: profileUsername.textContent,
+                    createdAt: serverTimestamp(),
+                    type: 'announcement'
+                };
+                
+                // Add announcement message to group
+                const messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages");
+                await addDoc(messagesRef, announcementData);
+                
+                hideCreateAnnouncement();
+                showNotification('Success', 'Announcement posted successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error creating announcement:', error);
+                showNotification('Error', 'Failed to post announcement', 'error');
+            }
+        }
+        
+        window.showGroupMembers = function showGroupMembers() {
+            // This will use the existing showGroupInfo function but focus on members tab
+            showGroupInfo();
+            // Switch to members tab
+            setTimeout(() => {
+                const membersTab = document.querySelector('[onclick="switchSettingsTab(\'members\')"]');
+                if (membersTab) {
+                    membersTab.click();
+                }
+            }, 100);
+        }
+        
+        window.showGroupAnalytics = function showGroupAnalytics() {
+            // This will use the existing showGroupInfo function but focus on analytics tab
+            showGroupInfo();
+            // Switch to analytics tab
+            setTimeout(() => {
+                const analyticsTab = document.querySelector('[onclick="switchSettingsTab(\'analytics\')"]');
+                if (analyticsTab) {
+                    analyticsTab.click();
+                }
+            }, 100);
+        }
+        
+        // General chat features
+        window.showMessageSearch = function showMessageSearch() {
+            showNotification('Info', 'Message search feature coming soon!', 'info');
+        }
+        
+        window.showTranslateOptions = function showTranslateOptions() {
+            showNotification('Info', 'Translation feature coming soon!', 'info');
+        }
+        
+        window.toggleBookmark = function toggleBookmark() {
+            showNotification('Info', 'Bookmark feature coming soon!', 'info');
+        }
+        
+        window.exportChat = function exportChat() {
+            showNotification('Info', 'Chat export feature coming soon!', 'info');
+        }
+        
+        window.toggleMuteNotifications = function toggleMuteNotifications() {
+            showNotification('Info', 'Mute notifications feature coming soon!', 'info');
+        }
+        
+        window.showChatThemePicker = function showChatThemePicker() {
+            showNotification('Info', 'Chat theme picker coming soon!', 'info');
         }
 
         // Theme Management
