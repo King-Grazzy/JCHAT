@@ -560,6 +560,7 @@
             margin: 0;
             padding: 0;
             overflow: hidden;
+            min-height: 0;
         }
 
         /* Chat Header */
@@ -649,16 +650,18 @@
         .messages-container {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 20px;
             display: flex;
             flex-direction: column;
             gap: 15px;
             width: 100%;
-            height: auto; /* Let flexbox handle the height */
             margin: 0;
             margin-top: 15px; /* Spacing between chat header and messages */
             min-height: 0; /* Allow shrinking in flex container */
             box-sizing: border-box;
+            /* Ensure proper scrolling area */
+            max-height: calc(100vh - 220px);
         }
 
         .message {
@@ -1020,6 +1023,8 @@
             z-index: 10;
             backdrop-filter: blur(10px);
             flex-shrink: 0;
+            display: block !important;
+            min-height: 80px;
         }
 
         .reply-preview {
@@ -1061,9 +1066,10 @@
         }
 
         .message-input-wrapper {
-            display: flex;
+            display: flex !important;
             gap: 10px;
             align-items: flex-end;
+            width: 100%;
         }
 
         .message-input {
@@ -1079,6 +1085,7 @@
             max-height: 120px;
             outline: none;
             transition: all 0.3s ease;
+            display: block !important;
         }
 
         .message-input:focus {
@@ -1091,8 +1098,9 @@
         }
 
         .input-actions {
-            display: flex;
+            display: flex !important;
             gap: 8px;
+            flex-shrink: 0;
         }
 
         .input-action-btn {
@@ -1103,7 +1111,7 @@
             background: rgba(255, 255, 255, 0.1);
             color: var(--text-light);
             cursor: pointer;
-            display: flex;
+            display: flex !important;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
@@ -1791,14 +1799,16 @@
                 padding: 15px;
                 gap: 12px;
                 width: 100%;
-                height: auto; /* Let flexbox handle mobile height too */
                 min-height: 0;
                 margin: 0;
                 margin-top: 10px;
+                max-height: calc(100vh - 200px);
             }
 
             .message-input-container {
                 padding: 12px 15px;
+                display: block !important;
+                min-height: 70px;
             }
 
             .emoji-picker {
@@ -2026,8 +2036,8 @@
                 </div>
             </div>
 
-            <!-- Message Input (hidden initially) -->
-            <div class="message-input-container" id="messageInputContainer" style="display: none;">
+            <!-- Message Input -->
+            <div class="message-input-container" id="messageInputContainer">
                 <!-- Reply Preview -->
                 <div class="reply-preview" id="replyPreview">
                     <div class="reply-preview-header">Replying to <span id="replyToSender"></span></div>
@@ -2649,9 +2659,9 @@
                 `;
             }
             
-            // Hide chat main area in demo mode
-            if (chatMain) {
-                chatMain.style.display = 'none';
+            // Show input area even in demo mode for UI testing
+            if (messageInputContainer) {
+                messageInputContainer.style.display = 'block';
             }
             
             console.log('JCHAT_DEBUG: Demo chat interface displayed');
@@ -3327,6 +3337,23 @@
             chatHeader.style.display = 'flex';
             messagesContainer.style.display = 'flex';
             messageInputContainer.style.display = 'block';
+            
+            // Ensure input container is visible and functional
+            setTimeout(() => {
+                if (messageInput) {
+                    messageInput.style.display = 'block';
+                    messageInput.disabled = false;
+                }
+                if (sendBtn) {
+                    sendBtn.style.display = 'flex';
+                    sendBtn.disabled = false;
+                }
+                // Show all input action buttons
+                document.querySelectorAll('.input-action-btn').forEach(btn => {
+                    btn.style.display = 'flex';
+                    btn.disabled = false;
+                });
+            }, 100);
         }
 
         // Load Chat Header
@@ -3568,12 +3595,12 @@
                 const senderData = getUserDataFromCache(message.senderId);
                 if (senderData?.profilePicId && senderData.visibility?.profilePic !== false) {
                     const imageUrl = getCloudinaryImageUrl(senderData.profilePicId, "w_32,h_32,c_fill,g_face,r_max");
-                    avatarContent = `<img src="${imageUrl}" alt="${message.senderName}'s Profile" onerror="this.style.display='none';this.parentElement.textContent='${message.senderName ? message.senderName[0].toUpperCase() : 'A'}';">`;
+                    avatarContent = `<img src="${imageUrl}" alt="${message.senderName}'s Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none';this.parentElement.innerHTML='${message.senderName ? message.senderName[0].toUpperCase() : 'A'}';">`;
                 }
             } else if (message.senderId === currentUser.uid) {
                 // Use current user's profile picture
                 if (profilePic && profilePic.src) {
-                    avatarContent = `<img src="${profilePic.src}" alt="Your Profile" onerror="this.style.display='none';this.parentElement.textContent='${message.senderName ? message.senderName[0].toUpperCase() : 'Y'}';">`;
+                    avatarContent = `<img src="${profilePic.src}" alt="Your Profile" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none';this.parentElement.innerHTML='${message.senderName ? message.senderName[0].toUpperCase() : 'Y'}';">`;
                 }
             }
 
