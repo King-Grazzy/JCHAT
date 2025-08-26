@@ -654,10 +654,10 @@
             flex-direction: column;
             gap: 15px;
             width: 100%;
-            height: calc(100vh - 200px); /* Proper height minus global header, chat header and input */
+            height: auto; /* Let flexbox handle the height */
             margin: 0;
             margin-top: 15px; /* Spacing between chat header and messages */
-            max-height: calc(100vh - 200px);
+            min-height: 0; /* Allow shrinking in flex container */
             box-sizing: border-box;
         }
 
@@ -690,6 +690,13 @@
             font-size: 0.8rem;
             font-weight: 600;
             flex-shrink: 0;
+        }
+
+        .message-avatar img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         .message-content {
@@ -1784,8 +1791,8 @@
                 padding: 15px;
                 gap: 12px;
                 width: 100%;
-                height: calc(100vh - 180px); /* Mobile height adjustment - proper spacing */
-                max-height: calc(100vh - 180px);
+                height: auto; /* Let flexbox handle mobile height too */
+                min-height: 0;
                 margin: 0;
                 margin-top: 10px;
             }
@@ -3033,17 +3040,39 @@
                 );
                 
                 const snapshot = await getDocs(q);
-                const existingChats = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    type: 'direct',
-                    ...doc.data()
-                }));
+                const existingChats = [];
                 
-                // Get friends list (matching Profile.html logic)
+                // Process existing chats to show real user data
+                for (const docSnap of snapshot.docs) {
+                    const chatData = docSnap.data();
+                    const otherUserId = chatData.members?.find(id => id !== currentUser.uid);
+                    
+                    if (otherUserId) {
+                        const userData = getUserDataFromCache(otherUserId) || await getUserData(otherUserId);
+                        existingChats.push({
+                            id: docSnap.id,
+                            type: 'direct',
+                            userId: otherUserId,
+                            name: userData?.username || chatData.displayName || 'Friend',
+                            profilePicId: userData?.profilePicId,
+                            visibility: userData?.visibility,
+                            isExistingChat: true,
+                            members: chatData.members,
+                            lastMessage: chatData.lastMessage,
+                            lastMessageTimestamp: chatData.lastMessageTimestamp
+                        });
+                    }
+                }
+                
+                // Get friends list (matching Profile.html logic) - only add friends not already in existing chats
                 const friendsList = [];
                 if (allUsersData.length > 0) {
                     allUsersData
-                        .filter(user => user.userId !== currentUser.uid && currentUsersFriends.has(user.userId))
+                        .filter(user => {
+                            return user.userId !== currentUser.uid && 
+                                   currentUsersFriends.has(user.userId) &&
+                                   !existingChats.some(chat => chat.userId === user.userId);
+                        })
                         .forEach(user => {
                             friendsList.push({
                                 id: `friend_${user.userId}`,
@@ -3053,12 +3082,12 @@
                                 name: user.username || 'Friend',
                                 profilePicId: user.profilePicId,
                                 visibility: user.visibility,
-                                status: 'Friends since ' + new Date().toLocaleDateString() // Could be enhanced with actual friend date
+                                status: 'Click to start chatting'
                             });
                         });
                 }
                 
-                console.log('JCHAT_DEBUG: Found', friendsList.length, 'friends for direct chats');
+                console.log('JCHAT_DEBUG: Found', existingChats.length, 'existing chats and', friendsList.length, 'available friends');
                 
                 // Combine existing chats with friends list, prioritizing existing chats
                 return [...existingChats, ...friendsList];
@@ -3078,7 +3107,7 @@
                             name: user.username || 'Friend',
                             profilePicId: user.profilePicId,
                             visibility: user.visibility,
-                            status: 'Friends since ' + new Date().toLocaleDateString()
+                            status: 'Click to start chatting'
                         }));
                 }
                 
@@ -3096,11 +3125,21 @@
                 );
                 
                 const snapshot = await getDocs(q);
-                return snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    type: 'group',
-                    ...doc.data()
-                }));
+                return snapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        type: 'group',
+                        name: data.info?.name || data.name || 'Group Chat',
+                        description: data.info?.description || data.description || '',
+                        members: data.members || data.info?.members || [],
+                        memberCount: (data.members || data.info?.members || []).length,
+                        lastMessage: data.lastMessage,
+                        adminIds: data.info?.adminIds || data.adminIds || [],
+                        createdAt: data.info?.createdAt || data.createdAt,
+                        createdBy: data.info?.createdBy || data.createdBy
+                    };
+                });
             } catch (error) {
                 console.log('JCHAT_DEBUG: No groups found or collection doesn\'t exist yet:', error.message);
                 return []; // Return empty array if collection doesn't exist
@@ -3213,13 +3252,13 @@
                 chatName = chat.name || 'Group Chat';
             }
 
-            // Determine status message for friends
+            // Determine status message for friends and chats
             let statusMessage = '';
-            if (chat.isFriend) {
-                statusMessage = '👥 Friend';
-                if (chat.status) {
-                    statusMessage = `👥 ${chat.status}`;
-                }
+            if (chat.isExistingChat) {
+                // Show last message for existing chats
+                statusMessage = formatLastMessage(lastMessage);
+            } else if (chat.isFriend) {
+                statusMessage = chat.status || 'Click to start chatting';
             } else if (chat.isUser) {
                 statusMessage = chat.isFriend ? '👥 Friend' : chat.hasRequest ? '📨 Request Pending' : '🆕 New User';
             } else {
@@ -3358,7 +3397,18 @@
                     return cachedUser;
                 }
                 
-                // Fallback to Firestore if not in cache
+                // Try public users collection first (more likely to have data)
+                try {
+                    const publicUserRef = doc(db, "artifacts", appId, "public", "data", "users", userId);
+                    const publicUserDoc = await getDoc(publicUserRef);
+                    if (publicUserDoc.exists()) {
+                        return publicUserDoc.data();
+                    }
+                } catch (error) {
+                    console.log('JCHAT_DEBUG: Public user not found, trying private profile');
+                }
+                
+                // Fallback to private Firestore profile
                 const userRef = doc(db, "artifacts", appId, "users", userId, "profiles", "user_profile");
                 const userDoc = await getDoc(userRef);
                 return userDoc.exists() ? userDoc.data() : null;
@@ -3510,10 +3560,27 @@
                 </div>
             ` : '';
 
+            // Get sender's profile picture for message avatar
+            let avatarContent = message.senderName ? message.senderName[0].toUpperCase() : 'A';
+            
+            // Try to get sender's profile picture from cache
+            if (message.senderId && message.senderId !== currentUser.uid) {
+                const senderData = getUserDataFromCache(message.senderId);
+                if (senderData?.profilePicId && senderData.visibility?.profilePic !== false) {
+                    const imageUrl = getCloudinaryImageUrl(senderData.profilePicId, "w_32,h_32,c_fill,g_face,r_max");
+                    avatarContent = `<img src="${imageUrl}" alt="${message.senderName}'s Profile" onerror="this.style.display='none';this.parentElement.textContent='${message.senderName ? message.senderName[0].toUpperCase() : 'A'}';">`;
+                }
+            } else if (message.senderId === currentUser.uid) {
+                // Use current user's profile picture
+                if (profilePic && profilePic.src) {
+                    avatarContent = `<img src="${profilePic.src}" alt="Your Profile" onerror="this.style.display='none';this.parentElement.textContent='${message.senderName ? message.senderName[0].toUpperCase() : 'Y'}';">`;
+                }
+            }
+
             return `
                 <div class="message ${messageClass}" data-message-id="${message.id}">
                     <div class="message-avatar">
-                        ${message.senderName ? message.senderName[0].toUpperCase() : 'A'}
+                        ${avatarContent}
                     </div>
                     <div class="message-content">
                         <div class="message-header">
