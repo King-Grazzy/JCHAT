@@ -3086,6 +3086,13 @@
             });
 
             loadChatList(tab);
+            
+            // If switching to direct tab, ensure status indicators are updated
+            if (tab === 'direct') {
+                setTimeout(() => {
+                    refreshDirectTabStatus();
+                }, 500); // Small delay to ensure chat list is rendered
+            }
         }
 
         // Load Chat List
@@ -4418,6 +4425,7 @@
         // Connection monitoring variables
         let connectionCheckInterval = null;
         let presenceListener = null;
+        let presenceHeartbeatInterval = null;
         
         // Setup Presence System
         async function setupPresenceSystem() {
@@ -4425,24 +4433,34 @@
             
             try {
                 const userPresenceRef = doc(db, "artifacts", appId, "public", "data", "presence", currentUser.uid);
+                
+                // Set user as online with enhanced presence data
                 await setDoc(userPresenceRef, {
                     online: true,
                     lastSeen: serverTimestamp(),
                     userId: currentUser.uid,
-                    userName: profileUsername.textContent
+                    userName: profileUsername.textContent,
+                    sessionId: Date.now().toString(), // Unique session identifier
+                    userAgent: navigator.userAgent.substring(0, 100) // Browser info (truncated)
                 });
+                
+                console.log('JCHAT_DEBUG: Set user presence as online for:', currentUser.uid);
 
                 // Listen for presence changes
                 const presenceRef = collection(db, "artifacts", appId, "public", "data", "presence");
                 presenceListener = onSnapshot(presenceRef, (snapshot) => {
+                    console.log('JCHAT_DEBUG: Presence update received, snapshot size:', snapshot.size);
+                    
                     onlineUsers.clear();
                     snapshot.forEach(doc => {
                         const data = doc.data();
+                        console.log(`JCHAT_DEBUG: User ${doc.id} presence:`, data);
                         if (data.online) {
                             onlineUsers.add(doc.id);
                         }
                     });
                     
+                    console.log('JCHAT_DEBUG: Updated online users:', Array.from(onlineUsers));
                     updateOnlineStatus();
                     updateConnectionStatus('connected');
                 }, (error) => {
@@ -4472,6 +4490,9 @@
                 
                 // Start connection monitoring
                 startConnectionMonitoring();
+                
+                // Start presence heartbeat to keep user online
+                startPresenceHeartbeat(userPresenceRef);
                 
                 console.log('JCHAT_DEBUG: Presence system setup complete');
             } catch (error) {
@@ -4586,6 +4607,11 @@
                 connectionCheckInterval = null;
             }
             
+            if (presenceHeartbeatInterval) {
+                clearInterval(presenceHeartbeatInterval);
+                presenceHeartbeatInterval = null;
+            }
+            
             if (presenceListener) {
                 presenceListener();
                 presenceListener = null;
@@ -4606,6 +4632,11 @@
                 }
             });
             
+            // If currently viewing Direct tab, refresh it to show updated status
+            if (activeTab === 'direct') {
+                refreshDirectTabStatus();
+            }
+            
             // Also update chat header status if viewing a direct chat
             if (currentChatType === 'direct' && currentChatId) {
                 const chatHeaderStatus = document.getElementById('chatHeaderStatus');
@@ -4620,6 +4651,50 @@
                     }
                 }
             }
+        }
+        
+        // Refresh Direct Tab Status Indicators
+        function refreshDirectTabStatus() {
+            // Only update if we're currently viewing the direct tab
+            if (activeTab !== 'direct') return;
+            
+            console.log('JCHAT_DEBUG: Refreshing Direct tab status indicators...');
+            console.log('JCHAT_DEBUG: Online users:', Array.from(onlineUsers));
+            
+            chatList.querySelectorAll('.chat-item[data-chat-type="direct"]').forEach(item => {
+                const userId = item.dataset.userId;
+                const statusIndicator = item.querySelector('.status-indicator');
+                
+                if (userId && statusIndicator) {
+                    const isOnline = onlineUsers.has(userId);
+                    statusIndicator.className = 'status-indicator ' + (isOnline ? 'online' : 'offline');
+                    
+                    console.log(`JCHAT_DEBUG: User ${userId} is ${isOnline ? 'online' : 'offline'}`);
+                }
+            });
+        }
+        
+        // Start Presence Heartbeat
+        function startPresenceHeartbeat(userPresenceRef) {
+            // Update presence every 30 seconds to keep user online
+            presenceHeartbeatInterval = setInterval(async () => {
+                try {
+                    if (currentUser && navigator.onLine) {
+                        await setDoc(userPresenceRef, {
+                            online: true,
+                            lastSeen: serverTimestamp(),
+                            userId: currentUser.uid,
+                            userName: profileUsername.textContent,
+                            sessionId: Date.now().toString(),
+                            userAgent: navigator.userAgent.substring(0, 100)
+                        }, { merge: true });
+                        
+                        console.log('JCHAT_DEBUG: Presence heartbeat sent for:', currentUser.uid);
+                    }
+                } catch (error) {
+                    console.log('JCHAT_DEBUG: Presence heartbeat failed:', error);
+                }
+            }, 30000); // Every 30 seconds
         }
 
         // Setup Notifications - Demo mode
