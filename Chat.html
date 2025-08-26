@@ -2628,22 +2628,14 @@
                         // Show success message
                         showNotification('Success', 'Successfully logged in!', 'success');
                     } else {
-                        // No user - use demo mode
-                        console.log('JCHAT_DEBUG: No user, using demo mode');
-                        currentUser = {
-                            uid: 'demo-user-' + Date.now(),
-                            displayName: 'Demo User',
-                            email: 'demo@jchat.com'
-                        };
-                        console.log('JCHAT_DEBUG: Using demo user:', currentUser.uid);
-                        
-                        // Show demo interface
-                        loadUserProfile();
-                        setupChatInterface();
-                        setupNotifications();
-                        
-                        // Hide loader after demo interface is ready
-                        hideLoader();
+                        console.log('JCHAT_DEBUG: No user authenticated. Blocking demo mode.');
+                        // Require authentication: hide chat UI and redirect to login
+                        if (chatMain) chatMain.style.display = 'none';
+                        if (welcomeScreen) welcomeScreen.style.display = 'none';
+                        showNotification('Login Required', 'Please sign in to use chat features.', 'error');
+                        setTimeout(() => {
+                            window.location.href = 'Login.html';
+                        }, 500);
                     }
                 });
 
