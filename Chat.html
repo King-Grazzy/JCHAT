@@ -492,15 +492,19 @@
 
         .status-indicator.online {
             background: var(--online-status);
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), 0 0 16px rgba(76, 175, 80, 0.3);
+            animation: onlineGlow 2s ease-in-out infinite;
         }
 
         .status-indicator.away {
             background: var(--away-status);
-            animation: awayPulse 3s ease-in-out infinite;
+            box-shadow: 0 0 8px rgba(255, 193, 7, 0.6), 0 0 16px rgba(255, 193, 7, 0.3);
+            animation: awayGlow 2s ease-in-out infinite;
         }
 
         .status-indicator.offline {
             background: var(--offline-status);
+            box-shadow: 0 0 4px rgba(44, 44, 44, 0.4);
         }
 
         .status-indicator.typing {
@@ -508,15 +512,30 @@
             animation: pulse 2s infinite;
         }
 
-        /* Away status animation */
-        @keyframes awayPulse {
+        /* Status indicator glow animations */
+        @keyframes onlineGlow {
             0%, 100% { 
-                opacity: 0.6; 
+                opacity: 0.8;
                 transform: scale(1);
+                box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), 0 0 16px rgba(76, 175, 80, 0.3);
             }
             50% { 
-                opacity: 1; 
-                transform: scale(1.05);
+                opacity: 1;
+                transform: scale(1.1);
+                box-shadow: 0 0 12px rgba(76, 175, 80, 0.8), 0 0 24px rgba(76, 175, 80, 0.5);
+            }
+        }
+
+        @keyframes awayGlow {
+            0%, 100% { 
+                opacity: 0.7;
+                transform: scale(1);
+                box-shadow: 0 0 8px rgba(255, 193, 7, 0.6), 0 0 16px rgba(255, 193, 7, 0.3);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.08);
+                box-shadow: 0 0 12px rgba(255, 193, 7, 0.8), 0 0 20px rgba(255, 193, 7, 0.4);
             }
         }
 
@@ -3886,10 +3905,32 @@
             }
         }
 
+        // Track user activity
+        function trackUserActivity(userId = null) {
+            const userIdToTrack = userId || currentUser?.uid;
+            if (userIdToTrack) {
+                const now = Date.now();
+                lastActivityTime.set(userIdToTrack, now);
+                userLastSeen.set(userIdToTrack, now);
+                
+                // Ensure current user is marked as online when active
+                if (userIdToTrack === currentUser?.uid) {
+                    if (awayUsers.has(userIdToTrack)) {
+                        awayUsers.delete(userIdToTrack);
+                        onlineUsers.add(userIdToTrack);
+                        updateOnlineStatus();
+                    }
+                }
+            }
+        }
+
         // Send Message
         async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text || !currentChatId || !currentUser) return;
+            
+            // Track user activity
+            trackUserActivity();
 
             messageInput.value = '';
             autoResizeTextarea();
@@ -3962,6 +4003,9 @@
         let typingTimeout;
         function handleTyping() {
             if (!currentChatId || !currentUser) return;
+            
+            // Track user activity on typing
+            trackUserActivity();
 
             // Show typing indicator to other users
             clearTimeout(typingTimeout);
@@ -4556,6 +4600,7 @@
         let presenceListener = null;
         let presenceHeartbeatInterval = null;
         let statusCheckInterval = null;
+        let lastActivityTime = new Map(); // Track last activity for all users
         
         // Setup Presence System
         async function setupPresenceSystem() {
@@ -4587,25 +4632,42 @@
                     offlineUsers.clear();
                     
                     const now = Date.now();
+                    const fiveMinutesAgo = now - (5 * 60 * 1000);
                     
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         const userId = doc.id;
                         console.log(`JCHAT_DEBUG: User ${userId} presence:`, data);
                         
-                        if (data.online) {
+                        // Get the last seen time from Firebase or our local cache
+                        const lastSeen = data.lastSeen ? 
+                            (data.lastSeen.toDate ? data.lastSeen.toDate().getTime() : data.lastSeen) : 
+                            lastActivityTime.get(userId) || now;
+                        
+                        // Update our activity tracking
+                        lastActivityTime.set(userId, lastSeen);
+                        userLastSeen.set(userId, lastSeen);
+                        
+                        // Determine status based on online flag AND last activity time
+                        const timeSinceLastSeen = now - lastSeen;
+                        
+                        if (data.online && timeSinceLastSeen < (2 * 60 * 1000)) {
+                            // User is marked online and was active within last 2 minutes
                             onlineUsers.add(userId);
-                            userLastSeen.set(userId, now);
+                        } else if (timeSinceLastSeen < (5 * 60 * 1000)) {
+                            // User was active within 5 minutes but not recently online
+                            awayUsers.add(userId);
                         } else {
-                            // User is not online, check last seen time
-                            const lastSeen = data.lastSeen ? 
-                                (data.lastSeen.toDate ? data.lastSeen.toDate().getTime() : data.lastSeen) : 
-                                userLastSeen.get(userId) || now;
-                            
-                            userLastSeen.set(userId, lastSeen);
+                            // User has been inactive for more than 5 minutes
+                            offlineUsers.add(userId);
+                        }
+                    });
+                    
+                    // Also check for users who might not have presence documents but we've seen before
+                    lastActivityTime.forEach((lastSeen, userId) => {
+                        if (!onlineUsers.has(userId) && !awayUsers.has(userId) && !offlineUsers.has(userId)) {
                             const timeSinceLastSeen = now - lastSeen;
-                            
-                            if (timeSinceLastSeen < 5 * 60 * 1000) { // Less than 5 minutes
+                            if (timeSinceLastSeen < (5 * 60 * 1000)) {
                                 awayUsers.add(userId);
                             } else {
                                 offlineUsers.add(userId);
@@ -4877,15 +4939,30 @@
         
         // Start Status Checking
         function startStatusChecking() {
-            // Check user statuses every minute to move away users to offline
+            // Check user statuses every 30 seconds to update presence more frequently
             statusCheckInterval = setInterval(() => {
                 const now = Date.now();
                 let statusChanged = false;
                 
+                // Check all online users to see if they should be moved to away
+                Array.from(onlineUsers).forEach(userId => {
+                    const lastSeen = lastActivityTime.get(userId) || userLastSeen.get(userId);
+                    if (lastSeen && (now - lastSeen) >= 2 * 60 * 1000) { // 2 minutes for away
+                        onlineUsers.delete(userId);
+                        if ((now - lastSeen) < 5 * 60 * 1000) {
+                            awayUsers.add(userId);
+                        } else {
+                            offlineUsers.add(userId);
+                        }
+                        statusChanged = true;
+                        console.log(`JCHAT_DEBUG: User ${userId} moved from online to ${(now - lastSeen) < 5 * 60 * 1000 ? 'away' : 'offline'}`);
+                    }
+                });
+                
                 // Check away users to see if they should be moved to offline
                 Array.from(awayUsers).forEach(userId => {
-                    const lastSeen = userLastSeen.get(userId);
-                    if (lastSeen && (now - lastSeen) >= 5 * 60 * 1000) { // 5 minutes
+                    const lastSeen = lastActivityTime.get(userId) || userLastSeen.get(userId);
+                    if (lastSeen && (now - lastSeen) >= 5 * 60 * 1000) { // 5 minutes for offline
                         awayUsers.delete(userId);
                         offlineUsers.add(userId);
                         statusChanged = true;
@@ -4894,9 +4971,10 @@
                 });
                 
                 if (statusChanged) {
+                    console.log('JCHAT_DEBUG: Status update triggered by timer');
                     updateOnlineStatus();
                 }
-            }, 60000); // Every minute
+            }, 30000); // Every 30 seconds
         }
 
         // Setup Notifications - Demo mode
