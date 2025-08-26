@@ -1447,6 +1447,109 @@
             justify-content: center;
         }
 
+        /* Bulk Delete Styles */
+        .bulk-action-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: var(--white);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .bulk-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .bulk-action-btn:active {
+            transform: scale(0.95);
+        }
+
+        .message-item.selected {
+            background: rgba(255, 193, 7, 0.2) !important;
+            border-left: 4px solid #FFC107 !important;
+            transform: scale(0.98);
+        }
+
+        .message-item.selectable {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .message-item.selectable:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .selected-count {
+            font-weight: 600;
+            color: #FFC107;
+        }
+
+        /* Chat More Options Dropdown */
+        .chat-more-dropdown {
+            position: fixed;
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .chat-more-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 12px 12px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 12px 12px;
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .dropdown-item span {
+            font-size: 0.9rem;
+        }
+
         .delete-btn {
             padding: 15px 30px;
             border: none;
@@ -2127,6 +2230,9 @@
                     </div>
                 </div>
                 <div class="chat-header-actions">
+                    <button class="chat-action-btn" id="clearAllBtn" title="Clear All Messages" style="color: #ff6b6b;">
+                        <i class="fas fa-broom"></i>
+                    </button>
                     <button class="chat-action-btn" id="voiceCallBtn" title="Voice Call">
                         <i class="fas fa-phone"></i>
                     </button>
@@ -3020,6 +3126,13 @@
             // Theme and logout
             themeToggle?.addEventListener('click', cycleTheme);
             logoutButton?.addEventListener('click', handleLogout);
+
+            // Delete functions
+            document.getElementById('clearAllBtn')?.addEventListener('click', showClearAllModal);
+            document.getElementById('chatMoreBtn')?.addEventListener('click', () => {
+                // Show dropdown menu for more options including bulk delete
+                showChatMoreOptions();
+            });
 
             // Message input auto-resize
             messageInput?.addEventListener('input', autoResizeTextarea);
@@ -4970,6 +5083,407 @@
             }
         }
 
+        // Check if chat is empty and show appropriate message
+        function checkIfChatEmpty() {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messages = messagesContainer.querySelectorAll('.message-item');
+            
+            if (messages.length === 0) {
+                messagesContainer.innerHTML = `
+                    <div class="empty-chat-message" style="text-align: center; padding: 40px 20px; color: var(--text-light);">
+                        <i class="fas fa-comments" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                        <p style="font-size: 1.1rem; margin: 0;">No messages yet</p>
+                        <p style="font-size: 0.9rem; margin: 5px 0 0 0; opacity: 0.7;">Start the conversation!</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Clear All Messages functionality
+        let isBulkDeleteMode = false;
+        let selectedMessages = new Set();
+
+        // Show Clear All Modal
+        function showClearAllModal() {
+            const clearAllModal = document.getElementById('clearAllModal');
+            clearAllModal.classList.add('active');
+            
+            // Add event listeners
+            document.getElementById('clearAllCancel').onclick = hideClearAllModal;
+            document.getElementById('clearAllConfirm').onclick = confirmClearAllMessages;
+            
+            // Close modal on backdrop click
+            clearAllModal.onclick = function(e) {
+                if (e.target === clearAllModal) {
+                    hideClearAllModal();
+                }
+            };
+        }
+
+        function hideClearAllModal() {
+            const clearAllModal = document.getElementById('clearAllModal');
+            clearAllModal.classList.remove('active');
+        }
+
+        async function confirmClearAllMessages() {
+            if (!currentChatId || !currentChatType) return;
+            
+            try {
+                // Show loading state
+                const confirmBtn = document.getElementById('clearAllConfirm');
+                const originalText = confirmBtn.innerHTML;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Clearing...';
+                confirmBtn.disabled = true;
+                
+                let messagesRef;
+                if (currentChatType === 'room') {
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "chat_rooms", currentChatId, "messages");
+                } else if (currentChatType === 'direct') {
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", currentChatId, "messages");
+                } else if (currentChatType === 'group') {
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages");
+                }
+                
+                // Get all messages
+                const messagesSnapshot = await getDocs(messagesRef);
+                const deletePromises = [];
+                
+                messagesSnapshot.forEach(doc => {
+                    deletePromises.push(deleteDoc(doc.ref));
+                });
+                
+                // Delete all messages
+                await Promise.all(deletePromises);
+                
+                hideClearAllModal();
+                showNotification('Success', `Cleared ${messagesSnapshot.size} messages`, 'success');
+                
+                // Clear UI with animation
+                const messagesContainer = document.getElementById('messagesContainer');
+                const messages = messagesContainer.querySelectorAll('.message-item');
+                
+                messages.forEach((message, index) => {
+                    setTimeout(() => {
+                        message.style.transform = 'translateY(-20px)';
+                        message.style.opacity = '0';
+                        message.style.transition = 'all 0.3s ease-out';
+                    }, index * 50);
+                });
+                
+                setTimeout(() => {
+                    checkIfChatEmpty();
+                }, messages.length * 50 + 300);
+                
+                // Reset button state
+                confirmBtn.innerHTML = originalText;
+                confirmBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('Error clearing all messages:', error);
+                hideClearAllModal();
+                showNotification('Error', 'Failed to clear messages. Please try again.', 'error');
+                
+                // Reset button state
+                const confirmBtn = document.getElementById('clearAllConfirm');
+                confirmBtn.innerHTML = '<i class="fas fa-broom"></i> Clear All Messages';
+                confirmBtn.disabled = false;
+            }
+        }
+
+        // Bulk Delete functionality
+        function showBulkDeleteModal() {
+            isBulkDeleteMode = true;
+            selectedMessages.clear();
+            
+            const bulkDeleteModal = document.getElementById('bulkDeleteModal');
+            bulkDeleteModal.classList.add('active');
+            
+            // Make messages selectable
+            const messages = document.querySelectorAll('.message-item');
+            messages.forEach(message => {
+                message.classList.add('selectable');
+                message.addEventListener('click', toggleMessageSelection);
+            });
+            
+            // Add event listeners
+            document.getElementById('bulkDeleteCancel').onclick = hideBulkDeleteModal;
+            document.getElementById('bulkDeleteConfirm').onclick = confirmBulkDelete;
+            document.getElementById('selectAllMessages').onclick = selectAllMessages;
+            document.getElementById('deselectAllMessages').onclick = deselectAllMessages;
+            document.getElementById('selectMyMessages').onclick = selectMyMessages;
+            document.getElementById('selectLastHour').onclick = selectLastHour;
+            document.getElementById('selectToday').onclick = selectToday;
+            
+            updateSelectedCount();
+        }
+
+        function hideBulkDeleteModal() {
+            isBulkDeleteMode = false;
+            selectedMessages.clear();
+            
+            const bulkDeleteModal = document.getElementById('bulkDeleteModal');
+            bulkDeleteModal.classList.remove('active');
+            
+            // Remove selectable class and event listeners
+            const messages = document.querySelectorAll('.message-item');
+            messages.forEach(message => {
+                message.classList.remove('selectable', 'selected');
+                message.removeEventListener('click', toggleMessageSelection);
+            });
+        }
+
+        function toggleMessageSelection(event) {
+            if (!isBulkDeleteMode) return;
+            
+            const messageElement = event.currentTarget;
+            const messageId = messageElement.dataset.messageId;
+            
+            if (selectedMessages.has(messageId)) {
+                selectedMessages.delete(messageId);
+                messageElement.classList.remove('selected');
+            } else {
+                selectedMessages.add(messageId);
+                messageElement.classList.add('selected');
+            }
+            
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const countElement = document.getElementById('selectedMessageCount');
+            const confirmBtn = document.getElementById('bulkDeleteConfirm');
+            const count = selectedMessages.size;
+            
+            countElement.textContent = `${count} message${count !== 1 ? 's' : ''} selected`;
+            confirmBtn.disabled = count === 0;
+            
+            if (count > 0) {
+                confirmBtn.innerHTML = `<i class="fas fa-trash"></i> Delete ${count} Message${count !== 1 ? 's' : ''}`;
+            } else {
+                confirmBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Selected';
+            }
+        }
+
+        function selectAllMessages() {
+            const messages = document.querySelectorAll('.message-item');
+            selectedMessages.clear();
+            
+            messages.forEach(message => {
+                const messageId = message.dataset.messageId;
+                selectedMessages.add(messageId);
+                message.classList.add('selected');
+            });
+            
+            updateSelectedCount();
+        }
+
+        function deselectAllMessages() {
+            selectedMessages.clear();
+            
+            const messages = document.querySelectorAll('.message-item.selected');
+            messages.forEach(message => {
+                message.classList.remove('selected');
+            });
+            
+            updateSelectedCount();
+        }
+
+        function selectMyMessages() {
+            const messages = document.querySelectorAll('.message-item');
+            selectedMessages.clear();
+            
+            messages.forEach(message => {
+                message.classList.remove('selected');
+                if (message.classList.contains('own-message')) {
+                    const messageId = message.dataset.messageId;
+                    selectedMessages.add(messageId);
+                    message.classList.add('selected');
+                }
+            });
+            
+            updateSelectedCount();
+        }
+
+        function selectLastHour() {
+            const oneHourAgo = Date.now() - (60 * 60 * 1000);
+            const messages = document.querySelectorAll('.message-item');
+            selectedMessages.clear();
+            
+            messages.forEach(message => {
+                message.classList.remove('selected');
+                const timestamp = parseInt(message.dataset.timestamp || '0');
+                if (timestamp > oneHourAgo) {
+                    const messageId = message.dataset.messageId;
+                    selectedMessages.add(messageId);
+                    message.classList.add('selected');
+                }
+            });
+            
+            updateSelectedCount();
+        }
+
+        function selectToday() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayTimestamp = today.getTime();
+            
+            const messages = document.querySelectorAll('.message-item');
+            selectedMessages.clear();
+            
+            messages.forEach(message => {
+                message.classList.remove('selected');
+                const timestamp = parseInt(message.dataset.timestamp || '0');
+                if (timestamp > todayTimestamp) {
+                    const messageId = message.dataset.messageId;
+                    selectedMessages.add(messageId);
+                    message.classList.add('selected');
+                }
+            });
+            
+            updateSelectedCount();
+        }
+
+        async function confirmBulkDelete() {
+            if (selectedMessages.size === 0) return;
+            
+            try {
+                // Show loading state
+                const confirmBtn = document.getElementById('bulkDeleteConfirm');
+                const originalText = confirmBtn.innerHTML;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                confirmBtn.disabled = true;
+                
+                const deletePromises = [];
+                
+                selectedMessages.forEach(messageId => {
+                    let messageRef;
+                    if (currentChatType === 'room') {
+                        messageRef = doc(db, "artifacts", appId, "public", "data", "chat_rooms", currentChatId, "messages", messageId);
+                    } else if (currentChatType === 'direct') {
+                        messageRef = doc(db, "artifacts", appId, "public", "data", "chats", currentChatId, "messages", messageId);
+                    } else if (currentChatType === 'group') {
+                        messageRef = doc(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages", messageId);
+                    }
+                    
+                    if (messageRef) {
+                        deletePromises.push(deleteDoc(messageRef));
+                    }
+                });
+                
+                await Promise.all(deletePromises);
+                
+                hideBulkDeleteModal();
+                showNotification('Success', `Deleted ${selectedMessages.size} messages`, 'success');
+                
+                // Remove messages from UI with staggered animation
+                const selectedElements = document.querySelectorAll('.message-item.selected');
+                selectedElements.forEach((element, index) => {
+                    setTimeout(() => {
+                        element.style.transform = 'translateX(-100%)';
+                        element.style.opacity = '0';
+                        element.style.transition = 'all 0.3s ease-out';
+                        setTimeout(() => element.remove(), 300);
+                    }, index * 100);
+                });
+                
+                setTimeout(() => {
+                    checkIfChatEmpty();
+                }, selectedElements.length * 100 + 300);
+                
+                // Reset button state
+                confirmBtn.innerHTML = originalText;
+                confirmBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('Error bulk deleting messages:', error);
+                showNotification('Error', 'Failed to delete some messages. Please try again.', 'error');
+                
+                // Reset button state
+                const confirmBtn = document.getElementById('bulkDeleteConfirm');
+                confirmBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Selected';
+                confirmBtn.disabled = false;
+            }
+        }
+
+        // Chat More Options Dropdown
+        function showChatMoreOptions() {
+            // Create dropdown if it doesn't exist
+            let dropdown = document.getElementById('chatMoreDropdown');
+            if (!dropdown) {
+                dropdown = document.createElement('div');
+                dropdown.id = 'chatMoreDropdown';
+                dropdown.className = 'chat-more-dropdown';
+                dropdown.innerHTML = `
+                    <div class="dropdown-item" onclick="showBulkDeleteModal()">
+                        <i class="fas fa-check-square"></i>
+                        <span>Bulk Delete Messages</span>
+                    </div>
+                    <div class="dropdown-item" onclick="exportChat()">
+                        <i class="fas fa-download"></i>
+                        <span>Export Chat</span>
+                    </div>
+                    <div class="dropdown-item" onclick="showChatSettings()">
+                        <i class="fas fa-cog"></i>
+                        <span>Chat Settings</span>
+                    </div>
+                `;
+                document.body.appendChild(dropdown);
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!e.target.closest('#chatMoreBtn') && !e.target.closest('#chatMoreDropdown')) {
+                        dropdown.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Position dropdown near the button
+            const moreBtn = document.getElementById('chatMoreBtn');
+            const rect = moreBtn.getBoundingClientRect();
+            dropdown.style.top = (rect.bottom + 5) + 'px';
+            dropdown.style.right = (window.innerWidth - rect.right) + 'px';
+            
+            dropdown.classList.toggle('active');
+        }
+
+        // Export Chat functionality
+        function exportChat() {
+            if (!currentChatId || !currentChatType) return;
+            
+            const messages = document.querySelectorAll('.message-item');
+            let chatExport = `JCHAT Export - ${new Date().toLocaleDateString()}\n`;
+            chatExport += `Chat: ${document.getElementById('chatHeaderName').textContent}\n`;
+            chatExport += `Type: ${currentChatType}\n`;
+            chatExport += `Messages: ${messages.length}\n\n`;
+            chatExport += '='.repeat(50) + '\n\n';
+            
+            messages.forEach(message => {
+                const sender = message.querySelector('.message-sender')?.textContent || 'Unknown';
+                const content = message.querySelector('.message-text')?.textContent || '[Media/File]';
+                const time = message.querySelector('.message-time')?.textContent || '';
+                
+                chatExport += `[${time}] ${sender}: ${content}\n`;
+            });
+            
+            // Download as text file
+            const blob = new Blob([chatExport], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `jchat-export-${currentChatId}-${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Success', 'Chat exported successfully', 'success');
+            document.getElementById('chatMoreDropdown').classList.remove('active');
+        }
+
+        // Chat Settings (placeholder)
+        function showChatSettings() {
+            showNotification('Info', 'Chat settings coming soon!', 'info');
+            document.getElementById('chatMoreDropdown').classList.remove('active');
+        }
+
         // Theme Management
         function applySavedTheme() {
             const savedTheme = localStorage.getItem('jchat-theme') || 'theme-dark-mode';
@@ -5042,5 +5556,67 @@
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', initializeChatApp);
     </script>
+
+    <!-- Clear All Messages Modal -->
+    <div class="modal-overlay" id="clearAllModal">
+        <div class="delete-modal-content" style="max-width: 500px;">
+            <div class="delete-icon" style="color: #ff6b6b;">
+                <i class="fas fa-broom"></i>
+            </div>
+            <h3 class="delete-title">Clear All Messages</h3>
+            <p class="delete-message">Are you sure you want to delete ALL messages in this chat? This will permanently remove the entire conversation history.</p>
+            <div class="delete-warning" style="background: rgba(255, 107, 107, 0.1); border-left: 3px solid #ff6b6b;">
+                <i class="fas fa-exclamation-triangle" style="color: #ff6b6b;"></i>
+                <span><strong>WARNING:</strong> This action cannot be undone and will delete all messages for everyone in this chat.</span>
+            </div>
+            <div class="delete-actions">
+                <button id="clearAllCancel" class="delete-btn delete-btn-cancel">Cancel</button>
+                <button id="clearAllConfirm" class="delete-btn delete-btn-confirm" style="background: #ff6b6b;">
+                    <i class="fas fa-broom"></i> Clear All Messages
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bulk Delete Modal -->
+    <div class="modal-overlay" id="bulkDeleteModal">
+        <div class="delete-modal-content" style="max-width: 600px;">
+            <div class="delete-icon" style="color: #ffa500;">
+                <i class="fas fa-check-square"></i>
+            </div>
+            <h3 class="delete-title">Bulk Delete Messages</h3>
+            <p class="delete-message">Select messages to delete. Click on messages to select them, then confirm deletion.</p>
+            
+            <div class="bulk-delete-controls" style="margin: 20px 0; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="selectAllMessages" class="bulk-action-btn">
+                    <i class="fas fa-check-square"></i> Select All
+                </button>
+                <button id="deselectAllMessages" class="bulk-action-btn">
+                    <i class="fas fa-square"></i> Deselect All
+                </button>
+                <button id="selectMyMessages" class="bulk-action-btn">
+                    <i class="fas fa-user"></i> Select My Messages
+                </button>
+                <button id="selectLastHour" class="bulk-action-btn">
+                    <i class="fas fa-clock"></i> Last Hour
+                </button>
+                <button id="selectToday" class="bulk-action-btn">
+                    <i class="fas fa-calendar-day"></i> Today
+                </button>
+            </div>
+            
+            <div class="selected-count" style="margin: 15px 0; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 8px; text-align: center;">
+                <span id="selectedMessageCount">0 messages selected</span>
+            </div>
+            
+            <div class="delete-actions">
+                <button id="bulkDeleteCancel" class="delete-btn delete-btn-cancel">Cancel</button>
+                <button id="bulkDeleteConfirm" class="delete-btn delete-btn-confirm" disabled>
+                    <i class="fas fa-trash"></i> Delete Selected
+                </button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
