@@ -667,6 +667,26 @@
             align-items: flex-end;
             gap: 4px;
         }
+        
+        .join-group-btn {
+            background: linear-gradient(135deg, var(--blue), var(--pink));
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .join-group-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        }
 
         .chat-time {
             font-size: 0.8rem;
@@ -3387,13 +3407,15 @@
         async function loadGroups() {
             try {
                 const groupsRef = collection(db, "artifacts", appId, "public", "data", "groups");
-                const q = query(
+                
+                // Load user's groups
+                const userGroupsQuery = query(
                     groupsRef,
                     where("members", "array-contains", currentUser.uid)
                 );
                 
-                const snapshot = await getDocs(q);
-                return snapshot.docs.map(doc => {
+                const userGroupsSnapshot = await getDocs(userGroupsQuery);
+                const userGroups = userGroupsSnapshot.docs.map(doc => {
                     const data = doc.data();
                     return {
                         id: doc.id,
@@ -3401,13 +3423,44 @@
                         name: data.info?.name || data.name || 'Group Chat',
                         description: data.info?.description || data.description || '',
                         members: data.members || data.info?.members || [],
-                        memberCount: (data.members || data.info?.members || []).length,
+                        memberCount: data.info?.memberCount || (data.members || data.info?.members || []).length,
                         lastMessage: data.lastMessage,
                         adminIds: data.info?.adminIds || data.adminIds || [],
                         createdAt: data.info?.createdAt || data.createdAt,
-                        createdBy: data.info?.createdBy || data.createdBy
+                        createdBy: data.info?.createdBy || data.createdBy,
+                        isMember: true
                     };
                 });
+                
+                // Load public groups user can join (limit to 10 to avoid performance issues)
+                const publicGroupsQuery = query(
+                    groupsRef,
+                    where("info.isPublic", "==", true),
+                    limit(10)
+                );
+                
+                const publicGroupsSnapshot = await getDocs(publicGroupsQuery);
+                const publicGroups = publicGroupsSnapshot.docs
+                    .filter(doc => !userGroups.some(userGroup => userGroup.id === doc.id)) // Exclude user's groups
+                    .map(doc => {
+                        const data = doc.data();
+                        return {
+                            id: doc.id,
+                            type: 'group',
+                            name: data.info?.name || data.name || 'Group Chat',
+                            description: data.info?.description || data.description || '',
+                            members: data.members || data.info?.members || [],
+                            memberCount: data.info?.memberCount || (data.members || data.info?.members || []).length,
+                            lastMessage: data.lastMessage,
+                            adminIds: data.info?.adminIds || data.adminIds || [],
+                            createdAt: data.info?.createdAt || data.createdAt,
+                            createdBy: data.info?.createdBy || data.createdBy,
+                            isPublic: true,
+                            isMember: false
+                        };
+                    });
+                
+                return [...userGroups, ...publicGroups];
             } catch (error) {
                 console.log('JCHAT_DEBUG: No groups found or collection doesn\'t exist yet:', error.message);
                 return []; // Return empty array if collection doesn't exist
@@ -3512,6 +3565,27 @@
             } else if (chat.type === 'group') {
                 avatarContent = '<i class="fas fa-users"></i>';
                 chatName = chat.name || 'Group Chat';
+                
+                // Show join button for public groups user is not a member of
+                if (chat.isPublic && !chat.isMember) {
+                    return `
+                        <div class="chat-item ${isActive ? 'active' : ''}" data-chat-id="${chat.id}" data-chat-type="${chat.type}">
+                            <div class="chat-avatar">
+                                ${avatarContent}
+                            </div>
+                            <div class="chat-info">
+                                <h4 class="chat-name">${chatName}</h4>
+                                <p class="chat-last-message">${chat.description || 'Public group'}</p>
+                            </div>
+                            <div class="chat-meta">
+                                <span class="chat-time">${chat.memberCount || 0} members</span>
+                                <button class="join-group-btn" onclick="joinGroup('${chat.id}', '${chat.name}')">
+                                    <i class="fas fa-plus"></i> Join
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
             }
 
             // Determine status message for friends and chats
@@ -4562,7 +4636,10 @@
                         adminIds: [currentUser.uid],
                         members: members,
                         createdAt: serverTimestamp(),
-                        createdBy: currentUser.uid
+                        createdBy: currentUser.uid,
+                        isPublic: true, // Make groups public by default
+                        joinRequests: [], // Track join requests
+                        memberCount: members.length
                     },
                     lastMessage: {
                         text: `Welcome to ${groupName}!`,
@@ -5070,6 +5147,56 @@
         window.selectUserForDirectChat = selectUserForDirectChat;
         window.toggleUserForGroup = toggleUserForGroup;
         window.insertEmoji = insertEmoji;
+        window.joinGroup = joinGroup;
+        
+        // Join Group Function
+        async function joinGroup(groupId, groupName) {
+            try {
+                if (!currentUser) {
+                    showNotification('Error', 'You must be logged in to join a group', 'error');
+                    return;
+                }
+                
+                if (confirm(`Do you want to join "${groupName}"?`)) {
+                    showNotification('Joining', `Joining "${groupName}"...`, 'info');
+                    
+                    const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", groupId);
+                    const groupDoc = await getDoc(groupRef);
+                    
+                    if (!groupDoc.exists()) {
+                        showNotification('Error', 'Group not found', 'error');
+                        return;
+                    }
+                    
+                    const groupData = groupDoc.data();
+                    const currentMembers = groupData.info?.members || groupData.members || [];
+                    
+                    if (currentMembers.includes(currentUser.uid)) {
+                        showNotification('Info', 'You are already a member of this group', 'info');
+                        return;
+                    }
+                    
+                    // Add user to group members
+                    const updatedMembers = [...currentMembers, currentUser.uid];
+                    const updatedMemberCount = groupData.info?.memberCount || currentMembers.length + 1;
+                    
+                    await updateDoc(groupRef, {
+                        'info.members': updatedMembers,
+                        'info.memberCount': updatedMemberCount
+                    });
+                    
+                    showNotification('Success', `Successfully joined "${groupName}"!`, 'success');
+                    
+                    // Refresh the groups list
+                    setTimeout(() => {
+                        loadChatList('groups');
+                    }, 1000);
+                }
+            } catch (error) {
+                console.error('Error joining group:', error);
+                showNotification('Error', `Failed to join group: ${error.message}`, 'error');
+            }
+        }
         window.playVoiceMessage = function(url) {
             audioPlayback.src = url;
             audioPlayback.play();
