@@ -3716,6 +3716,245 @@
                 padding: 6px;
             }
         }
+
+        /* ===== GROUPS TAB INTERFACE STYLES ===== */
+        
+        .groups-tab-content {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .groups-tab-content.active {
+            display: flex;
+        }
+
+        .groups-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .groups-header h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(90deg, var(--blue), var(--pink));
+            margin-bottom: 10px;
+        }
+
+        .groups-header p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .groups-section {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .2);
+        }
+
+        .groups-section h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            background-clip: text;
+            color: transparent;
+            background-image: linear-gradient(90deg, var(--blue), var(--pink));
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .group-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .group-card {
+            background: var(--input-background);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .group-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .group-card .group-avatar-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            background-image: linear-gradient(90deg, var(--blue), var(--pink));
+            border: 2px solid var(--blue);
+            flex-shrink: 0;
+            margin-bottom: 5px;
+        }
+
+        .group-card h3 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--white);
+            margin: 0;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .group-card p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            text-align: center;
+            flex-grow: 1;
+            line-height: 1.3;
+        }
+
+        .group-card .member-count {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .group-card .member-count i {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            background-image: linear-gradient(90deg, var(--blue), var(--pink));
+        }
+
+        .group-card .action-button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(0, 213, 255, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+
+        .group-card .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .group-card .action-button.leave-button {
+            background: var(--error);
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .no-groups-message {
+            text-align: center;
+            color: var(--text-light);
+            padding: 15px;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .create-group-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            color: var(--white);
+            border: none;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            font-size: 1.6rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            z-index: 70;
+        }
+
+        .create-group-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .groups-tab-content {
+                padding: 15px;
+            }
+
+            .groups-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .groups-section {
+                padding: 15px;
+            }
+
+            .group-cards-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .group-card {
+                padding: 12px;
+            }
+
+            .group-card .group-avatar-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 2rem;
+            }
+
+            .group-card h3 {
+                font-size: 1.1rem;
+            }
+
+            .create-group-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.4rem;
+                bottom: 15px;
+            }
+        }
     </style>
 </head>
 <body class="theme-dark-mode">
@@ -3797,6 +4036,36 @@
             </div>
             
             <div class="chat-list" id="chatList">
+                <!-- Groups Tab Content -->
+                <div class="groups-tab-content" id="groupsTabContent">
+                    <div class="groups-header">
+                        <h1>JCHAT Groups</h1>
+                        <p>Connect with communities and chat with multiple friends.</p>
+                    </div>
+
+                    <!-- My Groups Section -->
+                    <div class="groups-section">
+                        <h2>My Groups</h2>
+                        <p class="no-groups-message" id="loadingMyGroupsMessage">Loading your groups...</p>
+                        <div id="myGroupsGrid" class="group-cards-grid">
+                            <!-- My groups will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Discover Groups Section -->
+                    <div class="groups-section">
+                        <h2>Discover Groups</h2>
+                        <p class="no-groups-message" id="loadingDiscoverGroupsMessage">Loading public groups...</p>
+                        <div id="discoverGroupsGrid" class="group-cards-grid">
+                            <!-- Discoverable groups will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Create Group Button -->
+                <button class="create-group-btn" id="createGroupBtn" aria-label="Create New Group">
+                    <i class="fas fa-plus"></i>
+                </button>
                 <!-- Chat items will be dynamically loaded here -->
             </div>
         </aside>
@@ -4997,6 +5266,11 @@
                 btn.classList.toggle('active', btn.dataset.tab === tab);
             });
 
+            // Hide Groups content when switching to other tabs
+            if (tab !== 'groups') {
+                hideGroupsTabContent();
+            }
+
             loadChatList(tab);
             
             // If switching to direct tab, ensure status indicators are updated
@@ -5024,7 +5298,9 @@
                         chats = await loadDirectChats();
                         break;
                     case 'groups':
-                        chats = await loadGroups();
+                        // Show Groups interface in the chat list area
+                        showGroupsInChatList();
+                        return; // Don't render regular chat list for groups
                         break;
                 }
 
@@ -5307,6 +5583,11 @@
 
         // Render Chat List
         function renderChatList(chats, type) {
+            // Show all chat items when rendering regular chat list
+            chatList.querySelectorAll('.chat-item').forEach(item => {
+                item.style.display = 'block';
+            });
+
             if (chats.length === 0) {
                 chatList.innerHTML = `
                     <div style="padding: 20px; text-align: center; color: var(--text-light);">
@@ -11277,6 +11558,266 @@
         window.addEventListener('resize', () => {
             setTimeout(manageHeaderOverflow, 100);
         });
+
+        // ===== GROUPS TAB FUNCTIONS =====
+
+        // Global Groups Variables
+        let myGroupsData = [];
+        let allPublicGroupsData = [];
+
+        // Show Groups in Chat List
+        function showGroupsInChatList() {
+            // Hide regular chat list
+            const chatList = document.getElementById('chatList');
+            const groupsTabContent = document.getElementById('groupsTabContent');
+            const createGroupBtn = document.getElementById('createGroupBtn');
+            
+            // Hide all chat items
+            chatList.querySelectorAll('.chat-item').forEach(item => {
+                item.style.display = 'none';
+            });
+            
+            // Show groups content
+            groupsTabContent.classList.add('active');
+            createGroupBtn.style.display = 'flex';
+            
+            // Load groups data
+            loadGroupsData();
+        }
+
+        // Hide Groups Tab Content
+        function hideGroupsTabContent() {
+            const groupsTabContent = document.getElementById('groupsTabContent');
+            const createGroupBtn = document.getElementById('createGroupBtn');
+            
+            groupsTabContent.classList.remove('active');
+            createGroupBtn.style.display = 'none';
+        }
+
+        // Load Groups Data
+        async function loadGroupsData() {
+            try {
+                const groupsRef = collection(db, "artifacts", appId, "public", "data", "groups");
+                
+                // Load user's groups
+                const userGroupsQuery = query(
+                    groupsRef,
+                    where("members", "array-contains", currentUser.uid)
+                );
+                
+                const userGroupsSnapshot = await getDocs(userGroupsQuery);
+                myGroupsData = userGroupsSnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        ...data
+                    };
+                });
+                
+                // Load ALL public groups
+                const publicGroupsQuery = query(groupsRef);
+                const publicGroupsSnapshot = await getDocs(publicGroupsQuery);
+                allPublicGroupsData = publicGroupsSnapshot.docs.map(doc => {
+                    const data = doc.data();
+                    const members = data.members || [];
+                    const isMember = members.includes(currentUser.uid);
+                    
+                    return {
+                        id: doc.id,
+                        ...data,
+                        isPublic: true,
+                        isMember: isMember
+                    };
+                });
+                
+                renderMyGroups();
+                renderDiscoverGroups();
+                
+            } catch (error) {
+                console.error('Error loading groups data:', error);
+                showMessageBox('Error loading groups: ' + error.message, 'error');
+            }
+        }
+
+        // Render My Groups
+        function renderMyGroups() {
+            const myGroupsGrid = document.getElementById('myGroupsGrid');
+            const loadingMessage = document.getElementById('loadingMyGroupsMessage');
+            
+            if (myGroupsData.length === 0) {
+                loadingMessage.textContent = "You are not a member of any groups yet. Discover new groups below!";
+                myGroupsGrid.innerHTML = '';
+                return;
+            }
+            
+            loadingMessage.style.display = 'none';
+            myGroupsGrid.innerHTML = myGroupsData.map(group => createGroupCardHTML(group, true)).join('');
+            
+            // Add event listeners to group cards
+            myGroupsGrid.querySelectorAll('.group-card').forEach(card => {
+                const groupId = card.dataset.groupId;
+                const group = myGroupsData.find(g => g.id === groupId);
+                
+                // Enter Chat button
+                const enterButton = card.querySelector('.enter-chat-button');
+                if (enterButton) {
+                    enterButton.addEventListener('click', () => {
+                        selectChat(groupId, 'group');
+                    });
+                }
+                
+                // Leave Group button
+                const leaveButton = card.querySelector('.leave-button');
+                if (leaveButton) {
+                    leaveButton.addEventListener('click', () => handleLeaveGroup(groupId, group.name, leaveButton));
+                }
+            });
+        }
+
+        // Render Discover Groups
+        function renderDiscoverGroups() {
+            const discoverGrid = document.getElementById('discoverGroupsGrid');
+            const loadingMessage = document.getElementById('loadingDiscoverGroupsMessage');
+            
+            if (allPublicGroupsData.length === 0) {
+                discoverGrid.innerHTML = '<p class="no-groups-message">No public groups found.</p>';
+                return;
+            }
+            
+            loadingMessage.style.display = 'none';
+            discoverGrid.innerHTML = allPublicGroupsData.map(group => createGroupCardHTML(group, group.isMember)).join('');
+            
+            // Add event listeners to discover group cards
+            discoverGrid.querySelectorAll('.group-card').forEach(card => {
+                const groupId = card.dataset.groupId;
+                const group = allPublicGroupsData.find(g => g.id === groupId);
+                
+                // Join/Enter button
+                const actionButton = card.querySelector('.enter-chat-button');
+                if (actionButton) {
+                    actionButton.addEventListener('click', () => {
+                        if (group.isMember) {
+                            selectChat(groupId, 'group');
+                        } else {
+                            handleJoinGroup(groupId, group.name, actionButton);
+                        }
+                    });
+                }
+            });
+        }
+
+        // Create Group Card HTML
+        function createGroupCardHTML(group, isMember) {
+            const actionText = isMember ? 'Enter Chat' : 'Join Group';
+            const actionIcon = isMember ? 'fas fa-comments' : 'fas fa-user-plus';
+            const isGroupAdmin = currentUser && group.admin === currentUser.uid;
+
+            return `
+                <div class="group-card" data-group-id="${group.id}">
+                    <i class="fas fa-users group-avatar-icon"></i>
+                    <h3>${group.name || 'Unnamed Group'}</h3>
+                    <p>${group.description || 'No description provided.'}</p>
+                    <span class="member-count"><i class="fas fa-users"></i> ${group.members?.length || 0} Members</span>
+                    <button class="action-button enter-chat-button" data-group-id="${group.id}" data-is-member="${isMember}">
+                        <i class="${actionIcon}"></i> ${actionText}
+                    </button>
+                    ${isMember && !isGroupAdmin ? `<button class="action-button leave-button" data-group-id="${group.id}">
+                        <i class="fas fa-sign-out-alt"></i> Leave Group
+                    </button>` : ''}
+                </div>
+            `;
+        }
+
+        // Handle Join Group
+        async function handleJoinGroup(groupId, groupName, buttonElement) {
+            if (!currentUser) {
+                showMessageBox("You must be logged in to join a group.", "error");
+                return;
+            }
+
+            const confirmed = confirm(`Do you want to join "${groupName}"?`);
+            if (!confirmed) return;
+
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Joining...';
+            showMessageBox(`Joining "${groupName}"...`, "loading", true);
+
+            try {
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", groupId);
+                await updateDoc(groupRef, {
+                    members: arrayUnion(currentUser.uid)
+                });
+
+                showMessageBox(`Successfully joined "${groupName}"!`, "success");
+                loadGroupsData(); // Refresh groups data
+            } catch (error) {
+                console.error("Error joining group:", error);
+                showMessageBox(`Failed to join group: ${error.message}`, "error");
+            } finally {
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = `<i class="${actionIcon}"></i> ${actionText}`;
+            }
+        }
+
+        // Handle Leave Group
+        async function handleLeaveGroup(groupId, groupName, buttonElement) {
+            if (!currentUser) {
+                showMessageBox("You must be logged in to leave a group.", "error");
+                return;
+            }
+
+            const confirmed = confirm(`Are you sure you want to leave "${groupName}"?`);
+            if (!confirmed) return;
+
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Leaving...';
+            showMessageBox(`Leaving "${groupName}"...`, "loading", true);
+
+            try {
+                const groupRef = doc(db, "artifacts", appId, "public", "data", "groups", groupId);
+                await updateDoc(groupRef, {
+                    members: arrayRemove(currentUser.uid)
+                });
+
+                showMessageBox(`Successfully left "${groupName}".`, "success");
+                loadGroupsData(); // Refresh groups data
+            } catch (error) {
+                console.error("Error leaving group:", error);
+                showMessageBox(`Failed to leave group: ${error.message}`, "error");
+            } finally {
+                buttonElement.disabled = false;
+                buttonElement.innerHTML = `<i class="fas fa-sign-out-alt"></i> Leave Group`;
+            }
+        }
+
+        // Add Groups Event Listeners
+        function addGroupsEventListeners() {
+            // Create Group Button
+            const createGroupBtn = document.getElementById('createGroupBtn');
+            if (createGroupBtn) {
+                createGroupBtn.addEventListener('click', () => {
+                    if (!currentUser) {
+                        showMessageBox("Please log in to create a group.", "error");
+                        return;
+                    }
+                    showModal('groupChatModal');
+                });
+            }
+        }
+
+        // Initialize Groups functionality
+        function initializeGroups() {
+            addGroupsEventListeners();
+        }
+
+        // Call initializeGroups when the app is ready
+        if (typeof initializeChatApp === 'function') {
+            const originalInit = initializeChatApp;
+            initializeChatApp = function() {
+                originalInit();
+                initializeGroups();
+            };
+        }
     </script>
 
     <!-- Clear All Messages Modal -->
