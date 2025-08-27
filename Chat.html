@@ -909,7 +909,7 @@
             min-height: 0; /* Allow shrinking in flex container */
             box-sizing: border-box;
             /* Take full available height minus header, chat header, and input */
-            height: calc(100vh - var(--header-height) - 60px - 80px);
+            height: calc(100vh - var(--header-height) - 60px - 100px);
         }
 
         .message {
@@ -1263,7 +1263,7 @@
 
         /* Message Input Area */
         .message-input-container {
-            padding: 15px 20px;
+            padding: 12px 20px 20px 20px;
             border-top: 1px solid var(--border-light);
             background: rgba(255, 255, 255, 0.05);
             position: sticky;
@@ -1272,14 +1272,15 @@
             backdrop-filter: blur(15px);
             flex-shrink: 0;
             display: block !important;
-            min-height: 80px;
+            min-height: 100px;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
             border-radius: 15px 15px 0 0;
-            /* Ensure it stays at the bottom */
+            /* Ensure it stays at the bottom with proper spacing */
             position: relative;
             bottom: 0;
             left: 0;
             right: 0;
+            margin-bottom: 10px;
         }
 
         .reply-preview {
@@ -1356,6 +1357,8 @@
             display: flex !important;
             gap: 8px;
             flex-shrink: 0;
+            align-items: center;
+            margin-top: 8px;
         }
 
         .input-action-btn {
@@ -1399,7 +1402,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: calc(100vh - var(--header-height) - 60px - 80px);
+            height: calc(100vh - var(--header-height) - 60px - 100px);
             text-align: center;
             padding: 40px;
             flex: 1;
@@ -2568,6 +2571,27 @@
                 height: 22px;
                 font-size: 0.65rem;
                 padding: 2px;
+            }
+            
+            .message-input-container {
+                padding: 10px 15px 25px 15px;
+                margin-bottom: 15px;
+            }
+            
+            .input-actions {
+                margin-top: 10px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .message-input-container {
+                padding: 8px 12px 20px 12px;
+                margin-bottom: 20px;
+            }
+            
+            .input-action-btn {
+                width: 36px;
+                height: 36px;
             }
         }
 
