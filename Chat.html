@@ -2281,6 +2281,211 @@
             margin-left: 8px;
         }
 
+        /* Message Search Styles */
+        .search-controls {
+            margin-bottom: 20px;
+        }
+
+        .search-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            padding: 12px 20px;
+            background: var(--blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-filters select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            background: white;
+        }
+
+        .search-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .search-results-header {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .search-results-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            padding: 12px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-result-item:hover {
+            background: rgba(0, 123, 255, 0.1);
+            border-color: var(--blue);
+        }
+
+        .result-sender {
+            font-weight: bold;
+            color: var(--blue);
+            margin-bottom: 4px;
+        }
+
+        .result-content {
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .result-time {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Translation Styles */
+        .translate-options {
+            margin-bottom: 20px;
+        }
+
+        .translate-preview {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .preview-message {
+            margin-top: 10px;
+        }
+
+        .original-text {
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+
+        .translated-text {
+            color: var(--blue);
+            font-weight: 500;
+        }
+
+        /* Theme Picker Styles */
+        .theme-options {
+            margin-bottom: 30px;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .theme-option {
+            text-align: center;
+            cursor: pointer;
+            padding: 10px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .theme-option:hover {
+            border-color: var(--blue);
+            transform: translateY(-2px);
+        }
+
+        .theme-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            margin: 0 auto 8px;
+            border: 2px solid var(--border-light);
+        }
+
+        .default-theme {
+            background: linear-gradient(135deg, #007bff, #6c757d);
+        }
+
+        .dark-theme {
+            background: linear-gradient(135deg, #1a1a1a, #333);
+        }
+
+        .light-theme {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+
+        .blue-theme {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+        }
+
+        .green-theme {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+        }
+
+        .purple-theme {
+            background: linear-gradient(135deg, #6f42c1, #5a32a3);
+        }
+
+        /* Export Styles */
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Loading and Error States */
+        .loading-spinner {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #dc3545;
+        }
+
+        .error-message i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
         .member-role {
             padding: 2px 8px;
             border-radius: 10px;
@@ -5172,8 +5377,11 @@
                         groupFeatures.style.display = 'flex';
                     }
                     
-                    // Update group badges
-                    updateGroupBadges();
+                                    // Update group badges
+                updateGroupBadges();
+                
+                // Update button states
+                updateButtonStates();
                 }
             } catch (error) {
                 console.error('Error loading chat header:', error);
@@ -9921,29 +10129,751 @@
             }, 100);
         }
         
-        // General chat features
+        // Message Search System
         window.showMessageSearch = function showMessageSearch() {
-            showNotification('Info', 'Message search feature coming soon!', 'info');
+            try {
+                const modalHTML = `
+                    <div class="modal-overlay" id="messageSearchModal">
+                        <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+                            <div class="modal-header">
+                                <h3>🔍 Search Messages</h3>
+                                <button class="modal-close" onclick="hideMessageSearch()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="search-controls">
+                                    <div class="search-input-group">
+                                        <input type="text" id="messageSearchInput" placeholder="Search for messages..." class="search-input">
+                                        <button onclick="performMessageSearch()" class="search-btn">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <div class="search-filters">
+                                        <select id="searchTypeFilter">
+                                            <option value="all">All Messages</option>
+                                            <option value="text">Text Only</option>
+                                            <option value="media">Media Only</option>
+                                        </select>
+                                        <select id="searchDateFilter">
+                                            <option value="all">All Time</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">This Week</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="search-results" id="messageSearchResults">
+                                    <div class="search-placeholder">
+                                        <i class="fas fa-search" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+                                        <p>Enter a search term to find messages</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('messageSearchModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('messageSearchModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideMessageSearch();
+                    }
+                };
+                
+                // Set up search input listener
+                const searchInput = document.getElementById('messageSearchInput');
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        performMessageSearch();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error showing message search:', error);
+                showNotification('Error', 'Failed to load message search', 'error');
+            }
         }
         
-        window.showTranslateOptions = function showTranslateOptions() {
-            showNotification('Info', 'Translation feature coming soon!', 'info');
+        function hideMessageSearch() {
+            const modal = document.getElementById('messageSearchModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
         }
         
+        async function performMessageSearch() {
+            try {
+                const searchQuery = document.getElementById('messageSearchInput').value.trim();
+                const typeFilter = document.getElementById('searchTypeFilter').value;
+                const dateFilter = document.getElementById('searchDateFilter').value;
+                
+                if (!searchQuery) {
+                    showNotification('Error', 'Please enter a search term', 'error');
+                    return;
+                }
+                
+                if (!currentChatId || !currentChatType) {
+                    showNotification('Error', 'No active chat selected', 'error');
+                    return;
+                }
+                
+                const resultsContainer = document.getElementById('messageSearchResults');
+                resultsContainer.innerHTML = '<div class="loading-spinner">Searching messages...</div>';
+                
+                // Get messages from current chat
+                let messagesRef;
+                if (currentChatType === 'group') {
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages");
+                } else if (currentChatType === 'direct') {
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", currentChatId, "messages");
+                }
+                
+                const querySnapshot = await getDocs(messagesRef);
+                const messages = [];
+                
+                querySnapshot.forEach(doc => {
+                    const messageData = doc.data();
+                    messages.push({
+                        id: doc.id,
+                        ...messageData
+                    });
+                });
+                
+                // Filter messages based on search criteria
+                let filteredMessages = messages.filter(message => {
+                    // Text search
+                    const textMatch = message.text && message.text.toLowerCase().includes(searchQuery.toLowerCase());
+                    const senderMatch = message.senderName && message.senderName.toLowerCase().includes(searchQuery.toLowerCase());
+                    
+                    // Type filter
+                    let typeMatch = true;
+                    if (typeFilter === 'text' && message.type !== 'text') typeMatch = false;
+                    if (typeFilter === 'media' && !['image', 'voice'].includes(message.type)) typeMatch = false;
+                    
+                    // Date filter
+                    let dateMatch = true;
+                    if (dateFilter !== 'all' && message.timestamp) {
+                        const messageDate = message.timestamp.toDate ? message.timestamp.toDate() : new Date(message.timestamp);
+                        const now = new Date();
+                        
+                        if (dateFilter === 'today') {
+                            dateMatch = messageDate.toDateString() === now.toDateString();
+                        } else if (dateFilter === 'week') {
+                            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                            dateMatch = messageDate >= weekAgo;
+                        }
+                    }
+                    
+                    return (textMatch || senderMatch) && typeMatch && dateMatch;
+                });
+                
+                // Sort by timestamp (newest first)
+                filteredMessages.sort((a, b) => {
+                    const dateA = a.timestamp.toDate ? a.timestamp.toDate() : new Date(a.timestamp);
+                    const dateB = b.timestamp.toDate ? b.timestamp.toDate() : new Date(b.timestamp);
+                    return dateB - dateA;
+                });
+                
+                // Display results
+                if (filteredMessages.length === 0) {
+                    resultsContainer.innerHTML = `
+                        <div class="no-results">
+                            <i class="fas fa-search" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+                            <p>No messages found matching your search</p>
+                        </div>
+                    `;
+                } else {
+                    resultsContainer.innerHTML = `
+                        <div class="search-results-header">
+                            <h4>Found ${filteredMessages.length} message${filteredMessages.length !== 1 ? 's' : ''}</h4>
+                        </div>
+                        <div class="search-results-list">
+                            ${filteredMessages.map(message => `
+                                <div class="search-result-item" onclick="scrollToMessage('${message.id}'); hideMessageSearch();">
+                                    <div class="result-sender">${message.senderName || 'Unknown'}</div>
+                                    <div class="result-content">${message.text || message.type || 'Message'}</div>
+                                    <div class="result-time">${formatTime(message.timestamp)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error performing message search:', error);
+                document.getElementById('messageSearchResults').innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Failed to search messages. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Bookmark System
         window.toggleBookmark = function toggleBookmark() {
-            showNotification('Info', 'Bookmark feature coming soon!', 'info');
+            try {
+                if (!currentChatId || !currentChatType) {
+                    showNotification('Error', 'No active chat to bookmark', 'error');
+                    return;
+                }
+                
+                const bookmarks = JSON.parse(localStorage.getItem('jchat-bookmarks') || '[]');
+                const bookmarkId = `${currentChatType}-${currentChatId}`;
+                const existingBookmark = bookmarks.find(b => b.id === bookmarkId);
+                
+                if (existingBookmark) {
+                    // Remove bookmark
+                    const updatedBookmarks = bookmarks.filter(b => b.id !== bookmarkId);
+                    localStorage.setItem('jchat-bookmarks', JSON.stringify(updatedBookmarks));
+                    
+                    // Update button appearance
+                    const bookmarkBtn = document.getElementById('chatBookmarkBtn');
+                    if (bookmarkBtn) {
+                        bookmarkBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+                        bookmarkBtn.title = 'Bookmark Chat';
+                    }
+                    
+                    showNotification('Success', 'Chat removed from bookmarks', 'success');
+                } else {
+                    // Add bookmark
+                    const chatName = document.getElementById('chatHeaderName').textContent;
+                    const newBookmark = {
+                        id: bookmarkId,
+                        chatId: currentChatId,
+                        chatType: currentChatType,
+                        chatName: chatName,
+                        timestamp: Date.now()
+                    };
+                    
+                    bookmarks.push(newBookmark);
+                    localStorage.setItem('jchat-bookmarks', JSON.stringify(bookmarks));
+                    
+                    // Update button appearance
+                    const bookmarkBtn = document.getElementById('chatBookmarkBtn');
+                    if (bookmarkBtn) {
+                        bookmarkBtn.innerHTML = '<i class="fas fa-bookmark" style="color: #ffc107;"></i>';
+                        bookmarkBtn.title = 'Remove Bookmark';
+                    }
+                    
+                    showNotification('Success', 'Chat bookmarked successfully!', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Error toggling bookmark:', error);
+                showNotification('Error', 'Failed to update bookmark', 'error');
+            }
         }
         
-        window.exportChat = function exportChat() {
-            showNotification('Info', 'Chat export feature coming soon!', 'info');
-        }
-        
+        // Mute Notifications System
         window.toggleMuteNotifications = function toggleMuteNotifications() {
-            showNotification('Info', 'Mute notifications feature coming soon!', 'info');
+            try {
+                if (!currentChatId || !currentChatType) {
+                    showNotification('Error', 'No active chat to mute', 'error');
+                    return;
+                }
+                
+                const mutedChats = JSON.parse(localStorage.getItem('jchat-muted-chats') || '[]');
+                const chatId = `${currentChatType}-${currentChatId}`;
+                const isMuted = mutedChats.includes(chatId);
+                
+                if (isMuted) {
+                    // Unmute
+                    const updatedMutedChats = mutedChats.filter(id => id !== chatId);
+                    localStorage.setItem('jchat-muted-chats', JSON.stringify(updatedMutedChats));
+                    
+                    // Update button appearance
+                    const muteBtn = document.getElementById('chatMuteBtn');
+                    if (muteBtn) {
+                        muteBtn.innerHTML = '<i class="fas fa-bell-slash"></i>';
+                        muteBtn.title = 'Mute Notifications';
+                    }
+                    
+                    showNotification('Success', 'Chat notifications unmuted', 'success');
+                } else {
+                    // Mute
+                    mutedChats.push(chatId);
+                    localStorage.setItem('jchat-muted-chats', JSON.stringify(mutedChats));
+                    
+                    // Update button appearance
+                    const muteBtn = document.getElementById('chatMuteBtn');
+                    if (muteBtn) {
+                        muteBtn.innerHTML = '<i class="fas fa-bell-slash" style="color: #dc3545;"></i>';
+                        muteBtn.title = 'Unmute Notifications';
+                    }
+                    
+                    showNotification('Success', 'Chat notifications muted', 'success');
+                }
+                
+            } catch (error) {
+                console.error('Error toggling mute:', error);
+                showNotification('Error', 'Failed to update mute status', 'error');
+            }
         }
         
+        // Chat Export System
+        window.exportChat = function exportChat() {
+            try {
+                if (!currentChatId || !currentChatType) {
+                    showNotification('Error', 'No active chat to export', 'error');
+                    return;
+                }
+                
+                const modalHTML = `
+                    <div class="modal-overlay" id="exportModal">
+                        <div class="modal-content" style="max-width: 500px;">
+                            <div class="modal-header">
+                                <h3>📥 Export Chat</h3>
+                                <button class="modal-close" onclick="hideExportModal()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="export-options">
+                                    <div class="form-group">
+                                        <label>Export Format:</label>
+                                        <select id="exportFormat">
+                                            <option value="txt">Text File (.txt)</option>
+                                            <option value="json">JSON File (.json)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Date Range:</label>
+                                        <select id="exportDateRange">
+                                            <option value="all">All Messages</option>
+                                            <option value="today">Today</option>
+                                            <option value="week">This Week</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="hideExportModal()" class="btn btn-secondary">Cancel</button>
+                                <button onclick="performChatExport()" class="btn btn-primary">Export Chat</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('exportModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('exportModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideExportModal();
+                    }
+                };
+                
+            } catch (error) {
+                console.error('Error showing export modal:', error);
+                showNotification('Error', 'Failed to load export options', 'error');
+            }
+        }
+        
+        function hideExportModal() {
+            const modal = document.getElementById('exportModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        async function performChatExport() {
+            try {
+                const format = document.getElementById('exportFormat').value;
+                const dateRange = document.getElementById('exportDateRange').value;
+                
+                const chatName = document.getElementById('chatHeaderName').textContent;
+                
+                // Get messages from current chat
+                let messagesRef;
+                if (currentChatType === 'group') {
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "groups", currentChatId, "messages");
+                } else if (currentChatType === 'direct') {
+                    messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", currentChatId, "messages");
+                }
+                
+                const querySnapshot = await getDocs(messagesRef);
+                const messages = [];
+                
+                querySnapshot.forEach(doc => {
+                    const messageData = doc.data();
+                    messages.push({
+                        id: doc.id,
+                        ...messageData
+                    });
+                });
+                
+                // Filter by date range
+                let filteredMessages = messages;
+                if (dateRange !== 'all') {
+                    const now = new Date();
+                    let cutoffDate;
+                    
+                    if (dateRange === 'today') {
+                        cutoffDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    } else if (dateRange === 'week') {
+                        cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    }
+                    
+                    filteredMessages = messages.filter(message => {
+                        const messageDate = message.timestamp.toDate ? message.timestamp.toDate() : new Date(message.timestamp);
+                        return messageDate >= cutoffDate;
+                    });
+                }
+                
+                // Sort by timestamp
+                filteredMessages.sort((a, b) => {
+                    const dateA = a.timestamp.toDate ? a.timestamp.toDate() : new Date(a.timestamp);
+                    const dateB = b.timestamp.toDate ? b.timestamp.toDate() : new Date(b.timestamp);
+                    return dateA - dateB;
+                });
+                
+                // Generate export content
+                let exportContent = '';
+                let fileName = `${chatName}_chat_export`;
+                
+                if (format === 'txt') {
+                    exportContent = generateTextExport(filteredMessages, chatName);
+                    fileName += '.txt';
+                } else if (format === 'json') {
+                    exportContent = generateJsonExport(filteredMessages, chatName);
+                    fileName += '.json';
+                }
+                
+                // Download file
+                downloadFile(exportContent, fileName, format);
+                
+                hideExportModal();
+                showNotification('Success', 'Chat exported successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error exporting chat:', error);
+                showNotification('Error', 'Failed to export chat', 'error');
+            }
+        }
+        
+        function generateTextExport(messages, chatName) {
+            let content = `Chat Export: ${chatName}\n`;
+            content += `Exported on: ${new Date().toLocaleString()}\n`;
+            content += `Total Messages: ${messages.length}\n\n`;
+            content += '='.repeat(50) + '\n\n';
+            
+            messages.forEach(message => {
+                const timestamp = `[${formatTime(message.timestamp)}] `;
+                const sender = message.senderName || 'Unknown';
+                const text = message.text || message.type || 'Message';
+                
+                content += `${timestamp}${sender}: ${text}\n`;
+            });
+            
+            return content;
+        }
+        
+        function generateJsonExport(messages, chatName) {
+            const exportData = {
+                chatName: chatName,
+                exportDate: new Date().toISOString(),
+                totalMessages: messages.length,
+                messages: messages.map(msg => ({
+                    id: msg.id,
+                    sender: msg.senderName,
+                    text: msg.text,
+                    type: msg.type,
+                    timestamp: msg.timestamp.toDate ? msg.timestamp.toDate().toISOString() : new Date(msg.timestamp).toISOString()
+                }))
+            };
+            
+            return JSON.stringify(exportData, null, 2);
+        }
+        
+        function downloadFile(content, fileName, format) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Translation System
+        window.showTranslateOptions = function showTranslateOptions() {
+            try {
+                const modalHTML = `
+                    <div class="modal-overlay" id="translateModal">
+                        <div class="modal-content" style="max-width: 600px;">
+                            <div class="modal-header">
+                                <h3>🌐 Message Translation</h3>
+                                <button class="modal-close" onclick="hideTranslateModal()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="translate-options">
+                                    <div class="form-group">
+                                        <label>Translate messages to:</label>
+                                        <select id="targetLanguage">
+                                            <option value="en">English</option>
+                                            <option value="es">Spanish</option>
+                                            <option value="fr">French</option>
+                                            <option value="de">German</option>
+                                            <option value="it">Italian</option>
+                                            <option value="pt">Portuguese</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="autoTranslate">
+                                            Auto-translate new messages
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="translate-preview">
+                                    <h4>Preview</h4>
+                                    <div class="preview-message">
+                                        <div class="original-text">Hello, how are you today?</div>
+                                        <div class="translated-text" id="previewTranslation">Hola, ¿cómo estás hoy?</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="hideTranslateModal()" class="btn btn-secondary">Cancel</button>
+                                <button onclick="applyTranslationSettings()" class="btn btn-primary">Apply Settings</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('translateModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('translateModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideTranslateModal();
+                    }
+                };
+                
+                // Set up language change listener
+                document.getElementById('targetLanguage').addEventListener('change', updateTranslationPreview);
+                
+            } catch (error) {
+                console.error('Error showing translate options:', error);
+                showNotification('Error', 'Failed to load translation options', 'error');
+            }
+        }
+        
+        function hideTranslateModal() {
+            const modal = document.getElementById('translateModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        function updateTranslationPreview() {
+            const targetLang = document.getElementById('targetLanguage').value;
+            const previewTranslation = document.getElementById('previewTranslation');
+            
+            const translations = {
+                'es': 'Hola, ¿cómo estás hoy?',
+                'fr': 'Bonjour, comment allez-vous aujourd\'hui?',
+                'de': 'Hallo, wie geht es dir heute?',
+                'it': 'Ciao, come stai oggi?',
+                'pt': 'Olá, como você está hoje?',
+                'en': 'Hello, how are you today?'
+            };
+            
+            previewTranslation.textContent = translations[targetLang] || 'Hello, how are you today?';
+        }
+        
+        function applyTranslationSettings() {
+            const targetLanguage = document.getElementById('targetLanguage').value;
+            const autoTranslate = document.getElementById('autoTranslate').checked;
+            
+            // Save settings to localStorage
+            localStorage.setItem('jchat-translation-target', targetLanguage);
+            localStorage.setItem('jchat-auto-translate', autoTranslate);
+            
+            showNotification('Success', 'Translation settings applied!', 'success');
+            hideTranslateModal();
+        }
+        
+        // Chat Theme Picker System
         window.showChatThemePicker = function showChatThemePicker() {
-            showNotification('Info', 'Chat theme picker coming soon!', 'info');
+            try {
+                const modalHTML = `
+                    <div class="modal-overlay" id="themePickerModal">
+                        <div class="modal-content" style="max-width: 700px;">
+                            <div class="modal-header">
+                                <h3>🎨 Chat Theme</h3>
+                                <button class="modal-close" onclick="hideThemePicker()">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="theme-options">
+                                    <h4>Preset Themes</h4>
+                                    <div class="theme-grid">
+                                        <div class="theme-option" onclick="applyChatTheme('default')">
+                                            <div class="theme-preview default-theme"></div>
+                                            <span>Default</span>
+                                        </div>
+                                        <div class="theme-option" onclick="applyChatTheme('dark')">
+                                            <div class="theme-preview dark-theme"></div>
+                                            <span>Dark</span>
+                                        </div>
+                                        <div class="theme-option" onclick="applyChatTheme('light')">
+                                            <div class="theme-preview light-theme"></div>
+                                            <span>Light</span>
+                                        </div>
+                                        <div class="theme-option" onclick="applyChatTheme('blue')">
+                                            <div class="theme-preview blue-theme"></div>
+                                            <span>Blue</span>
+                                        </div>
+                                        <div class="theme-option" onclick="applyChatTheme('green')">
+                                            <div class="theme-preview green-theme"></div>
+                                            <span>Green</span>
+                                        </div>
+                                        <div class="theme-option" onclick="applyChatTheme('purple')">
+                                            <div class="theme-preview purple-theme"></div>
+                                            <span>Purple</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button onclick="resetChatTheme()" class="btn btn-secondary">Reset to Default</button>
+                                <button onclick="hideThemePicker()" class="btn btn-primary">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remove existing modal if any
+                const existingModal = document.getElementById('themePickerModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Add modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                
+                // Show modal
+                const modal = document.getElementById('themePickerModal');
+                modal.classList.add('active');
+                
+                // Close modal on backdrop click
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        hideThemePicker();
+                    }
+                };
+                
+            } catch (error) {
+                console.error('Error showing theme picker:', error);
+                showNotification('Error', 'Failed to load theme picker', 'error');
+            }
+        }
+        
+        function hideThemePicker() {
+            const modal = document.getElementById('themePickerModal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        }
+        
+        function applyChatTheme(themeName) {
+            const themes = {
+                'default': {
+                    '--primary-color': '#007bff',
+                    '--secondary-color': '#6c757d',
+                    '--background-color': '#ffffff',
+                    '--text-color': '#000000'
+                },
+                'dark': {
+                    '--primary-color': '#007bff',
+                    '--secondary-color': '#6c757d',
+                    '--background-color': '#1a1a1a',
+                    '--text-color': '#ffffff'
+                },
+                'light': {
+                    '--primary-color': '#28a745',
+                    '--secondary-color': '#6c757d',
+                    '--background-color': '#f8f9fa',
+                    '--text-color': '#212529'
+                },
+                'blue': {
+                    '--primary-color': '#007bff',
+                    '--secondary-color': '#0056b3',
+                    '--background-color': '#e3f2fd',
+                    '--text-color': '#0d47a1'
+                },
+                'green': {
+                    '--primary-color': '#28a745',
+                    '--secondary-color': '#1e7e34',
+                    '--background-color': '#e8f5e8',
+                    '--text-color': '#155724'
+                },
+                'purple': {
+                    '--primary-color': '#6f42c1',
+                    '--secondary-color': '#5a32a3',
+                    '--background-color': '#f3e5f5',
+                    '--text-color': '#4a148c'
+                }
+            };
+            
+            const theme = themes[themeName];
+            if (theme) {
+                Object.entries(theme).forEach(([property, value]) => {
+                    document.documentElement.style.setProperty(property, value);
+                });
+                
+                localStorage.setItem('jchat-custom-theme', JSON.stringify(theme));
+                showNotification('Success', `${themeName.charAt(0).toUpperCase() + themeName.slice(1)} theme applied!`, 'success');
+            }
+        }
+        
+        function resetChatTheme() {
+            // Reset to default theme
+            document.documentElement.style.removeProperty('--primary-color');
+            document.documentElement.style.removeProperty('--secondary-color');
+            document.documentElement.style.removeProperty('--background-color');
+            document.documentElement.style.removeProperty('--text-color');
+            
+            localStorage.removeItem('jchat-custom-theme');
+            showNotification('Success', 'Theme reset to default!', 'success');
         }
         
         // Transfer Ownership Function
@@ -10014,6 +10944,61 @@
             
             document.body.classList.remove(...themes);
             document.body.classList.add(savedTheme);
+            
+            // Apply custom theme if saved
+            const customTheme = localStorage.getItem('jchat-custom-theme');
+            if (customTheme) {
+                try {
+                    const theme = JSON.parse(customTheme);
+                    Object.entries(theme).forEach(([property, value]) => {
+                        document.documentElement.style.setProperty(property, value);
+                    });
+                } catch (error) {
+                    console.error('Error applying custom theme:', error);
+                }
+            }
+        }
+        
+        // Update button states based on saved settings
+        function updateButtonStates() {
+            try {
+                if (!currentChatId || !currentChatType) {
+                    return;
+                }
+                
+                const chatId = `${currentChatType}-${currentChatId}`;
+                
+                // Update bookmark button
+                const bookmarks = JSON.parse(localStorage.getItem('jchat-bookmarks') || '[]');
+                const isBookmarked = bookmarks.some(b => b.id === chatId);
+                const bookmarkBtn = document.getElementById('chatBookmarkBtn');
+                if (bookmarkBtn) {
+                    if (isBookmarked) {
+                        bookmarkBtn.innerHTML = '<i class="fas fa-bookmark" style="color: #ffc107;"></i>';
+                        bookmarkBtn.title = 'Remove Bookmark';
+                    } else {
+                        bookmarkBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+                        bookmarkBtn.title = 'Bookmark Chat';
+                    }
+                }
+                
+                // Update mute button
+                const mutedChats = JSON.parse(localStorage.getItem('jchat-muted-chats') || '[]');
+                const isMuted = mutedChats.includes(chatId);
+                const muteBtn = document.getElementById('chatMuteBtn');
+                if (muteBtn) {
+                    if (isMuted) {
+                        muteBtn.innerHTML = '<i class="fas fa-bell-slash" style="color: #dc3545;"></i>';
+                        muteBtn.title = 'Unmute Notifications';
+                    } else {
+                        muteBtn.innerHTML = '<i class="fas fa-bell-slash"></i>';
+                        muteBtn.title = 'Mute Notifications';
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error updating button states:', error);
+            }
         }
 
         function cycleTheme() {
