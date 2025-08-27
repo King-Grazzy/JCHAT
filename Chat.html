@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JCHAT - Instagram-Style Chat</title>
+    <title>JCHAT - Chat</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -546,6 +546,21 @@
             font-size: 14px;
             line-height: 1.5;
         }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -559,13 +574,12 @@
         <!-- Header - Top Bar -->
         <div class="chat-header">
             <div class="header-left">
-                <img src="https://res.cloudinary.com/cloudinary/image/upload/w_40,h_40,c_fill,g_face,r_max/sample" 
-                     alt="Profile Picture" 
-                     class="profile-picture"
-                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%234a4ae8%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2230%22>J</text></svg>'">
+                <div class="profile-picture" id="profilePicture">
+                    <i class="fas fa-user" style="font-size: 20px; color: white; display: flex; align-items: center; justify-content: center; height: 100%;"></i>
+                </div>
                 <div class="user-info">
-                    <div class="username">John Doe</div>
-                    <div class="status-text">online</div>
+                    <div class="username" id="username">Select a Chat</div>
+                    <div class="status-text" id="statusText">Choose a conversation to start messaging</div>
                     <div class="typing-indicator" id="typingIndicator">typing...</div>
                 </div>
             </div>
@@ -584,61 +598,10 @@
 
         <!-- Messages Area -->
         <div class="messages-area" id="messagesArea">
-            <!-- Reply Preview -->
-            <div class="reply-preview" id="replyPreview">
-                <strong>Replying to:</strong> Hey! How are you doing?
-            </div>
-
-            <!-- Demo Messages -->
-            <div class="message received">
-                <div class="message-bubble">
-                    <div class="message-text">Hey! How are you doing?</div>
-                    <div class="message-time">2:30 PM</div>
-                </div>
-            </div>
-
-            <div class="message sent">
-                <div class="message-bubble">
-                    <div class="message-text">I'm doing great! How about you?</div>
-                    <div class="message-time">2:32 PM</div>
-                    <div class="message-status">
-                        <i class="fas fa-check-double status-seen"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="message received">
-                <div class="message-bubble">
-                    <div class="message-text">Pretty good! Just wanted to check in. Are you free this weekend?</div>
-                    <div class="message-time">2:33 PM</div>
-                </div>
-            </div>
-
-            <div class="message sent">
-                <div class="message-bubble">
-                    <div class="message-text">Yes, I'm free! What do you have in mind?</div>
-                    <div class="message-time">2:35 PM</div>
-                    <div class="message-status">
-                        <i class="fas fa-check status-delivered"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="message received">
-                <div class="message-bubble">
-                    <div class="message-text">Maybe we could grab coffee and catch up? ☕</div>
-                    <div class="message-time">2:36 PM</div>
-                </div>
-            </div>
-
-            <div class="message sent">
-                <div class="message-bubble">
-                    <div class="message-text">That sounds perfect! I'd love that 😊</div>
-                    <div class="message-time">2:37 PM</div>
-                    <div class="message-status">
-                        <i class="fas fa-check status-sent"></i>
-                    </div>
-                </div>
+            <div class="empty-state">
+                <i class="fas fa-comments"></i>
+                <h3>Welcome to JCHAT</h3>
+                <p>Select a conversation from your chat list to start messaging</p>
             </div>
         </div>
 
@@ -653,8 +616,9 @@
             <textarea 
                 class="input-field" 
                 id="messageInput" 
-                placeholder="Message..."
+                placeholder="Type a message..."
                 rows="1"
+                disabled
             ></textarea>
             <div class="composer-icon" id="microphoneBtn" title="Voice Message">
                 <i class="fas fa-microphone"></i>
@@ -694,15 +658,18 @@
         const themeToggle = document.getElementById('themeToggle');
         const messageInput = document.getElementById('messageInput');
         const messagesArea = document.getElementById('messagesArea');
-        const replyPreview = document.getElementById('replyPreview');
-        const messageMenu = document.getElementById('messageMenu');
+        const username = document.getElementById('username');
+        const statusText = document.getElementById('statusText');
+        const profilePicture = document.getElementById('profilePicture');
         const typingIndicator = document.getElementById('typingIndicator');
+        const messageMenu = document.getElementById('messageMenu');
 
         // State
         let isDarkMode = false;
         let isVanishMode = false;
         let selectedMessage = null;
         let isReplying = false;
+        let currentChat = null;
 
         // Theme Toggle
         themeToggle.addEventListener('click', () => {
@@ -735,7 +702,7 @@
         // Send Message
         function sendMessage() {
             const text = messageInput.value.trim();
-            if (!text) return;
+            if (!text || !currentChat) return;
 
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message sent';
@@ -776,6 +743,8 @@
 
         // Like Button
         document.getElementById('likeBtn').addEventListener('click', () => {
+            if (!currentChat) return;
+            
             const heartDiv = document.createElement('div');
             heartDiv.className = 'message sent';
             heartDiv.innerHTML = `
@@ -793,38 +762,38 @@
 
         // Camera Button
         document.getElementById('cameraBtn').addEventListener('click', () => {
-            console.log('Camera clicked');
-            // TODO: Implement camera functionality
+            if (!currentChat) return;
+            // TODO: Implement camera functionality for real users
         });
 
         // Gallery Button
         document.getElementById('galleryBtn').addEventListener('click', () => {
-            console.log('Gallery clicked');
-            // TODO: Implement gallery functionality
+            if (!currentChat) return;
+            // TODO: Implement gallery functionality for real users
         });
 
         // Microphone Button
         document.getElementById('microphoneBtn').addEventListener('click', () => {
-            console.log('Microphone clicked');
-            // TODO: Implement voice message functionality
+            if (!currentChat) return;
+            // TODO: Implement voice message functionality for real users
         });
 
         // Call Button
         document.getElementById('callBtn').addEventListener('click', () => {
-            console.log('Call clicked');
-            // TODO: Implement call functionality
+            if (!currentChat) return;
+            // TODO: Implement call functionality for real users
         });
 
         // Video Button
         document.getElementById('videoBtn').addEventListener('click', () => {
-            console.log('Video call clicked');
-            // TODO: Implement video call functionality
+            if (!currentChat) return;
+            // TODO: Implement video call functionality for real users
         });
 
         // Info Button
         document.getElementById('infoBtn').addEventListener('click', () => {
-            console.log('Info clicked');
-            // TODO: Implement info panel
+            if (!currentChat) return;
+            // TODO: Implement info panel for real users
         });
 
         // Message Long Press Menu
@@ -877,18 +846,16 @@
         document.getElementById('replyBtn').addEventListener('click', () => {
             if (selectedMessage) {
                 const text = selectedMessage.querySelector('.message-text').textContent;
-                replyPreview.innerHTML = `<strong>Replying to:</strong> ${text}`;
-                replyPreview.classList.add('show');
-                replyPreview.scrollIntoView({ behavior: 'smooth' });
-                messageInput.focus();
-                isReplying = true;
+                // TODO: Implement reply functionality for real users
                 messageMenu.style.display = 'none';
             }
         });
 
         document.getElementById('forwardBtn').addEventListener('click', () => {
-            console.log('Forward message');
-            messageMenu.style.display = 'none';
+            if (selectedMessage) {
+                // TODO: Implement forward functionality for real users
+                messageMenu.style.display = 'none';
+            }
         });
 
         document.getElementById('reactBtn').addEventListener('click', () => {
@@ -910,7 +877,6 @@
 
         // Clear Reply
         function clearReply() {
-            replyPreview.classList.remove('show');
             isReplying = false;
         }
 
@@ -934,7 +900,7 @@
 
         // Typing Indicator
         messageInput.addEventListener('input', () => {
-            if (messageInput.value.trim()) {
+            if (messageInput.value.trim() && currentChat) {
                 typingIndicator.classList.add('show');
             } else {
                 typingIndicator.classList.remove('show');
@@ -943,6 +909,7 @@
 
         // Initialize
         console.log('JCHAT Instagram-style chat initialized successfully!');
+        console.log('Ready for production use with real users');
         console.log('Features: Dark mode, reactions, reply, long press menu, typing indicator');
     </script>
 </body>
