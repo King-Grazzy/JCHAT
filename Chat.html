@@ -20,8 +20,410 @@
             box-sizing: border-box;
         }
 
+        /* Global CSS Variables for easy theme switching */
         :root {
-            /* JCHAT Theme Colors */
+            --pink: #ff2e92;
+            --blue: #00d5ff;
+            --glass-black: rgba(10, 10, 10, .75);
+            --glass-blue: rgba(0, 213, 255, .15);
+            --radius: 20px;
+            --transition: .3s ease;
+
+            /* These variables will be overridden by theme classes */
+            --white: #fff;
+            --text-light: rgba(255, 255, 255, .7);
+            --background-main: rgba(10, 10, 10, .75);
+            --background-gradient-1: #00d5ff;
+            --background-gradient-2: #ff2e92;
+            --card-background: linear-gradient(145deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .01));
+            --header-background: linear-gradient(135deg, rgba(10, 10, 10, .85), rgba(10, 10, 10, .75));
+            --border-light: rgba(255, 255, 255, .05);
+            --input-background: rgba(255, 255, 255, 0.05);
+            --button-background: linear-gradient(90deg, var(--blue), var(--pink));
+            --button-shadow: 0 4px 15px var(--blue), 0 4px 15px var(--pink);
+
+            /* New variables for consistent theming */
+            --background-color-primary: #1a1a2e;
+            --background-color-secondary: #0f0f1f;
+            --header-background-color: #2a2a4a;
+            --footer-background-color: #2a2a4a;
+            --content-background-color: #20203a;
+            --card-background-color: #2a2a4a;
+            --text-color-primary: #e0e0e0;
+            --text-color-secondary: #b0b0d0;
+            --text-color-light: #64748b;
+            --accent-color: #00d5ff;
+            --accent-color-dark: #00aaff;
+            --border-color: #3a3a5a;
+            --input-background-color: #f1f5f9;
+            --button-hover-background: #2563eb;
+            --active-item-background: rgba(0, 213, 255, 0.1);
+            --status-online: #10b981;
+            --status-offline: #6b7280;
+            --status-away: #f59e0b;
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+            --theme-gold: #ffd700;
+        }
+
+        /* Theme Definitions from Home.html */
+        /* Light Mode - Premium Platinum Minimal */
+        body.theme-light-mode {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #94a3b8 75%, #64748b 100%) !important;
+            background-size: 400% 400% !important;
+            animation: platinumShimmer 20s ease-in-out infinite !important;
+            background-attachment: fixed !important;
+            --background-main: linear-gradient(135deg, #f8fafc 0%, #64748b 100%);
+            --background-gradient-1: #e2e8f0;
+            --background-gradient-2: #cbd5e1;
+            --white: #1e293b;
+            --text-light: #475569;
+            --card-background: rgba(255, 255, 255, 0.95);
+            --header-background: rgba(248, 250, 252, 0.98);
+            --border-light: rgba(148, 163, 184, 0.2);
+            --input-background: rgba(241, 245, 249, 0.8);
+            --button-background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+            --button-shadow: 0 4px 15px rgba(59, 130, 246, 0.3), 0 4px 15px rgba(29, 78, 216, 0.3);
+            --background-color-primary: #f8fafc;
+            --background-color-secondary: #e2e8f0;
+            --header-background-color: #ffffff;
+            --footer-background-color: #ffffff;
+            --content-background-color: #f1f5f9;
+            --card-background-color: #ffffff;
+            --text-color-primary: #1e293b;
+            --text-color-secondary: #475569;
+            --text-color-light: #64748b;
+            --accent-color: #3b82f6;
+            --accent-color-dark: #1d4ed8;
+            --border-color: #e2e8f0;
+            --input-background-color: #f1f5f9;
+            --button-hover-background: #2563eb;
+            --active-item-background: rgba(59, 130, 246, 0.1);
+            --status-online: #10b981;
+            --status-offline: #6b7280;
+            --status-away: #f59e0b;
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+            box-shadow: inset 0 0 100px rgba(59, 130, 246, 0.05) !important;
+        }
+        
+        @keyframes platinumShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 25%; }
+            50% { background-position: 100% 75%; }
+            75% { background-position: 0% 100%; }
+        }
+
+        /* Dark Mode - Premium Starlight Noir */
+        body.theme-dark-mode {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%) !important;
+            background-size: 400% 400% !important;
+            animation: starlightDrift 25s ease-in-out infinite !important;
+            background-attachment: fixed !important;
+            --background-main: linear-gradient(135deg, #0f0f23 0%, #533483 100%);
+            --background-gradient-1: #16213e;
+            --background-gradient-2: #0f3460;
+            --white: #e2e8f0;
+            --text-light: #94a3b8;
+            --card-background: rgba(30, 41, 59, 0.8);
+            --header-background: linear-gradient(135deg, rgba(15, 15, 35, 0.95), rgba(26, 26, 46, 0.9));
+            --border-light: rgba(148, 163, 184, 0.15);
+            --input-background: rgba(51, 65, 85, 0.6);
+            --button-background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+            --button-shadow: 0 4px 15px rgba(139, 92, 246, 0.4), 0 4px 15px rgba(124, 58, 237, 0.4);
+            --background-color-primary: #0f172a;
+            --background-color-secondary: #1e293b;
+            --header-background-color: #1e293b;
+            --footer-background-color: #1e293b;
+            --content-background-color: #334155;
+            --card-background-color: #475569;
+            --text-color-primary: #f1f5f9;
+            --text-color-secondary: #cbd5e1;
+            --accent-color: #8b5cf6;
+            --accent-color-dark: #7c3aed;
+            --border-color: #475569;
+            --input-background-color: #334155;
+            --button-hover-background: #a855f7;
+            --active-item-background: rgba(139, 92, 246, 0.2);
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+            box-shadow: inset 0 0 100px rgba(139, 92, 246, 0.1) !important;
+        }
+        
+        @keyframes starlightDrift {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 25%; }
+            50% { background-position: 100% 75%; }
+            75% { background-position: 0% 100%; }
+        }
+
+        /* Sunset Theme */
+        body.theme-sunset-mode {
+            background: linear-gradient(to top, #ff7e5f, #feb47b) !important;
+            background-color: transparent !important;
+            background-image: linear-gradient(to top, #ff7e5f, #feb47b) !important;
+            --background-main: linear-gradient(to top, #ff7e5f, #feb47b);
+            --card-background: rgba(255, 255, 255, 0.15);
+            --white: #fff;
+            --text-light: rgba(255, 255, 255, 0.8);
+            --input-background: rgba(255, 255, 255, 0.1);
+            --border-light: rgba(255, 255, 255, 0.3);
+            --button-background: linear-gradient(90deg, #fd746c, #ff9068);
+            --button-shadow: 0 4px 15px rgba(253, 116, 108, 0.4), 0 4px 15px rgba(255, 144, 104, 0.4);
+            --background-color-primary: #ff7e5f;
+            --background-color-secondary: #feb47b;
+            --header-background-color: rgba(255, 126, 95, 0.9);
+            --footer-background-color: rgba(255, 126, 95, 0.9);
+            --content-background-color: rgba(255, 126, 95, 0.85);
+            --card-background-color: rgba(255, 255, 255, 0.15);
+            --text-color-primary: #fff;
+            --text-color-secondary: rgba(255, 255, 255, 0.8);
+            --accent-color: #fd746c;
+            --accent-color-dark: #ff9068;
+            --border-color: rgba(255, 255, 255, 0.3);
+            --input-background-color: rgba(255, 255, 255, 0.1);
+            --button-background: linear-gradient(90deg, #fd746c, #ff9068);
+            --button-hover-background: #ff9068;
+            --active-item-background: rgba(253, 116, 108, 0.2);
+            --delete-button-color: #dc143c;
+            --warning-color: #ffd700;
+        }
+
+        /* Glass Mode specific variables */
+        body.theme-glass-mode {
+            --background-main: rgba(10, 10, 10, 0.75);
+            background-image: url('https://source.unsplash.com/random/1920x1080?abstract,blur') !important;
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            backdrop-filter: blur(10px);
+            --card-background: rgba(25, 25, 40, 0.7);
+            --white: #e0e0e0;
+            --text-light: rgba(255, 255, 255, 0.7);
+            --input-background: rgba(255, 255, 255, 0.05);
+            --border-light: rgba(255, 255, 255, 0.1);
+            --button-background: linear-gradient(90deg, var(--pink), var(--blue));
+            --button-shadow: 0 4px 15px var(--blue), 0 4px 15px var(--pink);
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5);
+            --background-color-primary: rgba(10, 10, 10, 0.75);
+            --background-color-secondary: rgba(10, 10, 10, 0.6);
+            --header-background-color: rgba(10, 10, 10, 0.85);
+            --footer-background-color: rgba(10, 10, 10, 0.85);
+            --content-background-color: rgba(10, 10, 10, 0.75);
+            --card-background-color: rgba(25, 25, 40, 0.7);
+            --text-color-primary: #e0e0e0;
+            --text-color-secondary: #b0b0d0;
+            --accent-color: #00d5ff;
+            --accent-color-dark: #00aaff;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --input-background-color: rgba(255, 255, 255, 0.05);
+            --button-background: rgba(0, 213, 255, 0.15);
+            --button-hover-background: rgba(0, 213, 255, 0.25);
+            --active-item-background: rgba(0, 213, 255, 0.1);
+        }
+
+        /* Ocean Theme */
+        body.theme-ocean-mode {
+            background: linear-gradient(135deg, #001f3f 0%, #0074d9 20%, #7fdbff 40%, #39cccc 60%, #01ff70 80%, #2ecc40 100%) !important;
+            background-size: 400% 400% !important;
+            animation: oceanWaves 15s ease-in-out infinite !important;
+            background-attachment: fixed !important;
+            --background-main: linear-gradient(135deg, #001f3f 0%, #2ecc40 100%);
+            --card-background: rgba(0, 116, 217, 0.15);
+            --white: #ffffff;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --input-background: rgba(0, 116, 217, 0.1);
+            --border-light: rgba(127, 219, 255, 0.4);
+            --button-background: linear-gradient(45deg, #0074d9, #7fdbff, #39cccc);
+            --button-shadow: 0 8px 25px rgba(0, 116, 217, 0.4), 0 0 30px rgba(127, 219, 255, 0.3);
+            --background-color-primary: rgba(0, 31, 63, 0.95);
+            --background-color-secondary: rgba(0, 116, 217, 0.9);
+            --header-background-color: rgba(0, 31, 63, 0.95);
+            --footer-background-color: rgba(57, 204, 204, 0.9);
+            --content-background-color: rgba(0, 116, 217, 0.08);
+            --card-background-color: rgba(127, 219, 255, 0.12);
+            --text-color-primary: #ffffff;
+            --text-color-secondary: #e6f9ff;
+            --accent-color: #7fdbff;
+            --accent-color-dark: #0074d9;
+            --border-color: rgba(127, 219, 255, 0.5);
+            --input-background-color: rgba(0, 116, 217, 0.1);
+            --button-hover-background: #39cccc;
+            --active-item-background: rgba(127, 219, 255, 0.25);
+            --delete-button-color: #ff6b6b;
+            --warning-color: #ffdc00;
+            box-shadow: inset 0 0 100px rgba(127, 219, 255, 0.1) !important;
+        }
+        
+        @keyframes oceanWaves {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 25%; }
+            50% { background-position: 100% 75%; }
+            75% { background-position: 0% 100%; }
+        }
+
+        /* Forest Theme */
+        body.theme-forest-mode {
+            background: linear-gradient(135deg, #064e3b, #065f46, #047857, #059669) !important;
+            background-color: transparent !important;
+            background-image: linear-gradient(135deg, #064e3b, #065f46, #047857, #059669) !important;
+            --background-main: linear-gradient(135deg, #064e3b, #065f46, #047857, #059669);
+            --card-background: rgba(255, 255, 255, 0.1);
+            --white: #ffffff;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --input-background: rgba(255, 255, 255, 0.1);
+            --border-light: rgba(255, 255, 255, 0.2);
+            --button-background: linear-gradient(90deg, #059669, #10b981);
+            --button-shadow: 0 4px 15px rgba(5, 150, 105, 0.4), 0 4px 15px rgba(16, 185, 129, 0.4);
+            --background-color-primary: #064e3b;
+            --background-color-secondary: #065f46;
+            --header-background-color: rgba(6, 78, 59, 0.9);
+            --footer-background-color: rgba(6, 78, 59, 0.9);
+            --content-background-color: rgba(6, 78, 59, 0.85);
+            --card-background-color: rgba(255, 255, 255, 0.1);
+            --text-color-primary: #ffffff;
+            --text-color-secondary: rgba(255, 255, 255, 0.9);
+            --accent-color: #10b981;
+            --accent-color-dark: #059669;
+            --border-color: rgba(255, 255, 255, 0.2);
+            --input-background-color: rgba(255, 255, 255, 0.1);
+            --button-background: linear-gradient(90deg, #059669, #10b981);
+            --button-hover-background: #047857;
+            --active-item-background: rgba(16, 185, 129, 0.2);
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        /* Cosmic Theme */
+        body.theme-cosmic-mode {
+            background: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca, #6366f1) !important;
+            background-color: transparent !important;
+            background-image: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca, #6366f1) !important;
+            --background-main: linear-gradient(135deg, #1e1b4b, #312e81, #4338ca, #6366f1);
+            --card-background: rgba(255, 255, 255, 0.1);
+            --white: #ffffff;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --input-background: rgba(255, 255, 255, 0.1);
+            --border-light: rgba(255, 255, 255, 0.2);
+            --button-background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            --button-shadow: 0 4px 15px rgba(99, 102, 241, 0.4), 0 4px 15px rgba(139, 92, 246, 0.4);
+            --background-color-primary: #1e1b4b;
+            --background-color-secondary: #312e81;
+            --header-background-color: rgba(30, 27, 75, 0.9);
+            --footer-background-color: rgba(30, 27, 75, 0.9);
+            --content-background-color: rgba(30, 27, 75, 0.85);
+            --card-background-color: rgba(255, 255, 255, 0.1);
+            --text-color-primary: #ffffff;
+            --text-color-secondary: rgba(255, 255, 255, 0.9);
+            --accent-color: #8b5cf6;
+            --accent-color-dark: #7c3aed;
+            --border-color: rgba(255, 255, 255, 0.2);
+            --input-background-color: rgba(255, 255, 255, 0.1);
+            --button-background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            --button-hover-background: #7c3aed;
+            --active-item-background: rgba(139, 92, 246, 0.2);
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        /* Retro Theme */
+        body.theme-retro-mode {
+            background: linear-gradient(135deg, #581c87, #7c3aed, #a855f7, #c084fc) !important;
+            background-color: transparent !important;
+            background-image: linear-gradient(135deg, #581c87, #7c3aed, #a855f7, #c084fc) !important;
+            --background-main: linear-gradient(135deg, #581c87, #7c3aed, #a855f7, #c084fc);
+            --card-background: rgba(255, 255, 255, 0.1);
+            --white: #ffffff;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --input-background: rgba(255, 255, 255, 0.1);
+            --border-light: rgba(255, 255, 255, 0.2);
+            --button-background: linear-gradient(90deg, #a855f7, #c084fc);
+            --button-shadow: 0 4px 15px rgba(168, 85, 247, 0.4), 0 4px 15px rgba(192, 132, 252, 0.4);
+            --background-color-primary: #581c87;
+            --background-color-secondary: #7c3aed;
+            --header-background-color: rgba(88, 28, 135, 0.9);
+            --footer-background-color: rgba(88, 28, 135, 0.9);
+            --content-background-color: rgba(88, 28, 135, 0.85);
+            --card-background-color: rgba(255, 255, 255, 0.1);
+            --text-color-primary: #ffffff;
+            --text-color-secondary: rgba(255, 255, 255, 0.9);
+            --accent-color: #c084fc;
+            --accent-color-dark: #a855f7;
+            --border-color: rgba(255, 255, 255, 0.2);
+            --input-background-color: rgba(255, 255, 255, 0.1);
+            --button-background: linear-gradient(90deg, #a855f7, #c084fc);
+            --button-hover-background: #9333ea;
+            --active-item-background: rgba(192, 132, 252, 0.2);
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        /* Neon Theme */
+        body.theme-neon-mode {
+            background: linear-gradient(135deg, #0f172a, #1e293b, #334155, #475569) !important;
+            background-color: transparent !important;
+            background-image: linear-gradient(135deg, #0f172a, #1e293b, #334155, #475569) !important;
+            --background-main: linear-gradient(135deg, #0f172a, #1e293b, #334155, #475569);
+            --card-background: rgba(255, 255, 255, 0.1);
+            --white: #ffffff;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --input-background: rgba(255, 255, 255, 0.1);
+            --border-light: rgba(255, 255, 255, 0.2);
+            --button-background: linear-gradient(90deg, #06b6d4, #0ea5e9);
+            --button-shadow: 0 4px 15px rgba(6, 182, 212, 0.4), 0 4px 15px rgba(14, 165, 233, 0.4);
+            --background-color-primary: #0f172a;
+            --background-color-secondary: #1e293b;
+            --header-background-color: rgba(15, 23, 42, 0.9);
+            --footer-background-color: rgba(15, 23, 42, 0.9);
+            --content-background-color: rgba(15, 23, 42, 0.85);
+            --card-background-color: rgba(255, 255, 255, 0.1);
+            --text-color-primary: #ffffff;
+            --text-color-secondary: rgba(255, 255, 255, 0.9);
+            --accent-color: #06b6d4;
+            --accent-color-dark: #0891b2;
+            --border-color: rgba(255, 255, 255, 0.2);
+            --input-background-color: rgba(255, 255, 255, 0.1);
+            --button-background: linear-gradient(90deg, #06b6d4, #0ea5e9);
+            --button-hover-background: #0891b2;
+            --active-item-background: rgba(6, 182, 212, 0.2);
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        /* Elegant Theme */
+        body.theme-elegant-mode {
+            background: linear-gradient(135deg, #92400e, #b45309, #d97706, #f59e0b) !important;
+            background-color: transparent !important;
+            background-image: linear-gradient(135deg, #92400e, #b45309, #d97706, #f59e0b) !important;
+            --background-main: linear-gradient(135deg, #92400e, #b45309, #d97706, #f59e0b);
+            --card-background: rgba(255, 255, 255, 0.1);
+            --white: #ffffff;
+            --text-light: rgba(255, 255, 255, 0.9);
+            --input-background: rgba(255, 255, 255, 0.1);
+            --border-light: rgba(255, 255, 255, 0.2);
+            --button-background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            --button-shadow: 0 4px 15px rgba(245, 158, 11, 0.4), 0 4px 15px rgba(251, 191, 36, 0.4);
+            --background-color-primary: #92400e;
+            --background-color-secondary: #b45309;
+            --header-background-color: rgba(146, 64, 14, 0.9);
+            --footer-background-color: rgba(146, 64, 14, 0.9);
+            --content-background-color: rgba(146, 64, 14, 0.85);
+            --card-background-color: rgba(255, 255, 255, 0.1);
+            --text-color-primary: #ffffff;
+            --text-color-secondary: rgba(255, 255, 255, 0.9);
+            --accent-color: #fbbf24;
+            --accent-color-dark: #f59e0b;
+            --border-color: rgba(255, 255, 255, 0.2);
+            --input-background-color: rgba(255, 255, 255, 0.1);
+            --button-background: linear-gradient(90deg, #f59e0b, #fbbf24);
+            --button-hover-background: #d97706;
+            --active-item-background: rgba(251, 191, 36, 0.2);
+            --delete-button-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        /* JCHAT Theme Colors */
+        :root {
             --jchat-primary: #4a4ae8;
             --jchat-primary-dark: #3a3ad8;
             --jchat-secondary: #6c63ff;
@@ -689,7 +1091,63 @@
         function initializeChat() {
             console.log('JCHAT_DEBUG: Initializing Instagram-style chat');
             initializeFirebase();
+            applyThemeFromHome();
             setupEventListeners();
+        }
+
+        // Apply theme from Home.html automatically
+        function applyThemeFromHome() {
+            try {
+                // Get the saved theme from localStorage (same key used in Home.html)
+                const savedTheme = localStorage.getItem('jchat-theme') || 'theme-dark-mode';
+                console.log('JCHAT_DEBUG: Applying theme from Home.html:', savedTheme);
+                
+                // Apply the theme class to body
+                document.body.className = savedTheme;
+                
+                // Update chat elements to use theme colors
+                updateChatThemeColors(savedTheme);
+                
+            } catch (error) {
+                console.error('JCHAT_ERROR: Error applying theme:', error);
+                // Fallback to dark mode
+                document.body.className = 'theme-dark-mode';
+            }
+        }
+
+        // Update chat elements to use theme colors
+        function updateChatThemeColors(theme) {
+            try {
+                // Update chat header background
+                const chatHeader = document.querySelector('.chat-header');
+                if (chatHeader) {
+                    chatHeader.style.background = getComputedStyle(document.body).getPropertyValue('--accent-color') || '#4a4ae8';
+                }
+
+                // Update message bubbles to use theme colors
+                const style = document.createElement('style');
+                style.textContent = `
+                    body.${theme} .message.sent .message-bubble {
+                        background: ${getComputedStyle(document.body).getPropertyValue('--accent-color') || '#4a4ae8'} !important;
+                    }
+                    body.${theme} .message.received .message-bubble {
+                        background: ${getComputedStyle(document.body).getPropertyValue('--card-background-color') || '#f1f1f1'} !important;
+                    }
+                    body.${theme} .composer {
+                        background: ${getComputedStyle(document.body).getPropertyValue('--background-color-primary') || '#ffffff'} !important;
+                        border-top-color: ${getComputedStyle(document.body).getPropertyValue('--border-color') || '#dbdbdb'} !important;
+                    }
+                    body.${theme} .input-field {
+                        background: ${getComputedStyle(document.body).getPropertyValue('--input-background-color') || '#f1f1f1'} !important;
+                        color: ${getComputedStyle(document.body).getPropertyValue('--text-color-primary') || '#262626'} !important;
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                console.log('JCHAT_DEBUG: Theme colors updated for:', theme);
+            } catch (error) {
+                console.error('JCHAT_ERROR: Error updating theme colors:', error);
+            }
         }
 
         // Setup Event Listeners
@@ -1049,6 +1507,26 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             initializeChat();
+        });
+
+        // Listen for theme changes from Home.html
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'jchat-theme') {
+                console.log('JCHAT_DEBUG: Theme changed from Home.html:', event.newValue);
+                if (event.newValue) {
+                    document.body.className = event.newValue;
+                    updateChatThemeColors(event.newValue);
+                }
+            }
+        });
+
+        // Also listen for custom theme change events
+        window.addEventListener('jchat-theme-changed', (event) => {
+            if (event.detail && event.detail.theme) {
+                console.log('JCHAT_DEBUG: Custom theme change event:', event.detail.theme);
+                document.body.className = event.detail.theme;
+                updateChatThemeColors(event.detail.theme);
+            }
         });
 
         console.log('JCHAT Instagram-style chat initialized successfully!');
