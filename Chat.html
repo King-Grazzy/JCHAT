@@ -1325,7 +1325,7 @@
         // Firebase Imports
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase Configuration
         const firebaseConfig = {
@@ -1380,23 +1380,36 @@
 
         // Initialize Firebase
         function initializeFirebase() {
-            console.log('JCHAT_DEBUG: Initializing Firebase with config:', firebaseConfig);
-            console.log('JCHAT_DEBUG: Cloudinary config:', cloudinaryConfig);
+            try {
+                console.log('JCHAT_DEBUG: Initializing Firebase with config:', firebaseConfig);
+                console.log('JCHAT_DEBUG: Cloudinary config:', cloudinaryConfig);
+                
+                // Initialize Firebase app
+                const app = initializeApp(firebaseConfig);
+                const auth = getAuth(app);
+                const db = getFirestore(app);
+                
+                // Store references globally
+                window.jchatAuth = auth;
+                window.jchatDb = db;
+                
+                console.log('JCHAT_DEBUG: Firebase initialized successfully');
+                return { auth, db };
+            } catch (error) {
+                console.error('JCHAT_ERROR: Firebase initialization failed:', error);
+                return null;
+            }
         }
 
         // Initialize Chat
         function initializeChat() {
             console.log('JCHAT_DEBUG: Initializing Instagram-style chat');
-            initializeFirebase();
+            const firebaseResult = initializeFirebase();
+            if (firebaseResult) {
+                setupAuthentication();
+            }
             applyThemeFromHome();
             setupEventListeners();
-            
-            // Auto-sync friends after a short delay
-            setTimeout(() => {
-                if (currentUser) {
-                    syncFriendsFromFindFriends();
-                }
-            }, 2000);
         }
 
         // Apply theme from Home.html automatically
@@ -1568,6 +1581,12 @@
         // Fetch friends from Firebase
         async function fetchFriendsFromFirebase() {
             try {
+                const { db } = window.jchatDb ? { db: window.jchatDb } : initializeFirebase();
+                if (!db || !currentUser) {
+                    console.error('JCHAT_ERROR: DB or user not available');
+                    return;
+                }
+
                 const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
                 const friendsSnapshot = await getDocs(publicFriendsRef);
                 
@@ -1631,13 +1650,44 @@
                 friendsCount.textContent = `${friendsList.size} friends`;
 
                 if (friendsList.size === 0) {
+                    // Show demo friends for testing
                     friendsList.innerHTML = `
-                        <div class="no-friends">
-                            <i class="fas fa-users"></i>
-                            <div>No friends yet</div>
-                            <div style="font-size: 11px; margin-top: 4px;">Add friends from Find Friends page</div>
+                        <div class="friend-item" data-friend-id="demo1">
+                            <div class="friend-avatar">J</div>
+                            <div class="friend-info">
+                                <div class="friend-name">John Doe</div>
+                                <div class="friend-status online">Online</div>
+                            </div>
+                        </div>
+                        <div class="friend-item" data-friend-id="demo2">
+                            <div class="friend-avatar">S</div>
+                            <div class="friend-info">
+                                <div class="friend-name">Sarah Smith</div>
+                                <div class="friend-status offline">Offline</div>
+                            </div>
+                        </div>
+                        <div class="friend-item" data-friend-id="demo3">
+                            <div class="friend-avatar">M</div>
+                            <div class="friend-info">
+                                <div class="friend-name">Mike Johnson</div>
+                                <div class="friend-status online">Online</div>
+                            </div>
                         </div>
                     `;
+
+                    // Add click events to demo friends
+                    document.querySelectorAll('.friend-item').forEach(item => {
+                        item.addEventListener('click', () => {
+                            const friendName = item.querySelector('.friend-name').textContent;
+                            const isOnline = item.querySelector('.friend-status').classList.contains('online');
+                            selectFriendToChat({
+                                uid: item.dataset.friendId,
+                                username: friendName,
+                                isOnline: isOnline
+                            });
+                        });
+                    });
+
                     return;
                 }
 
@@ -1687,6 +1737,12 @@
         async function fetchFriendProfiles() {
             try {
                 const profiles = [];
+                const { db } = window.jchatDb ? { db: window.jchatDb } : initializeFirebase();
+                if (!db) {
+                    console.error('JCHAT_ERROR: DB not available');
+                    return [];
+                }
+
                 const publicProfilesRef = collection(db, "artifacts", appId, "public", "data", "profiles");
                 
                 for (const friendId of friendsList) {
@@ -1973,6 +2029,12 @@
         // Save Message to Firebase
         async function saveMessageToFirebase(text, type) {
             try {
+                const { db } = window.jchatDb ? { db: window.jchatDb } : initializeFirebase();
+                if (!db || !currentChatId || !currentUser) {
+                    console.error('JCHAT_ERROR: DB, chat ID, or user not available');
+                    return;
+                }
+
                 const messagesRef = collection(db, "artifacts", appId, "chats", currentChatId, "messages");
                 await addDoc(messagesRef, {
                     text: text,
@@ -2153,26 +2215,41 @@
         });
 
         // Authentication
-        onAuthStateChanged(auth, async (user) => {
+        function setupAuthentication() {
             try {
-                if (user) {
-                    currentUser = user;
-                    console.log("JCHAT_DEBUG: User authenticated:", user.uid);
-                    
-                    // TODO: Load user profile data and chat list
-                } else {
-                    console.log("JCHAT_DEBUG: No user signed in.");
-                    try {
-                        await signInAnonymously(auth);
-                        console.log("JCHAT_DEBUG: Signed in anonymously.");
-                    } catch (error) {
-                        console.error("JCHAT_ERROR: Error during anonymous sign-in:", error);
-                    }
+                const { auth } = window.jchatAuth ? { auth: window.jchatAuth } : initializeFirebase();
+                if (!auth) {
+                    console.error('JCHAT_ERROR: Auth not available');
+                    return;
                 }
+
+                onAuthStateChanged(auth, async (user) => {
+                    try {
+                        if (user) {
+                            currentUser = user;
+                            console.log("JCHAT_DEBUG: User authenticated:", user.uid);
+                            
+                            // Enable friends sync
+                            setTimeout(() => {
+                                syncFriendsFromFindFriends();
+                            }, 1000);
+                        } else {
+                            console.log("JCHAT_DEBUG: No user signed in.");
+                            try {
+                                await signInAnonymously(auth);
+                                console.log("JCHAT_DEBUG: Signed in anonymously.");
+                            } catch (error) {
+                                console.error("JCHAT_ERROR: Error during anonymous sign-in:", error);
+                            }
+                        }
+                    } catch (error) {
+                        console.error("JCHAT_ERROR: Error in authentication flow:", error);
+                    }
+                });
             } catch (error) {
-                console.error("JCHAT_ERROR: Error in authentication flow:", error);
+                console.error('JCHAT_ERROR: Authentication setup failed:', error);
             }
-        });
+        }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
