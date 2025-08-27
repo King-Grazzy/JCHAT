@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCHAT - Instagram-Style Chat</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* JCHAT Theme Colors */
+            --jchat-primary: #4a4ae8;
+            --jchat-primary-dark: #3a3ad8;
+            --jchat-secondary: #6c63ff;
+            --jchat-accent: #ff6b6b;
+            
+            /* Instagram-Style Colors */
+            --ig-bg: #ffffff;
+            --ig-bg-dark: #121212;
+            --ig-sent-bubble: #4a4ae8;
+            --ig-received-bubble: #f1f1f1;
+            --ig-received-bubble-dark: #2a2a2a;
+            --ig-text-primary: #262626;
+            --ig-text-secondary: #8e8e93;
+            --ig-text-light: #ffffff;
+            --ig-border: #dbdbdb;
+            --ig-border-dark: #383838;
+            --ig-shadow: rgba(0, 0, 0, 0.1);
+            
+            /* Dimensions */
+            --header-height: 60px;
+            --composer-height: 55px;
+            --chat-max-width: 600px;
+            --profile-size: 40px;
+            --icon-size: 24px;
+            --bubble-max-width: 70%;
+            --message-padding: 12px;
+            --message-border-radius: 18px;
+            --message-gap: 8px;
+            --input-min-height: 36px;
+            --input-border-radius: 18px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--ig-bg);
+            color: var(--ig-text-primary);
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: var(--ig-bg-dark);
+            color: var(--ig-text-light);
+        }
+
+        /* Main Chat Container */
+        .chat-container {
+            max-width: var(--chat-max-width);
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--ig-bg);
+            transition: background-color 0.3s ease;
+        }
+
+        body.dark-mode .chat-container {
+            background: var(--ig-bg-dark);
+        }
+
+        /* Header - Top Bar */
+        .chat-header {
+            height: var(--header-height);
+            background: var(--jchat-primary);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px var(--ig-shadow);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .profile-picture {
+            width: var(--profile-size);
+            height: var(--profile-size);
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .profile-picture:hover {
+            transform: scale(1.05);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--ig-text-light);
+            line-height: 1.2;
+        }
+
+        .status-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.2;
+        }
+
+        .typing-indicator {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-style: italic;
+            display: none;
+        }
+
+        .typing-indicator.show {
+            display: block;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header-icon {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            color: var(--ig-text-light);
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-icon:hover {
+            opacity: 0.8;
+        }
+
+        /* Messages Area */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: var(--ig-bg);
+            transition: background-color 0.3s ease;
+        }
+
+        body.dark-mode .messages-area {
+            background: var(--ig-bg-dark);
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: var(--message-gap);
+            max-width: 100%;
+            animation: messageSlideIn 0.3s ease-out;
+        }
+
+        @keyframes messageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message-bubble {
+            max-width: var(--bubble-max-width);
+            padding: var(--message-padding);
+            border-radius: var(--message-border-radius);
+            word-wrap: break-word;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .message.sent .message-bubble {
+            background: var(--ig-sent-bubble);
+            color: var(--ig-text-light);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received .message-bubble {
+            background: var(--ig-received-bubble);
+            color: var(--ig-text-primary);
+            border-bottom-left-radius: 4px;
+        }
+
+        body.dark-mode .message.received .message-bubble {
+            background: var(--ig-received-bubble-dark);
+            color: var(--ig-text-light);
+        }
+
+        .message-text {
+            font-size: 15px;
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: right;
+            float: right;
+            margin-left: 8px;
+        }
+
+        .message.received .message-time {
+            color: var(--ig-text-secondary);
+        }
+
+        .message-status {
+            display: inline-block;
+            margin-left: 4px;
+            font-size: 11px;
+        }
+
+        .status-sent { color: rgba(255, 255, 255, 0.7); }
+        .status-delivered { color: #53bdeb; }
+        .status-seen { color: #53bdeb; }
+
+        /* Message Reactions */
+        .message-reaction {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--ig-accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            animation: reactionPop 0.3s ease-out;
+        }
+
+        @keyframes reactionPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Reply Preview */
+        .reply-preview {
+            background: rgba(0, 0, 0, 0.05);
+            border-left: 3px solid var(--jchat-primary);
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--ig-text-secondary);
+            display: none;
+        }
+
+        body.dark-mode .reply-preview {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .reply-preview.show {
+            display: block;
+        }
+
+        /* Composer - Bottom Input Bar */
+        .composer {
+            height: var(--composer-height);
+            background: var(--ig-bg);
+            border-top: 1px solid var(--ig-border);
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: sticky;
+            bottom: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        body.dark-mode .composer {
+            background: var(--ig-bg-dark);
+            border-top-color: var(--ig-border-dark);
+        }
+
+        .composer-icon {
+            width: var(--icon-size);
+            height: var(--icon-size);
+            color: var(--ig-text-secondary);
+            cursor: pointer;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .composer-icon:hover {
+            color: var(--jchat-primary);
+        }
+
+        .composer-icon.like {
+            width: 20px;
+            height: 20px;
+            color: var(--ig-accent);
+        }
+
+        .input-field {
+            flex: 1;
+            min-height: var(--input-min-height);
+            max-height: 120px;
+            border: none;
+            border-radius: var(--input-border-radius);
+            padding: 8px 16px;
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--ig-received-bubble);
+            color: var(--ig-text-primary);
+            resize: none;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        body.dark-mode .input-field {
+            background: var(--ig-received-bubble-dark);
+            color: var(--ig-text-light);
+        }
+
+        .input-field:focus {
+            background: var(--ig-bg);
+            box-shadow: 0 0 0 2px var(--jchat-primary);
+        }
+
+        body.dark-mode .input-field:focus {
+            background: var(--ig-bg-dark);
+        }
+
+        /* Long Press Menu */
+        .message-menu {
+            position: fixed;
+            background: var(--ig-bg);
+            border: 1px solid var(--ig-border);
+            border-radius: 12px;
+            padding: 8px 0;
+            box-shadow: 0 4px 20px var(--ig-shadow);
+            z-index: 1000;
+            display: none;
+            animation: menuSlideUp 0.2s ease-out;
+        }
+
+        body.dark-mode .message-menu {
+            background: var(--ig-bg-dark);
+            border-color: var(--ig-border-dark);
+        }
+
+        @keyframes menuSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--ig-text-primary);
+        }
+
+        body.dark-mode .menu-item {
+            color: var(--ig-text-light);
+        }
+
+        .menu-item:hover {
+            background: var(--ig-received-bubble);
+        }
+
+        body.dark-mode .menu-item:hover {
+            background: var(--ig-received-bubble-dark);
+        }
+
+        .menu-item i {
+            width: 16px;
+            color: var(--ig-text-secondary);
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--jchat-primary);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px var(--ig-shadow);
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px var(--ig-shadow);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .chat-container {
+                max-width: 100%;
+            }
+            
+            .messages-area {
+                padding: 12px;
+            }
+            
+            .composer {
+                padding: 0 12px;
+            }
+            
+            .header-right {
+                gap: 16px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--ig-border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--ig-text-secondary);
+        }
+
+        /* Vanish Mode */
+        .vanish-mode {
+            background: var(--ig-bg-dark) !important;
+            color: var(--ig-text-light) !important;
+        }
+
+        .vanish-mode .chat-container {
+            background: var(--ig-bg-dark) !important;
+        }
+
+        .vanish-mode .messages-area {
+            background: var(--ig-bg-dark) !important;
+        }
+
+        .vanish-mode .composer {
+            background: var(--ig-bg-dark) !important;
+            border-top-color: var(--ig-border-dark) !important;
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: var(--ig-text-secondary);
+            padding: 40px;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: var(--ig-text-primary);
+        }
+
+        body.dark-mode .empty-state h3 {
+            color: var(--ig-text-light);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Main Chat Container -->
+    <div class="chat-container">
+        <!-- Header - Top Bar -->
+        <div class="chat-header">
+            <div class="header-left">
+                <img src="https://res.cloudinary.com/cloudinary/image/upload/w_40,h_40,c_fill,g_face,r_max/sample" 
+                     alt="Profile Picture" 
+                     class="profile-picture"
+                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%234a4ae8%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2230%22>J</text></svg>'">
+                <div class="user-info">
+                    <div class="username">John Doe</div>
+                    <div class="status-text">online</div>
+                    <div class="typing-indicator" id="typingIndicator">typing...</div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-icon" id="callBtn" title="Call">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="header-icon" id="videoBtn" title="Video Call">
+                    <i class="fas fa-video"></i>
+                </div>
+                <div class="header-icon" id="infoBtn" title="Info">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="messages-area" id="messagesArea">
+            <!-- Reply Preview -->
+            <div class="reply-preview" id="replyPreview">
+                <strong>Replying to:</strong> Hey! How are you doing?
+            </div>
+
+            <!-- Demo Messages -->
+            <div class="message received">
+                <div class="message-bubble">
+                    <div class="message-text">Hey! How are you doing?</div>
+                    <div class="message-time">2:30 PM</div>
+                </div>
+            </div>
+
+            <div class="message sent">
+                <div class="message-bubble">
+                    <div class="message-text">I'm doing great! How about you?</div>
+                    <div class="message-time">2:32 PM</div>
+                    <div class="message-status">
+                        <i class="fas fa-check-double status-seen"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message received">
+                <div class="message-bubble">
+                    <div class="message-text">Pretty good! Just wanted to check in. Are you free this weekend?</div>
+                    <div class="message-time">2:33 PM</div>
+                </div>
+            </div>
+
+            <div class="message sent">
+                <div class="message-bubble">
+                    <div class="message-text">Yes, I'm free! What do you have in mind?</div>
+                    <div class="message-time">2:35 PM</div>
+                    <div class="message-status">
+                        <i class="fas fa-check status-delivered"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message received">
+                <div class="message-bubble">
+                    <div class="message-text">Maybe we could grab coffee and catch up? ☕</div>
+                    <div class="message-time">2:36 PM</div>
+                </div>
+            </div>
+
+            <div class="message sent">
+                <div class="message-bubble">
+                    <div class="message-text">That sounds perfect! I'd love that 😊</div>
+                    <div class="message-time">2:37 PM</div>
+                    <div class="message-status">
+                        <i class="fas fa-check status-sent"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Composer - Bottom Input Bar -->
+        <div class="composer">
+            <div class="composer-icon" id="cameraBtn" title="Camera">
+                <i class="fas fa-camera"></i>
+            </div>
+            <div class="composer-icon" id="galleryBtn" title="Gallery">
+                <i class="fas fa-image"></i>
+            </div>
+            <textarea 
+                class="input-field" 
+                id="messageInput" 
+                placeholder="Message..."
+                rows="1"
+            ></textarea>
+            <div class="composer-icon" id="microphoneBtn" title="Voice Message">
+                <i class="fas fa-microphone"></i>
+            </div>
+            <div class="composer-icon like" id="likeBtn" title="Send Heart">
+                <i class="fas fa-heart"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Long Press Menu -->
+    <div class="message-menu" id="messageMenu">
+        <div class="menu-item" id="copyBtn">
+            <i class="fas fa-copy"></i>
+            Copy
+        </div>
+        <div class="menu-item" id="replyBtn">
+            <i class="fas fa-reply"></i>
+            Reply
+        </div>
+        <div class="menu-item" id="forwardBtn">
+            <i class="fas fa-share"></i>
+            Forward
+        </div>
+        <div class="menu-item" id="reactBtn">
+            <i class="fas fa-heart"></i>
+            React
+        </div>
+        <div class="menu-item" id="deleteBtn">
+            <i class="fas fa-trash"></i>
+            Delete
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const messageInput = document.getElementById('messageInput');
+        const messagesArea = document.getElementById('messagesArea');
+        const replyPreview = document.getElementById('replyPreview');
+        const messageMenu = document.getElementById('messageMenu');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // State
+        let isDarkMode = false;
+        let isVanishMode = false;
+        let selectedMessage = null;
+        let isReplying = false;
+
+        // Theme Toggle
+        themeToggle.addEventListener('click', () => {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            
+            const icon = themeToggle.querySelector('i');
+            if (isDarkMode) {
+                icon.className = 'fas fa-sun';
+                themeToggle.title = 'Toggle Light Mode';
+            } else {
+                icon.className = 'fas fa-moon';
+                themeToggle.title = 'Toggle Dark Mode';
+            }
+        });
+
+        // Message Input Functionality
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Send Message
+        function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message sent';
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    <div class="message-text">${text}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div class="message-status">
+                        <i class="fas fa-check status-sent"></i>
+                    </div>
+                </div>
+            `;
+
+            messagesArea.appendChild(messageDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+
+            // Clear input
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            // Simulate message delivery
+            setTimeout(() => {
+                const statusIcon = messageDiv.querySelector('.status-sent i');
+                statusIcon.className = 'fas fa-check-double status-delivered';
+            }, 1000);
+
+            // Simulate message seen
+            setTimeout(() => {
+                const statusIcon = messageDiv.querySelector('.status-delivered i');
+                statusIcon.className = 'fas fa-check-double status-seen';
+            }, 2000);
+
+            // Clear reply if active
+            if (isReplying) {
+                clearReply();
+            }
+        }
+
+        // Like Button
+        document.getElementById('likeBtn').addEventListener('click', () => {
+            const heartDiv = document.createElement('div');
+            heartDiv.className = 'message sent';
+            heartDiv.innerHTML = `
+                <div class="message-bubble">
+                    <div class="message-text">❤️</div>
+                    <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div class="message-status">
+                        <i class="fas fa-check status-sent"></i>
+                    </div>
+                </div>
+            `;
+            messagesArea.appendChild(heartDiv);
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        });
+
+        // Camera Button
+        document.getElementById('cameraBtn').addEventListener('click', () => {
+            console.log('Camera clicked');
+            // TODO: Implement camera functionality
+        });
+
+        // Gallery Button
+        document.getElementById('galleryBtn').addEventListener('click', () => {
+            console.log('Gallery clicked');
+            // TODO: Implement gallery functionality
+        });
+
+        // Microphone Button
+        document.getElementById('microphoneBtn').addEventListener('click', () => {
+            console.log('Microphone clicked');
+            // TODO: Implement voice message functionality
+        });
+
+        // Call Button
+        document.getElementById('callBtn').addEventListener('click', () => {
+            console.log('Call clicked');
+            // TODO: Implement call functionality
+        });
+
+        // Video Button
+        document.getElementById('videoBtn').addEventListener('click', () => {
+            console.log('Video call clicked');
+            // TODO: Implement video call functionality
+        });
+
+        // Info Button
+        document.getElementById('infoBtn').addEventListener('click', () => {
+            console.log('Info clicked');
+            // TODO: Implement info panel
+        });
+
+        // Message Long Press Menu
+        let longPressTimer;
+        let longPressedMessage = null;
+
+        messagesArea.addEventListener('mousedown', (e) => {
+            const messageBubble = e.target.closest('.message-bubble');
+            if (messageBubble) {
+                longPressedMessage = messageBubble.closest('.message');
+                longPressTimer = setTimeout(() => {
+                    showMessageMenu(e, messageBubble);
+                }, 500);
+            }
+        });
+
+        messagesArea.addEventListener('mouseup', () => {
+            clearTimeout(longPressTimer);
+        });
+
+        messagesArea.addEventListener('mouseleave', () => {
+            clearTimeout(longPressTimer);
+        });
+
+        function showMessageMenu(e, messageBubble) {
+            const rect = messageBubble.getBoundingClientRect();
+            messageMenu.style.display = 'block';
+            messageMenu.style.left = `${e.clientX - 100}px`;
+            messageMenu.style.top = `${e.clientY - 120}px`;
+            
+            selectedMessage = messageBubble;
+        }
+
+        // Hide menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!messageMenu.contains(e.target)) {
+                messageMenu.style.display = 'none';
+            }
+        });
+
+        // Menu Actions
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            if (selectedMessage) {
+                const text = selectedMessage.querySelector('.message-text').textContent;
+                navigator.clipboard.writeText(text);
+                messageMenu.style.display = 'none';
+            }
+        });
+
+        document.getElementById('replyBtn').addEventListener('click', () => {
+            if (selectedMessage) {
+                const text = selectedMessage.querySelector('.message-text').textContent;
+                replyPreview.innerHTML = `<strong>Replying to:</strong> ${text}`;
+                replyPreview.classList.add('show');
+                replyPreview.scrollIntoView({ behavior: 'smooth' });
+                messageInput.focus();
+                isReplying = true;
+                messageMenu.style.display = 'none';
+            }
+        });
+
+        document.getElementById('forwardBtn').addEventListener('click', () => {
+            console.log('Forward message');
+            messageMenu.style.display = 'none';
+        });
+
+        document.getElementById('reactBtn').addEventListener('click', () => {
+            if (selectedMessage) {
+                const reaction = document.createElement('div');
+                reaction.className = 'message-reaction';
+                reaction.innerHTML = '❤️';
+                selectedMessage.querySelector('.message-bubble').appendChild(reaction);
+                messageMenu.style.display = 'none';
+            }
+        });
+
+        document.getElementById('deleteBtn').addEventListener('click', () => {
+            if (selectedMessage) {
+                selectedMessage.remove();
+                messageMenu.style.display = 'none';
+            }
+        });
+
+        // Clear Reply
+        function clearReply() {
+            replyPreview.classList.remove('show');
+            isReplying = false;
+        }
+
+        // Double Tap Reaction
+        let lastTap = 0;
+        messagesArea.addEventListener('click', (e) => {
+            const messageBubble = e.target.closest('.message-bubble');
+            if (messageBubble) {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                if (tapLength < 500 && tapLength > 0) {
+                    // Double tap detected
+                    const reaction = document.createElement('div');
+                    reaction.className = 'message-reaction';
+                    reaction.innerHTML = '❤️';
+                    messageBubble.appendChild(reaction);
+                }
+                lastTap = currentTime;
+            }
+        });
+
+        // Typing Indicator
+        messageInput.addEventListener('input', () => {
+            if (messageInput.value.trim()) {
+                typingIndicator.classList.add('show');
+            } else {
+                typingIndicator.classList.remove('show');
+            }
+        });
+
+        // Initialize
+        console.log('JCHAT Instagram-style chat initialized successfully!');
+        console.log('Features: Dark mode, reactions, reply, long press menu, typing indicator');
+    </script>
+</body>
+</html>
