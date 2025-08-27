@@ -1312,40 +1312,43 @@
     </div>
 
     <script type="module">
-        // Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        // Import Firebase modules (same as Find_Friends.html)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, query, onSnapshot, getDocs, writeBatch, deleteDoc, serverTimestamp, updateDoc, where, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Firebase Configuration
+        // --- Firebase & Canvas Environment Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
             authDomain: "jchat-1.firebaseapp.com",
             projectId: "jchat-1",
             storageBucket: "jchat-1.firebasestorage.app",
+            messagingSenderId: "328479683167",
             appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
             measurementId: "G-S6Z9GG0R9P"
         };
+        const appId = "1:328479683167:web:276c0b7e8ea44dd2d6a1ea";
 
         // Cloudinary Configuration
         const cloudinaryConfig = {
-            cloudName: "cloudinary",
-            uploadPreset: "ml_default"
+            cloudName: "dxld01rcp", // Your Cloudinary Cloud Name
+            uploadPreset: "Storage_preset" // Your Cloudinary Upload Preset
         };
 
-        const appId = "1:328479683167:web:276c0b7e8ea44dd2d6a1ea";
+        // Initialize Firebase services
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Chat State
-        let currentUser = null;
-        let currentUserProfileData = null;
-        let currentChatId = null;
-        let unsubscribeMessages = null;
-        let chatListData = [];
-        let friendsList = new Set(); // Store friends from Find_Friends.html
-        let isFriendsSynced = false; // Track sync status
+        // --- Global State ---
+        let currentUser = null; // The currently authenticated user (Firebase Auth object)
+        let currentUserProfileData = null; // Store the current user's profile data
+        let currentChatId = null; // Current chat ID
+        let unsubscribeMessages = null; // To store unsubscribe function for messages
+        let chatListData = []; // Store chat list data
+
+        // Set to store friend UIDs (same as Find_Friends.html)
+        let friendsList = new Set(); // Stores friend UIDs
 
         // DOM Elements
         const messageInput = document.getElementById('messageInput');
@@ -1368,36 +1371,12 @@
         let isReplying = false;
         let currentChat = null;
 
-        // Initialize Firebase
-        function initializeFirebase() {
-            try {
-                console.log('JCHAT_DEBUG: Initializing Firebase with config:', firebaseConfig);
-                console.log('JCHAT_DEBUG: Cloudinary config:', cloudinaryConfig);
-                
-                // Initialize Firebase app
-                const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
-                const db = getFirestore(app);
-                
-                // Store references globally
-                window.jchatAuth = auth;
-                window.jchatDb = db;
-                
-                console.log('JCHAT_DEBUG: Firebase initialized successfully');
-                return { auth, db };
-            } catch (error) {
-                console.error('JCHAT_ERROR: Firebase initialization failed:', error);
-                return null;
-            }
-        }
+
 
         // Initialize Chat
         function initializeChat() {
             console.log('JCHAT_DEBUG: Initializing Instagram-style chat');
-            const firebaseResult = initializeFirebase();
-            if (firebaseResult) {
-                setupAuthentication();
-            }
+            setupAuthentication();
             applyThemeFromHome();
             setupEventListeners();
         }
@@ -1568,53 +1547,35 @@
             }
         }
 
-        // Fetch friends from Firebase
+        // Fetch friends from Firebase (same logic as Find_Friends.html)
         async function fetchFriendsFromFirebase() {
             try {
-                const { db } = window.jchatDb ? { db: window.jchatDb } : initializeFirebase();
                 if (!db || !currentUser) {
                     console.error('JCHAT_ERROR: DB or user not available');
                     return;
                 }
 
-                console.log('JCHAT_DEBUG: Current user UID:', currentUser.uid);
-                console.log('JCHAT_DEBUG: App ID:', appId);
+                console.log('JCHAT_DEBUG: Fetching friends for user:', currentUser.uid);
 
-                // Try to get friends from localStorage first (from Find_Friends.html)
-                const storedFriends = localStorage.getItem('jchat-friends');
-                if (storedFriends) {
-                    try {
-                        const friendsArray = JSON.parse(storedFriends);
-                        friendsList.clear();
-                        friendsArray.forEach(friendId => friendsList.add(friendId));
-                        console.log('JCHAT_DEBUG: Loaded friends from localStorage:', friendsList.size);
-                    } catch (e) {
-                        console.log('JCHAT_DEBUG: Error parsing localStorage friends:', e);
+                // Use the exact same collection path as Find_Friends.html
+                const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
+                const friendsSnapshot = await getDocs(publicFriendsRef);
+                
+                friendsList.clear();
+                
+                friendsSnapshot.forEach((doc) => {
+                    const friendData = doc.data();
+                    if (friendData.user1Id === currentUser.uid) {
+                        friendsList.add(friendData.user2Id);
+                        console.log('JCHAT_DEBUG: Added friend:', friendData.user2Id);
+                    } else if (friendData.user2Id === currentUser.uid) {
+                        friendsList.add(friendData.user1Id);
+                        console.log('JCHAT_DEBUG: Added friend:', friendData.user1Id);
                     }
-                }
+                });
 
-                // Also try to fetch from Firebase as backup
-                try {
-                    const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
-                    const friendsSnapshot = await getDocs(publicFriendsRef);
-                    
-                    console.log('JCHAT_DEBUG: Firebase friends snapshot size:', friendsSnapshot.size);
-                    
-                    friendsSnapshot.forEach((doc) => {
-                        const friendData = doc.data();
-                        console.log('JCHAT_DEBUG: Friend data:', friendData);
-                        if (friendData.user1Id === currentUser.uid) {
-                            friendsList.add(friendData.user2Id);
-                        } else if (friendData.user2Id === currentUser.uid) {
-                            friendsList.add(friendData.user1Id);
-                        }
-                    });
-                } catch (firebaseError) {
-                    console.log('JCHAT_DEBUG: Firebase friends fetch failed, using localStorage only:', firebaseError);
-                }
-
-                console.log('JCHAT_DEBUG: Final friends list size:', friendsList.size);
-                console.log('JCHAT_DEBUG: Friends list contents:', [...friendsList]);
+                console.log('JCHAT_DEBUG: Found friends:', friendsList.size);
+                console.log('JCHAT_DEBUG: Friends UIDs:', [...friendsList]);
                 
             } catch (error) {
                 console.error('JCHAT_ERROR: Error fetching friends from Firebase:', error);
@@ -1678,38 +1639,14 @@
                 const friendProfiles = await fetchFriendProfiles();
                 
                 if (friendProfiles.length === 0) {
-                    // Show test friends for demonstration
                     friendsListElement.innerHTML = `
-                        <div class="friend-item" data-friend-id="test1">
-                            <div class="friend-avatar">T</div>
-                            <div class="friend-info">
-                                <div class="friend-name">Test User 1</div>
-                                <div class="friend-status online">Online</div>
-                            </div>
-                        </div>
-                        <div class="friend-item" data-friend-id="test2">
-                            <div class="friend-avatar">T</div>
-                            <div class="friend-info">
-                                <div class="friend-name">Test User 2</div>
-                                <div class="friend-status offline">Offline</div>
-                            </div>
+                        <div class="no-friends">
+                            <i class="fas fa-users"></i>
+                            <div>No friends yet</div>
+                            <div style="font-size: 11px; margin-top: 4px;">Add friends from Find Friends page</div>
                         </div>
                     `;
-
-                    // Add click events to test friends
-                    document.querySelectorAll('.friend-item').forEach(item => {
-                        item.addEventListener('click', () => {
-                            const friendName = item.querySelector('.friend-name').textContent;
-                            const isOnline = item.querySelector('.friend-status').classList.contains('online');
-                            selectFriendToChat({
-                                uid: item.dataset.friendId,
-                                username: friendName,
-                                isOnline: isOnline
-                            });
-                        });
-                    });
-
-                    friendsCount.textContent = "2 test friends";
+                    friendsCount.textContent = "0 friends";
                     return;
                 }
                 
@@ -1753,7 +1690,6 @@
         async function fetchFriendProfiles() {
             try {
                 const profiles = [];
-                const { db } = window.jchatDb ? { db: window.jchatDb } : initializeFirebase();
                 if (!db) {
                     console.error('JCHAT_ERROR: DB not available');
                     return [];
@@ -2045,7 +1981,7 @@
         // Save Message to Firebase
         async function saveMessageToFirebase(text, type) {
             try {
-                const { db } = window.jchatDb ? { db: window.jchatDb } : initializeFirebase();
+
                 if (!db || !currentChatId || !currentUser) {
                     console.error('JCHAT_ERROR: DB, chat ID, or user not available');
                     return;
@@ -2233,7 +2169,7 @@
         // Authentication
         function setupAuthentication() {
             try {
-                const { auth } = window.jchatAuth ? { auth: window.jchatAuth } : initializeFirebase();
+
                 if (!auth) {
                     console.error('JCHAT_ERROR: Auth not available');
                     return;
