@@ -1098,7 +1098,7 @@
         // Apply theme from Home.html automatically
         function applyThemeFromHome() {
             try {
-                // Get the saved theme from localStorage (same key used in Home.html)
+                // Get the current active theme from Home.html
                 const savedTheme = localStorage.getItem('jchat-theme') || 'theme-dark-mode';
                 console.log('JCHAT_DEBUG: Applying theme from Home.html:', savedTheme);
                 
@@ -1108,10 +1108,68 @@
                 // Update chat elements to use theme colors
                 updateChatThemeColors(savedTheme);
                 
+                // Set up real-time theme synchronization
+                setupThemeSync();
+                
             } catch (error) {
                 console.error('JCHAT_ERROR: Error applying theme:', error);
                 // Fallback to dark mode
                 document.body.className = 'theme-dark-mode';
+            }
+        }
+
+        // Set up real-time theme synchronization with Home.html
+        function setupThemeSync() {
+            // Check for theme changes every 500ms to stay in sync
+            setInterval(() => {
+                const currentTheme = localStorage.getItem('jchat-theme');
+                if (currentTheme && document.body.className !== currentTheme) {
+                    console.log('JCHAT_DEBUG: Theme changed, updating to:', currentTheme);
+                    document.body.className = currentTheme;
+                    updateChatThemeColors(currentTheme);
+                }
+            }, 500);
+
+            // Listen for storage events (when Home.html changes theme)
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'jchat-theme' && event.newValue) {
+                    console.log('JCHAT_DEBUG: Theme changed from Home.html:', event.newValue);
+                    document.body.className = event.newValue;
+                    updateChatThemeColors(event.newValue);
+                }
+            });
+
+            // Listen for custom theme change events
+            window.addEventListener('jchat-theme-changed', (event) => {
+                if (event.detail && event.detail.theme) {
+                    console.log('JCHAT_DEBUG: Custom theme change event:', event.detail.theme);
+                    document.body.className = event.detail.theme;
+                    updateChatThemeColors(event.detail.theme);
+                }
+            });
+
+            // Listen for theme changes from Home.html via postMessage
+            window.addEventListener('message', (event) => {
+                if (event.data && event.data.type === 'theme-change' && event.data.theme) {
+                    console.log('JCHAT_DEBUG: Theme change via postMessage:', event.data.theme);
+                    document.body.className = event.data.theme;
+                    updateChatThemeColors(event.data.theme);
+                }
+            });
+
+            // Try to communicate with Home.html if it's open
+            try {
+                // Send a message to Home.html to request current theme
+                if (window.opener && !window.opener.closed) {
+                    window.opener.postMessage({ type: 'request-theme' }, '*');
+                }
+                
+                // Also try to communicate with parent window
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'request-theme' }, '*');
+                }
+            } catch (error) {
+                console.log('JCHAT_DEBUG: Home.html not accessible, using localStorage sync');
             }
         }
 
@@ -1509,29 +1567,30 @@
             initializeChat();
         });
 
-        // Listen for theme changes from Home.html
-        window.addEventListener('storage', (event) => {
-            if (event.key === 'jchat-theme') {
-                console.log('JCHAT_DEBUG: Theme changed from Home.html:', event.newValue);
-                if (event.newValue) {
-                    document.body.className = event.newValue;
-                    updateChatThemeColors(event.newValue);
-                }
-            }
-        });
 
-        // Also listen for custom theme change events
-        window.addEventListener('jchat-theme-changed', (event) => {
-            if (event.detail && event.detail.theme) {
-                console.log('JCHAT_DEBUG: Custom theme change event:', event.detail.theme);
-                document.body.className = event.detail.theme;
-                updateChatThemeColors(event.detail.theme);
-            }
-        });
+
+        // Display current theme status
+        function showThemeStatus() {
+            const currentTheme = localStorage.getItem('jchat-theme') || 'theme-dark-mode';
+            const themeName = currentTheme.replace('theme-', '').replace('-mode', '').replace('-', ' ');
+            const themeDisplay = themeName.charAt(0).toUpperCase() + themeName.slice(1);
+            
+            console.log('🎨 JCHAT Chat Theme Status:');
+            console.log(`   Current Theme: ${themeDisplay}`);
+            console.log(`   Theme Class: ${currentTheme}`);
+            console.log(`   Synced with Home.html: ✅`);
+            console.log(`   Auto-updates: ✅`);
+        }
+
+        // Show theme status after initialization
+        setTimeout(() => {
+            showThemeStatus();
+        }, 1000);
 
         console.log('JCHAT Instagram-style chat initialized successfully!');
         console.log('Firebase and Cloudinary configured and ready for real users');
         console.log('Features: Reactions, reply, long press menu, typing indicator');
+        console.log('🎨 Theme System: Auto-sync with Home.html enabled');
     </script>
 </body>
 </html>
