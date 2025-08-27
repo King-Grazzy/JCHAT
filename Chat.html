@@ -795,14 +795,15 @@
 
         .chat-header-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
             align-items: center;
             max-width: 100%;
             overflow-x: auto;
-            padding: 5px;
+            padding: 4px;
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE and Edge */
+            min-height: 44px;
         }
 
         .chat-header-actions::-webkit-scrollbar {
@@ -812,9 +813,9 @@
         .group-features {
             display: flex;
             align-items: center;
-            gap: 4px;
-            margin-right: 8px;
-            padding-right: 8px;
+            gap: 3px;
+            margin-right: 6px;
+            padding-right: 6px;
             border-right: 1px solid var(--border-light);
             flex-shrink: 0;
         }
@@ -822,7 +823,7 @@
         .general-features {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             flex-shrink: 0;
         }
 
@@ -847,14 +848,14 @@
             background: none;
             border: none;
             color: var(--text-light);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            padding: 6px;
+            padding: 5px;
             border-radius: 50%;
             transition: all 0.3s ease;
             position: relative;
-            min-width: 32px;
-            height: 32px;
+            min-width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2486,6 +2487,90 @@
             margin-bottom: 1rem;
         }
 
+        /* Collapsible Menu for Overflow */
+        .collapsible-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            min-width: 180px;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .menu-content {
+            padding: 8px 0;
+        }
+
+        .menu-content .chat-action-btn {
+            width: 100%;
+            border-radius: 0;
+            justify-content: flex-start;
+            padding: 8px 12px;
+            min-width: auto;
+            height: auto;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .menu-content .chat-action-btn:last-child {
+            border-bottom: none;
+        }
+
+        .menu-content .chat-action-btn:hover {
+            background: rgba(0, 123, 255, 0.1);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .chat-action-btn {
+                min-width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+                padding: 4px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .chat-action-btn {
+                min-width: 26px;
+                height: 26px;
+                font-size: 0.75rem;
+                padding: 3px;
+            }
+            
+            .group-features, .general-features {
+                gap: 2px;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .chat-action-btn {
+                min-width: 24px;
+                height: 24px;
+                font-size: 0.7rem;
+                padding: 3px;
+            }
+            
+            .chat-header-actions {
+                gap: 4px;
+                padding: 3px;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .chat-action-btn {
+                min-width: 22px;
+                height: 22px;
+                font-size: 0.65rem;
+                padding: 2px;
+            }
+        }
+
         .member-role {
             padding: 2px 8px;
             border-radius: 10px;
@@ -3768,6 +3853,13 @@
                         <button class="chat-action-btn" id="chatMoreBtn" title="More Options">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
+                        
+                        <!-- Collapsible Menu for Overflow -->
+                        <div class="collapsible-menu" id="collapsibleMenu">
+                            <div class="menu-content">
+                                <!-- Hidden buttons will be moved here dynamically -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4781,6 +4873,76 @@
             if (!emojiPicker.contains(e.target) && !emojiBtn.contains(e.target)) {
                 emojiPicker.classList.remove('active');
             }
+            
+            // Close collapsible menu when clicking outside
+            const collapsibleMenu = document.getElementById('collapsibleMenu');
+            const moreBtn = document.getElementById('chatMoreBtn');
+            if (collapsibleMenu && moreBtn && 
+                !collapsibleMenu.contains(e.target) && 
+                !moreBtn.contains(e.target)) {
+                collapsibleMenu.style.display = 'none';
+            }
+        }
+        
+        // Dynamic overflow management
+        function manageHeaderOverflow() {
+            const headerActions = document.querySelector('.chat-header-actions');
+            const collapsibleMenu = document.getElementById('collapsibleMenu');
+            const menuContent = collapsibleMenu?.querySelector('.menu-content');
+            
+            if (!headerActions || !collapsibleMenu || !menuContent) return;
+            
+            // Clear menu content
+            menuContent.innerHTML = '';
+            
+            // Get all buttons
+            const allButtons = headerActions.querySelectorAll('.chat-action-btn');
+            const visibleButtons = [];
+            const hiddenButtons = [];
+            
+            // Check which buttons are visible
+            allButtons.forEach(button => {
+                if (button.offsetParent !== null && button.style.display !== 'none') {
+                    const rect = button.getBoundingClientRect();
+                    const headerRect = headerActions.getBoundingClientRect();
+                    
+                    if (rect.right <= headerRect.right - 10) {
+                        visibleButtons.push(button);
+                    } else {
+                        hiddenButtons.push(button);
+                    }
+                }
+            });
+            
+            // Move overflow buttons to menu
+            hiddenButtons.forEach(button => {
+                const clone = button.cloneNode(true);
+                clone.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    button.click();
+                    collapsibleMenu.style.display = 'none';
+                });
+                menuContent.appendChild(clone);
+            });
+            
+            // Show/hide more button based on overflow
+            const moreBtn = document.getElementById('chatMoreBtn');
+            if (moreBtn) {
+                moreBtn.style.display = hiddenButtons.length > 0 ? 'flex' : 'none';
+            }
+        }
+        
+        // Toggle collapsible menu
+        function toggleMoreOptions() {
+            const collapsibleMenu = document.getElementById('collapsibleMenu');
+            if (collapsibleMenu) {
+                const isVisible = collapsibleMenu.style.display !== 'none';
+                collapsibleMenu.style.display = isVisible ? 'none' : 'block';
+                
+                if (!isVisible) {
+                    manageHeaderOverflow();
+                }
+            }
         }
 
         // Switch Tabs
@@ -5382,6 +5544,9 @@
                 
                 // Update button states
                 updateButtonStates();
+                
+                // Manage header overflow
+                setTimeout(manageHeaderOverflow, 100);
                 }
             } catch (error) {
                 console.error('Error loading chat header:', error);
@@ -11063,6 +11228,11 @@
 
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', initializeChatApp);
+        
+        // Add resize listener for dynamic overflow management
+        window.addEventListener('resize', () => {
+            setTimeout(manageHeaderOverflow, 100);
+        });
     </script>
 
     <!-- Clear All Messages Modal -->
