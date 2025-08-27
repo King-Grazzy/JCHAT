@@ -649,7 +649,6 @@
 
         .refresh-friends:hover {
             background: rgba(0, 213, 255, 0.1);
-            transform: rotate(180deg);
         }
 
         .friends-list {
@@ -760,12 +759,11 @@
         }
 
         .friends-sync-toggle:hover {
-            transform: scale(1.1);
             color: var(--accent-color);
         }
 
         .friends-sync-toggle.syncing {
-            animation: pulse 1.5s ease-in-out infinite;
+            /* Animation removed */
         }
 
         .friends-sync-toggle.synced {
@@ -789,7 +787,7 @@
 
         .friends-sync-toggle.syncing .sync-indicator {
             background: var(--warning-color);
-            animation: blink 1s ease-in-out infinite;
+            /* Animation removed */
         }
 
         .friends-sync-toggle.synced .sync-indicator {
@@ -800,15 +798,7 @@
             background: var(--delete-button-color);
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
 
         /* Friends Sync Notification */
         .friends-sync-notification {
@@ -826,23 +816,13 @@
             font-size: 14px;
             font-weight: 500;
             z-index: 1000;
-            animation: slideInRight 0.3s ease-out;
         }
 
         .friends-sync-notification i {
             font-size: 16px;
         }
 
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
+
 
         /* Messages Area */
         .messages-area {
@@ -1656,48 +1636,29 @@
             try {
                 if (!friendsListElement || !friendsCount) return;
 
-                // Always show demo friends for now (since friendsList might be empty)
-                friendsCount.textContent = "3 demo friends";
-                
-                // Show demo friends for testing
+
+                // Show loading state
                 friendsListElement.innerHTML = `
-                    <div class="friend-item" data-friend-id="demo1">
-                        <div class="friend-avatar">J</div>
-                        <div class="friend-info">
-                            <div class="friend-name">John Doe</div>
-                            <div class="friend-status online">Online</div>
-                        </div>
-                    </div>
-                    <div class="friend-item" data-friend-id="demo2">
-                        <div class="friend-avatar">S</div>
-                        <div class="friend-info">
-                            <div class="friend-name">Sarah Smith</div>
-                            <div class="friend-status offline">Offline</div>
-                        </div>
-                    </div>
-                    <div class="friend-item" data-friend-id="demo3">
-                        <div class="friend-avatar">M</div>
-                        <div class="friend-info">
-                            <div class="friend-name">Mike Johnson</div>
-                            <div class="friend-status online">Online</div>
-                        </div>
+                    <div class="loading-friends">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <span>Loading friends...</span>
                     </div>
                 `;
 
-                // Add click events to demo friends
-                document.querySelectorAll('.friend-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        const friendName = item.querySelector('.friend-name').textContent;
-                        const isOnline = item.querySelector('.friend-status').classList.contains('online');
-                        selectFriendToChat({
-                            uid: item.dataset.friendId,
-                            username: friendName,
-                            isOnline: isOnline
-                        });
-                    });
-                });
+                // Fetch real friends from Find_Friends.html
+                await fetchFriendsFromFirebase();
+                
+                // Update friends count
+                friendsCount.textContent = `${friendsList.size} friends`;
+                
 
-                return;
+                friendsListElement.innerHTML = `
+
+
+
+                `;
+
+
 
                 // Clear loading state
                 friendsListElement.innerHTML = '';
