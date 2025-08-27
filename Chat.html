@@ -569,6 +569,105 @@
             opacity: 0.8;
         }
 
+        /* Friends Sync Toggle */
+        .friends-sync-toggle {
+            position: relative;
+            width: var(--icon-size);
+            height: var(--icon-size);
+            color: var(--ig-text-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 8px;
+        }
+
+        .friends-sync-toggle:hover {
+            transform: scale(1.1);
+            color: var(--accent-color);
+        }
+
+        .friends-sync-toggle.syncing {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .friends-sync-toggle.synced {
+            color: var(--status-online);
+        }
+
+        .friends-sync-toggle.error {
+            color: var(--delete-button-color);
+        }
+
+        .sync-indicator {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .friends-sync-toggle.syncing .sync-indicator {
+            background: var(--warning-color);
+            animation: blink 1s ease-in-out infinite;
+        }
+
+        .friends-sync-toggle.synced .sync-indicator {
+            background: var(--status-online);
+        }
+
+        .friends-sync-toggle.error .sync-indicator {
+            background: var(--delete-button-color);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Friends Sync Notification */
+        .friends-sync-notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: var(--status-online);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .friends-sync-notification i {
+            font-size: 16px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
         /* Messages Area */
         .messages-area {
             flex: 1;
@@ -963,6 +1062,11 @@
                 </div>
             </div>
             <div class="header-right">
+                <!-- Friends Sync Toggle -->
+                <div class="friends-sync-toggle" id="friendsSyncToggle" title="Sync Friends from Find Friends">
+                    <i class="fas fa-users"></i>
+                    <div class="sync-indicator" id="syncIndicator"></div>
+                </div>
                 <div class="header-icon" id="callBtn" title="Call">
                     <i class="fas fa-phone"></i>
                 </div>
@@ -1065,6 +1169,8 @@
         let currentChatId = null;
         let unsubscribeMessages = null;
         let chatListData = [];
+        let friendsList = new Set(); // Store friends from Find_Friends.html
+        let isFriendsSynced = false; // Track sync status
 
         // DOM Elements
         const messageInput = document.getElementById('messageInput');
@@ -1074,6 +1180,8 @@
         const profilePicture = document.getElementById('profilePicture');
         const typingIndicator = document.getElementById('typingIndicator');
         const messageMenu = document.getElementById('messageMenu');
+        const friendsSyncToggle = document.getElementById('friendsSyncToggle');
+        const syncIndicator = document.getElementById('syncIndicator');
 
         // State
         let isVanishMode = false;
@@ -1208,8 +1316,122 @@
             }
         }
 
+        // Friends Sync Functions
+        async function syncFriendsFromFindFriends() {
+            try {
+                if (!friendsSyncToggle) return;
+
+                // Set syncing state
+                friendsSyncToggle.classList.add('syncing');
+                friendsSyncToggle.classList.remove('synced', 'error');
+                friendsSyncToggle.title = 'Syncing friends...';
+
+                console.log('JCHAT_DEBUG: Starting friends sync from Find_Friends.html');
+
+                // Try to get friends from localStorage (if Find_Friends.html has stored them)
+                const storedFriends = localStorage.getItem('jchat-friends');
+                if (storedFriends) {
+                    try {
+                        const friendsData = JSON.parse(storedFriends);
+                        friendsList = new Set(friendsData);
+                        console.log('JCHAT_DEBUG: Found stored friends:', friendsList.size);
+                    } catch (error) {
+                        console.log('JCHAT_DEBUG: No stored friends found, will fetch from Firebase');
+                    }
+                }
+
+                // Fetch friends from Firebase (same collection used in Find_Friends.html)
+                if (currentUser) {
+                    await fetchFriendsFromFirebase();
+                } else {
+                    console.log('JCHAT_DEBUG: User not authenticated, skipping Firebase sync');
+                }
+
+                // Update sync status
+                isFriendsSynced = true;
+                friendsSyncToggle.classList.remove('syncing');
+                friendsSyncToggle.classList.add('synced');
+                friendsSyncToggle.title = `Friends synced! (${friendsList.size} friends)`;
+
+                console.log('JCHAT_DEBUG: Friends sync completed successfully');
+                showFriendsSyncNotification();
+
+            } catch (error) {
+                console.error('JCHAT_ERROR: Error syncing friends:', error);
+                
+                // Update error state
+                friendsSyncToggle.classList.remove('syncing');
+                friendsSyncToggle.classList.add('error');
+                friendsSyncToggle.title = 'Sync failed. Click to retry.';
+            }
+        }
+
+        // Fetch friends from Firebase
+        async function fetchFriendsFromFirebase() {
+            try {
+                const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
+                const friendsSnapshot = await getDocs(publicFriendsRef);
+                
+                friendsList.clear();
+                
+                friendsSnapshot.forEach((doc) => {
+                    const friendData = doc.data();
+                    if (friendData.user1Id === currentUser.uid) {
+                        friendsList.add(friendData.user2Id);
+                    } else if (friendData.user2Id === currentUser.uid) {
+                        friendsList.add(friendData.user1Id);
+                    }
+                });
+
+                // Store friends in localStorage for persistence
+                localStorage.setItem('jchat-friends', JSON.stringify([...friendsList]));
+                
+                console.log('JCHAT_DEBUG: Fetched friends from Firebase:', friendsList.size);
+                
+            } catch (error) {
+                console.error('JCHAT_ERROR: Error fetching friends from Firebase:', error);
+                throw error;
+            }
+        }
+
+        // Show friends sync notification
+        function showFriendsSyncNotification() {
+            const notification = document.createElement('div');
+            notification.className = 'friends-sync-notification';
+            notification.innerHTML = `
+                <i class="fas fa-check-circle"></i>
+                <span>Friends synced successfully! (${friendsList.size} friends)</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // Check if a user is a friend
+        function isUserFriend(userId) {
+            return friendsList.has(userId);
+        }
+
+        // Get friends count
+        function getFriendsCount() {
+            return friendsList.size;
+        }
+
         // Setup Event Listeners
         function setupEventListeners() {
+            // Friends Sync Toggle
+            if (friendsSyncToggle) {
+                friendsSyncToggle.addEventListener('click', () => {
+                    syncFriendsFromFindFriends();
+                });
+            }
+
             // Message Input Functionality
             if (messageInput) {
                 messageInput.addEventListener('input', function() {
