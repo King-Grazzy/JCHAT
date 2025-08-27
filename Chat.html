@@ -1368,7 +1368,7 @@
         const friendsSyncToggle = document.getElementById('friendsSyncToggle');
         const syncIndicator = document.getElementById('syncIndicator');
         const friendsDropdown = document.getElementById('friendsDropdown');
-        const friendsList = document.getElementById('friendsList');
+        const friendsListElement = document.getElementById('friendsList');
         const friendsCount = document.getElementById('friendsCount');
         const refreshFriends = document.getElementById('refreshFriends');
 
@@ -1644,14 +1644,14 @@
         // Populate friends dropdown
         async function populateFriendsDropdown() {
             try {
-                if (!friendsList || !friendsCount) return;
+                if (!friendsListElement || !friendsCount) return;
 
                 // Update friends count
                 friendsCount.textContent = `${friendsList.size} friends`;
 
                 if (friendsList.size === 0) {
                     // Show demo friends for testing
-                    friendsList.innerHTML = `
+                    friendsListElement.innerHTML = `
                         <div class="friend-item" data-friend-id="demo1">
                             <div class="friend-avatar">J</div>
                             <div class="friend-info">
@@ -1692,7 +1692,7 @@
                 }
 
                 // Clear loading state
-                friendsList.innerHTML = '';
+                friendsListElement.innerHTML = '';
 
                 // Fetch friend profiles and populate dropdown
                 const friendProfiles = await fetchFriendProfiles();
@@ -1719,12 +1719,12 @@
                         selectFriendToChat(friend);
                     });
 
-                    friendsList.appendChild(friendItem);
+                    friendsListElement.appendChild(friendItem);
                 });
 
             } catch (error) {
                 console.error('JCHAT_ERROR: Error populating friends dropdown:', error);
-                friendsList.innerHTML = `
+                friendsListElement.innerHTML = `
                     <div class="no-friends">
                         <i class="fas fa-exclamation-triangle"></i>
                         <div>Error loading friends</div>
