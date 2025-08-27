@@ -582,6 +582,34 @@
             from { transform: translateX(-20px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+
+        /* Demo Content */
+        .demo-chat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid var(--whatsapp-border);
+        }
+
+        .demo-chat-item:hover {
+            background: var(--whatsapp-hover);
+        }
+
+        .demo-avatar {
+            width: 49px;
+            height: 49px;
+            border-radius: 50%;
+            background: var(--whatsapp-icon);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--whatsapp-sidebar-bg);
+            font-size: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -590,10 +618,12 @@
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="user-profile">
-                    <img id="userAvatar" src="" alt="User Avatar" class="user-avatar">
+                    <div class="user-avatar" style="background: var(--whatsapp-green); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: bold;">
+                        J
+                    </div>
                     <div class="user-info">
-                        <h3 id="userName">Guest</h3>
-                        <p id="userStatus">Online</p>
+                        <h3>JCHAT User</h3>
+                        <p>Online</p>
                     </div>
                 </div>
                 <div class="header-actions">
@@ -614,14 +644,80 @@
             </div>
 
             <div class="chat-list" id="chatList">
-                <!-- Chat items will be populated here -->
+                <!-- Demo Chat Items -->
+                <div class="demo-chat-item" onclick="selectDemoChat('John Doe')">
+                    <div class="demo-avatar">J</div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">John Doe</div>
+                            <div class="chat-time">2m</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="chat-message">Hey! How are you doing?</div>
+                            <div class="chat-status">
+                                <div class="unread-badge">2</div>
+                                <i class="fas fa-check-double status-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-chat-item" onclick="selectDemoChat('Jane Smith')">
+                    <div class="demo-avatar">J</div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">Jane Smith</div>
+                            <div class="chat-time">1h</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="chat-message">Did you see the new update?</div>
+                            <div class="chat-status">
+                                <i class="fas fa-check-double status-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-chat-item" onclick="selectDemoChat('Mike Johnson')">
+                    <div class="demo-avatar">M</div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">Mike Johnson</div>
+                            <div class="chat-time">3h</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="chat-message">Meeting at 3 PM tomorrow</div>
+                            <div class="chat-status">
+                                <i class="fas fa-check-double status-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-chat-item" onclick="selectDemoChat('Sarah Wilson')">
+                    <div class="demo-avatar">S</div>
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">Sarah Wilson</div>
+                            <div class="chat-time">1d</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="chat-message">Thanks for your help!</div>
+                            <div class="chat-status">
+                                <i class="fas fa-check-double status-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Main Chat Area -->
         <div class="main-chat" id="mainChat">
             <div class="chat-header" id="chatHeader" style="display: none;">
-                <img id="chatHeaderAvatar" src="" alt="Chat Avatar" class="chat-header-avatar">
+                <div class="chat-header-avatar" id="chatHeaderAvatar" style="background: var(--whatsapp-green); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: bold;">
+                    U
+                </div>
                 <div class="chat-header-info">
                     <div class="chat-header-name" id="chatHeaderName">Select a Chat</div>
                     <div class="chat-header-status" id="chatHeaderStatus">Choose a conversation</div>
@@ -673,452 +769,117 @@
         </div>
     </div>
 
-    <script type="module">
-        // Firebase Imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
-            authDomain: "jchat-1.firebaseapp.com",
-            projectId: "jchat-1",
-            storageBucket: "jchat-1.firebasestorage.app",
-            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
-            measurementId: "G-S6Z9GG0R9P"
-        };
-
-        // Cloudinary Configuration
-        const cloudinaryConfig = {
-            cloudName: "cloudinary",
-            uploadPreset: "ml_default"
-        };
-
-        const appId = "default-app-id";
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Chat State
-        let currentUser = null;
-        let currentUserProfileData = null;
-        let currentChatId = null;
-        let unsubscribeMessages = null;
-        let chatListData = [];
-
-        // DOM Elements
-        const sidebar = document.getElementById('sidebar');
-        const mainChat = document.getElementById('mainChat');
-        const chatList = document.getElementById('chatList');
-        const chatHeader = document.getElementById('chatHeader');
-        const inputArea = document.getElementById('inputArea');
-        const messagesArea = document.getElementById('messagesArea');
-        const messageInput = document.getElementById('messageInput');
-        const sendButton = document.getElementById('sendButton');
-        const searchInput = document.getElementById('searchInput');
-        const newChatBtn = document.getElementById('newChatBtn');
-        const userAvatar = document.getElementById('userAvatar');
-        const userName = document.getElementById('userName');
-        const typingIndicator = document.getElementById('typingIndicator');
-
-        // Initialize Chat
-        function initializeChat() {
-            console.log('JCHAT_DEBUG: Initializing WhatsApp-style chat');
-            setupEventListeners();
-        }
-
-        // Setup Event Listeners
-        function setupEventListeners() {
-            // Send Message
-            if (sendButton) {
-                sendButton.addEventListener('click', sendMessage);
-            }
-
-            // Message Input
-            if (messageInput) {
-                messageInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                });
-
-                messageInput.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-                    
-                    if (sendButton) {
-                        sendButton.disabled = this.value.trim().length === 0;
-                    }
-                });
-            }
-
-            // Search
-            if (searchInput) {
-                searchInput.addEventListener('input', (e) => {
-                    searchChats(e.target.value);
-                });
-            }
-
-            // New Chat
-            if (newChatBtn) {
-                newChatBtn.addEventListener('click', () => {
-                    console.log('JCHAT_DEBUG: New chat button clicked');
-                    // TODO: Implement new chat creation
-                });
-            }
-
-            // Mobile menu toggle
-            if (document.getElementById('menuBtn')) {
-                document.getElementById('menuBtn').addEventListener('click', () => {
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.toggle('show');
-                    }
-                });
-            }
-        }
-
-        // Fetch Chat List
-        async function fetchChatList() {
-            if (!currentUser) return;
-
-            try {
-                const chatsRef = collection(db, "artifacts", appId, "chats");
-                const q = query(chatsRef, where("participants", "array-contains", currentUser.uid));
-                const querySnapshot = await getDocs(q);
-                
-                chatListData = [];
-                querySnapshot.forEach((doc) => {
-                    const chatData = doc.data();
-                    chatListData.push({
-                        id: doc.id,
-                        ...chatData
-                    });
-                });
-
-                renderChatList();
-            } catch (error) {
-                console.error('JCHAT_ERROR: Error fetching chat list:', error);
-            }
-        }
-
-        // Render Chat List
-        function renderChatList() {
-            if (!chatList) return;
-            
-            chatList.innerHTML = '';
-            
-            if (chatListData.length === 0) {
-                chatList.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: var(--whatsapp-text-secondary);">
-                        <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-                        <p>No conversations yet</p>
-                        <p style="font-size: 14px; margin-top: 8px;">Start a new chat to begin messaging!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            chatListData.forEach(chat => {
-                const chatItem = document.createElement('div');
-                chatItem.className = 'chat-item';
-                chatItem.onclick = () => selectChat(chat);
-                
-                const otherUserId = chat.participants.find(id => id !== currentUser.uid);
-                const otherUserData = chat.participantsData?.[otherUserId] || {};
-                
-                let otherUserProfilePic = otherUserData.profilePicId;
-                if (!otherUserProfilePic && otherUserData.username) {
-                    otherUserProfilePic = currentUserProfileData?.profilePicId;
-                }
-
-                const unreadCount = chat.unreadCount || 0;
-                const lastMessageTime = chat.lastMessageTime?.toDate() || new Date();
-                const timeAgo = getTimeAgo(lastMessageTime);
-                
-                chatItem.innerHTML = `
-                    <img src="${otherUserProfilePic ? `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/w_50,h_50,c_fill,g_face,r_max/${otherUserProfilePic}` : ''}" 
-                         alt="Avatar" 
-                         class="chat-avatar"
-                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%238696a0%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2230%22>${(otherUserData.username || 'U').charAt(0).toUpperCase()}</text></svg>'">
-                    <div class="chat-info">
-                        <div class="chat-header">
-                            <div class="chat-name">${otherUserData.username || `User_${otherUserId.substring(0, 8)}`}</div>
-                            <div class="chat-time">${timeAgo}</div>
-                        </div>
-                        <div class="chat-preview">
-                            <div class="chat-message">${chat.lastMessage || 'Start a conversation!'}</div>
-                            <div class="chat-status">
-                                ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
-                                <i class="fas fa-check-double status-icon"></i>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                chatList.appendChild(chatItem);
-            });
-        }
-
-        // Select Chat
-        function selectChat(chat) {
-            currentChatId = chat.id;
-            
-            // Update active state
-            document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            
-            // Show chat interface
-            if (chatHeader) chatHeader.style.display = 'flex';
-            if (inputArea) inputArea.style.display = 'flex';
-            
-            const otherUserId = chat.participants.find(id => id !== currentUser.uid);
-            const otherUserData = chat.participantsData?.[otherUserId] || {};
-            
+    <script>
+        // Simple demo functionality
+        function selectDemoChat(name) {
             // Update chat header
-            if (chatHeader) {
-                const chatHeaderName = document.getElementById('chatHeaderName');
-                const chatHeaderStatus = document.getElementById('chatHeaderStatus');
-                if (chatHeaderName) chatHeaderName.textContent = otherUserData.username || `User_${otherUserId.substring(0, 8)}`;
-                if (chatHeaderStatus) chatHeaderStatus.textContent = 'online';
-            }
+            document.getElementById('chatHeader').style.display = 'flex';
+            document.getElementById('chatHeaderName').textContent = name;
+            document.getElementById('chatHeaderStatus').textContent = 'online';
+            document.getElementById('chatHeaderAvatar').textContent = name.charAt(0);
             
-            // Update chat header avatar
-            const chatHeaderAvatar = document.getElementById('chatHeaderAvatar');
-            if (chatHeaderAvatar) {
-                if (otherUserData.profilePicId) {
-                    chatHeaderAvatar.src = `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/w_40,h_40,c_fill,g_face,r_max/${otherUserData.profilePicId}`;
-                } else {
-                    chatHeaderAvatar.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%238696a0"/><text x="50" y="50" text-anchor="middle" dy=".3em" fill="white" font-size="30">${(otherUserData.username || 'U').charAt(0).toUpperCase()}</text></svg>`;
-                }
-            }
+            // Show input area
+            document.getElementById('inputArea').style.display = 'flex';
             
-            // Load messages
-            loadChatMessages(chat.id);
-            
-            // Enable input
-            if (messageInput) messageInput.disabled = false;
-            if (sendButton) sendButton.disabled = false;
-
-            // Hide sidebar on mobile
-            if (window.innerWidth <= 768) {
-                sidebar.classList.remove('show');
-            }
-        }
-
-        // Load Chat Messages
-        async function loadChatMessages(chatId) {
-            if (unsubscribeMessages) {
-                unsubscribeMessages();
-            }
-
-            try {
-                const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
-                const q = query(messagesRef, orderBy("timestamp", "asc"));
-                
-                unsubscribeMessages = onSnapshot(q, (snapshot) => {
-                    if (!messagesArea) return;
-                    
-                    messagesArea.innerHTML = '';
-                    
-                    snapshot.forEach((doc) => {
-                        const messageData = doc.data();
-                        const messageElement = createMessageElement(messageData);
-                        messagesArea.appendChild(messageElement);
-                    });
-                    
-                    messagesArea.scrollTop = messagesArea.scrollHeight;
-                });
-            } catch (error) {
-                console.error('JCHAT_ERROR: Error loading messages:', error);
-            }
-        }
-
-        // Create Message Element
-        function createMessageElement(messageData) {
-            const messageDiv = document.createElement('div');
-            const isSent = messageData.senderId === currentUser.uid;
-            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
-            
-            const timestamp = messageData.timestamp?.toDate() || new Date();
-            const timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            const messageStatus = messageData.status || 'sent';
-            const statusIcon = getStatusIcon(messageStatus);
-            const statusClass = `status-${messageStatus}`;
-            
-            messageDiv.innerHTML = `
-                <div class="message-content">
-                    <div class="message-text">${messageData.text}</div>
-                    <div class="message-time">
-                        ${timeString}
-                        <span class="message-status">
-                            <i class="fas ${statusIcon} ${statusClass}"></i>
-                        </span>
+            // Update messages area with demo messages
+            const messagesArea = document.getElementById('messagesArea');
+            messagesArea.innerHTML = `
+                <div class="message received">
+                    <div class="message-content">
+                        <div class="message-text">Hey! How are you doing?</div>
+                        <div class="message-time">2:30 PM</div>
+                    </div>
+                </div>
+                <div class="message sent">
+                    <div class="message-content">
+                        <div class="message-text">I'm doing great! How about you?</div>
+                        <div class="message-time">2:32 PM</div>
+                    </div>
+                </div>
+                <div class="message received">
+                    <div class="message-content">
+                        <div class="message-text">Pretty good! Just wanted to check in.</div>
+                        <div class="message-time">2:33 PM</div>
                     </div>
                 </div>
             `;
             
-            return messageDiv;
-        }
-
-        // Get Status Icon
-        function getStatusIcon(status) {
-            switch(status) {
-                case 'sent': return 'fa-check';
-                case 'delivered': return 'fa-check-double';
-                case 'read': return 'fa-check-double';
-                case 'failed': return 'fa-exclamation-triangle';
-                default: return 'fa-check';
-            }
-        }
-
-        // Send Message
-        async function sendMessage() {
-            if (!currentChatId || !messageInput || !messageInput.value.trim()) return;
-
-            const messageText = messageInput.value.trim();
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
-
-            try {
-                const messagesRef = collection(db, "artifacts", appId, "chats", currentChatId, "messages");
-                await addDoc(messagesRef, {
-                    text: messageText,
-                    senderId: currentUser.uid,
-                    senderProfilePic: currentUserProfileData?.profilePicId || currentUser.profilePicId,
-                    timestamp: serverTimestamp(),
-                    status: 'sent'
-                });
-
-                const chatRef = doc(db, "artifacts", appId, "chats", currentChatId);
-                await updateDoc(chatRef, {
-                    lastMessage: messageText,
-                    lastMessageTime: serverTimestamp()
-                });
-
-            } catch (error) {
-                console.error('JCHAT_ERROR: Error sending message:', error);
-            }
-        }
-
-        // Search Chats
-        function searchChats(query) {
-            if (!query.trim()) {
-                renderChatList();
-                return;
-            }
-
-            const filteredChats = chatListData.filter(chat => {
-                const otherUserId = chat.participants.find(id => id !== currentUser.uid);
-                const otherUserData = chat.participantsData?.[otherUserId] || {};
-                const username = otherUserData.username || `User_${otherUserId.substring(0, 8)}`;
-                const lastMessage = chat.lastMessage || '';
-                
-                return username.toLowerCase().includes(query.toLowerCase()) ||
-                       lastMessage.toLowerCase().includes(query.toLowerCase());
-            });
-
-            renderFilteredChatList(filteredChats);
-        }
-
-        // Render Filtered Chat List
-        function renderFilteredChatList(filteredChats) {
-            if (!chatList) return;
+            // Enable input
+            document.getElementById('messageInput').disabled = false;
+            document.getElementById('sendButton').disabled = false;
             
-            chatList.innerHTML = '';
+            // Update active state
+            document.querySelectorAll('.demo-chat-item').forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        // Message input functionality
+        document.getElementById('messageInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
             
-            if (filteredChats.length === 0) {
-                chatList.innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px; color: var(--whatsapp-text-secondary);">
-                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-                        <p>No chats found</p>
-                        <p style="font-size: 14px; margin-top: 8px;">Try a different search term</p>
-                    </div>
-                `;
-                return;
-            }
+            document.getElementById('sendButton').disabled = this.value.trim().length === 0;
+        });
 
-            filteredChats.forEach(chat => {
-                const chatItem = document.createElement('div');
-                chatItem.className = 'chat-item';
-                chatItem.onclick = () => selectChat(chat);
-                
-                const otherUserId = chat.participants.find(id => id !== currentUser.uid);
-                const otherUserData = chat.participantsData?.[otherUserId] || {};
-                
-                let otherUserProfilePic = otherUserData.profilePicId;
-                if (!otherUserProfilePic && otherUserData.username) {
-                    otherUserProfilePic = currentUserProfileData?.profilePicId;
-                }
-
-                const unreadCount = chat.unreadCount || 0;
-                const lastMessageTime = chat.lastMessageTime?.toDate() || new Date();
-                const timeAgo = getTimeAgo(lastMessageTime);
-                
-                chatItem.innerHTML = `
-                    <img src="${otherUserProfilePic ? `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/w_50,h_50,c_fill,g_face,r_max/${otherUserProfilePic}` : ''}" 
-                         alt="Avatar" 
-                         class="chat-avatar"
-                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%238696a0%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2230%22>${(otherUserData.username || 'U').charAt(0).toUpperCase()}</text></svg>'">
-                    <div class="chat-info">
-                        <div class="chat-header">
-                            <div class="chat-name">${otherUserData.username || `User_${otherUserId.substring(0, 8)}`}</div>
-                            <div class="chat-time">${timeAgo}</div>
-                        </div>
-                        <div class="chat-preview">
-                            <div class="chat-message">${chat.lastMessage || 'Start a conversation!'}</div>
-                            <div class="chat-status">
-                                ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
-                                <i class="fas fa-check-double status-icon"></i>
-                            </div>
-                        </div>
+        // Send message functionality
+        document.getElementById('sendButton').addEventListener('click', function() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message) {
+                const messagesArea = document.getElementById('messagesArea');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message sent';
+                messageDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="message-text">${message}</div>
+                        <div class="message-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     </div>
                 `;
                 
-                chatList.appendChild(chatItem);
-            });
-        }
+                messagesArea.appendChild(messageDiv);
+                messagesArea.scrollTop = messagesArea.scrollHeight;
+                
+                input.value = '';
+                input.style.height = 'auto';
+                this.disabled = true;
+            }
+        });
 
-        // Utility Functions
-        function getTimeAgo(date) {
-            const now = new Date();
-            const diffInSeconds = Math.floor((now - date) / 1000);
+        // Enter key to send
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('sendButton').click();
+            }
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const chatItems = document.querySelectorAll('.demo-chat-item');
             
-            if (diffInSeconds < 60) return 'now';
-            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
-            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
-            if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d`;
-            return date.toLocaleDateString();
-        }
-
-        // Authentication
-        onAuthStateChanged(auth, async (user) => {
-            try {
-                if (user) {
-                    currentUser = user;
-                    console.log("JCHAT_DEBUG: User authenticated:", user.uid);
-                    
-                    await fetchChatList();
+            chatItems.forEach(item => {
+                const name = item.querySelector('.chat-name').textContent.toLowerCase();
+                const message = item.querySelector('.chat-message').textContent.toLowerCase();
+                
+                if (name.includes(query) || message.includes(query)) {
+                    item.style.display = 'flex';
                 } else {
-                    console.log("JCHAT_DEBUG: No user signed in.");
-                    try {
-                        await signInAnonymously(auth);
-                        console.log("JCHAT_DEBUG: Signed in anonymously.");
-                    } catch (error) {
-                        console.error("JCHAT_ERROR: Error during anonymous sign-in:", error);
-                    }
+                    item.style.display = 'none';
                 }
-            } catch (error) {
-                console.error("JCHAT_ERROR: Error in authentication flow:", error);
+            });
+        });
+
+        // Mobile menu toggle
+        document.getElementById('menuBtn').addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.toggle('show');
             }
         });
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeChat();
-        });
+        console.log('JCHAT WhatsApp-style chat initialized successfully!');
     </script>
 </body>
 </html>
