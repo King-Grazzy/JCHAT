@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCHAT - Chat</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --whatsapp-green: #00a884;
+            --whatsapp-green-dark: #008f72;
+            --whatsapp-bg: #111b21;
+            --whatsapp-chat-bg: #0b141a;
+            --whatsapp-sidebar-bg: #202c33;
+            --whatsapp-message-out: #005c4b;
+            --whatsapp-message-in: #202c33;
+            --whatsapp-text: #e9edef;
+            --whatsapp-text-secondary: #8696a0;
+            --whatsapp-border: #222d34;
+            --whatsapp-hover: #2a3942;
+            --whatsapp-active: #2a3942;
+            --whatsapp-input-bg: #2a3942;
+            --whatsapp-icon: #8696a0;
+            --whatsapp-icon-hover: #e9edef;
+            --whatsapp-search-bg: #202c33;
+            --whatsapp-unread: #00a884;
+            --whatsapp-typing: #00a884;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--whatsapp-bg);
+            color: var(--whatsapp-text);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            height: 100vh;
+            background: var(--whatsapp-bg);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 400px;
+            background: var(--whatsapp-sidebar-bg);
+            border-right: 1px solid var(--whatsapp-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            background: var(--whatsapp-sidebar-bg);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--whatsapp-border);
+            height: 60px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
+        .user-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--whatsapp-text);
+        }
+
+        .user-info p {
+            font-size: 13px;
+            color: var(--whatsapp-text-secondary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header-action {
+            background: none;
+            border: none;
+            color: var(--whatsapp-icon);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .header-action:hover {
+            background: var(--whatsapp-hover);
+            color: var(--whatsapp-icon-hover);
+        }
+
+        /* Search */
+        .search-container {
+            padding: 8px 12px;
+            background: var(--whatsapp-sidebar-bg);
+        }
+
+        .search-box {
+            background: var(--whatsapp-search-bg);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px 8px 40px;
+            width: 100%;
+            color: var(--whatsapp-text);
+            font-size: 15px;
+            position: relative;
+        }
+
+        .search-box::placeholder {
+            color: var(--whatsapp-text-secondary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--whatsapp-text-secondary);
+            font-size: 16px;
+        }
+
+        /* Chat List */
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid var(--whatsapp-border);
+        }
+
+        .chat-item:hover {
+            background: var(--whatsapp-hover);
+        }
+
+        .chat-item.active {
+            background: var(--whatsapp-active);
+        }
+
+        .chat-avatar {
+            width: 49px;
+            height: 49px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .chat-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--whatsapp-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: var(--whatsapp-text-secondary);
+            white-space: nowrap;
+        }
+
+        .chat-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-message {
+            font-size: 14px;
+            color: var(--whatsapp-text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .chat-status {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .unread-badge {
+            background: var(--whatsapp-unread);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-icon {
+            color: var(--whatsapp-text-secondary);
+            font-size: 16px;
+        }
+
+        /* Main Chat Area */
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--whatsapp-chat-bg);
+        }
+
+        .chat-header {
+            background: var(--whatsapp-sidebar-bg);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--whatsapp-border);
+            height: 60px;
+        }
+
+        .chat-header-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .chat-header-info {
+            flex: 1;
+        }
+
+        .chat-header-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--whatsapp-text);
+            margin-bottom: 2px;
+        }
+
+        .chat-header-status {
+            font-size: 13px;
+            color: var(--whatsapp-text-secondary);
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 20px;
+        }
+
+        .chat-action {
+            background: none;
+            border: none;
+            color: var(--whatsapp-icon);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .chat-action:hover {
+            background: var(--whatsapp-hover);
+            color: var(--whatsapp-icon-hover);
+        }
+
+        /* Messages Area */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--whatsapp-chat-bg);
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23ffffff" opacity="0.02"/><circle cx="75" cy="75" r="1" fill="%23ffffff" opacity="0.02"/><circle cx="50" cy="10" r="0.5" fill="%23ffffff" opacity="0.02"/><circle cx="10" cy="60" r="0.5" fill="%23ffffff" opacity="0.02"/><circle cx="90" cy="40" r="0.5" fill="%23ffffff" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        }
+
+        .no-chat-selected {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: var(--whatsapp-text-secondary);
+        }
+
+        .no-chat-selected i {
+            font-size: 80px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .no-chat-selected h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--whatsapp-text);
+        }
+
+        .no-chat-selected p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        /* Message Bubbles */
+        .message {
+            display: flex;
+            margin-bottom: 8px;
+            max-width: 65%;
+        }
+
+        .message.sent {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+
+        .message.received {
+            margin-right: auto;
+        }
+
+        .message-content {
+            background: var(--whatsapp-message-out);
+            color: white;
+            padding: 6px 12px 8px 12px;
+            border-radius: 7.5px;
+            position: relative;
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+
+        .message.received .message-content {
+            background: var(--whatsapp-message-in);
+            color: var(--whatsapp-text);
+        }
+
+        .message-text {
+            font-size: 14.2px;
+            line-height: 19px;
+            margin-bottom: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: right;
+            float: right;
+            margin-left: 8px;
+            margin-top: 2px;
+        }
+
+        .message.received .message-time {
+            color: var(--whatsapp-text-secondary);
+        }
+
+        .message-status {
+            display: inline-block;
+            margin-left: 4px;
+            font-size: 11px;
+        }
+
+        .status-sent { color: rgba(255, 255, 255, 0.7); }
+        .status-delivered { color: #53bdeb; }
+        .status-read { color: #53bdeb; }
+
+        /* Input Area */
+        .input-area {
+            background: var(--whatsapp-sidebar-bg);
+            padding: 10px 16px;
+            border-top: 1px solid var(--whatsapp-border);
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .input-action {
+            background: none;
+            border: none;
+            color: var(--whatsapp-icon);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .input-action:hover {
+            background: var(--whatsapp-hover);
+            color: var(--whatsapp-icon-hover);
+        }
+
+        .message-input {
+            flex: 1;
+            background: var(--whatsapp-input-bg);
+            border: none;
+            border-radius: 8px;
+            padding: 9px 12px;
+            color: var(--whatsapp-text);
+            font-size: 15px;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            min-height: 20px;
+            max-height: 100px;
+            line-height: 20px;
+        }
+
+        .message-input::placeholder {
+            color: var(--whatsapp-text-secondary);
+        }
+
+        .send-button {
+            background: var(--whatsapp-green);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            font-size: 16px;
+        }
+
+        .send-button:hover:not(:disabled) {
+            background: var(--whatsapp-green-dark);
+            transform: scale(1.05);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            color: var(--whatsapp-text-secondary);
+            font-size: 14px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 2px;
+        }
+
+        .typing-dots span {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--whatsapp-typing);
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { 
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            40% { 
+                transform: scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--whatsapp-border);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--whatsapp-hover);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                display: none;
+            }
+            
+            .sidebar.show {
+                display: flex;
+                position: absolute;
+                z-index: 1000;
+                height: 100%;
+            }
+            
+            .main-chat {
+                width: 100%;
+            }
+        }
+
+        /* Loading States */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <img id="userAvatar" src="" alt="User Avatar" class="user-avatar">
+                    <div class="user-info">
+                        <h3 id="userName">Guest</h3>
+                        <p id="userStatus">Online</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="header-action" id="newChatBtn" title="New Chat">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="header-action" id="menuBtn" title="Menu">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <div style="position: relative;">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-box" id="searchInput" placeholder="Search or start new chat">
+                </div>
+            </div>
+
+            <div class="chat-list" id="chatList">
+                <!-- Chat items will be populated here -->
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-chat" id="mainChat">
+            <div class="chat-header" id="chatHeader" style="display: none;">
+                <img id="chatHeaderAvatar" src="" alt="Chat Avatar" class="chat-header-avatar">
+                <div class="chat-header-info">
+                    <div class="chat-header-name" id="chatHeaderName">Select a Chat</div>
+                    <div class="chat-header-status" id="chatHeaderStatus">Choose a conversation</div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="chat-action" id="searchChatBtn" title="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="chat-action" id="moreChatBtn" title="More">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="messages-area" id="messagesArea">
+                <div class="no-chat-selected">
+                    <i class="fab fa-whatsapp"></i>
+                    <h2>Welcome to JCHAT</h2>
+                    <p>Select a chat from the left to start messaging</p>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <span class="typing-dots">
+                    <span></span><span></span><span></span>
+                </span>
+                <span>typing...</span>
+            </div>
+
+            <div class="input-area" id="inputArea" style="display: none;">
+                <div class="input-actions">
+                    <button class="input-action" id="emojiBtn" title="Emoji">
+                        <i class="far fa-smile"></i>
+                    </button>
+                    <button class="input-action" id="attachBtn" title="Attach">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                </div>
+                <textarea 
+                    class="message-input" 
+                    id="messageInput" 
+                    placeholder="Type a message"
+                    rows="1"
+                ></textarea>
+                <button class="send-button" id="sendButton" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, setDoc, collection, query, where, getDocs, onSnapshot, addDoc, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebasestorage.app",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+
+        // Cloudinary Configuration
+        const cloudinaryConfig = {
+            cloudName: "cloudinary",
+            uploadPreset: "ml_default"
+        };
+
+        const appId = "default-app-id";
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Chat State
+        let currentUser = null;
+        let currentUserProfileData = null;
+        let currentChatId = null;
+        let unsubscribeMessages = null;
+        let chatListData = [];
+
+        // DOM Elements
+        const sidebar = document.getElementById('sidebar');
+        const mainChat = document.getElementById('mainChat');
+        const chatList = document.getElementById('chatList');
+        const chatHeader = document.getElementById('chatHeader');
+        const inputArea = document.getElementById('inputArea');
+        const messagesArea = document.getElementById('messagesArea');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const searchInput = document.getElementById('searchInput');
+        const newChatBtn = document.getElementById('newChatBtn');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Initialize Chat
+        function initializeChat() {
+            console.log('JCHAT_DEBUG: Initializing WhatsApp-style chat');
+            setupEventListeners();
+        }
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Send Message
+            if (sendButton) {
+                sendButton.addEventListener('click', sendMessage);
+            }
+
+            // Message Input
+            if (messageInput) {
+                messageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        sendMessage();
+                    }
+                });
+
+                messageInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+                    
+                    if (sendButton) {
+                        sendButton.disabled = this.value.trim().length === 0;
+                    }
+                });
+            }
+
+            // Search
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchChats(e.target.value);
+                });
+            }
+
+            // New Chat
+            if (newChatBtn) {
+                newChatBtn.addEventListener('click', () => {
+                    console.log('JCHAT_DEBUG: New chat button clicked');
+                    // TODO: Implement new chat creation
+                });
+            }
+
+            // Mobile menu toggle
+            if (document.getElementById('menuBtn')) {
+                document.getElementById('menuBtn').addEventListener('click', () => {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.toggle('show');
+                    }
+                });
+            }
+        }
+
+        // Fetch Chat List
+        async function fetchChatList() {
+            if (!currentUser) return;
+
+            try {
+                const chatsRef = collection(db, "artifacts", appId, "chats");
+                const q = query(chatsRef, where("participants", "array-contains", currentUser.uid));
+                const querySnapshot = await getDocs(q);
+                
+                chatListData = [];
+                querySnapshot.forEach((doc) => {
+                    const chatData = doc.data();
+                    chatListData.push({
+                        id: doc.id,
+                        ...chatData
+                    });
+                });
+
+                renderChatList();
+            } catch (error) {
+                console.error('JCHAT_ERROR: Error fetching chat list:', error);
+            }
+        }
+
+        // Render Chat List
+        function renderChatList() {
+            if (!chatList) return;
+            
+            chatList.innerHTML = '';
+            
+            if (chatListData.length === 0) {
+                chatList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--whatsapp-text-secondary);">
+                        <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <p>No conversations yet</p>
+                        <p style="font-size: 14px; margin-top: 8px;">Start a new chat to begin messaging!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            chatListData.forEach(chat => {
+                const chatItem = document.createElement('div');
+                chatItem.className = 'chat-item';
+                chatItem.onclick = () => selectChat(chat);
+                
+                const otherUserId = chat.participants.find(id => id !== currentUser.uid);
+                const otherUserData = chat.participantsData?.[otherUserId] || {};
+                
+                let otherUserProfilePic = otherUserData.profilePicId;
+                if (!otherUserProfilePic && otherUserData.username) {
+                    otherUserProfilePic = currentUserProfileData?.profilePicId;
+                }
+
+                const unreadCount = chat.unreadCount || 0;
+                const lastMessageTime = chat.lastMessageTime?.toDate() || new Date();
+                const timeAgo = getTimeAgo(lastMessageTime);
+                
+                chatItem.innerHTML = `
+                    <img src="${otherUserProfilePic ? `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/w_50,h_50,c_fill,g_face,r_max/${otherUserProfilePic}` : ''}" 
+                         alt="Avatar" 
+                         class="chat-avatar"
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%238696a0%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2230%22>${(otherUserData.username || 'U').charAt(0).toUpperCase()}</text></svg>'">
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">${otherUserData.username || `User_${otherUserId.substring(0, 8)}`}</div>
+                            <div class="chat-time">${timeAgo}</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="chat-message">${chat.lastMessage || 'Start a conversation!'}</div>
+                            <div class="chat-status">
+                                ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
+                                <i class="fas fa-check-double status-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                chatList.appendChild(chatItem);
+            });
+        }
+
+        // Select Chat
+        function selectChat(chat) {
+            currentChatId = chat.id;
+            
+            // Update active state
+            document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            // Show chat interface
+            if (chatHeader) chatHeader.style.display = 'flex';
+            if (inputArea) inputArea.style.display = 'flex';
+            
+            const otherUserId = chat.participants.find(id => id !== currentUser.uid);
+            const otherUserData = chat.participantsData?.[otherUserId] || {};
+            
+            // Update chat header
+            if (chatHeader) {
+                const chatHeaderName = document.getElementById('chatHeaderName');
+                const chatHeaderStatus = document.getElementById('chatHeaderStatus');
+                if (chatHeaderName) chatHeaderName.textContent = otherUserData.username || `User_${otherUserId.substring(0, 8)}`;
+                if (chatHeaderStatus) chatHeaderStatus.textContent = 'online';
+            }
+            
+            // Update chat header avatar
+            const chatHeaderAvatar = document.getElementById('chatHeaderAvatar');
+            if (chatHeaderAvatar) {
+                if (otherUserData.profilePicId) {
+                    chatHeaderAvatar.src = `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/w_40,h_40,c_fill,g_face,r_max/${otherUserData.profilePicId}`;
+                } else {
+                    chatHeaderAvatar.src = `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%238696a0"/><text x="50" y="50" text-anchor="middle" dy=".3em" fill="white" font-size="30">${(otherUserData.username || 'U').charAt(0).toUpperCase()}</text></svg>`;
+                }
+            }
+            
+            // Load messages
+            loadChatMessages(chat.id);
+            
+            // Enable input
+            if (messageInput) messageInput.disabled = false;
+            if (sendButton) sendButton.disabled = false;
+
+            // Hide sidebar on mobile
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('show');
+            }
+        }
+
+        // Load Chat Messages
+        async function loadChatMessages(chatId) {
+            if (unsubscribeMessages) {
+                unsubscribeMessages();
+            }
+
+            try {
+                const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+                const q = query(messagesRef, orderBy("timestamp", "asc"));
+                
+                unsubscribeMessages = onSnapshot(q, (snapshot) => {
+                    if (!messagesArea) return;
+                    
+                    messagesArea.innerHTML = '';
+                    
+                    snapshot.forEach((doc) => {
+                        const messageData = doc.data();
+                        const messageElement = createMessageElement(messageData);
+                        messagesArea.appendChild(messageElement);
+                    });
+                    
+                    messagesArea.scrollTop = messagesArea.scrollHeight;
+                });
+            } catch (error) {
+                console.error('JCHAT_ERROR: Error loading messages:', error);
+            }
+        }
+
+        // Create Message Element
+        function createMessageElement(messageData) {
+            const messageDiv = document.createElement('div');
+            const isSent = messageData.senderId === currentUser.uid;
+            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+            
+            const timestamp = messageData.timestamp?.toDate() || new Date();
+            const timeString = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            const messageStatus = messageData.status || 'sent';
+            const statusIcon = getStatusIcon(messageStatus);
+            const statusClass = `status-${messageStatus}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="message-text">${messageData.text}</div>
+                    <div class="message-time">
+                        ${timeString}
+                        <span class="message-status">
+                            <i class="fas ${statusIcon} ${statusClass}"></i>
+                        </span>
+                    </div>
+                </div>
+            `;
+            
+            return messageDiv;
+        }
+
+        // Get Status Icon
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'sent': return 'fa-check';
+                case 'delivered': return 'fa-check-double';
+                case 'read': return 'fa-check-double';
+                case 'failed': return 'fa-exclamation-triangle';
+                default: return 'fa-check';
+            }
+        }
+
+        // Send Message
+        async function sendMessage() {
+            if (!currentChatId || !messageInput || !messageInput.value.trim()) return;
+
+            const messageText = messageInput.value.trim();
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            try {
+                const messagesRef = collection(db, "artifacts", appId, "chats", currentChatId, "messages");
+                await addDoc(messagesRef, {
+                    text: messageText,
+                    senderId: currentUser.uid,
+                    senderProfilePic: currentUserProfileData?.profilePicId || currentUser.profilePicId,
+                    timestamp: serverTimestamp(),
+                    status: 'sent'
+                });
+
+                const chatRef = doc(db, "artifacts", appId, "chats", currentChatId);
+                await updateDoc(chatRef, {
+                    lastMessage: messageText,
+                    lastMessageTime: serverTimestamp()
+                });
+
+            } catch (error) {
+                console.error('JCHAT_ERROR: Error sending message:', error);
+            }
+        }
+
+        // Search Chats
+        function searchChats(query) {
+            if (!query.trim()) {
+                renderChatList();
+                return;
+            }
+
+            const filteredChats = chatListData.filter(chat => {
+                const otherUserId = chat.participants.find(id => id !== currentUser.uid);
+                const otherUserData = chat.participantsData?.[otherUserId] || {};
+                const username = otherUserData.username || `User_${otherUserId.substring(0, 8)}`;
+                const lastMessage = chat.lastMessage || '';
+                
+                return username.toLowerCase().includes(query.toLowerCase()) ||
+                       lastMessage.toLowerCase().includes(query.toLowerCase());
+            });
+
+            renderFilteredChatList(filteredChats);
+        }
+
+        // Render Filtered Chat List
+        function renderFilteredChatList(filteredChats) {
+            if (!chatList) return;
+            
+            chatList.innerHTML = '';
+            
+            if (filteredChats.length === 0) {
+                chatList.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: var(--whatsapp-text-secondary);">
+                        <i class="fas fa-search" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <p>No chats found</p>
+                        <p style="font-size: 14px; margin-top: 8px;">Try a different search term</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredChats.forEach(chat => {
+                const chatItem = document.createElement('div');
+                chatItem.className = 'chat-item';
+                chatItem.onclick = () => selectChat(chat);
+                
+                const otherUserId = chat.participants.find(id => id !== currentUser.uid);
+                const otherUserData = chat.participantsData?.[otherUserId] || {};
+                
+                let otherUserProfilePic = otherUserData.profilePicId;
+                if (!otherUserProfilePic && otherUserData.username) {
+                    otherUserProfilePic = currentUserProfileData?.profilePicId;
+                }
+
+                const unreadCount = chat.unreadCount || 0;
+                const lastMessageTime = chat.lastMessageTime?.toDate() || new Date();
+                const timeAgo = getTimeAgo(lastMessageTime);
+                
+                chatItem.innerHTML = `
+                    <img src="${otherUserProfilePic ? `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/w_50,h_50,c_fill,g_face,r_max/${otherUserProfilePic}` : ''}" 
+                         alt="Avatar" 
+                         class="chat-avatar"
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%238696a0%22/><text x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2230%22>${(otherUserData.username || 'U').charAt(0).toUpperCase()}</text></svg>'">
+                    <div class="chat-info">
+                        <div class="chat-header">
+                            <div class="chat-name">${otherUserData.username || `User_${otherUserId.substring(0, 8)}`}</div>
+                            <div class="chat-time">${timeAgo}</div>
+                        </div>
+                        <div class="chat-preview">
+                            <div class="chat-message">${chat.lastMessage || 'Start a conversation!'}</div>
+                            <div class="chat-status">
+                                ${unreadCount > 0 ? `<div class="unread-badge">${unreadCount}</div>` : ''}
+                                <i class="fas fa-check-double status-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                chatList.appendChild(chatItem);
+            });
+        }
+
+        // Utility Functions
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'now';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h`;
+            if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d`;
+            return date.toLocaleDateString();
+        }
+
+        // Authentication
+        onAuthStateChanged(auth, async (user) => {
+            try {
+                if (user) {
+                    currentUser = user;
+                    console.log("JCHAT_DEBUG: User authenticated:", user.uid);
+                    
+                    await fetchChatList();
+                } else {
+                    console.log("JCHAT_DEBUG: No user signed in.");
+                    try {
+                        await signInAnonymously(auth);
+                        console.log("JCHAT_DEBUG: Signed in anonymously.");
+                    } catch (error) {
+                        console.error("JCHAT_ERROR: Error during anonymous sign-in:", error);
+                    }
+                }
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error in authentication flow:", error);
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeChat();
+        });
+    </script>
+</body>
+</html>
