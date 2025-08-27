@@ -430,27 +430,7 @@
             color: var(--ig-text-secondary);
         }
 
-        /* Dark Mode Toggle */
-        .theme-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--jchat-primary);
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px var(--ig-shadow);
-            z-index: 1000;
-        }
 
-        .theme-toggle:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px var(--ig-shadow);
-        }
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -564,10 +544,7 @@
     </style>
 </head>
 <body>
-    <!-- Theme Toggle -->
-    <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
-        <i class="fas fa-moon"></i>
-    </button>
+
 
     <!-- Main Chat Container -->
     <div class="chat-container">
@@ -688,7 +665,6 @@
         let chatListData = [];
 
         // DOM Elements
-        const themeToggle = document.getElementById('themeToggle');
         const messageInput = document.getElementById('messageInput');
         const messagesArea = document.getElementById('messagesArea');
         const username = document.getElementById('username');
@@ -698,7 +674,6 @@
         const messageMenu = document.getElementById('messageMenu');
 
         // State
-        let isDarkMode = false;
         let isVanishMode = false;
         let selectedMessage = null;
         let isReplying = false;
@@ -719,23 +694,6 @@
 
         // Setup Event Listeners
         function setupEventListeners() {
-            // Theme Toggle
-            if (themeToggle) {
-                themeToggle.addEventListener('click', () => {
-                    isDarkMode = !isDarkMode;
-                    document.body.classList.toggle('dark-mode', isDarkMode);
-                    
-                    const icon = themeToggle.querySelector('i');
-                    if (isDarkMode) {
-                        icon.className = 'fas fa-sun';
-                        themeToggle.title = 'Toggle Light Mode';
-                    } else {
-                        icon.className = 'fas fa-moon';
-                        themeToggle.title = 'Toggle Dark Mode';
-                    }
-                });
-            }
-
             // Message Input Functionality
             if (messageInput) {
                 messageInput.addEventListener('input', function() {
@@ -1095,7 +1053,7 @@
 
         console.log('JCHAT Instagram-style chat initialized successfully!');
         console.log('Firebase and Cloudinary configured and ready for real users');
-        console.log('Features: Dark mode, reactions, reply, long press menu, typing indicator');
+        console.log('Features: Reactions, reply, long press menu, typing indicator');
     </script>
 </body>
 </html>
