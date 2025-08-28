@@ -100,6 +100,13 @@
         .typing-dot:nth-child(3) { animation-delay: .4s; }
         @keyframes pulse { 0%, 60%, 100% { transform: scale(1); opacity: .5; } 30% { transform: scale(1.2); opacity: 1; } }
 
+        .empty-label {
+            display: none;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+            padding: 20px 10px;
+        }
         .gradient-title { 
             font-family: 'Poppins', sans-serif; 
             font-weight: 900; 
@@ -150,6 +157,7 @@
         </div>
 
         <div class="messages" id="messages">
+            <div class="empty-label" id="emptyLabel">No messages yet. Say hi 👋</div>
             <div class="typing" id="typingIndicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
         </div>
 
@@ -369,8 +377,10 @@
             const q = query(messagesRef, orderBy('timestamp', 'asc'));
             if (unsubscribeMessages) { try { unsubscribeMessages(); } catch {} }
             unsubscribeMessages = onSnapshot(q, (snap) => {
-                // Preserve typing indicator while clearing messages
+                // Preserve typing indicator and empty label while clearing messages
                 messagesEl.querySelectorAll('.msg').forEach(node => node.remove());
+                const emptyLabel = document.getElementById('emptyLabel');
+                if (emptyLabel) emptyLabel.style.display = snap.empty ? 'block' : 'none';
                 snap.forEach(docSnap => {
                     const m = docSnap.data();
                     renderMessage({
