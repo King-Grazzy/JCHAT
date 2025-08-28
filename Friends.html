@@ -1407,10 +1407,29 @@
                         const publicDocSnap = await getDoc(publicProfileDocRef);
                         if (publicDocSnap.exists()) {
                             const friendProfile = publicDocSnap.data();
+                            
+                            // Determine online status
+                            let onlineStatus = 'offline';
+                            if (friendProfile.lastOnline && friendProfile.lastOnline.toDate) {
+                                const lastOnlineTime = friendProfile.lastOnline.toDate();
+                                const now = new Date();
+                                const timeDiff = now - lastOnlineTime;
+                                
+                                // Consider online if last seen within 2 minutes
+                                if (timeDiff <= 2 * 60 * 1000) {
+                                    onlineStatus = 'online';
+                                } else if (timeDiff <= 10 * 60 * 1000) {
+                                    // Consider away if last seen within 10 minutes
+                                    onlineStatus = 'away';
+                                }
+                            }
+                            
                             friendsData.push({
                                 userId: friendId,
                                 username: friendProfile.username,
                                 profilePicId: friendProfile.profilePicId,
+                                onlineStatus: onlineStatus,
+                                lastOnline: friendProfile.lastOnline,
                                 // Add other public data you want to display
                             });
                         } else {
@@ -1419,6 +1438,8 @@
                                 userId: friendId,
                                 username: `Unknown User (${friendId.substring(0, 8)})`,
                                 profilePicId: null,
+                                onlineStatus: 'offline',
+                                lastOnline: null,
                             });
                         }
                     } catch (error) {
@@ -1427,9 +1448,26 @@
                             userId: friendId,
                             username: `Error User (${friendId.substring(0, 8)})`,
                             profilePicId: null,
+                            onlineStatus: 'offline',
+                            lastOnline: null,
                         });
                     }
                 }
+                
+                // Sort friends: online first, then away, then offline
+                friendsData.sort((a, b) => {
+                    const statusOrder = { 'online': 0, 'away': 1, 'offline': 2 };
+                    const aOrder = statusOrder[a.onlineStatus] || 2;
+                    const bOrder = statusOrder[b.onlineStatus] || 2;
+                    
+                    if (aOrder !== bOrder) {
+                        return aOrder - bOrder;
+                    }
+                    
+                    // If same status, sort by username
+                    return (a.username || '').localeCompare(b.username || '');
+                });
+                
                 renderFriendsList(friendsData);
             }, (error) => {
                 console.error("JCHAT_ERROR: Error fetching friends list:", error);
