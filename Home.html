@@ -8870,14 +8870,14 @@
                 } else { 
                     console.warn('JCHAT_WARN: offline, skipping system settings fetch'); 
                 } // Initial fetch of system settings.
-                // Level chip mirrors Profile.html calculation
+                // Level chip: realtime gas progress
                 try {
                     const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
-                    const snap = await getDoc(userRef);
-                    const data = snap.exists() ? snap.data() : null;
-                    if (data && homeChipsRow && levelChipName && levelChipProgressFill) {
-                        const totalGasEarned = data.totalGasEarned ?? 0;
-                        // compute level by cumulative thresholds
+                    onSnapshot(userRef, (snap) => {
+                        const data = snap.exists() ? snap.data() : null;
+                        if (!data || !homeChipsRow || !levelChipName || !levelChipProgressFill) return;
+                        const totalGasEarned = data.gas ?? data.totalGasEarned ?? 0;
+                        // derive current level by cumulative thresholds
                         let currentLevel = 1;
                         for (let i = 1; i <= 500; i++) {
                             const needed = getTotalGasRequiredToReachLevel(i);
@@ -8886,25 +8886,19 @@
                         currentLevel = Math.max(1, currentLevel);
                         const info = getLevelInfo(currentLevel);
                         if (levelChipIcon) levelChipIcon.className = `${info.icon}`;
-                        levelChipName.textContent = info.name; // e.g., Novice, Explorer
+                        levelChipName.textContent = info.name;
                         const gasNeededCurr = getTotalGasRequiredToReachLevel(currentLevel);
                         const gasNeededNext = getTotalGasRequiredToReachLevel(currentLevel + 1);
-                        let progressPct = 0;
-                        if (currentLevel < 500) {
-                            const inSeg = totalGasEarned - gasNeededCurr;
-                            const segSize = gasNeededNext - gasNeededCurr;
-                            progressPct = segSize > 0 ? Math.min(100, (inSeg / segSize) * 100) : 100;
-                        } else {
-                            progressPct = 100;
-                            levelChipName.textContent = info.name;
-                        }
-                        if (levelChipPercent) levelChipPercent.textContent = `${Math.round(progressPct)}%`;
-                        // Move gradient like Profile: background-position from right to left
-                        const backgroundPosition = 100 - Math.round(progressPct);
+                        const segSize = Math.max(1, gasNeededNext - gasNeededCurr);
+                        const inSeg = Math.max(0, Math.min(totalGasEarned, gasNeededNext) - gasNeededCurr);
+                        const progressPct = Math.floor((inSeg / segSize) * 100);
+                        if (levelChipPercent) levelChipPercent.textContent = `${progressPct}%`;
+                        levelChipProgressFill.style.width = `${progressPct}%`;
+                        const backgroundPosition = 100 - progressPct;
                         levelChipProgressFill.style.backgroundPosition = `${backgroundPosition}% 0`;
                         homeChipsRow.style.display = 'flex';
-                    }
-                } catch(e) { console.warn('level chip load', e); }
+                    });
+                } catch(e) { console.warn('level chip realtime', e); }
                 // Highlights (best-effort)
                 try {
                     if (highlightsSection && highlightsStrip) {

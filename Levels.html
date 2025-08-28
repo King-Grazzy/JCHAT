@@ -440,6 +440,39 @@
             align-items: center;
         }
 
+        /* Current progress widget */
+        .current-progress {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .current-progress .meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+        .current-progress .bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.12); /* grey base */
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .current-progress .fill {
+            width: 0%;
+            height: 100%;
+            background-image: linear-gradient(90deg, var(--pink), var(--blue));
+            background-size: 200% 100%;
+            transition: width .35s ease;
+        }
+
         /* Levels Section */
         .levels-section {
             background: var(--card-background);
@@ -771,6 +804,16 @@
 
     <main>
         <div class="content-wrapper">
+            <div id="yourProgress" class="current-progress" style="display:none;">
+                <i class="fas fa-star" id="yourProgressIcon" style="font-size:20px;background-image:linear-gradient(90deg, var(--blue), var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;"></i>
+                <div class="meta" style="flex:1;">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <div id="yourProgressName">Level 1</div>
+                        <div id="yourProgressPercent" style="opacity:.85;font-size:.9rem;">0%</div>
+                    </div>
+                    <div class="bar"><div id="yourProgressFill" class="fill"></div></div>
+                </div>
+            </div>
             <div class="levels-section">
                 <h2>User Levels Progression</h2>
                 <div class="levels-grid" id="levelsGrid">
@@ -815,10 +858,10 @@
     </button>
 
     <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        // Import Firebase modules (align with Home.html v11.8.0)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // --- Firebase & Canvas Environment Configuration ---
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -1194,6 +1237,36 @@
                 await fetchAndDisplayHeaderProfile(user);
                 fetchNotificationCount(user.uid);
                 if (logoutButton) logoutButton.disabled = false; // Null check
+
+                // Realtime current progress widget
+                const yourProgress = document.getElementById('yourProgress');
+                const yourProgressName = document.getElementById('yourProgressName');
+                const yourProgressPercent = document.getElementById('yourProgressPercent');
+                const yourProgressFill = document.getElementById('yourProgressFill');
+                if (yourProgress && yourProgressName && yourProgressPercent && yourProgressFill) {
+                    const userRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profiles', 'user_profile');
+                    onSnapshot(userRef, (snap) => {
+                        const data = snap.exists() ? snap.data() : null;
+                        if (!data) return;
+                        const totalGasEarned = data.gas ?? data.totalGasEarned ?? 0;
+                        let currentLevel = 1;
+                        for (let i = 1; i <= 500; i++) {
+                            const needed = getTotalGasRequiredToReachLevel(i);
+                            if (totalGasEarned >= needed) currentLevel = i; else break;
+                        }
+                        currentLevel = Math.max(1, currentLevel);
+                        const info = getLevelInfo(currentLevel);
+                        yourProgressName.textContent = info.name;
+                        const gasNeededCurr = getTotalGasRequiredToReachLevel(currentLevel);
+                        const gasNeededNext = getTotalGasRequiredToReachLevel(currentLevel + 1);
+                        const segSize = Math.max(1, gasNeededNext - gasNeededCurr);
+                        const inSeg = Math.max(0, Math.min(totalGasEarned, gasNeededNext) - gasNeededCurr);
+                        const progressPct = Math.floor((inSeg / segSize) * 100);
+                        yourProgressPercent.textContent = `${progressPct}%`;
+                        yourProgressFill.style.width = `${progressPct}%`;
+                        yourProgress.style.display = 'flex';
+                    });
+                }
             } else {
                 console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
                 try {
