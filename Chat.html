@@ -1496,7 +1496,7 @@
             }
         }
 
-        // Friends Sync Functions
+        // Friends Sync Functions (EXACT same logic as Find_Friends.html)
         async function syncFriendsFromFindFriends() {
             try {
                 if (!friendsSyncToggle) return;
@@ -1506,25 +1506,22 @@
                 friendsSyncToggle.classList.remove('synced', 'error');
                 friendsSyncToggle.title = 'Syncing friends...';
 
-                console.log('JCHAT_DEBUG: Starting friends sync from Find_Friends.html');
+                console.log('JCHAT_DEBUG: Starting friends sync - EXACT same as Find_Friends.html');
 
-                // Use EXACT same logic as Find_Friends.html - no localStorage, direct Firebase sync
-
-                // Fetch friends from Firebase (same collection used in Find_Friends.html)
-                if (currentUser) {
-                    await fetchFriendsFromFirebase();
-                } else {
-                    console.log('JCHAT_DEBUG: User not authenticated, skipping Firebase sync');
+                // Ensure user is authenticated
+                if (!currentUser) {
+                    console.error('JCHAT_ERROR: User not authenticated');
+                    throw new Error('User not authenticated');
                 }
 
-                // Update sync status and populate dropdown
+                // Setup real-time Firebase listener (same as Find_Friends.html)
+                await fetchFriendsFromFirebase();
+
+                // Update sync status
                 isFriendsSynced = true;
                 friendsSyncToggle.classList.remove('syncing');
                 friendsSyncToggle.classList.add('synced');
                 friendsSyncToggle.title = `Friends synced! (${friendsList.size} friends)`;
-
-                // Populate friends dropdown
-                populateFriendsDropdown();
 
                 console.log('JCHAT_DEBUG: Friends sync completed successfully');
                 showFriendsSyncNotification();
@@ -1536,6 +1533,8 @@
                 friendsSyncToggle.classList.remove('syncing');
                 friendsSyncToggle.classList.add('error');
                 friendsSyncToggle.title = 'Sync failed. Click to retry.';
+                
+                showMessageBox(`Error syncing friends: ${error.message}`, 'error');
             }
         }
 
@@ -1552,33 +1551,32 @@
                 // Use the EXACT same collection path and logic as Find_Friends.html
                 const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
                 
-                // Use onSnapshot for real-time updates (same as Find_Friends.html)
+                // Use onSnapshot for real-time updates (EXACT same as Find_Friends.html)
                 onSnapshot(publicFriendsRef, (snapshot) => {
                     friendsList.clear();
                     snapshot.forEach(docSnap => {
                         const friendData = docSnap.data();
                         if (friendData.user1Id === currentUser.uid) {
                             friendsList.add(friendData.user2Id);
-                            console.log('JCHAT_DEBUG: Added friend:', friendData.user2Id);
                         } else if (friendData.user2Id === currentUser.uid) {
                             friendsList.add(friendData.user1Id);
-                            console.log('JCHAT_DEBUG: Added friend:', friendData.user1Id);
                         }
                     });
                     
                     console.log('JCHAT_DEBUG: Found friends:', friendsList.size);
                     console.log('JCHAT_DEBUG: Friends UIDs:', [...friendsList]);
                     
-                    // Update friends count and populate dropdown
+                    // Update friends count and populate dropdown (real-time)
                     if (friendsCount) {
                         friendsCount.textContent = `${friendsList.size} friends`;
                     }
                     
-                    // Populate dropdown with updated friends
-                    populateFriendsDropdown();
+                    // Populate dropdown with updated friends (real-time)
+                    populateFriendsDropdownRealtime();
                     
                 }, (error) => {
                     console.error('JCHAT_ERROR: Error fetching confirmed friends:', error);
+                    showMessageBox(`Error loading friends data: ${error.message}`, 'error');
                 });
                 
             } catch (error) {
@@ -1685,11 +1683,10 @@
             return friendsList.size;
         }
 
-        // Populate friends dropdown
+        // Populate friends dropdown (initial load)
         async function populateFriendsDropdown() {
             try {
                 if (!friendsListElement || !friendsCount) return;
-
 
                 // Show loading state
                 friendsListElement.innerHTML = `
@@ -1699,16 +1696,32 @@
                     </div>
                 `;
 
-                // Fetch real friends from Find_Friends.html
+                // Trigger initial fetch (will populate via real-time updates)
                 await fetchFriendsFromFirebase();
                 
+            } catch (error) {
+                console.error('JCHAT_ERROR: Error populating friends dropdown:', error);
+                friendsListElement.innerHTML = `
+                    <div class="no-friends">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>Error loading friends</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Populate friends dropdown (real-time updates)
+        async function populateFriendsDropdownRealtime() {
+            try {
+                if (!friendsListElement || !friendsCount) return;
+
                 // Update friends count
                 friendsCount.textContent = `${friendsList.size} friends`;
 
-                // Clear loading state
+                // Clear current list
                 friendsListElement.innerHTML = '';
 
-                // Fetch friend profiles and populate dropdown
+                // Fetch friend profiles and populate dropdown (ONLY FRIENDS)
                 const friendProfiles = await fetchFriendProfiles();
                 
                 if (friendProfiles.length === 0) {
@@ -1719,10 +1732,10 @@
                             <div style="font-size: 11px; margin-top: 4px;">Add friends from Find Friends page</div>
                         </div>
                     `;
-                    friendsCount.textContent = "0 friends";
                     return;
                 }
                 
+                // Only show actual friends (filtered by friendsList Set)
                 friendProfiles.forEach(friend => {
                     const friendItem = document.createElement('div');
                     friendItem.className = 'friend-item';
@@ -1730,7 +1743,10 @@
                     
                     friendItem.innerHTML = `
                         <div class="friend-avatar">
-                            ${friend.username ? friend.username.charAt(0).toUpperCase() : 'F'}
+                            ${friend.profilePicture ? 
+                                `<img src="${friend.profilePicture}" alt="${friend.username}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` :
+                                `<div style="width: 100%; height: 100%; background: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">${friend.username ? friend.username.charAt(0).toUpperCase() : 'F'}</div>`
+                            }
                         </div>
                         <div class="friend-info">
                             <div class="friend-name">${friend.username || 'Unknown User'}</div>
@@ -1749,7 +1765,7 @@
                 });
 
             } catch (error) {
-                console.error('JCHAT_ERROR: Error populating friends dropdown:', error);
+                console.error('JCHAT_ERROR: Error populating friends dropdown (realtime):', error);
                 friendsListElement.innerHTML = `
                     <div class="no-friends">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -1759,7 +1775,7 @@
             }
         }
 
-        // Fetch friend profiles
+        // Fetch friend profiles (EXACT same logic as Find_Friends.html - ONLY FRIENDS)
         async function fetchFriendProfiles() {
             try {
                 const profiles = [];
@@ -1768,26 +1784,40 @@
                     return [];
                 }
 
-                const publicProfilesRef = collection(db, "artifacts", appId, "public", "data", "profiles");
+                // Use same collection path as Find_Friends.html
+                const publicUsersCollectionRef = collection(db, "artifacts", appId, "public", "data", "users");
                 
+                // ONLY fetch profiles for users who are confirmed friends
                 for (const friendId of friendsList) {
                     try {
-                        const profileDoc = await getDoc(doc(publicProfilesRef, friendId));
-                        if (profileDoc.exists()) {
-                            const profileData = profileDoc.data();
+                        const userDoc = await getDoc(doc(publicUsersCollectionRef, friendId));
+                        if (userDoc.exists()) {
+                            const userData = userDoc.data();
+                            
+                            // Build profile picture URL (same logic as Find_Friends.html)
+                            let profilePictureUrl = null;
+                            if (userData.profilePicId) {
+                                profilePictureUrl = `https://res.cloudinary.com/dxld01rcp/image/upload/c_fill,w_150,h_150,q_auto,f_auto/${userData.profilePicId}`;
+                            }
+                            
                             profiles.push({
                                 uid: friendId,
-                                username: profileData.username || 'Unknown User',
-                                isOnline: profileData.lastOnline ? 
-                                    (Date.now() - profileData.lastOnline.toMillis()) < 300000 : false // 5 minutes
+                                username: userData.username || 'Unknown User',
+                                profilePicture: profilePictureUrl,
+                                isOnline: userData.lastOnline ? 
+                                    (Date.now() - userData.lastOnline.toMillis()) < 300000 : false, // 5 minutes
+                                bio: userData.bio || '',
+                                location: userData.location || ''
                             });
                         }
                     } catch (error) {
-                        console.log('JCHAT_DEBUG: Could not fetch profile for friend:', friendId);
+                        console.log('JCHAT_DEBUG: Could not fetch profile for friend:', friendId, error);
                     }
                 }
                 
+                console.log('JCHAT_DEBUG: Fetched profiles for', profiles.length, 'friends');
                 return profiles;
+                
             } catch (error) {
                 console.error('JCHAT_ERROR: Error fetching friend profiles:', error);
                 return [];
@@ -2281,6 +2311,27 @@
                 });
             } catch (error) {
                 console.error('JCHAT_ERROR: Authentication setup failed:', error);
+            }
+        }
+
+        // Initialize Chat (EXACT same pattern as Find_Friends.html)
+        async function initializeChat() {
+            try {
+                console.log('JCHAT_DEBUG: Initializing Chat page...');
+                
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Setup authentication
+                setupAuthentication();
+                
+                // Apply theme
+                applyTheme();
+                
+                console.log('JCHAT_DEBUG: Chat page initialized successfully');
+                
+            } catch (error) {
+                console.error('JCHAT_ERROR: Failed to initialize chat:', error);
             }
         }
 
