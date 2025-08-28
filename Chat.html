@@ -252,6 +252,23 @@
         let unsubscribeMessages = null;
         let unsubscribeTyping = null;
 
+        // Apply theme from Home.html (localStorage: 'jchat-theme')
+        function applySavedTheme() {
+            try {
+                const saved = localStorage.getItem('jchat-theme');
+                if (!saved) return;
+                const body = document.body;
+                // Remove any existing theme-* classes
+                [...body.classList].filter(c => c.startsWith('theme-')).forEach(c => body.classList.remove(c));
+                body.classList.add(saved);
+            } catch {}
+        }
+
+        applySavedTheme();
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'jchat-theme') applySavedTheme();
+        });
+
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = '/Login.html'; return; }
             currentUser = user;
