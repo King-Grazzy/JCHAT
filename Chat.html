@@ -357,9 +357,29 @@
 
         function chatIdFor(u1, u2) { return [u1, u2].sort().join('_'); }
 
+        async function ensureChatDoc(chatId) {
+            try {
+                const chatDocRef = doc(db, "artifacts", appId, "chats", chatId);
+                const snap = await getDoc(chatDocRef);
+                if (!snap.exists()) {
+                    await setDoc(chatDocRef, {
+                        participants: [currentUser.uid, currentPartner.id].sort(),
+                        createdAt: serverTimestamp(),
+                        updatedAt: serverTimestamp()
+                    }, { merge: true });
+                } else {
+                    // touch updatedAt for activity
+                    await updateDoc(chatDocRef, { updatedAt: serverTimestamp() });
+                }
+            } catch (e) {
+                // non-fatal; sending will fail if rules still restrict
+            }
+        }
+
         async function sendMessage(text) {
             const chatId = chatIdFor(currentUser.uid, currentPartner.id);
             const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+            await ensureChatDoc(chatId);
             await addDoc(messagesRef, {
                 text,
                 senderId: currentUser.uid,
