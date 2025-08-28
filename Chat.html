@@ -583,22 +583,23 @@
             margin-right: 8px;
         }
 
-        /* Friends Dropdown */
+        /* Friends Dropdown - JCHAT Style */
         .friends-dropdown {
             position: absolute;
             top: 100%;
             right: 0;
-            width: 280px;
-            max-height: 400px;
-            background: var(--ig-bg);
-            border: 1px solid var(--ig-border);
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            width: 320px;
+            max-height: 450px;
+            background: var(--card-background-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25), 0 4px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
-            transition: all 0.3s ease;
+            transition: all var(--transition);
             margin-top: 8px;
             overflow: hidden;
         }
@@ -612,8 +613,9 @@
         }
 
         body.dark-mode .friends-dropdown {
-            background: var(--ig-bg-dark);
-            border-color: var(--ig-border-dark);
+            background: var(--glass-black);
+            border-color: var(--border-light);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .friends-dropdown.show {
@@ -626,29 +628,36 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 16px;
-            border-bottom: 1px solid var(--ig-border);
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-light);
             font-weight: 600;
-            color: var(--ig-text-primary);
+            font-size: 15px;
+            color: var(--text-color-primary);
+            background: linear-gradient(135deg, var(--card-background), rgba(255, 255, 255, 0.02));
         }
 
         body.dark-mode .dropdown-header {
-            border-bottom-color: var(--ig-border-dark);
-            color: var(--ig-text-light);
+            border-bottom-color: var(--border-light);
+            color: var(--white);
+            background: linear-gradient(135deg, var(--glass-black), rgba(255, 255, 255, 0.05));
         }
 
         .refresh-friends {
             background: none;
             border: none;
-            color: var(--accent-color);
+            color: var(--blue);
             cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .refresh-friends:hover {
-            background: rgba(0, 213, 255, 0.1);
+            background: var(--glass-blue);
+            transform: scale(1.05);
         }
 
         .friends-list {
@@ -660,44 +669,78 @@
         .loading-friends {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 16px;
-            color: var(--ig-text-secondary);
-            font-size: 14px;
+            justify-content: center;
+            gap: 12px;
+            padding: 32px 24px;
+            color: var(--text-color-secondary);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .loading-friends i {
+            color: var(--blue);
+            font-size: 18px;
+        }
+
+        body.dark-mode .loading-friends {
+            color: var(--text-light);
         }
 
         .friend-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
+            gap: 15px;
+            padding: 14px 20px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
-            border-radius: 8px;
-            margin: 0 8px;
+            transition: all var(--transition);
+            border-radius: 12px;
+            margin: 4px 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .friend-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--glass-blue);
+            opacity: 0;
+            transition: opacity var(--transition);
+            z-index: -1;
+        }
+
+        .friend-item:hover::before {
+            opacity: 1;
         }
 
         .friend-item:hover {
-            background: var(--ig-received-bubble);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 213, 255, 0.2);
         }
 
         body.dark-mode .friend-item:hover {
-            background: var(--ig-received-bubble-dark);
+            box-shadow: 0 4px 12px rgba(0, 213, 255, 0.3);
         }
 
         .friend-avatar {
-            width: 40px;
-            height: 40px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
-            background: var(--accent-color);
+            background: linear-gradient(135deg, var(--blue), var(--pink));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
             overflow: hidden;
             flex-shrink: 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all var(--transition);
         }
 
         .friend-avatar img {
@@ -713,10 +756,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--accent-color);
+            background: linear-gradient(135deg, var(--blue), var(--pink));
             color: white;
-            font-weight: bold;
-            font-size: 18px;
+            font-weight: 700;
+            font-size: 20px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .friend-info {
@@ -725,58 +769,138 @@
         }
 
         .friend-name {
-            font-weight: 500;
-            color: var(--ig-text-primary);
-            margin-bottom: 2px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-color-primary);
+            margin-bottom: 3px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            letter-spacing: 0.01em;
         }
 
         body.dark-mode .friend-name {
-            color: var(--ig-text-light);
+            color: var(--white);
         }
 
         .friend-status {
-            font-size: 12px;
-            color: var(--ig-text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-color-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .friend-status.online {
-            color: var(--status-online);
+        .friend-status::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--status-offline);
+            transition: background-color var(--transition);
         }
 
-        .friend-status.offline {
-            color: var(--status-offline);
+        .friend-status.online::before {
+            background: var(--status-online);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+        }
+
+        .friend-status.offline::before {
+            background: var(--status-offline);
+        }
+
+        body.dark-mode .friend-status {
+            color: var(--text-light);
         }
 
         .dropdown-footer {
-            padding: 12px 16px;
-            border-top: 1px solid var(--ig-border);
+            padding: 16px 20px;
+            border-top: 1px solid var(--border-light);
             text-align: center;
-            font-size: 12px;
-            color: var(--ig-text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-color-secondary);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), transparent);
         }
 
         body.dark-mode .dropdown-footer {
-            border-top-color: var(--ig-border-dark);
+            border-top-color: var(--border-light);
+            color: var(--text-light);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent);
         }
 
         .friends-count {
-            font-weight: 500;
+            font-weight: 600;
+            color: var(--blue);
         }
 
         .no-friends {
-            padding: 24px 16px;
+            padding: 32px 24px;
             text-align: center;
-            color: var(--ig-text-secondary);
-            font-size: 14px;
+            color: var(--text-color-secondary);
+            font-size: 15px;
         }
 
         .no-friends i {
-            font-size: 24px;
-            margin-bottom: 8px;
-            opacity: 0.5;
+            font-size: 32px;
+            margin-bottom: 12px;
+            opacity: 0.6;
+            color: var(--blue);
+            background: var(--glass-blue);
+            padding: 16px;
+            border-radius: 50%;
+            width: 64px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        body.dark-mode .no-friends {
+            color: var(--text-light);
+        }
+
+        /* Theme-specific Friends Dropdown Styling */
+        body.theme-light-mode .friends-dropdown {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: var(--border-color);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.15), 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body.theme-light-mode .dropdown-header {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 252, 0.9));
+            border-bottom-color: var(--border-color);
+            color: var(--text-color-primary);
+        }
+
+        body.theme-light-mode .friend-item:hover::before {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        body.theme-light-mode .friend-item:hover {
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+        }
+
+        body.theme-light-mode .friend-avatar {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+
+        body.theme-light-mode .refresh-friends:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        body.theme-dark-mode .friends-dropdown {
+            background: var(--glass-black);
+            border-color: var(--border-light);
+            backdrop-filter: blur(25px);
+        }
+
+        body.theme-dark-mode .dropdown-header {
+            background: linear-gradient(135deg, var(--glass-black), rgba(255, 255, 255, 0.05));
         }
 
         .friends-sync-toggle:hover {
