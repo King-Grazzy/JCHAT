@@ -102,12 +102,14 @@
 
         .gradient-title { 
             font-family: 'Poppins', sans-serif; 
-            font-weight: 800; 
+            font-weight: 900; 
             background-image: linear-gradient(90deg, var(--blue), var(--pink)); 
             -webkit-background-clip: text; 
             background-clip: text; 
             color: transparent; 
             letter-spacing: -0.02em;
+            font-size: 1.25rem;
+            text-shadow: 0 2px 0 rgba(0,0,0,0.25), 0 6px 12px rgba(0, 213, 255, 0.25), 0 6px 12px rgba(255, 46, 146, 0.25);
         }
 
         .input-bar { display: flex; align-items: flex-end; gap: 10px; padding: 12px 16px; background: var(--header-background); border-top: 1px solid var(--border-light); }
@@ -125,7 +127,6 @@
             <div class="header-left">
                 <button class="back-btn" id="backBtn" title="Back"><i class="fas fa-arrow-left"></i></button>
                 <div class="partner">
-                    <img id="partnerAvatar" alt="Avatar" src="https://placehold.co/42x42/00d5ff/ffffff?text=U">
                     <div>
                         <div class="name gradient-title" id="partnerName">JCHAT</div>
                         <div class="status" id="partnerStatus" style="display:none"></div>
@@ -279,12 +280,15 @@
             // Keep static JCHAT title per request; do not overwrite
             if (nameEl) nameEl.textContent = 'JCHAT';
             const initial = (partner.displayName || 'J').charAt(0).toUpperCase();
-            if (partner.profilePicId) {
-                const url = getCloudinaryImageUrl(partner.profilePicId, "w_42,h_42,c_fill,g_face,r_max");
-                avatarEl.src = url;
-                avatarEl.onerror = () => avatarEl.src = `https://placehold.co/42x42/00d5ff/ffffff?text=${initial}`;
-            } else {
-                avatarEl.src = `https://placehold.co/42x42/00d5ff/ffffff?text=${initial}`;
+            // Avatar removed by design; guard accesses
+            if (avatarEl) {
+                if (partner.profilePicId) {
+                    const url = getCloudinaryImageUrl(partner.profilePicId, "w_42,h_42,c_fill,g_face,r_max");
+                    avatarEl.src = url;
+                    avatarEl.onerror = () => avatarEl.src = `https://placehold.co/42x42/00d5ff/ffffff?text=${initial}`;
+                } else {
+                    avatarEl.src = `https://placehold.co/42x42/00d5ff/ffffff?text=${initial}`;
+                }
             }
             if (statusEl) statusEl.style.display = 'none';
         }
