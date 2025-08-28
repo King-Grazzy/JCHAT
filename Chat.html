@@ -36,6 +36,14 @@
     <!-- Tone.js for audio notifications -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+    <!-- Firebase v9 modular SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, onSnapshot, deleteDoc, getDocs, limit, writeBatch } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        window.firebaseImports = { initializeApp, getAuth, onAuthStateChanged, signOut, getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, where, orderBy, onSnapshot, deleteDoc, getDocs, limit, writeBatch };
+    </script>
+
     <style>
         /* Universal box-sizing for consistent layout */
         *, *::before, *::after {
@@ -741,6 +749,144 @@
             }
         }
 
+        /* Friends Toggle */
+        .friends-toggle-container {
+            position: absolute;
+            top: 15px;
+            right: 120px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 101;
+        }
+
+        .friends-toggle-label {
+            font-size: 12px;
+            color: var(--text-color-secondary);
+            font-weight: 500;
+        }
+
+        .friends-toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--input-background);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .friends-toggle::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background: var(--text-color-secondary);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .friends-toggle.active {
+            background: var(--button-background);
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(0, 213, 255, 0.3), 0 0 15px rgba(255, 46, 146, 0.3);
+        }
+
+        .friends-toggle.active::before {
+            transform: translateX(20px);
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Custom Message Box */
+        #messageBox {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-background);
+            backdrop-filter: blur(20px);
+            color: var(--text-color-primary);
+            padding: 25px 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            display: none;
+            opacity: 0;
+            transition: all 0.4s ease;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid var(--border-light);
+            min-width: 300px;
+            max-width: 400px;
+        }
+
+        #messageBox.show {
+            opacity: 1;
+            display: flex;
+        }
+
+        #messageBox.success {
+            background: var(--button-background);
+            color: #ffffff;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0, 213, 255, 0.4), 0 10px 40px rgba(255, 46, 146, 0.4);
+        }
+
+        #messageBox.error {
+            border-left: 5px solid var(--delete-button-color);
+            background: var(--card-background);
+        }
+
+        #messageBox.info {
+            border-left: 5px solid var(--accent-color);
+            background: var(--card-background);
+        }
+
+        #messageBox.warning {
+            border-left: 5px solid var(--warning-color);
+            background: var(--card-background);
+        }
+
+        #messageBox i {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            background: var(--button-background);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        #messageBox.success i {
+            color: #ffffff;
+            -webkit-text-fill-color: #ffffff;
+        }
+
+        #messageBox.error i {
+            color: var(--delete-button-color);
+        }
+
+        #messageBox.info i {
+            color: var(--accent-color);
+        }
+
+        #messageBox.warning i {
+            color: var(--warning-color);
+        }
+
+        #messageBox span {
+            font-size: 1.1rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
         /* Accessibility */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -798,6 +944,13 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Friends Toggle -->
+            <div class="friends-toggle-container" id="friendsToggleContainer">
+                <span class="friends-toggle-label">Friends Only</span>
+                <div class="friends-toggle" id="friendsToggle" title="Toggle Friends Only Mode"></div>
+            </div>
+            
             <div class="chat-header-right">
                 <button class="header-action-btn" id="videoCallBtn" title="Video Call">
                     <i class="fas fa-video"></i>
@@ -889,7 +1042,35 @@
     <!-- Hidden File Input -->
     <input type="file" id="fileInput" style="display: none;" multiple accept="*/*">
 
+    <!-- Custom Message Box -->
+    <div id="messageBox"></div>
+
     <script>
+        // Firebase Configuration
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebasestorage.app",
+            messagingSenderId: "328479683167",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase (wait for imports to be available)
+        let app, auth, db;
+        
+        window.addEventListener('load', async () => {
+            if (window.firebaseImports) {
+                const { initializeApp, getAuth, getFirestore } = window.firebaseImports;
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+            }
+        });
+
         // Global Variables
         let currentUser = null;
         let currentPartner = null;
@@ -897,13 +1078,113 @@
         let isTyping = false;
         let typingTimeout = null;
         let lastSeenTimestamp = Date.now();
+        let friendsOnlyMode = false;
+        let messageBox = null;
 
         // Initialize the chat application
         document.addEventListener('DOMContentLoaded', function() {
+            messageBox = document.getElementById('messageBox');
             initializeChat();
             setupEventListeners();
             loadChatData();
         });
+
+        /**
+         * Custom Message Box Function (from Find_Friends.html)
+         * @param {string} message - The message to display.
+         * @param {string} type - The type of message ('success', 'error', 'info', 'loading', 'warning').
+         * @param {boolean} [isPersistent=false] - If true, message stays until explicitly cleared or replaced.
+         * @param {number} [durationMs=3000] - Duration in milliseconds for the message to display if not persistent.
+         */
+        function showMessageBox(message, type, isPersistent = false, durationMs = 3000) {
+            if (messageBox.timeoutId) {
+                clearTimeout(messageBox.timeoutId);
+            }
+
+            messageBox.innerHTML = `<i id="messageBoxIcon"></i><span id="messageBoxText"></span>`;
+            const messageBoxIcon = document.getElementById('messageBoxIcon');
+            const messageBoxText = document.getElementById('messageBoxText');
+
+            messageBoxText.textContent = message;
+            messageBox.className = 'show ' + type;
+
+            // Set icon based on type
+            if (type === 'success') {
+                messageBoxIcon.classList.add('fas', 'fa-check-circle');
+            } else if (type === 'error') {
+                messageBoxIcon.classList.add('fas', 'fa-times-circle');
+            } else if (type === 'info') {
+                messageBoxIcon.classList.add('fas', 'fa-info-circle');
+            } else if (type === 'warning') {
+                messageBoxIcon.classList.add('fas', 'fa-exclamation-triangle');
+            } else if (type === 'loading') {
+                messageBoxIcon.classList.add('fas', 'fa-spinner', 'fa-spin');
+            } else {
+                messageBoxIcon.className = '';
+            }
+
+            messageBox.style.display = 'flex';
+            messageBox.style.opacity = '1';
+
+            if (!isPersistent) {
+                messageBox.timeoutId = setTimeout(() => {
+                    messageBox.style.opacity = '0';
+                    messageBox.addEventListener('transitionend', function handler() {
+                        messageBox.style.display = 'none';
+                        messageBox.removeEventListener('transitionend', handler);
+                    }, { once: true });
+                }, durationMs);
+            }
+        }
+
+        /**
+         * Cloudinary Image URL Function (from Find_Friends.html)
+         * @param {string} urlOrPublicId - The full Cloudinary URL or the public ID of the image on Cloudinary.
+         * @param {string} transformations - Optional Cloudinary transformations.
+         * @returns {string|null} The full Cloudinary URL or null if urlOrPublicId is not provided.
+         */
+        function getCloudinaryImageUrl(urlOrPublicId, transformations = "w_auto,f_auto,q_auto") {
+            if (!urlOrPublicId) return null;
+            if (urlOrPublicId.startsWith('http://') || urlOrPublicId.startsWith('https://')) {
+                if (urlOrPublicId.includes('res.cloudinary.com')) {
+                    const parts = urlOrPublicId.split('/upload/');
+                    if (parts.length === 2) {
+                        return `${parts[0]}/upload/${transformations}/${parts[1]}`;
+                    }
+                }
+                return urlOrPublicId;
+            }
+            return `https://res.cloudinary.com/dcwcenq1y/image/upload/${transformations}/${urlOrPublicId}`;
+        }
+
+        /**
+         * Display Profile Picture Function (from Find_Friends.html)
+         * @param {HTMLElement} imgElement - The image element.
+         * @param {HTMLElement} iconElement - The icon element.
+         * @param {string} profilePicId - The profile picture ID or URL.
+         * @param {string} usernameInitial - The username initial for fallback.
+         * @param {string} transformations - Cloudinary transformations.
+         */
+        function displayProfilePicture(imgElement, iconElement, profilePicId, usernameInitial, transformations) {
+            if (imgElement && iconElement) {
+                if (profilePicId) {
+                    const imageUrl = getCloudinaryImageUrl(profilePicId, transformations);
+                    imgElement.src = imageUrl;
+                    imgElement.style.display = 'block';
+                    iconElement.style.display = 'none';
+                    imgElement.onerror = () => {
+                        console.error(`JCHAT_ERROR: Failed to load profile picture: ${profilePicId}. Using placeholder.`);
+                        imgElement.src = `https://placehold.co/45x45/CCCCCC/000000?text=${usernameInitial}`;
+                        imgElement.style.display = 'block';
+                        iconElement.style.display = 'none';
+                    };
+                } else {
+                    imgElement.style.display = 'none';
+                    iconElement.style.display = 'block';
+                    imgElement.src = `https://placehold.co/45x45/2a2a4a/ffffff?text=${usernameInitial}`;
+                }
+            }
+        }
 
         // Initialize chat application
         function initializeChat() {
@@ -942,6 +1223,7 @@
             const backButton = document.getElementById('backButton');
             const attachFileBtn = document.getElementById('attachFileBtn');
             const fileInput = document.getElementById('fileInput');
+            const friendsToggle = document.getElementById('friendsToggle');
 
             // Message input events
             messageInput.addEventListener('input', handleInputChange);
@@ -965,11 +1247,52 @@
             document.getElementById('voiceCallBtn').addEventListener('click', startVoiceCall);
             document.getElementById('chatInfoBtn').addEventListener('click', openChatInfo);
 
+            // Friends toggle event
+            friendsToggle.addEventListener('click', toggleFriendsOnlyMode);
+
             // Auto-resize textarea
             autoResizeTextarea(messageInput);
 
             // Scroll to bottom on window resize
             window.addEventListener('resize', scrollToBottom);
+        }
+
+        // Toggle friends only mode
+        function toggleFriendsOnlyMode() {
+            friendsOnlyMode = !friendsOnlyMode;
+            const friendsToggle = document.getElementById('friendsToggle');
+            
+            if (friendsOnlyMode) {
+                friendsToggle.classList.add('active');
+                showMessageBox('Friends Only Mode Enabled! 👥', 'success', false, 2000);
+                localStorage.setItem('jchat_friends_only_mode', 'true');
+            } else {
+                friendsToggle.classList.remove('active');
+                showMessageBox('Friends Only Mode Disabled', 'info', false, 2000);
+                localStorage.setItem('jchat_friends_only_mode', 'false');
+            }
+            
+            // Apply the mode to current chat
+            applyFriendsOnlyMode();
+        }
+
+        // Apply friends only mode
+        function applyFriendsOnlyMode() {
+            if (friendsOnlyMode && currentPartner) {
+                // Check if current partner is a friend
+                checkFriendshipStatus(currentPartner.id).then(isFriend => {
+                    if (!isFriend) {
+                        showMessageBox('⚠️ This user is not in your friends list. Some features may be limited.', 'warning', false, 4000);
+                    }
+                });
+            }
+        }
+
+        // Check friendship status (placeholder function)
+        async function checkFriendshipStatus(userId) {
+            // This would connect to your Firebase friends collection
+            // For now, return a random result for demonstration
+            return Math.random() > 0.5;
         }
 
         // Handle input changes
@@ -1178,25 +1501,47 @@
 
         // Load partner information
         function loadPartnerInfo(partnerId) {
-            // Simulate API call (replace with actual implementation)
+            // Load friends only mode state
+            const savedFriendsMode = localStorage.getItem('jchat_friends_only_mode');
+            if (savedFriendsMode === 'true') {
+                friendsOnlyMode = true;
+                document.getElementById('friendsToggle').classList.add('active');
+            }
+
+            // Simulate API call (replace with actual Firebase implementation)
             setTimeout(() => {
                 const partnerInfo = {
                     id: partnerId,
                     name: 'Chat Partner',
-                    avatar: 'https://placehold.co/45x45/00d5ff/ffffff?text=' + partnerId.charAt(0).toUpperCase(),
+                    profilePicId: null, // This would come from Firebase user data
                     status: 'online',
                     lastSeen: Date.now() - 300000 // 5 minutes ago
                 };
 
                 updatePartnerUI(partnerInfo);
                 currentPartner = partnerInfo;
+                applyFriendsOnlyMode();
             }, 500);
         }
 
         // Update partner UI
         function updatePartnerUI(partner) {
             document.getElementById('partnerName').textContent = partner.name;
-            document.getElementById('partnerAvatar').src = partner.avatar;
+            
+            // Use Cloudinary profile picture logic
+            const partnerAvatar = document.getElementById('partnerAvatar');
+            const usernameInitial = partner.name.charAt(0).toUpperCase();
+            
+            if (partner.profilePicId) {
+                const imageUrl = getCloudinaryImageUrl(partner.profilePicId, "w_45,h_45,c_fill,g_face,r_max");
+                partnerAvatar.src = imageUrl;
+                partnerAvatar.onerror = () => {
+                    console.error(`JCHAT_ERROR: Failed to load profile picture: ${partner.profilePicId}. Using placeholder.`);
+                    partnerAvatar.src = `https://placehold.co/45x45/00d5ff/ffffff?text=${usernameInitial}`;
+                };
+            } else {
+                partnerAvatar.src = `https://placehold.co/45x45/00d5ff/ffffff?text=${usernameInitial}`;
+            }
             
             const statusIndicator = document.getElementById('statusIndicator');
             const statusText = document.getElementById('statusText');
@@ -1368,11 +1713,6 @@
         // Utility functions
         function showError(message) {
             showMessageBox(message, 'error');
-        }
-
-        function showMessageBox(message, type = 'info') {
-            // Simple alert for now (replace with custom modal)
-            alert(message);
         }
 
         // File upload option handlers
