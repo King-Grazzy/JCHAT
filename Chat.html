@@ -1475,14 +1475,14 @@
                     iconElement.style.display = 'none';
                     imgElement.onerror = () => {
                         console.error(`JCHAT_ERROR: Failed to load profile picture: ${profilePicId}. Using placeholder.`);
-                        imgElement.src = `https://placehold.co/45x45/CCCCCC/000000?text=${usernameInitial}`;
+                        imgElement.src = `https://placehold.co/36x36/ff2e92/ffffff?text=${usernameInitial}`;
                         imgElement.style.display = 'block';
                         iconElement.style.display = 'none';
                     };
                 } else {
                     imgElement.style.display = 'none';
                     iconElement.style.display = 'block';
-                    imgElement.src = `https://placehold.co/45x45/2a2a4a/ffffff?text=${usernameInitial}`;
+                    imgElement.src = `https://placehold.co/36x36/ff2e92/ffffff?text=${usernameInitial}`;
                 }
             }
         }
@@ -2234,7 +2234,7 @@
             }
         }
 
-        // Update header profile display
+        // Update header profile display - using same logic as Profile.html
         function updateHeaderProfile(user) {
             const headerProfilePic = document.getElementById('headerProfilePic');
             const headerProfileIcon = document.getElementById('headerProfileIcon');
@@ -2248,34 +2248,8 @@
             // Update tooltip
             headerProfile.title = `${displayName} - My Profile`;
             
-            if (user.profilePicId) {
-                // Load Cloudinary profile picture
-                const imageUrl = getCloudinaryImageUrl(user.profilePicId, "w_36,h_36,c_fill,g_face,r_max");
-                headerProfilePic.src = imageUrl;
-                headerProfilePic.style.display = 'block';
-                headerProfileIcon.style.display = 'none';
-                
-                headerProfilePic.onerror = () => {
-                    console.error(`JCHAT_ERROR: Failed to load user profile picture: ${user.profilePicId}. Using fallback.`);
-                    headerProfilePic.src = `https://placehold.co/36x36/ff2e92/ffffff?text=${usernameInitial}`;
-                    headerProfilePic.style.display = 'block';
-                    headerProfileIcon.style.display = 'none';
-                };
-            } else if (user.photoURL) {
-                // Use Google/Firebase photo URL if available
-                headerProfilePic.src = user.photoURL;
-                headerProfilePic.style.display = 'block';
-                headerProfileIcon.style.display = 'none';
-                
-                headerProfilePic.onerror = () => {
-                    headerProfilePic.src = `https://placehold.co/36x36/ff2e92/ffffff?text=${usernameInitial}`;
-                };
-            } else {
-                // Use placeholder with user initial
-                headerProfilePic.src = `https://placehold.co/36x36/ff2e92/ffffff?text=${usernameInitial}`;
-                headerProfilePic.style.display = 'block';
-                headerProfileIcon.style.display = 'none';
-            }
+            // Use the same displayProfilePicture function logic as Profile.html
+            displayProfilePicture(headerProfilePic, headerProfileIcon, user.profilePicId || user.photoURL, usernameInitial, "w_36,h_36,c_fill,g_face,r_max");
         }
 
         // Load chat data
