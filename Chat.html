@@ -358,6 +358,8 @@
             } catch (e) {
                 updateOptimisticStatus(tempId, 'failed');
             }
+            // If no snapshot arrives within 3s (offline/rules), mark failed
+            setTimeout(() => updateOptimisticStatus(tempId, 'failed'), 3000);
             handleTyping(false);
         });
 
@@ -403,8 +405,8 @@
             const q = query(messagesRef, orderBy('timestamp', 'asc'));
             if (unsubscribeMessages) { try { unsubscribeMessages(); } catch {} }
             unsubscribeMessages = onSnapshot(q, (snap) => {
-                // Preserve typing indicator and empty label while clearing messages
-                messagesEl.querySelectorAll('.msg').forEach(node => node.remove());
+                // Preserve optimistic messages until real data arrives
+                messagesEl.querySelectorAll('.msg:not([data-optimistic-id])').forEach(node => node.remove());
                 const emptyLabel = document.getElementById('emptyLabel');
                 if (emptyLabel) emptyLabel.style.display = snap.empty ? 'block' : 'none';
                 snap.forEach(docSnap => {
@@ -420,6 +422,10 @@
                         status: m.status || 'delivered'
                     });
                 });
+                // If we received any real messages, remove optimistic placeholders
+                if (!snap.empty) {
+                    messagesEl.querySelectorAll('[data-optimistic-id]').forEach(node => node.remove());
+                }
                 messagesEl.scrollTop = messagesEl.scrollHeight;
             });
             // Typing listener (presence doc under chat)
