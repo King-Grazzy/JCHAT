@@ -349,9 +349,15 @@
         sendBtn.addEventListener('click', async () => {
             const text = inputEl.value.trim();
             if (!text || !currentUser || !currentPartner) return;
+            // Optimistic UI
+            const tempId = addOptimisticMessage(text);
             inputEl.value = '';
             inputEl.dispatchEvent(new Event('input'));
-            await sendMessage(text);
+            try {
+                await sendMessage(text);
+            } catch (e) {
+                updateOptimisticStatus(tempId, 'failed');
+            }
             handleTyping(false);
         });
 
@@ -452,6 +458,31 @@
             bubble.innerHTML = `${content}<div class="time">${timeStr}${statusIcon}</div>`;
             wrap.appendChild(bubble);
             messagesEl.appendChild(wrap);
+        }
+
+        // Optimistic message rendering (cleared on next snapshot)
+        function addOptimisticMessage(text) {
+            const id = `temp_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+            const wrap = document.createElement('div');
+            wrap.className = 'msg sent';
+            wrap.dataset.optimisticId = id;
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            const timeStr = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const statusIcon = `<span style="margin-left:6px;opacity:.85;">${renderStatusIcon('sent')}</span>`;
+            bubble.innerHTML = `${escapeHtml(text)}<div class="time">${timeStr}${statusIcon}</div>`;
+            wrap.appendChild(bubble);
+            const emptyLabel = document.getElementById('emptyLabel');
+            if (emptyLabel) emptyLabel.style.display = 'none';
+            messagesEl.appendChild(wrap);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+            return id;
+        }
+
+        function updateOptimisticStatus(tempId, status) {
+            const el = messagesEl.querySelector(`[data-optimistic-id="${tempId}"] .time`);
+            if (!el) return;
+            el.innerHTML = `${el.textContent.split(' ')[0]} <span style="margin-left:6px;opacity:.85;">${renderStatusIcon(status)}</span>`;
         }
 
         function renderStatusIcon(status) {
