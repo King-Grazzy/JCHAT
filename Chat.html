@@ -112,6 +112,14 @@
             padding: 20px 10px;
         }
 
+        /* Hide/blur messages while friends toggle is open */
+        .messages.hidden-while-friends {
+            filter: blur(6px);
+            opacity: 0.2;
+            pointer-events: none;
+            transition: opacity .2s ease, filter .2s ease;
+        }
+
         /* Presence indicator */
         .status { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
         .status.status-pill { background: var(--input-background); border: 1px solid var(--border-light); border-radius: 12px; padding: 2px 8px; backdrop-filter: blur(6px); transition: box-shadow .3s ease, border-color .3s ease; }
@@ -626,12 +634,16 @@
         friendsTrigger.addEventListener('click', () => {
             const isOpen = friendsMenu.classList.contains('show');
             if (isOpen) closeFriends(); else openFriends();
+            const messages = document.getElementById('messages');
+            if (messages) messages.classList.toggle('hidden-while-friends', !isOpen);
         });
 
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#friendsRoot')) closeFriends();
+            const messages = document.getElementById('messages');
+            if (messages && !friendsMenu.classList.contains('show')) messages.classList.remove('hidden-while-friends');
         });
-
+        
         friendsSearchEl.addEventListener('input', () => {
             const term = friendsSearchEl.value.trim().toLowerCase();
             if (!term) {
