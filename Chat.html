@@ -46,6 +46,21 @@
             --button-shadow: 0 4px 15px rgba(109,213,237,0.4), 0 4px 15px rgba(33,147,176,0.4);
         }
 
+        /* Light mode readability overrides */
+        body.theme-light-mode .messages { background: transparent; }
+        body.theme-light-mode .msg.recv .bubble {
+            background: rgba(0,0,0,0.06);
+            border: 1px solid rgba(0,0,0,0.12);
+            color: #111;
+        }
+        body.theme-light-mode .msg.sent .bubble {
+            background: linear-gradient(135deg, #2193b0, #6dd5ed);
+            color: #ffffff;
+        }
+        body.theme-light-mode .time { color: rgba(0,0,0,0.6); }
+        body.theme-light-mode .empty-label { color: #555; }
+        body.theme-light-mode .input { color: #111; }
+
         body {
             margin: 0;
             padding: 0;
