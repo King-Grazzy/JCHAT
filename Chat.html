@@ -367,7 +367,7 @@
 
         async function ensureChatDoc(chatId) {
             try {
-                const chatDocRef = doc(db, "artifacts", appId, "chats", chatId);
+                const chatDocRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId);
                 const snap = await getDoc(chatDocRef);
                 if (!snap.exists()) {
                     await setDoc(chatDocRef, {
@@ -386,7 +386,7 @@
 
         async function sendMessage(text) {
             const chatId = chatIdFor(currentUser.uid, currentPartner.id);
-            const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+            const messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatId, "messages");
             await ensureChatDoc(chatId);
             await addDoc(messagesRef, {
                 text,
@@ -401,7 +401,7 @@
         function startMessagesListener() {
             if (!currentUser || !currentPartner) return;
             const chatId = chatIdFor(currentUser.uid, currentPartner.id);
-            const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+            const messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatId, "messages");
             const q = query(messagesRef, orderBy('timestamp', 'asc'));
             if (unsubscribeMessages) { try { unsubscribeMessages(); } catch {} }
             unsubscribeMessages = onSnapshot(q, (snap) => {
@@ -429,7 +429,7 @@
                 messagesEl.scrollTop = messagesEl.scrollHeight;
             });
             // Typing listener (presence doc under chat)
-            const typingDocRef = doc(db, "artifacts", appId, "chats", chatId, "presence", "typing");
+            const typingDocRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId, "presence", "typing");
             if (unsubscribeTyping) { try { unsubscribeTyping(); } catch {} }
             unsubscribeTyping = onSnapshot(typingDocRef, (snap) => {
                 const data = snap.data() || {};
@@ -508,7 +508,7 @@
         async function handleTyping(isTyping) {
             if (!currentUser || !currentPartner) return;
             const chatId = chatIdFor(currentUser.uid, currentPartner.id);
-            const typingDocRef = doc(db, "artifacts", appId, "chats", chatId, "presence", "typing");
+            const typingDocRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId, "presence", "typing");
             try { await setDoc(typingDocRef, { [currentUser.uid]: isTyping }, { merge: true }); } catch {}
             clearTimeout(typingTimer);
             if (isTyping) typingTimer = setTimeout(() => handleTyping(false), 1200);
@@ -517,7 +517,7 @@
         // Read receipts
         async function markRead(chatId) {
             // Mark all partner messages as read by creating/merging a read receipt doc
-            const receiptRef = doc(db, "artifacts", appId, "chats", chatId, "presence", "receipts");
+            const receiptRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId, "presence", "receipts");
             try { await setDoc(receiptRef, { [currentUser.uid]: serverTimestamp() }, { merge: true }); } catch {}
         }
 
