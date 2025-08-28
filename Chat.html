@@ -1589,13 +1589,19 @@
             const trigger = document.getElementById('friendsDropdownTrigger');
             const menu = document.getElementById('friendsDropdownMenu');
             
+            console.log(`JCHAT_DEBUG: Opening friends dropdown. Current friends count: ${friendsData.length}`);
+            
             friendsDropdownOpen = true;
             trigger.classList.add('active');
             menu.classList.add('show');
             
             // Load friends if not already loaded
             if (friendsData.length === 0) {
+                console.log('JCHAT_DEBUG: No friends loaded, triggering loadFriends()');
                 loadFriends();
+            } else {
+                console.log('JCHAT_DEBUG: Friends already loaded, rendering list');
+                renderFriendsList();
             }
         }
 
@@ -1619,7 +1625,7 @@
             renderFriendsList();
         }
 
-        // Load friends from Firebase (adapted from Find_Friends.html)
+        // Load friends from Firebase (exact same logic as Find_Friends.html)
         async function loadFriends() {
             if (!currentUser || !db) {
                 showFriendsError("Authentication required");
@@ -1627,48 +1633,73 @@
             }
 
             try {
-                const { collection, query, where, onSnapshot, doc, getDoc } = window.firebaseImports;
+                const { collection, onSnapshot, doc, getDoc } = window.firebaseImports;
                 
-                // Listen for current user's friends
-                const publicFriendsRef = collection(db, "artifacts", appId, "confirmed_friends");
-                const userFriendsQuery = query(publicFriendsRef, where("user1Id", "==", currentUser.uid));
-                const userFriendsQuery2 = query(publicFriendsRef, where("user2Id", "==", currentUser.uid));
+                // Use the exact same path as Find_Friends.html
+                const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
 
                 // Clear existing friends
                 currentUsersFriends.clear();
                 friendsData = [];
 
-                // Set up real-time listener for friends
-                onSnapshot(userFriendsQuery, async (snapshot) => {
-                    for (const docSnap of snapshot.docs) {
+                // Set up real-time listener for friends (same logic as Find_Friends.html)
+                onSnapshot(publicFriendsRef, async (snapshot) => {
+                    console.log(`JCHAT_DEBUG: Friends snapshot received. Total docs: ${snapshot.size}`);
+                    console.log(`JCHAT_DEBUG: Current user ID: ${currentUser.uid}`);
+                    
+                    // Clear and rebuild friends list
+                    currentUsersFriends.clear();
+                    const friendIds = new Set(); // Track unique friend IDs
+                    
+                    snapshot.forEach(docSnap => {
                         const friendData = docSnap.data();
-                        const friendId = friendData.user2Id;
-                        currentUsersFriends.add(friendId);
-                        await loadFriendDetails(friendId);
+                        console.log(`JCHAT_DEBUG: Processing friendship doc:`, friendData);
+                        
+                        let friendId = null;
+                        
+                        // Check if current user is in this friendship
+                        if (friendData.user1Id === currentUser.uid) {
+                            friendId = friendData.user2Id;
+                            console.log(`JCHAT_DEBUG: Found friend as user2: ${friendId}`);
+                        } else if (friendData.user2Id === currentUser.uid) {
+                            friendId = friendData.user1Id;
+                            console.log(`JCHAT_DEBUG: Found friend as user1: ${friendId}`);
+                        }
+                        
+                        if (friendId) {
+                            currentUsersFriends.add(friendId);
+                            friendIds.add(friendId);
+                        }
+                    });
+                    
+                    console.log(`JCHAT_DEBUG: Found ${friendIds.size} friends for current user`);
+                    console.log(`JCHAT_DEBUG: Friend IDs:`, Array.from(friendIds));
+                    
+                    // Load details for all friends
+                    friendsData = []; // Clear existing data
+                    if (friendIds.size > 0) {
+                        const loadPromises = Array.from(friendIds).map(friendId => loadFriendDetails(friendId));
+                        await Promise.all(loadPromises);
                     }
+                    
+                    // Render the updated friends list
                     renderFriendsList();
-                });
-
-                onSnapshot(userFriendsQuery2, async (snapshot) => {
-                    for (const docSnap of snapshot.docs) {
-                        const friendData = docSnap.data();
-                        const friendId = friendData.user1Id;
-                        currentUsersFriends.add(friendId);
-                        await loadFriendDetails(friendId);
-                    }
-                    renderFriendsList();
+                    
+                }, (error) => {
+                    console.error("JCHAT_ERROR: Error loading friends:", error);
+                    showFriendsError("Failed to load friends");
                 });
 
             } catch (error) {
-                console.error("JCHAT_ERROR: Error loading friends:", error);
-                showFriendsError("Failed to load friends");
+                console.error("JCHAT_ERROR: Error setting up friends listener:", error);
+                showFriendsError("Failed to setup friends sync");
             }
         }
 
         // Load individual friend details
         async function loadFriendDetails(friendId) {
             try {
-                const { doc, getDoc, collection } = window.firebaseImports;
+                const { doc, getDoc } = window.firebaseImports;
                 
                 // Get friend's profile data
                 const friendProfileRef = doc(db, "artifacts", appId, "users", friendId, "profiles", "user_profile");
@@ -1692,9 +1723,30 @@
                     } else {
                         friendsData.push(friendInfo);
                     }
+                    
+                    console.log(`JCHAT_DEBUG: Loaded friend details for ${friendInfo.displayName} (${friendId})`);
+                } else {
+                    console.warn(`JCHAT_WARNING: No profile found for friend ${friendId}`);
+                    
+                    // Add friend with basic info even if no profile exists
+                    const basicFriendInfo = {
+                        id: friendId,
+                        username: `User_${friendId.substring(0, 8)}`,
+                        displayName: `User ${friendId.substring(0, 8)}`,
+                        profilePicId: null,
+                        status: 'offline',
+                        lastSeen: Date.now()
+                    };
+                    
+                    const existingIndex = friendsData.findIndex(f => f.id === friendId);
+                    if (existingIndex >= 0) {
+                        friendsData[existingIndex] = basicFriendInfo;
+                    } else {
+                        friendsData.push(basicFriendInfo);
+                    }
                 }
             } catch (error) {
-                console.error("JCHAT_ERROR: Error loading friend details:", error);
+                console.error(`JCHAT_ERROR: Error loading friend details for ${friendId}:`, error);
             }
         }
 
@@ -1703,6 +1755,9 @@
             const friendsList = document.getElementById('friendsDropdownList');
             const friendsTrigger = document.getElementById('friendsDropdownTrigger');
             const dataToRender = filteredFriendsData.length > 0 ? filteredFriendsData : friendsData;
+            
+            console.log(`JCHAT_DEBUG: Rendering friends list. Total friends: ${friendsData.length}, Filtered: ${filteredFriendsData.length}`);
+            console.log('JCHAT_DEBUG: Friends data:', friendsData);
             
             // Update friends badge
             if (friendsData.length > 0) {
@@ -2119,11 +2174,16 @@
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         currentUser = user;
+                        console.log(`JCHAT_DEBUG: User authenticated: ${user.uid}, email: ${user.email}`);
+                        
                         // Load user profile data and update header
                         await loadUserProfile(user.uid);
+                        
                         // Load friends after user is authenticated
-                        loadFriends();
+                        console.log('JCHAT_DEBUG: Loading friends for authenticated user...');
+                        await loadFriends();
                     } else {
+                        console.log('JCHAT_DEBUG: No user authenticated, redirecting to login');
                         // Redirect to login if not authenticated
                         window.location.href = '/Login.html';
                     }
@@ -2136,6 +2196,8 @@
                     email: 'dev@jchat.app'
                 };
                 updateHeaderProfile(currentUser);
+                console.log('JCHAT_DEBUG: Using development user, loading friends...');
+                loadFriends();
             }
         }
 
