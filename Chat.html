@@ -373,6 +373,7 @@
             if (!user) { window.location.href = '/Login.html'; return; }
             currentUser = user;
             startPresenceHeartbeat();
+            startIncomingListener();
             await setupHeader(user);
             await loadFriends();
             if (!partnerId) return;
@@ -494,6 +495,14 @@
         const videoWrap = document.getElementById('videoWrap');
         const localVideo = document.getElementById('localVideo');
         const remoteVideo = document.getElementById('remoteVideo');
+        
+        // --- WebRTC signaling (Firestore) ---
+        let pc = null;
+        let callDocRef = null;
+        let unsubCallDoc = null;
+        let unsubCallerCand = null;
+        let unsubCalleeCand = null;
+        const rtcConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
         backBtn.onclick = () => history.back();
 
         // Emoji setup with categories and ~500 emojis
@@ -633,34 +642,132 @@
             });
         }
 
-        // Calls (simplified skeleton)
-        let pc = null;
         endCallBtn?.addEventListener('click', endCall);
         voiceCallBtn?.addEventListener('click', () => startCall(false));
         videoCallBtn?.addEventListener('click', () => startCall(true));
 
         async function startCall(isVideo) {
             if (!currentPartner) return;
+            openCallUI(isVideo);
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isVideo });
+                if (isVideo) localVideo.srcObject = stream;
+                pc = new RTCPeerConnection(rtcConfig);
+                stream.getTracks().forEach(t => pc.addTrack(t, stream));
+                pc.ontrack = (e) => { if (isVideo) remoteVideo.srcObject = e.streams[0]; };
+
+                // Create call doc
+                const callsCol = collection(db, 'artifacts', appId, 'public', 'data', 'calls');
+                callDocRef = await addDoc(callsCol, {
+                    callerId: currentUser.uid,
+                    calleeId: currentPartner.id,
+                    video: !!isVideo,
+                    status: 'ringing',
+                    createdAt: serverTimestamp()
+                });
+
+                // ICE
+                const callerCandCol = collection(callDocRef, 'callerCandidates');
+                pc.onicecandidate = (e) => { if (e.candidate) addDoc(callerCandCol, e.candidate.toJSON()); };
+
+                // Offer
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                await updateDoc(callDocRef, { offer: { sdp: offer.sdp, type: offer.type } });
+
+                // Listen for answer
+                unsubCallDoc = onSnapshot(callDocRef, async (docSnap) => {
+                    const data = docSnap.data();
+                    if (data?.answer && pc && !pc.currentRemoteDescription) {
+                        const answerDesc = new RTCSessionDescription(data.answer);
+                        await pc.setRemoteDescription(answerDesc);
+                    }
+                    if (data?.status === 'ended') endCall();
+                });
+
+                // Listen for callee ICE
+                const calleeCandCol = collection(callDocRef, 'calleeCandidates');
+                unsubCalleeCand = onSnapshot(calleeCandCol, (snap) => {
+                    snap.docChanges().forEach(change => {
+                        if (change.type === 'added') {
+                            const cand = new RTCIceCandidate(change.doc.data());
+                            try { pc.addIceCandidate(cand); } catch {}
+                        }
+                    });
+                });
+            } catch (e) {
+                endCall();
+            }
+        }
+
+        // Incoming call listener (basic)
+        let unsubIncoming = null;
+        function startIncomingListener() {
+            try {
+                const callsCol = collection(db, 'artifacts', appId, 'public', 'data', 'calls');
+                const q = query(callsCol, where('calleeId', '==', currentUser.uid), where('status', '==', 'ringing'));
+                unsubIncoming = onSnapshot(q, async (snap) => {
+                    snap.docChanges().forEach(async change => {
+                        if (change.type === 'added' && !pc) {
+                            await acceptIncomingCall(change.doc);
+                        }
+                    });
+                });
+            } catch {}
+        }
+        // Start incoming listener on auth
+        // (after currentUser is set)
+        
+        async function acceptIncomingCall(docSnap) {
+            try {
+                callDocRef = docSnap.ref;
+                const data = docSnap.data();
+                const isVideo = !!data.video;
+                openCallUI(isVideo);
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isVideo });
+                if (isVideo) localVideo.srcObject = stream;
+                pc = new RTCPeerConnection(rtcConfig);
+                stream.getTracks().forEach(t => pc.addTrack(t, stream));
+                pc.ontrack = (e) => { if (isVideo) remoteVideo.srcObject = e.streams[0]; };
+                const calleeCandCol = collection(callDocRef, 'calleeCandidates');
+                pc.onicecandidate = (e) => { if (e.candidate) addDoc(calleeCandCol, e.candidate.toJSON()); };
+                // Set remote offer
+                const offerDesc = new RTCSessionDescription(data.offer);
+                await pc.setRemoteDescription(offerDesc);
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                await updateDoc(callDocRef, { answer: { sdp: answer.sdp, type: answer.type } });
+                // Listen caller ICE
+                const callerCandCol = collection(callDocRef, 'callerCandidates');
+                unsubCallerCand = onSnapshot(callerCandCol, (snap) => {
+                    snap.docChanges().forEach(change => {
+                        if (change.type === 'added') {
+                            const cand = new RTCIceCandidate(change.doc.data());
+                            try { pc.addIceCandidate(cand); } catch {}
+                        }
+                    });
+                });
+            } catch (e) {
+                endCall();
+            }
+        }
+
+        function openCallUI(isVideo) {
             callModal.style.display = 'flex';
             callTitle.textContent = isVideo ? 'Video Call' : 'Voice Call';
             voiceWrap.style.display = isVideo ? 'none' : 'block';
             videoWrap.style.display = isVideo ? 'block' : 'none';
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isVideo });
-                if (isVideo) localVideo.srcObject = stream;
-                pc = new RTCPeerConnection();
-                stream.getTracks().forEach(t => pc.addTrack(t, stream));
-                pc.ontrack = (e) => { if (isVideo) remoteVideo.srcObject = e.streams[0]; };
-                // Signaling would be implemented here using Firestore documents
-            } catch (e) {
-                callModal.style.display = 'none';
-            }
         }
 
-        function endCall() {
+        async function endCall() {
             try { pc && pc.getSenders().forEach(s => s.track && s.track.stop()); } catch {}
             try { pc && pc.close(); } catch {}
             pc = null;
+            try { unsubCallDoc && unsubCallDoc(); } catch {}
+            try { unsubCallerCand && unsubCallerCand(); } catch {}
+            try { unsubCalleeCand && unsubCalleeCand(); } catch {}
+            if (callDocRef) { try { await updateDoc(callDocRef, { status: 'ended' }); } catch {} }
+            callDocRef = null;
             callModal.style.display = 'none';
         }
 
