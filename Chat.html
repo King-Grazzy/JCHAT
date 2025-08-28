@@ -153,9 +153,9 @@
         .msg-actions { display:flex; gap:6px; align-items:center; margin-left: 6px; }
         .msg-action-btn { background: transparent; border: none; color: inherit; cursor: pointer; opacity: .85; }
         .menu-btn { background: transparent; border: none; color: inherit; cursor: pointer; opacity: .85; }
-        .msg-menu { display:none; position: absolute; right: 8px; margin-top: 4px; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.35); z-index: 5; }
-        .msg-menu ul { list-style: none; margin: 0; padding: 6px; min-width: 140px; }
-        .msg-menu li { padding: 8px 10px; font-size: 13px; cursor: pointer; color: var(--white); border-radius: 6px; }
+        .msg-menu { display:none; position: absolute; right: 8px; margin-top: 4px; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.35); z-index: 5; min-width: 120px; max-width: 180px; }
+        .msg-menu ul { list-style: none; margin: 0; padding: 4px; }
+        .msg-menu li { padding: 8px 10px; font-size: 12px; cursor: pointer; color: var(--white); border-radius: 6px; }
         .msg-menu li:hover { background: var(--input-background); }
         .typing { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,.1); border: 1px solid var(--border-light); border-radius: 16px; width: fit-content; }
         .typing.show { display: inline-flex; }
@@ -683,16 +683,16 @@
         }
 
         document.getElementById('clearChatBtn')?.addEventListener('click', async () => {
-            const ok = confirm('Clear all messages in this chat?');
-            if (!ok) return;
-            try {
-                const chatId = chatIdFor(currentUser.uid, currentPartner.id);
-                const msgsCol = collection(db, 'artifacts', appId, 'public', 'data', 'chats', chatId, 'messages');
-                const snap = await getDocs(query(msgsCol));
-                const deletes = [];
-                snap.forEach(d => deletes.push(deleteDoc(d.ref)));
-                await Promise.all(deletes);
-            } catch {}
+            showConfirm('Clear all messages in this chat?', 'Clear', async () => {
+                try {
+                    const chatId = chatIdFor(currentUser.uid, currentPartner.id);
+                    const msgsCol = collection(db, 'artifacts', appId, 'public', 'data', 'chats', chatId, 'messages');
+                    const snap = await getDocs(query(msgsCol));
+                    const deletes = [];
+                    snap.forEach(d => deletes.push(deleteDoc(d.ref)));
+                    await Promise.all(deletes);
+                } catch {}
+            });
         });
 
         // Voice message
