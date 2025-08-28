@@ -73,7 +73,7 @@
         /* Friends dropdown */
         .friends-root { position: relative; }
         .friends-trigger { width: 40px; height: 40px; border-radius: 50%; background: var(--input-background); border: 1px solid var(--border-light); color: var(--text-light); display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .friends-trigger:hover { background: var(--border-light); color: var(--white); }
+        .friends-trigger:hover, .friends-trigger.active { background: var(--border-light); color: var(--white); }
         .friends-menu { position: absolute; right: 0; top: calc(100% + 10px); min-width: 280px; max-width: 320px; max-height: 420px; overflow: hidden; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.4); display: none; }
         .friends-menu.show { display: block; }
         .friends-search { padding: 10px; border-bottom: 1px solid var(--border-light); }
@@ -85,6 +85,10 @@
         .friend-meta { min-width: 0; }
         .friend-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .friend-sub { font-size: 11px; color: var(--text-light); }
+        .friend-presence { display: inline-flex; align-items: center; gap: 6px; }
+        .friend-dot { width: 8px; height: 8px; border-radius: 50%; background: #6c757d; }
+        .friend-dot.online { background: #4CAF50; box-shadow: 0 0 8px rgba(76,175,80,.7); animation: onlinePulse 1.8s ease-in-out infinite; }
+        .friend-dot.away { background: #FFC107; box-shadow: 0 0 6px rgba(255,193,7,.6); }
 
         .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
         .msg { display: flex; }
@@ -144,7 +148,7 @@
                 <div class="partner">
                     <div>
                         <div class="name gradient-title" id="partnerName">JCHAT</div>
-                        <div class="status" id="partnerStatus"><span id="statusDot" class="status-dot status-offline"></span><span id="statusText">Offline</span></div>
+                        <div class="status" id="partnerStatus" style="display:none"><span id="statusDot" class="status-dot status-offline"></span><span id="statusText">Offline</span></div>
                     </div>
                 </div>
             </div>
@@ -684,7 +688,7 @@
                     <img src="${avatar}" onerror="this.src='https://placehold.co/36x36/00d5ff/ffffff?text=${initial}'" alt="${initial}">
                     <div class="friend-meta">
                         <div class="friend-name">${escapeHtml(f.displayName)}</div>
-                        <div class="friend-sub">Tap to chat</div>
+                        <div class="friend-sub"><span class="friend-presence"><span class="friend-dot" data-presence-id="${f.id}"></span><span data-presence-text-id="${f.id}">Offline</span></span></div>
                     </div>
                 </div>`;
             }).join('');
@@ -699,6 +703,29 @@
                     }
                 });
             });
+            // subscribe to presence for each friend (lightweight)
+            data.forEach(f => subscribeFriendPresence(f.id));
+        }
+
+        const friendPresenceUnsubs = new Map();
+        function subscribeFriendPresence(friendId) {
+            try {
+                if (friendPresenceUnsubs.has(friendId)) return;
+                const ref = doc(db, "artifacts", appId, "public", "data", "users", friendId);
+                const unsub = onSnapshot(ref, (snap) => {
+                    const d = snap.data() || {};
+                    const last = d.lastActive?.toMillis ? d.lastActive.toMillis() : (d.lastActive || 0);
+                    const now = Date.now();
+                    let state = 'offline';
+                    if (d.online) state = 'online';
+                    else if (now - last <= 5 * 60 * 1000) state = (now - last <= 3 * 60 * 1000) ? 'away' : 'offline';
+                    const dot = document.querySelector(`[data-presence-id="${friendId}"]`);
+                    const text = document.querySelector(`[data-presence-text-id="${friendId}"]`);
+                    if (dot) dot.className = 'friend-dot ' + (state === 'online' ? 'online' : state === 'away' ? 'away' : '');
+                    if (text) text.textContent = state === 'online' ? 'Online' : (state === 'away' ? 'Recently active' : 'Offline');
+                });
+                friendPresenceUnsubs.set(friendId, unsub);
+            } catch {}
         }
 
         // Visibility-based read receipts
