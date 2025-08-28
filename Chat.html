@@ -1049,8 +1049,12 @@
                 } else {
                     content = `<div style="margin-bottom:6px"><a href="${m.fileUrl}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">${escapeHtml(m.fileName||'File')}</a></div>`;
                 }
-            } else if (m.type === 'audio' && m.fileUrl) {
-                content = `<div style="margin-bottom:6px"><audio controls src="${m.fileUrl}" style="width:220px"></audio></div>`;
+            } else if (m.type === 'audio') {
+                if (m.fileUrl) {
+                    content = `<div style="margin-bottom:6px"><audio controls src="${m.fileUrl}" style="width:220px"></audio></div>`;
+                } else {
+                    content = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><i class="fas fa-microphone"></i><span>Voice note</span><i class="fas fa-spinner fa-spin"></i></div>`;
+                }
             } else {
                 content = escapeHtml(m.text || '');
             }
