@@ -3407,45 +3407,136 @@
             showMessageBox(`Deleting account for ${lookedUpUserProfileData.username}... This may take a moment.`, 'loading', true, 10000); // Persistent message
 
             try {
-                const batch = writeBatch(db);
+                // Use multiple batches to avoid Firestore 500 operation limit
+                const batches = [];
+                let currentBatch = writeBatch(db);
+                let operationCount = 0;
+
+                // Helper function to add operation to batch and create new batch if needed
+                const addToBatch = (operation) => {
+                    if (operationCount >= 450) { // Leave some buffer under 500 limit
+                        batches.push(currentBatch);
+                        currentBatch = writeBatch(db);
+                        operationCount = 0;
+                    }
+                    operation(currentBatch);
+                    operationCount++;
+                };
 
                 // 1. Delete user's private profile
                 const privateProfileDocRef = doc(db, "artifacts", appId, "users", lookedUpUserId, "profiles", "user_profile");
-                batch.delete(privateProfileDocRef);
+                addToBatch((batch) => batch.delete(privateProfileDocRef));
 
                 // 2. Delete user's public profile
                 const publicProfileDocRef = doc(db, "artifacts", appId, "public", "data", "users", lookedUpUserId);
-                batch.delete(publicProfileDocRef);
+                addToBatch((batch) => batch.delete(publicProfileDocRef));
 
                 // 3. Delete user's notifications
                 const notificationsQuery = query(collection(db, "artifacts", appId, "users", lookedUpUserId, "notifications"));
                 const notificationsSnapshot = await getDocs(notificationsQuery);
-                notificationsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+                console.log(`JCHAT_DEBUG: Found ${notificationsSnapshot.size} notifications to delete`);
+                notificationsSnapshot.docs.forEach(docRef => {
+                    addToBatch((batch) => batch.delete(docRef.ref));
+                });
 
                 // 4. Delete user's posts
                 const postsQuery = query(collection(db, "artifacts", appId, "public", "data", "posts"), where("authorId", "==", lookedUpUserId));
                 const postsSnapshot = await getDocs(postsQuery);
-                postsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+                console.log(`JCHAT_DEBUG: Found ${postsSnapshot.size} posts to delete`);
+                postsSnapshot.docs.forEach(docRef => {
+                    addToBatch((batch) => batch.delete(docRef.ref));
+                });
 
                 // 5. Delete user's reported content
                 const reportsMadeByUserQuery = query(collection(db, "artifacts", appId, "public", "data", "reports"), where("reporterId", "==", lookedUpUserId));
                 const reportsMadeByUserSnapshot = await getDocs(reportsMadeByUserQuery);
-                reportsMadeByUserSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+                console.log(`JCHAT_DEBUG: Found ${reportsMadeByUserSnapshot.size} reports made by user to delete`);
+                reportsMadeByUserSnapshot.docs.forEach(docRef => {
+                    addToBatch((batch) => batch.delete(docRef.ref));
+                });
 
                 // 6. Delete reports where this user is REPORTED
                 const reportsOnUserQuery = query(collection(db, "artifacts", appId, "public", "data", "reports"), where("reportedId", "==", lookedUpUserId));
                 const reportsOnUserSnapshot = await getDocs(reportsOnUserQuery);
-                reportsOnUserSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+                console.log(`JCHAT_DEBUG: Found ${reportsOnUserSnapshot.size} reports on user to delete`);
+                reportsOnUserSnapshot.docs.forEach(docRef => {
+                    addToBatch((batch) => batch.delete(docRef.ref));
+                });
 
                 // 7. Delete JCoin buy requests made by this user
                 const jcoinRequestsQuery = query(collection(db, "artifacts", appId, "public", "data", "jcoin_buy_requests"), where("userId", "==", lookedUpUserId));
                 const jcoinRequestsSnapshot = await getDocs(jcoinRequestsQuery);
-                jcoinRequestsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+                console.log(`JCHAT_DEBUG: Found ${jcoinRequestsSnapshot.size} JCoin requests to delete`);
+                jcoinRequestsSnapshot.docs.forEach(docRef => {
+                    addToBatch((batch) => batch.delete(docRef.ref));
+                });
 
                 // 8. Delete pending activity rewards for this user
                 const pendingRewardsQuery = query(collection(db, "artifacts", appId, "public", "data", "pending_activity_rewards"), where("userId", "==", lookedUpUserId));
                 const pendingRewardsSnapshot = await getDocs(pendingRewardsQuery);
-                pendingRewardsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+                console.log(`JCHAT_DEBUG: Found ${pendingRewardsSnapshot.size} pending rewards to delete`);
+                pendingRewardsSnapshot.docs.forEach(docRef => {
+                    addToBatch((batch) => batch.delete(docRef.ref));
+                });
+
+                // 9. Delete user's transactions
+                const transactionsQuery = query(collection(db, "artifacts", appId, "users", lookedUpUserId, "transactions"));
+                const transactionsSnapshot = await getDocs(transactionsQuery);
+                console.log(`JCHAT_DEBUG: Found ${transactionsSnapshot.size} transactions to delete`);
+                transactionsSnapshot.docs.forEach(docRef => {
+                    addToBatch((batch) => batch.delete(docRef.ref));
+                });
+
+                // 10. Delete user's entitlements
+                const userEntitlementsDocRef = doc(db, "artifacts", appId, "users", lookedUpUserId, "user_entitlements");
+                addToBatch((batch) => batch.delete(userEntitlementsDocRef));
+
+                // 11. Delete user's shop purchases
+                const shopPurchasesDocRef = doc(db, "artifacts", appId, "users", lookedUpUserId, "shop", "purchases");
+                addToBatch((batch) => batch.delete(shopPurchasesDocRef));
+
+                // 12. Delete user's profile entitlements (alternative location)
+                const profileEntitlementsDocRef = doc(db, "artifacts", appId, "users", lookedUpUserId, "profiles", "user_entitlements");
+                addToBatch((batch) => batch.delete(profileEntitlementsDocRef));
+
+                // 13. Delete shop payment requests made by this user
+                const shopPaymentRequestsQuery = query(collection(db, "artifacts", appId, "public", "data", "shop_payment_requests"), where("userId", "==", lookedUpUserId));
+                const shopPaymentRequestsSnapshot = await getDocs(shopPaymentRequestsQuery);
+                console.log(`JCHAT_DEBUG: Found ${shopPaymentRequestsSnapshot.size} shop payment requests to delete`);
+                shopPaymentRequestsSnapshot.docs.forEach(docRef => {
+                    addToBatch((batch) => batch.delete(docRef.ref));
+                });
+
+                // 14. Delete wallet unlock requests made by this user
+                const walletUnlockRequestsQuery = query(collection(db, "artifacts", appId, "public", "data", "wallet_unlock_requests"), where("userId", "==", lookedUpUserId));
+                const walletUnlockRequestsSnapshot = await getDocs(walletUnlockRequestsQuery);
+                console.log(`JCHAT_DEBUG: Found ${walletUnlockRequestsSnapshot.size} wallet unlock requests to delete`);
+                walletUnlockRequestsSnapshot.docs.forEach(docRef => {
+                    addToBatch((batch) => batch.delete(docRef.ref));
+                });
+
+                // 15. Delete feature orders made by this user
+                const featureOrdersQuery = query(collection(db, "artifacts", appId, "public", "data", "feature_orders"), where("userId", "==", lookedUpUserId));
+                const featureOrdersSnapshot = await getDocs(featureOrdersQuery);
+                console.log(`JCHAT_DEBUG: Found ${featureOrdersSnapshot.size} feature orders to delete`);
+                featureOrdersSnapshot.docs.forEach(docRef => {
+                    addToBatch((batch) => batch.delete(docRef.ref));
+                });
+
+                // Add the current batch if it has operations
+                if (operationCount > 0) {
+                    batches.push(currentBatch);
+                }
+
+                console.log(`JCHAT_DEBUG: Executing ${batches.length} batch operations with total ${operationCount} operations`);
+
+                // Execute all batches
+                const batchPromises = batches.map((batch, index) => {
+                    console.log(`JCHAT_DEBUG: Committing batch ${index + 1} of ${batches.length}`);
+                    return batch.commit();
+                });
+
+                await Promise.all(batchPromises);
 
                 // --- IMPORTANT: Handling Chat Messages ---
                 // Deleting all chat messages involving a user can be very complex and resource-intensive
@@ -3458,9 +3549,23 @@
                 // and delete them. This would be too slow and potentially hit limits for a client-side operation.
                 console.warn("JCHAT_WARNING: Chat messages for this user are NOT deleted by this client-side function. A Cloud Function is recommended for full chat data purging.");
 
-                await batch.commit();
+                console.log(`JCHAT_DEBUG: Successfully deleted all user data for ${lookedUpUserId}`);
 
-                showMessageBox(`Account for ${lookedUpUserProfileData.username} and associated data successfully deleted!`, 'success');
+                // --- IMPORTANT: Firebase Auth User Deletion ---
+                // This function only deletes Firestore data. The Firebase Auth user account still exists.
+                // To completely remove the user, you need to delete their Firebase Auth account as well.
+                // This requires server-side implementation (Cloud Functions or Admin SDK) because:
+                // 1. Client-side code cannot delete other users' Auth accounts for security reasons
+                // 2. Only the Firebase Admin SDK can delete user accounts
+                // 3. The user would need to be signed out and their session invalidated
+                // 
+                // To implement complete user deletion:
+                // 1. Create a Cloud Function that accepts the user ID
+                // 2. Use admin.auth().deleteUser(uid) in the Cloud Function
+                // 3. Call this function from the admin panel after Firestore data deletion
+                console.warn("JCHAT_WARNING: Firebase Auth user account still exists. Server-side deletion required for complete removal.");
+
+                showMessageBox(`Account data for ${lookedUpUserProfileData.username} successfully deleted! Note: Firebase Auth account still exists and requires server-side deletion.`, 'success');
                 playNotificationSound('success');
                 clearUserDetailsDisplay(); // Clear and hide the user details section
             } catch (error) {
