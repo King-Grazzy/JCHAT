@@ -347,7 +347,7 @@
                 window.addEventListener('online', post);
                 window.addEventListener('offline', post);
                 document.addEventListener('visibilitychange', post);
-                window.addEventListener('beforeunload', () => { try { navigator.sendBeacon && navigator.sendBeacon('/'); } catch {} post(); });
+                window.addEventListener('beforeunload', () => { try { post(); } catch {} });
             } catch {}
         }
 
@@ -737,7 +737,21 @@
             renderFriends();
         });
 
-        function openFriends() { friendsMenu.classList.add('show'); renderFriends(); }
+        function openFriends() {
+            friendsMenu.classList.add('show');
+            renderFriends();
+            // Reapply cached presence immediately to avoid flicker/offline
+            const data = filteredFriends.length ? filteredFriends : friendsData;
+            data.forEach(f => {
+                const cached = friendPresenceCache.get(f.id);
+                if (cached) {
+                    const dot = document.querySelector(`[data-presence-id="${f.id}"]`);
+                    const text = document.querySelector(`[data-presence-text-id="${f.id}"]`);
+                    if (dot) dot.className = 'friend-dot ' + (cached.state === 'online' ? 'online' : cached.state === 'away' ? 'away' : '');
+                    if (text) text.textContent = cached.state === 'online' ? 'Online' : (cached.state === 'away' ? `Away • ${formatRelativeTime(cached.lastMs)}` : `Offline • ${formatRelativeTime(cached.lastMs)}`);
+                }
+            });
+        }
         function closeFriends() { friendsMenu.classList.remove('show'); }
 
         async function loadFriends() {
@@ -797,6 +811,7 @@
         }
 
         const friendPresenceUnsubs = new Map();
+        const friendPresenceCache = new Map(); // friendId -> { state, lastMs }
         function subscribeFriendPresence(friendId) {
             try {
                 if (friendPresenceUnsubs.has(friendId)) return;
@@ -808,6 +823,7 @@
                     let state = 'offline';
                     if (d.online) state = 'online';
                     else if (now - lastMs <= 5*60*1000) state = 'away';
+                    friendPresenceCache.set(friendId, { state, lastMs });
                     const dot = document.querySelector(`[data-presence-id="${friendId}"]`);
                     const text = document.querySelector(`[data-presence-text-id="${friendId}"]`);
                     if (dot) dot.className = 'friend-dot ' + (state === 'online' ? 'online' : state === 'away' ? 'away' : '');
