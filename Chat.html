@@ -179,7 +179,11 @@
         .send { width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--button-background); color: white; box-shadow: var(--button-shadow); cursor: pointer; }
 
         /* Emoji panel */
-        .emoji-panel { position: absolute; bottom: 64px; right: 16px; width: 320px; max-height: 300px; overflow: auto; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 12px; padding: 8px; display: none; z-index: 200; }
+        .emoji-panel { position: absolute; bottom: 64px; right: 16px; width: 360px; max-height: 360px; overflow: hidden; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 12px; display: none; z-index: 200; box-shadow: 0 12px 40px rgba(0,0,0,.3); }
+        .emoji-header { display: flex; gap: 6px; padding: 6px; overflow-x: auto; border-bottom: 1px solid var(--border-light); }
+        .emoji-tab { background: transparent; border: 1px solid var(--border-light); color: var(--white); font-size: 12px; padding: 6px 8px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
+        .emoji-tab.active { background: var(--input-background); }
+        .emoji-scroll { max-height: 300px; overflow: auto; padding: 8px; }
         .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
         .emoji-btn { background: transparent; border: none; font-size: 20px; cursor: pointer; line-height: 1; padding: 6px; border-radius: 6px; }
         .emoji-btn:hover { background: var(--input-background); }
@@ -229,7 +233,10 @@
             <button class="send" id="sendBtn" title="Send"><i class="fas fa-paper-plane"></i></button>
             <input type="file" id="fileInput" style="display:none" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx">
         </div>
-        <div class="emoji-panel" id="emojiPanel"><div class="emoji-grid" id="emojiGrid"></div></div>
+        <div class="emoji-panel" id="emojiPanel">
+            <div class="emoji-header" id="emojiTabs"></div>
+            <div class="emoji-scroll"><div class="emoji-grid" id="emojiGrid"></div></div>
+        </div>
     </div>
 
     <!-- Notification sound -->
@@ -456,32 +463,56 @@
         const emojiBtn = document.getElementById('emojiBtn');
         const emojiPanel = document.getElementById('emojiPanel');
         const emojiGrid = document.getElementById('emojiGrid');
+        const emojiTabs = document.getElementById('emojiTabs');
         backBtn.onclick = () => history.back();
 
-        // Emoji setup
-        const emojiList = (() => {
-            // Build ~350 emojis (mix of faces, symbols, hands, animals)
-            const ranges = [
-                [0x1F600, 0x1F64F], // Emoticons
-                [0x1F300, 0x1F320], // Weather
-                [0x1F330, 0x1F37F], // Food/Drink subset
-                [0x1F380, 0x1F3C0], // Activities subset
-                [0x1F3C1, 0x1F3FF], // Sports/skin-tones subset
-                [0x1F400, 0x1F43F], // Animals subset
-                [0x1F440, 0x1F4FF], // Objects subset
-            ];
+        // Emoji setup with categories and ~500 emojis
+        const emojiCategories = [
+            { key: 'faces', label: 'Faces', ranges: [[0x1F600,0x1F64F]] },
+            { key: 'people', label: 'People', ranges: [[0x1F466,0x1F487]] },
+            { key: 'hands', label: 'Hands', ranges: [[0x1F44A,0x1F64F]] },
+            { key: 'animals', label: 'Animals', ranges: [[0x1F400,0x1F43F],[0x1F980,0x1F991]] },
+            { key: 'food', label: 'Food', ranges: [[0x1F32D,0x1F37F]] },
+            { key: 'activities', label: 'Activities', ranges: [[0x1F380,0x1F3CF]] },
+            { key: 'travel', label: 'Travel', ranges: [[0x1F680,0x1F6C5]] },
+            { key: 'objects', label: 'Objects', ranges: [[0x1F4A0,0x1F4FC],[0x1F9F0,0x1F9FF]] },
+            { key: 'symbols', label: 'Symbols', ranges: [[0x1F300,0x1F320],[0x1F500,0x1F5FF]] },
+            { key: 'flags', label: 'Flags', ranges: [[0x1F1E6,0x1F1FF]] },
+        ];
+
+        const emojiCacheByCategory = new Map();
+        function buildCategoryEmojis(cat) {
+            if (emojiCacheByCategory.has(cat.key)) return emojiCacheByCategory.get(cat.key);
             const list = [];
-            for (const [start, end] of ranges) {
-                for (let code = start; code <= end && list.length < 360; code++) {
+            for (const [start,end] of cat.ranges) {
+                for (let code=start; code<=end && list.length<600; code++) {
                     try { list.push(String.fromCodePoint(code)); } catch {}
                 }
             }
-            return list.slice(0, 350);
-        })();
+            // Limit to about 60 per category for total ~600; then slice to 50 for tighter ~500 total
+            const capped = list.slice(0, 50);
+            emojiCacheByCategory.set(cat.key, capped);
+            return capped;
+        }
 
-        function renderEmojis() {
+        function renderEmojiTabs(activeKey) {
+            emojiTabs.innerHTML = '';
+            emojiCategories.forEach((cat, idx) => {
+                const tab = document.createElement('button');
+                tab.className = 'emoji-tab' + (cat.key === activeKey ? ' active' : '');
+                tab.type = 'button';
+                tab.textContent = cat.label;
+                tab.addEventListener('click', () => renderEmojis(cat.key));
+                emojiTabs.appendChild(tab);
+            });
+        }
+
+        function renderEmojis(categoryKey) {
+            const key = categoryKey || (emojiCategories[0]?.key);
+            renderEmojiTabs(key);
             emojiGrid.innerHTML = '';
-            emojiList.forEach(e => {
+            const list = buildCategoryEmojis(emojiCategories.find(c => c.key === key));
+            list.forEach(e => {
                 const b = document.createElement('button');
                 b.className = 'emoji-btn';
                 b.type = 'button';
