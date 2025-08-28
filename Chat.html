@@ -561,32 +561,45 @@
         async function maybeSendFriendWelcome(userId, friendId, friendName) {
             const chatId = chatIdFor(userId, friendId);
             const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
-            // Use a deterministic message ID to avoid duplicates in race conditions
-            const welcomeMsgRef = doc(messagesRef, 'welcome_friend');
+            const metaWelcomeRef = doc(db, "artifacts", appId, "chats", chatId, "meta", "welcome_friend");
 
             try {
                 await runTransaction(db, async (tx) => {
-                    const existingWelcome = await tx.get(welcomeMsgRef);
-                    if (existingWelcome.exists()) return; // already sent
+                    const welcomeSnap = await tx.get(metaWelcomeRef);
+                    if (welcomeSnap.exists() && welcomeSnap.data()?.sent === true) return; // already sent
 
                     const oneMsgQuery = query(messagesRef, limit(1));
                     const oneMsgSnap = await getDocs(oneMsgQuery);
                     if (!oneMsgSnap.empty) {
-                        // Messages exist, do not send welcome
+                        // There are messages already, set flag to avoid future attempts
+                        tx.set(metaWelcomeRef, { sent: true, reason: 'messages_exist', at: serverTimestamp() }, { merge: true });
                         return;
                     }
 
-                    // Create one system message authored by the current user so rules allow it
-                    const friendlyText = `You and ${friendName} are now friends! Say hi 👋`;
-                    tx.set(welcomeMsgRef, {
+                    // Compose symmetric messages for both users
+                    const friendlyForUser = `You and ${friendName} are now friends! Say hi 👋`;
+                    const friendlyForFriend = `You and a new friend are connected! Say hi 👋`;
+
+                    // Create two system messages (from server) visible to both sides
+                    tx.set(doc(messagesRef), {
                         type: 'system',
-                        text: friendlyText,
+                        text: friendlyForUser,
                         timestamp: serverTimestamp(),
                         status: 'delivered',
-                        senderId: userId,
+                        senderId: 'system',
                         receiverId: friendId,
                         chatId
-                    }, { merge: false });
+                    });
+                    tx.set(doc(messagesRef), {
+                        type: 'system',
+                        text: friendlyForFriend,
+                        timestamp: serverTimestamp(),
+                        status: 'delivered',
+                        senderId: 'system',
+                        receiverId: userId,
+                        chatId
+                    });
+                    tx.set(metaWelcomeRef, { sent: true, at: serverTimestamp(), reason: 'empty_chat' }, { merge: true });
                 });
             } catch (e) {
                 // Best-effort. Ignore errors to avoid blocking UI.
