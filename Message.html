@@ -93,6 +93,12 @@
         .msg.sent .bubble { background: linear-gradient(135deg, var(--blue), var(--pink)); color: white; border-bottom-right-radius: 8px; }
         .msg.recv .bubble { background: rgba(255,255,255,.1); border: 1px solid var(--border-light); color: white; border-bottom-left-radius: 8px; }
         .time { font-size: 11px; opacity: .75; margin-top: 4px; text-align: right; }
+        .typing { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,.1); border: 1px solid var(--border-light); border-radius: 16px; width: fit-content; }
+        .typing.show { display: inline-flex; }
+        .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-light); animation: pulse 1.2s infinite ease-in-out; }
+        .typing-dot:nth-child(2) { animation-delay: .2s; }
+        .typing-dot:nth-child(3) { animation-delay: .4s; }
+        @keyframes pulse { 0%, 60%, 100% { transform: scale(1); opacity: .5; } 30% { transform: scale(1.2); opacity: 1; } }
 
         .input-bar { display: flex; align-items: flex-end; gap: 10px; padding: 12px 16px; background: var(--header-background); border-top: 1px solid var(--border-light); }
         .input-wrap { flex: 1; display: flex; align-items: center; background: var(--input-background); border: 1px solid var(--border-light); border-radius: 20px; }
@@ -132,7 +138,9 @@
             </div>
         </div>
 
-        <div class="messages" id="messages"></div>
+        <div class="messages" id="messages">
+            <div class="typing" id="typingIndicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>
+        </div>
 
         <div class="input-bar">
             <div class="input-wrap">
@@ -143,6 +151,7 @@
                 </div>
             </div>
             <button class="send" id="sendBtn" title="Send"><i class="fas fa-paper-plane"></i></button>
+            <input type="file" id="fileInput" style="display:none" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx">
         </div>
     </div>
 
@@ -150,6 +159,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-storage.js";
 
         // Firebase config (same pattern as Profile.html)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -171,6 +181,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         // Helpers: Cloudinary URL
         function getCloudinaryImageUrl(urlOrPublicId, transformations = "w_auto,f_auto,q_auto") {
@@ -226,6 +237,7 @@
         let currentPartner = null;
         let friendsData = [];
         let filteredFriends = [];
+        let typingTimer = null;
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = '/Login.html'; return; }
@@ -274,6 +286,7 @@
         inputEl.addEventListener('input', () => {
             inputEl.style.height = 'auto';
             inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+            handleTyping(true);
         });
 
         sendBtn.addEventListener('click', async () => {
@@ -282,6 +295,7 @@
             inputEl.value = '';
             inputEl.dispatchEvent(new Event('input'));
             await sendMessage(text);
+            handleTyping(false);
         });
 
         function chatIdFor(u1, u2) { return [u1, u2].sort().join('_'); }
@@ -311,12 +325,26 @@
                     renderMessage({
                         id: docSnap.id,
                         text: m.text,
+                        type: m.type || 'text',
+                        fileUrl: m.fileUrl || null,
+                        fileName: m.fileName || null,
                         sender: m.senderId === currentUser.uid ? 'current' : 'partner',
-                        timestamp: m.timestamp?.toMillis?.() || Date.now()
+                        timestamp: m.timestamp?.toMillis?.() || Date.now(),
+                        status: m.status || 'delivered'
                     });
                 });
                 messagesEl.scrollTop = messagesEl.scrollHeight;
             });
+            // Typing listener (presence doc under chat)
+            const typingDocRef = doc(db, "artifacts", appId, "chats", chatId, "presence", "typing");
+            onSnapshot(typingDocRef, (snap) => {
+                const data = snap.data() || {};
+                const isPartnerTyping = !!data[currentPartner.id];
+                const ti = document.getElementById('typingIndicator');
+                if (isPartnerTyping) ti.classList.add('show'); else ti.classList.remove('show');
+            });
+            // Mark read on open
+            markRead(chatId);
         }
 
         function renderMessage(m) {
@@ -324,15 +352,97 @@
             wrap.className = `msg ${m.sender === 'current' ? 'sent' : 'recv'}`;
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
-            bubble.innerHTML = `${escapeHtml(m.text)}<div class="time">${new Date(m.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>`;
+            const timeStr = new Date(m.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            const statusIcon = m.sender === 'current' ? `<span style="margin-left:6px;opacity:.85;">${renderStatusIcon(m.status || 'delivered')}</span>` : '';
+            let content = '';
+            if (m.type === 'file' && m.fileUrl) {
+                if (m.fileUrl.match(/\.(png|jpe?g|gif|webp)$/i)) {
+                    content = `<div style="margin-bottom:6px"><img src="${m.fileUrl}" alt="${escapeHtml(m.fileName||'image')}" style="max-width:220px;border-radius:10px;border:1px solid var(--border-light)" onerror="this.style.display='none'"></div>`;
+                } else if (m.fileUrl.match(/\.(mp4|webm|ogg)$/i)) {
+                    content = `<div style="margin-bottom:6px"><video src="${m.fileUrl}" controls style="max-width:220px;border-radius:10px;border:1px solid var(--border-light)"></video></div>`;
+                } else {
+                    content = `<div style="margin-bottom:6px"><a href="${m.fileUrl}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">${escapeHtml(m.fileName||'File')}</a></div>`;
+                }
+            } else {
+                content = escapeHtml(m.text || '');
+            }
+            bubble.innerHTML = `${content}<div class="time">${timeStr}${statusIcon}</div>`;
             wrap.appendChild(bubble);
             messagesEl.appendChild(wrap);
+        }
+
+        function renderStatusIcon(status) {
+            if (status === 'read') return '✔✔';
+            if (status === 'delivered') return '✔';
+            if (status === 'sent') return '⏺';
+            return '';
         }
 
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // Typing presence
+        async function handleTyping(isTyping) {
+            if (!currentUser || !currentPartner) return;
+            const chatId = chatIdFor(currentUser.uid, currentPartner.id);
+            const typingDocRef = doc(db, "artifacts", appId, "chats", chatId, "presence", "typing");
+            try { await setDoc(typingDocRef, { [currentUser.uid]: isTyping }, { merge: true }); } catch {}
+            clearTimeout(typingTimer);
+            if (isTyping) typingTimer = setTimeout(() => handleTyping(false), 1200);
+        }
+
+        // Read receipts
+        async function markRead(chatId) {
+            // Mark all partner messages as read by creating/merging a read receipt doc
+            const receiptRef = doc(db, "artifacts", appId, "chats", chatId, "presence", "receipts");
+            try { await setDoc(receiptRef, { [currentUser.uid]: serverTimestamp() }, { merge: true }); } catch {}
+        }
+
+        // Attachments via Cloudinary direct upload
+        const attachBtn = document.getElementById('attachBtn');
+        const fileInput = document.getElementById('fileInput');
+        attachBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files || []);
+            if (!files.length || !currentUser || !currentPartner) return;
+            for (const f of files) {
+                const uploadedUrl = await uploadToCloudinary(f);
+                if (!uploadedUrl) continue;
+                await sendFileMessage(f, uploadedUrl);
+            }
+            fileInput.value = '';
+        });
+
+        async function uploadToCloudinary(file) {
+            try {
+                const fd = new FormData();
+                fd.append('file', file);
+                fd.append('upload_preset', cloudinaryConfig.uploadPreset);
+                const type = file.type.startsWith('image/') ? 'image' : (file.type.startsWith('video/') ? 'video' : 'raw');
+                const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/${type}/upload`, { method: 'POST', body: fd });
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data.secure_url || data.url || null;
+            } catch (e) { return null; }
+        }
+
+        async function sendFileMessage(file, url) {
+            const chatId = chatIdFor(currentUser.uid, currentPartner.id);
+            const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+            await addDoc(messagesRef, {
+                text: file.type.startsWith('image/') ? 'Photo' : (file.type.startsWith('video/') ? 'Video' : 'Attachment'),
+                type: 'file',
+                fileUrl: url,
+                fileName: file.name,
+                senderId: currentUser.uid,
+                receiverId: currentPartner.id,
+                timestamp: serverTimestamp(),
+                status: 'sent',
+                chatId
+            });
         }
 
         // Friends dropdown logic
