@@ -222,10 +222,11 @@
             justify-content: space-between;
             padding: 15px 20px;
             background: var(--header-background);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
             border-bottom: 1px solid var(--border-light);
             position: relative;
             z-index: 100;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
         }
 
         .chat-header-left {
@@ -260,12 +261,20 @@
         }
 
         .partner-avatar {
-            width: 45px;
-            height: 45px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             border: 2px solid var(--border-light);
             object-fit: cover;
             position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 0 2px rgba(0, 213, 255, 0);
+        }
+
+        .partner-avatar:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.3);
         }
 
         .partner-details h3 {
@@ -760,65 +769,88 @@
         .friends-dropdown-trigger {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
             background: var(--input-background);
             border: 1px solid var(--border-light);
-            border-radius: 12px;
-            padding: 6px 12px;
+            border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s ease;
             color: var(--text-color-secondary);
-            font-size: 12px;
-            font-weight: 500;
-            min-width: 80px;
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
         }
 
         .friends-dropdown-trigger:hover {
             background: var(--border-light);
             border-color: var(--accent-color);
             color: var(--text-color-primary);
+            transform: scale(1.05);
         }
 
         .friends-dropdown-trigger.active {
             background: var(--button-background);
             border-color: transparent;
             color: #ffffff;
-            box-shadow: 0 0 15px rgba(0, 213, 255, 0.3), 0 0 15px rgba(255, 46, 146, 0.3);
+            box-shadow: 0 0 20px rgba(0, 213, 255, 0.4), 0 0 20px rgba(255, 46, 146, 0.4);
+            transform: scale(1.1);
         }
 
-        .friends-dropdown-arrow {
-            transition: transform 0.3s ease;
+        .friends-dropdown-trigger::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background: var(--notification-badge-color);
+            border-radius: 50%;
+            border: 2px solid var(--background-color-primary);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
         }
 
-        .friends-dropdown-trigger.active .friends-dropdown-arrow {
-            transform: rotate(180deg);
+        .friends-dropdown-trigger.has-friends::before {
+            opacity: 1;
+            transform: scale(1);
         }
 
         .friends-dropdown-menu {
             position: absolute;
-            top: 100%;
+            top: calc(100% + 10px);
             right: 0;
-            margin-top: 5px;
             background: var(--card-background);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px);
             border: 1px solid var(--border-light);
-            border-radius: 12px;
-            min-width: 250px;
-            max-width: 300px;
-            max-height: 400px;
-            overflow-y: auto;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
+            min-width: 280px;
+            max-width: 320px;
+            max-height: 450px;
+            overflow: hidden;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.6),
+                0 8px 25px rgba(0, 213, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
             opacity: 0;
             visibility: hidden;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
+            transform: translateY(-15px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 1000;
         }
 
         .friends-dropdown-menu.show {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
+        }
+
+        .friends-dropdown-list {
+            padding: 5px 0;
+            max-height: 300px;
+            overflow-y: auto;
         }
 
         .friends-dropdown-header {
@@ -854,34 +886,60 @@
             box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.2);
         }
 
-        .friends-dropdown-list {
-            padding: 5px 0;
-        }
-
         .friend-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 15px;
+            padding: 12px 16px;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .friend-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(0, 213, 255, 0.1), rgba(255, 46, 146, 0.1));
+            transition: width 0.3s ease;
         }
 
         .friend-item:hover {
             background: var(--border-light);
+            transform: translateX(4px);
+        }
+
+        .friend-item:hover::before {
+            width: 100%;
         }
 
         .friend-item:last-child {
             border-bottom: none;
         }
 
+        .friend-item:active {
+            transform: translateX(2px) scale(0.98);
+        }
+
         .friend-avatar {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            border: 1px solid var(--border-light);
+            border: 2px solid var(--border-light);
             object-fit: cover;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .friend-item:hover .friend-avatar {
+            border-color: var(--accent-color);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 213, 255, 0.3);
         }
 
         .friend-info {
@@ -908,15 +966,36 @@
         }
 
         .friend-status-dot {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: var(--status-offline);
+            transition: all 0.3s ease;
+            position: relative;
         }
 
         .friend-status-dot.online {
             background: var(--status-online);
-            box-shadow: 0 0 6px var(--status-online);
+            box-shadow: 
+                0 0 8px var(--status-online),
+                0 0 15px rgba(76, 175, 80, 0.3);
+            animation: pulse-online 2s infinite;
+        }
+
+        @keyframes pulse-online {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes slideInFriend {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         .friends-dropdown-empty {
@@ -1090,10 +1169,8 @@
             
             <!-- Friends Dropdown -->
             <div class="friends-dropdown-container" id="friendsDropdownContainer">
-                <div class="friends-dropdown-trigger" id="friendsDropdownTrigger">
+                <div class="friends-dropdown-trigger" id="friendsDropdownTrigger" title="Chat with Friends">
                     <i class="fas fa-users"></i>
-                    <span>Friends</span>
-                    <i class="fas fa-chevron-down friends-dropdown-arrow"></i>
                 </div>
                 <div class="friends-dropdown-menu" id="friendsDropdownMenu">
                     <div class="friends-dropdown-header">
@@ -1560,38 +1637,58 @@
         // Render friends list
         function renderFriendsList() {
             const friendsList = document.getElementById('friendsDropdownList');
+            const friendsTrigger = document.getElementById('friendsDropdownTrigger');
             const dataToRender = filteredFriendsData.length > 0 ? filteredFriendsData : friendsData;
             
+            // Update friends badge
+            if (friendsData.length > 0) {
+                friendsTrigger.classList.add('has-friends');
+                friendsTrigger.title = `Chat with Friends (${friendsData.length})`;
+            } else {
+                friendsTrigger.classList.remove('has-friends');
+                friendsTrigger.title = 'No friends yet';
+            }
+            
             if (dataToRender.length === 0) {
-                friendsList.innerHTML = `
-                    <div class="friends-dropdown-empty">
-                        <i class="fas fa-user-friends" style="font-size: 24px; margin-bottom: 8px; opacity: 0.5;"></i>
-                        <div>No friends found</div>
-                        <div style="font-size: 11px; margin-top: 4px;">Add friends to start chatting</div>
-                    </div>
-                `;
+                const emptyMessage = friendsData.length === 0 ? 
+                    `<div class="friends-dropdown-empty">
+                        <i class="fas fa-user-plus" style="font-size: 32px; margin-bottom: 12px; opacity: 0.5; background: linear-gradient(45deg, var(--blue), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                        <div style="font-weight: 600; margin-bottom: 4px;">No friends yet</div>
+                        <div style="font-size: 11px; color: var(--text-color-secondary);">Add friends from the Find Friends page</div>
+                        <button onclick="window.location.href='/Find_Friends.html'" style="margin-top: 10px; padding: 6px 12px; background: var(--button-background); color: white; border: none; border-radius: 8px; font-size: 11px; cursor: pointer;">Find Friends</button>
+                    </div>` :
+                    `<div class="friends-dropdown-empty">
+                        <i class="fas fa-search" style="font-size: 24px; margin-bottom: 8px; opacity: 0.5;"></i>
+                        <div>No friends match your search</div>
+                        <div style="font-size: 11px; margin-top: 4px;">Try a different search term</div>
+                    </div>`;
+                
+                friendsList.innerHTML = emptyMessage;
                 return;
             }
             
-            const friendsHTML = dataToRender.map(friend => {
+            const friendsHTML = dataToRender.map((friend, index) => {
                 const usernameInitial = friend.displayName.charAt(0).toUpperCase();
                 let avatarHTML = '';
                 
                 if (friend.profilePicId) {
-                    const imageUrl = getCloudinaryImageUrl(friend.profilePicId, "w_32,h_32,c_fill,g_face,r_max");
-                    avatarHTML = `<img src="${imageUrl}" alt="${friend.displayName}" class="friend-avatar" onerror="this.src='https://placehold.co/32x32/CCCCCC/000000?text=${usernameInitial}';">`;
+                    const imageUrl = getCloudinaryImageUrl(friend.profilePicId, "w_36,h_36,c_fill,g_face,r_max");
+                    avatarHTML = `<img src="${imageUrl}" alt="${friend.displayName}" class="friend-avatar" onerror="this.src='https://placehold.co/36x36/00d5ff/ffffff?text=${usernameInitial}';">`;
                 } else {
-                    avatarHTML = `<img src="https://placehold.co/32x32/CCCCCC/000000?text=${usernameInitial}" alt="${friend.displayName}" class="friend-avatar">`;
+                    avatarHTML = `<img src="https://placehold.co/36x36/00d5ff/ffffff?text=${usernameInitial}" alt="${friend.displayName}" class="friend-avatar">`;
                 }
                 
+                // Simulate random online status for demo (in real app, this would come from presence system)
+                const isOnline = Math.random() > 0.7;
+                
                 return `
-                    <div class="friend-item" data-friend-id="${friend.id}" onclick="selectFriend('${friend.id}')">
+                    <div class="friend-item" data-friend-id="${friend.id}" onclick="selectFriend('${friend.id}')" style="animation: slideInFriend 0.3s ease forwards; animation-delay: ${index * 0.05}s; opacity: 0;">
                         ${avatarHTML}
                         <div class="friend-info">
-                            <div class="friend-name">${friend.displayName}</div>
+                            <div class="friend-name">${escapeHtml(friend.displayName)}</div>
                             <div class="friend-status">
-                                <div class="friend-status-dot ${friend.status === 'online' ? 'online' : ''}"></div>
-                                ${friend.status === 'online' ? 'Online' : 'Offline'}
+                                <div class="friend-status-dot ${isOnline ? 'online' : ''}"></div>
+                                ${isOnline ? 'Online' : 'Last seen recently'}
                             </div>
                         </div>
                     </div>
@@ -1605,9 +1702,23 @@
         function selectFriend(friendId) {
             const friend = friendsData.find(f => f.id === friendId);
             if (friend) {
-                // Navigate to chat with this friend
-                window.location.href = `/Chat.html?partnerId=${friendId}`;
+                // Show selection feedback
+                const friendItem = document.querySelector(`[data-friend-id="${friendId}"]`);
+                if (friendItem) {
+                    friendItem.style.background = 'var(--button-background)';
+                    friendItem.style.color = '#ffffff';
+                }
+                
+                // Close dropdown with animation
                 closeFriendsDropdown();
+                
+                // Show loading message
+                showMessageBox(`Opening chat with ${friend.displayName}...`, 'loading', true);
+                
+                // Navigate after brief delay for better UX
+                setTimeout(() => {
+                    window.location.href = `/Chat.html?partnerId=${friendId}`;
+                }, 800);
             }
         }
 
@@ -1870,14 +1981,14 @@
             const usernameInitial = partner.name.charAt(0).toUpperCase();
             
             if (partner.profilePicId) {
-                const imageUrl = getCloudinaryImageUrl(partner.profilePicId, "w_45,h_45,c_fill,g_face,r_max");
+                const imageUrl = getCloudinaryImageUrl(partner.profilePicId, "w_48,h_48,c_fill,g_face,r_max");
                 partnerAvatar.src = imageUrl;
                 partnerAvatar.onerror = () => {
                     console.error(`JCHAT_ERROR: Failed to load profile picture: ${partner.profilePicId}. Using placeholder.`);
-                    partnerAvatar.src = `https://placehold.co/45x45/00d5ff/ffffff?text=${usernameInitial}`;
+                    partnerAvatar.src = `https://placehold.co/48x48/00d5ff/ffffff?text=${usernameInitial}`;
                 };
             } else {
-                partnerAvatar.src = `https://placehold.co/45x45/00d5ff/ffffff?text=${usernameInitial}`;
+                partnerAvatar.src = `https://placehold.co/48x48/00d5ff/ffffff?text=${usernameInitial}`;
             }
             
             const statusIndicator = document.getElementById('statusIndicator');
