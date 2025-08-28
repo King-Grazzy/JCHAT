@@ -400,8 +400,9 @@
                         const d = snap.data() || {};
                         const lastMs = d.lastActive?.toMillis ? d.lastActive.toMillis() : (d.lastActive || 0);
                         const now = Date.now();
+                        const fresh = now - lastMs <= 60000; // 60s freshness guard
                         let state = 'offline';
-                        if (d.online) state = 'online';
+                        if (d.online && fresh) state = 'online';
                         else if (now - lastMs <= 5 * 60 * 1000) state = 'away';
                         const dotClass = state === 'online' ? 'status-online' : (state === 'away' ? 'status-away' : 'status-offline');
                         if (statusDot) statusDot.className = 'status-dot ' + dotClass;
@@ -837,8 +838,9 @@
                     const d = snap.data() || {};
                     const lastMs = d.lastActive?.toMillis ? d.lastActive.toMillis() : (d.lastActive || 0);
                     const now = Date.now();
+                    const fresh = now - lastMs <= 60000; // 60s freshness guard
                     let state = 'offline';
-                    if (d.online) state = 'online';
+                    if (d.online && fresh) state = 'online';
                     else if (now - lastMs <= 5*60*1000) state = 'away';
                     friendPresenceCache.set(friendId, { state, lastMs });
                     const dot = document.querySelector(`[data-presence-id="${friendId}"]`);
