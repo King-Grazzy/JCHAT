@@ -103,11 +103,11 @@
         .friends-root { position: relative; }
         .friends-trigger { width: 40px; height: 40px; border-radius: 50%; background: var(--input-background); border: 1px solid var(--border-light); color: var(--text-light); display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .friends-trigger:hover, .friends-trigger.active { background: var(--border-light); color: var(--white); }
-        .friends-menu { position: absolute; right: 0; top: calc(100% + 10px); min-width: 280px; max-width: 320px; max-height: 420px; overflow: hidden; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.4); display: none; }
+        .friends-menu { position: absolute; right: 0; top: calc(100% + 10px); min-width: 280px; max-width: min(90vw, 360px); max-height: min(65vh, 460px); overflow: hidden; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.4); display: none; }
         .friends-menu.show { display: block; }
-        .friends-search { padding: 10px; border-bottom: 1px solid var(--border-light); }
+        .friends-search { padding: 10px; border-bottom: 1px solid var(--border-light); position: sticky; top: 0; background: var(--card-background); z-index: 1; }
         .friends-search input { width: 100%; background: var(--input-background); border: 1px solid var(--border-light); border-radius: 8px; padding: 8px 10px; color: white; outline: none; }
-        .friends-list { max-height: 320px; overflow-y: auto; }
+        .friends-list { max-height: calc(min(65vh, 460px) - 48px); overflow-y: auto; }
         .friend-item { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer; }
         .friend-item:hover { background: rgba(255,255,255,.05); }
         .friend-item img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border-light); object-fit: cover; }
