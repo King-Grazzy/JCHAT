@@ -107,6 +107,14 @@
             font-size: 14px;
             padding: 20px 10px;
         }
+
+        /* Presence indicator */
+        .status { display: flex; align-items: center; gap: 6px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #6c757d; box-shadow: none; }
+        .status-online { background: #4CAF50; box-shadow: 0 0 8px rgba(76,175,80,.7); animation: onlinePulse 1.8s ease-in-out infinite; }
+        .status-away { background: #FFC107; box-shadow: 0 0 6px rgba(255,193,7,.6); }
+        .status-offline { background: #6c757d; }
+        @keyframes onlinePulse { 0%,100%{ transform: scale(1)} 50%{ transform: scale(1.2)} }
         .gradient-title { 
             font-family: 'Poppins', sans-serif; 
             font-weight: 900; 
@@ -136,7 +144,7 @@
                 <div class="partner">
                     <div>
                         <div class="name gradient-title" id="partnerName">JCHAT</div>
-                        <div class="status" id="partnerStatus" style="display:none"></div>
+                        <div class="status" id="partnerStatus"><span id="statusDot" class="status-dot status-offline"></span><span id="statusText">Offline</span></div>
                     </div>
                 </div>
             </div>
@@ -280,6 +288,7 @@
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = '/Login.html'; return; }
             currentUser = user;
+            startPresenceHeartbeat();
             await setupHeader(user);
             await loadFriends();
             if (!partnerId) return;
@@ -287,6 +296,23 @@
             if (currentPartner) updatePartnerHeader(currentPartner);
             startMessagesListener();
         });
+
+        // Presence heartbeat for current user
+        let heartbeatTimer = null;
+        function startPresenceHeartbeat() {
+            try {
+                const userDocRef = doc(db, "artifacts", appId, "public", "data", "users", currentUser.uid);
+                const post = async () => {
+                    try { await setDoc(userDocRef, { online: navigator.onLine && document.visibilityState === 'visible', lastActive: serverTimestamp() }, { merge: true }); } catch {}
+                };
+                post();
+                if (heartbeatTimer) clearInterval(heartbeatTimer);
+                heartbeatTimer = setInterval(post, 30000);
+                window.addEventListener('visibilitychange', post);
+                window.addEventListener('online', post);
+                window.addEventListener('offline', post);
+            } catch {}
+        }
 
         async function setupHeader(user) {
             const userProfileRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
@@ -301,6 +327,8 @@
         function updatePartnerHeader(partner) {
             const nameEl = document.getElementById('partnerName');
             const statusEl = document.getElementById('partnerStatus');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
             const headerProfilePic = document.getElementById('headerProfilePic');
             const headerProfileIcon = document.getElementById('headerProfileIcon');
             const headerProfile = document.getElementById('headerProfile');
@@ -310,7 +338,27 @@
                 nameEl.textContent = partner.displayName || 'JCHAT User';
                 nameEl.classList.add('gradient-title');
             }
-            if (statusEl) statusEl.style.display = 'none';
+            // Live presence subscription
+            try {
+                if (currentPartner && currentPartner.id) {
+                    const partnerDoc = doc(db, "artifacts", appId, "public", "data", "users", currentPartner.id);
+                    onSnapshot(partnerDoc, (snap) => {
+                        const d = snap.data() || {};
+                        const last = d.lastActive?.toMillis ? d.lastActive.toMillis() : (d.lastActive || 0);
+                        const now = Date.now();
+                        let state = 'offline';
+                        if (d.online) state = 'online';
+                        else if (now - last <= 5 * 60 * 1000) state = (now - last <= 3 * 60 * 1000) ? 'away' : 'offline';
+                        // Apply UI
+                        if (statusDot) {
+                            statusDot.className = 'status-dot ' + (state === 'online' ? 'status-online' : state === 'away' ? 'status-away' : 'status-offline');
+                        }
+                        if (statusText) {
+                            statusText.textContent = state === 'online' ? 'Online' : (state === 'away' ? 'Recently active' : 'Offline');
+                        }
+                    });
+                }
+            } catch {}
 
             // 2) Replace my profile picture (right) with friend's picture
             if (headerProfilePic && headerProfileIcon && headerProfile) {
@@ -438,6 +486,12 @@
                 if (!ti) return;
                 if (isPartnerTyping) ti.classList.add('show'); else ti.classList.remove('show');
             });
+            // Delivered/read receipts listener
+            const receiptsRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId, "presence", "receipts");
+            onSnapshot(receiptsRef, (snap) => {
+                const d = snap.data() || {};
+                // Optionally wire message-level updates here
+            });
             // Mark read on open
             markRead(chatId);
         }
@@ -448,7 +502,7 @@
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
             const timeStr = new Date(m.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            const statusIcon = m.sender === 'current' ? `<span style="margin-left:6px;opacity:.85;">${renderStatusIcon(m.status || 'delivered')}</span>` : '';
+            const statusIcon = m.sender === 'current' ? `<span class="msg-status" data-id="${m.id || ''}" style="margin-left:6px;opacity:.85;">${renderStatusIcon(m.status || 'delivered')}</span>` : '';
             let content = '';
             if (m.type === 'file' && m.fileUrl) {
                 if (m.fileUrl.match(/\.(png|jpe?g|gif|webp)$/i)) {
@@ -475,7 +529,7 @@
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
             const timeStr = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            const statusIcon = `<span style="margin-left:6px;opacity:.85;">${renderStatusIcon('sent')}</span>`;
+            const statusIcon = `<span class="msg-status" style="margin-left:6px;opacity:.85;">${renderStatusIcon('sent')}</span>`;
             bubble.innerHTML = `${escapeHtml(text)}<div class="time">${timeStr}${statusIcon}</div>`;
             wrap.appendChild(bubble);
             const emptyLabel = document.getElementById('emptyLabel');
@@ -518,7 +572,7 @@
         async function markRead(chatId) {
             // Mark all partner messages as read by creating/merging a read receipt doc
             const receiptRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId, "presence", "receipts");
-            try { await setDoc(receiptRef, { [currentUser.uid]: serverTimestamp() }, { merge: true }); } catch {}
+            try { await setDoc(receiptRef, { readAt: { [currentUser.uid]: serverTimestamp() } }, { merge: true }); } catch {}
         }
 
         // Attachments via Cloudinary direct upload
