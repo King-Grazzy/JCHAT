@@ -150,9 +150,13 @@
         .msg.sent .bubble { background: linear-gradient(135deg, var(--blue), var(--pink)); color: white; border-bottom-right-radius: 8px; }
         .msg.recv .bubble { background: rgba(255,255,255,.1); border: 1px solid var(--border-light); color: white; border-bottom-left-radius: 8px; }
         .time { font-size: 11px; opacity: .75; margin-top: 4px; text-align: right; }
-        .msg-actions { display:none; margin-left: 6px; }
-        .msg.sent:hover .msg-actions { display:inline-flex; gap:6px; }
+        .msg-actions { display:flex; gap:6px; align-items:center; margin-left: 6px; }
         .msg-action-btn { background: transparent; border: none; color: inherit; cursor: pointer; opacity: .85; }
+        .menu-btn { background: transparent; border: none; color: inherit; cursor: pointer; opacity: .85; }
+        .msg-menu { display:none; position: absolute; right: 8px; margin-top: 4px; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.35); z-index: 5; }
+        .msg-menu ul { list-style: none; margin: 0; padding: 6px; min-width: 140px; }
+        .msg-menu li { padding: 8px 10px; font-size: 13px; cursor: pointer; color: var(--white); border-radius: 6px; }
+        .msg-menu li:hover { background: var(--input-background); }
         .typing { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,.1); border: 1px solid var(--border-light); border-radius: 16px; width: fit-content; }
         .typing.show { display: inline-flex; }
         .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-light); animation: pulse 1.2s infinite ease-in-out; }
@@ -267,6 +271,17 @@
         <div class="emoji-panel" id="emojiPanel">
             <div class="emoji-header" id="emojiTabs"></div>
             <div class="emoji-scroll"><div class="emoji-grid" id="emojiGrid"></div></div>
+        </div>
+        <!-- Custom Confirm Modal -->
+        <div id="confirmOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter: blur(2px); z-index:1000; align-items:center; justify-content:center;">
+            <div style="background:var(--card-background); border:1px solid var(--border-light); border-radius:12px; padding:16px; width:90%; max-width:360px;">
+                <div id="confirmTitle" style="font-weight:700; margin-bottom:6px;">Confirm</div>
+                <div id="confirmText" style="color:var(--text-light); font-size:14px;">Are you sure?</div>
+                <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px;">
+                    <button id="confirmCancel" class="icon-btn" style="border:1px solid var(--border-light); border-radius:8px; padding:6px 10px;">Cancel</button>
+                    <button id="confirmOk" class="icon-btn" style="background: var(--button-background); color:#fff; border-radius:8px; padding:6px 10px;">Delete</button>
+                </div>
+            </div>
         </div>
         <!-- Call Modal -->
         <div id="callModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter: blur(4px); z-index:300; align-items:center; justify-content:center;">
@@ -622,21 +637,48 @@
             if (!e.target.closest('#emojiPanel') && !e.target.closest('#emojiBtn')) {
                 emojiPanel.style.display = 'none';
             }
-            // Delete message action
-            const delBtn = e.target.closest('[data-del-id]');
-            if (delBtn) {
-                const id = delBtn.getAttribute('data-del-id');
-                confirmDeleteMessage(id);
+            // Toggle per-message menu
+            const menuBtn = e.target.closest('[data-menu-id]');
+            if (menuBtn) {
+                const id = menuBtn.getAttribute('data-menu-id');
+                const menu = document.getElementById(`menu_${id}`);
+                if (menu) menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                return;
             }
+            const delItem = e.target.closest('[data-del-id]');
+            if (delItem) { const id = delItem.getAttribute('data-del-id'); showConfirm(`Delete this message?`, 'Delete', async () => { await deleteMessage(id); }); return; }
+            const shareItem = e.target.closest('[data-share-id]');
+            if (shareItem) { const id = shareItem.getAttribute('data-share-id'); shareMessage(id); return; }
+            // click outside closes any menus
+            document.querySelectorAll('.msg-menu').forEach(m => m.style.display = 'none');
         });
 
-        async function confirmDeleteMessage(messageId) {
-            const ok = confirm('Delete this message?');
-            if (!ok) return;
+        // Custom confirm modal helpers
+        function showConfirm(message, actionLabel, onOk) {
+            const overlay = document.getElementById('confirmOverlay');
+            const text = document.getElementById('confirmText');
+            const okBtn = document.getElementById('confirmOk');
+            const cancelBtn = document.getElementById('confirmCancel');
+            text.textContent = message;
+            okBtn.textContent = actionLabel || 'OK';
+            overlay.style.display = 'flex';
+            const cleanup = () => { overlay.style.display = 'none'; okBtn.onclick = null; cancelBtn.onclick = null; };
+            okBtn.onclick = () => { try { onOk && onOk(); } finally { cleanup(); } };
+            cancelBtn.onclick = cleanup;
+        }
+
+        async function deleteMessage(messageId) {
             try {
                 const chatId = chatIdFor(currentUser.uid, currentPartner.id);
                 const msgRef = doc(db, 'artifacts', appId, 'public', 'data', 'chats', chatId, 'messages', messageId);
                 await deleteDoc(msgRef);
+            } catch {}
+        }
+        function shareMessage(messageId) {
+            try {
+                const node = document.querySelector(`[data-message-id="${messageId}"] .bubble`);
+                const text = node ? node.innerText : window.location.href;
+                if (navigator.share) { navigator.share({ text }); } else { navigator.clipboard.writeText(text); alert('Copied to clipboard'); }
             } catch {}
         }
 
@@ -1012,8 +1054,8 @@
             } else {
                 content = escapeHtml(m.text || '');
             }
-            const actions = m.sender === 'current' ? `<span class="msg-actions"><button class="msg-action-btn" title="Delete" data-del-id="${m.id}"><i class="fas fa-trash"></i></button></span>` : '';
-            bubble.innerHTML = `${content}<div class="time">${timeStr}${statusIcon}${actions}</div>`;
+            const actions = m.sender === 'current' ? `<span class="msg-actions"><button class="menu-btn" title="More" data-menu-id="${m.id}"><i class=\"fas fa-ellipsis-v\"></i></button></span>` : '';
+            bubble.innerHTML = `${content}<div class="time" style="position:relative;">${timeStr}${statusIcon}${actions}<div class="msg-menu" id="menu_${m.id}"><ul><li data-share-id="${m.id}"><i class=\"fas fa-share\"></i> Share</li><li data-del-id="${m.id}"><i class=\"fas fa-trash\"></i> Delete</li></ul></div></div>`;
             wrap.appendChild(bubble);
             messagesEl.appendChild(wrap);
         }
