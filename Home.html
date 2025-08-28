@@ -3791,6 +3791,16 @@
             </div>
             </div>
 
+            <!-- People You May Know Strip -->
+            <div id="peopleMayKnow" style="display:none; margin: 16px auto; max-width: 900px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                    <div style="font-family: 'Poppins', sans-serif; font-weight:700; color: var(--white);">People you may know</div>
+                    <button id="refreshPymkBtn" class="icon-btn" title="Refresh" style="border:1px solid var(--border-color); border-radius:10px; padding:6px 10px;"><i class="fas fa-rotate"></i></button>
+                </div>
+                <div id="pymkScroller" style="display:flex; gap:12px; overflow-x:auto; padding:8px; border:1px solid var(--border-color); border-radius:12px; background: var(--card-background);">
+                </div>
+            </div>
+
             <!-- Global Announcements Section -->
             <div id="globalAnnouncementsSection" class="global-announcements-section" style="display: none;">
                 <div class="announcement-header">
@@ -4747,10 +4757,101 @@
                     } else {
                         hideGlobalAnnouncement();
                     }
+                    // People you may know
+                    try { await loadAndRenderPymk(); } catch (e) { console.warn('PYMK failed:', e); }
                 }
             } catch (error) {
                 console.error("JCHAT_ERROR: Error checking global announcements:", error);
             }
+        }
+
+        async function loadAndRenderPymk() {
+            const wrap = document.getElementById('peopleMayKnow');
+            const scroller = document.getElementById('pymkScroller');
+            if (!wrap || !scroller || !currentUser) return;
+            wrap.style.display = 'block';
+            scroller.innerHTML = '';
+            // Load current friends
+            const friendsCol = collection(db, 'artifacts', appId, 'public', 'data', 'friends');
+            const friendsSnap = await getDocs(friendsCol);
+            const myFriends = new Set();
+            const friendships = [];
+            friendsSnap.forEach(d => {
+                const f = d.data();
+                friendships.push(f);
+                if (f.user1Id === currentUser.uid) myFriends.add(f.user2Id);
+                if (f.user2Id === currentUser.uid) myFriends.add(f.user1Id);
+            });
+            // Build friends-of-friends candidates
+            const candidates = new Map(); // uid -> mutuals count
+            friendships.forEach(f => {
+                const a = f.user1Id, b = f.user2Id;
+                if (myFriends.has(a) && b !== currentUser.uid && !myFriends.has(b)) {
+                    candidates.set(b, (candidates.get(b) || 0) + 1);
+                }
+                if (myFriends.has(b) && a !== currentUser.uid && !myFriends.has(a)) {
+                    candidates.set(a, (candidates.get(a) || 0) + 1);
+                }
+            });
+            // Fetch profiles for candidates
+            const entries = Array.from(candidates.entries()).slice(0, 30);
+            const profiles = await Promise.all(entries.map(async ([uid, mutuals]) => {
+                const pRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', uid);
+                const pSnap = await getDoc(pRef);
+                if (!pSnap.exists()) return null;
+                const p = pSnap.data();
+                return { id: uid, displayName: p.displayName || p.username || 'User', username: p.username || 'user', profilePicId: p.profilePicId || null, mutuals };
+            }));
+            const filtered = profiles.filter(Boolean).sort((a,b) => b.mutuals - a.mutuals).slice(0, 20);
+            // Render cards
+            filtered.forEach(p => {
+                const card = document.createElement('div');
+                card.style.display = 'flex';
+                card.style.flexDirection = 'column';
+                card.style.alignItems = 'center';
+                card.style.gap = '6px';
+                card.style.minWidth = '96px';
+                const img = document.createElement('img');
+                const url = getCloudinaryImageUrl(p.profilePicId, 'w_70,h_70,c_fill,g_face,r_max') || `https://placehold.co/70x70/00d5ff/ffffff?text=${p.displayName.charAt(0).toUpperCase()}`;
+                img.src = url;
+                img.style.width = '70px';
+                img.style.height = '70px';
+                img.style.borderRadius = '50%';
+                img.style.objectFit = 'cover';
+                img.style.border = '2px solid var(--border-color)';
+                const name = document.createElement('div');
+                name.textContent = p.displayName;
+                name.style.fontSize = '12px';
+                name.style.maxWidth = '92px';
+                name.style.color = 'var(--white)';
+                name.style.whiteSpace = 'nowrap';
+                name.style.overflow = 'hidden';
+                name.style.textOverflow = 'ellipsis';
+                const badge = document.createElement('div');
+                badge.textContent = `${p.mutuals} mutual` + (p.mutuals === 1 ? '' : 's');
+                badge.style.fontSize = '11px';
+                badge.style.color = 'var(--text-light)';
+                const btn = document.createElement('button');
+                btn.textContent = 'Add friend';
+                btn.className = 'icon-btn';
+                btn.style.border = '1px solid var(--border-color)';
+                btn.style.borderRadius = '8px';
+                btn.style.padding = '6px 10px';
+                btn.addEventListener('click', async () => {
+                    try {
+                        const reqCol = collection(db, 'artifacts', appId, 'public', 'data', 'friend_requests');
+                        await addDoc(reqCol, { fromUserId: currentUser.uid, toUserId: p.id, status: 'pending', createdAt: serverTimestamp() });
+                        btn.textContent = 'Requested';
+                        btn.disabled = true;
+                    } catch(err) { console.error('Add friend failed', err); }
+                });
+                card.appendChild(img);
+                card.appendChild(name);
+                card.appendChild(badge);
+                card.appendChild(btn);
+                scroller.appendChild(card);
+            });
+            document.getElementById('refreshPymkBtn')?.addEventListener('click', () => loadAndRenderPymk());
         }
 
         /**
