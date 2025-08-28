@@ -177,6 +177,12 @@
         .action-btn { background: none; border: none; color: var(--text-light); font-size: 18px; cursor: pointer; padding: 8px; border-radius: 50%; }
         .action-btn:hover { background: var(--border-light); color: var(--accent-color); }
         .send { width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--button-background); color: white; box-shadow: var(--button-shadow); cursor: pointer; }
+
+        /* Emoji panel */
+        .emoji-panel { position: absolute; bottom: 64px; right: 16px; width: 320px; max-height: 300px; overflow: auto; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 12px; padding: 8px; display: none; z-index: 200; }
+        .emoji-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+        .emoji-btn { background: transparent; border: none; font-size: 20px; cursor: pointer; line-height: 1; padding: 6px; border-radius: 6px; }
+        .emoji-btn:hover { background: var(--input-background); }
     </style>
 </head>
 <body>
@@ -223,6 +229,7 @@
             <button class="send" id="sendBtn" title="Send"><i class="fas fa-paper-plane"></i></button>
             <input type="file" id="fileInput" style="display:none" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx">
         </div>
+        <div class="emoji-panel" id="emojiPanel"><div class="emoji-grid" id="emojiGrid"></div></div>
     </div>
 
     <!-- Notification sound -->
@@ -446,7 +453,69 @@
         const inputEl = document.getElementById('messageInput');
         const sendBtn = document.getElementById('sendBtn');
         const backBtn = document.getElementById('backBtn');
+        const emojiBtn = document.getElementById('emojiBtn');
+        const emojiPanel = document.getElementById('emojiPanel');
+        const emojiGrid = document.getElementById('emojiGrid');
         backBtn.onclick = () => history.back();
+
+        // Emoji setup
+        const emojiList = (() => {
+            // Build ~350 emojis (mix of faces, symbols, hands, animals)
+            const ranges = [
+                [0x1F600, 0x1F64F], // Emoticons
+                [0x1F300, 0x1F320], // Weather
+                [0x1F330, 0x1F37F], // Food/Drink subset
+                [0x1F380, 0x1F3C0], // Activities subset
+                [0x1F3C1, 0x1F3FF], // Sports/skin-tones subset
+                [0x1F400, 0x1F43F], // Animals subset
+                [0x1F440, 0x1F4FF], // Objects subset
+            ];
+            const list = [];
+            for (const [start, end] of ranges) {
+                for (let code = start; code <= end && list.length < 360; code++) {
+                    try { list.push(String.fromCodePoint(code)); } catch {}
+                }
+            }
+            return list.slice(0, 350);
+        })();
+
+        function renderEmojis() {
+            emojiGrid.innerHTML = '';
+            emojiList.forEach(e => {
+                const b = document.createElement('button');
+                b.className = 'emoji-btn';
+                b.type = 'button';
+                b.textContent = e;
+                b.addEventListener('click', () => insertEmoji(e));
+                emojiGrid.appendChild(b);
+            });
+        }
+
+        function insertEmoji(emoji) {
+            const el = inputEl;
+            const start = el.selectionStart || 0;
+            const end = el.selectionEnd || 0;
+            const val = el.value;
+            el.value = val.slice(0, start) + emoji + val.slice(end);
+            const caret = start + emoji.length;
+            el.setSelectionRange(caret, caret);
+            el.focus();
+            el.dispatchEvent(new Event('input'));
+        }
+
+        emojiBtn.addEventListener('click', () => {
+            if (emojiPanel.style.display === 'block') {
+                emojiPanel.style.display = 'none';
+            } else {
+                renderEmojis();
+                emojiPanel.style.display = 'block';
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#emojiPanel') && !e.target.closest('#emojiBtn')) {
+                emojiPanel.style.display = 'none';
+            }
+        });
 
         inputEl.addEventListener('input', () => {
             inputEl.style.height = 'auto';
