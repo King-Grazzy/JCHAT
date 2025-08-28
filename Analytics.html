@@ -1044,7 +1044,7 @@
                 imgElement.onerror = () => {
                     console.error(`Failed to load profile picture: ${profilePicId}. Using placeholder.`);
                     // Fallback to a generic placeholder image if Cloudinary URL fails
-                    imgElement.src = `https://placehold.co/120x120/CCCCCC/000000?text=${usernameInitial}`;
+                    imgElement.src = '/assets/User.png';
                     imgElement.style.display = 'block';
                     if (iconElement) iconElement.style.display = 'none';
                 };

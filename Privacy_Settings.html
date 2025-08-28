@@ -1202,7 +1202,7 @@
                 iconElement.style.display = 'none';
                 imgElement.onerror = () => {
                     console.error(`Failed to load profile picture: ${profilePicId}. Using placeholder.`);
-                    imgElement.src = `https://placehold.co/120x120/CCCCCC/000000?text=${usernameInitial}`;
+                    imgElement.src = '/assets/User.png';
                     imgElement.style.display = 'block';
                     iconElement.style.display = 'none';
                 };

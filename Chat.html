@@ -354,12 +354,13 @@
                 imgElement.style.display = 'block';
                 iconElement.style.display = 'none';
                 imgElement.onerror = () => {
-                    imgElement.src = `https://placehold.co/36x36/ff2e92/ffffff?text=${usernameInitial}`;
+                    imgElement.onerror = null;
+                    imgElement.src = '/assets/User.png';
                     imgElement.style.display = 'block';
                     iconElement.style.display = 'none';
                 };
             } else {
-                imgElement.src = `https://placehold.co/36x36/ff2e92/ffffff?text=${usernameInitial}`;
+                imgElement.src = '/assets/User.png';
                 imgElement.style.display = 'block';
                 iconElement.style.display = 'none';
             }
