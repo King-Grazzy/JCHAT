@@ -293,7 +293,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-storage.js";
 
         // Firebase config (same pattern as Profile.html)
@@ -622,6 +622,35 @@
             if (!e.target.closest('#emojiPanel') && !e.target.closest('#emojiBtn')) {
                 emojiPanel.style.display = 'none';
             }
+            // Delete message action
+            const delBtn = e.target.closest('[data-del-id]');
+            if (delBtn) {
+                const id = delBtn.getAttribute('data-del-id');
+                confirmDeleteMessage(id);
+            }
+        });
+
+        async function confirmDeleteMessage(messageId) {
+            const ok = confirm('Delete this message?');
+            if (!ok) return;
+            try {
+                const chatId = chatIdFor(currentUser.uid, currentPartner.id);
+                const msgRef = doc(db, 'artifacts', appId, 'public', 'data', 'chats', chatId, 'messages', messageId);
+                await deleteDoc(msgRef);
+            } catch {}
+        }
+
+        document.getElementById('clearChatBtn')?.addEventListener('click', async () => {
+            const ok = confirm('Clear all messages in this chat?');
+            if (!ok) return;
+            try {
+                const chatId = chatIdFor(currentUser.uid, currentPartner.id);
+                const msgsCol = collection(db, 'artifacts', appId, 'public', 'data', 'chats', chatId, 'messages');
+                const snap = await getDocs(query(msgsCol));
+                const deletes = [];
+                snap.forEach(d => deletes.push(deleteDoc(d.ref)));
+                await Promise.all(deletes);
+            } catch {}
         });
 
         // Voice message
@@ -636,9 +665,13 @@
                     mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
                     mediaRecorder.onstop = async () => {
                         const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                        const tempId = addPendingAudioBubble();
                         const url = await uploadToCloudinary(blob);
                         if (url) {
                             await sendAudioMessage(url, blob.size);
+                            finalizePendingAudioBubble(tempId, url);
+                        } else {
+                            markPendingAudioFailed(tempId);
                         }
                         stream.getTracks().forEach(t => t.stop());
                     };
@@ -652,6 +685,34 @@
                 }
             } catch (e) {}
         });
+
+        function addPendingAudioBubble() {
+            const id = `pending_audio_${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
+            const wrap = document.createElement('div');
+            wrap.className = 'msg sent';
+            wrap.dataset.optimisticId = id;
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerHTML = `<div style="display:flex; align-items:center; gap:8px;"><i class="fas fa-microphone"></i><span>Voice note</span><i class="fas fa-spinner fa-spin"></i></div>`;
+            wrap.appendChild(bubble);
+            messagesEl.appendChild(wrap);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+            return id;
+        }
+        function finalizePendingAudioBubble(id, url) {
+            const node = messagesEl.querySelector(`[data-optimistic-id="${id}"]`);
+            if (!node) return;
+            const bubble = node.querySelector('.bubble');
+            if (!bubble) return;
+            bubble.innerHTML = `<div style="margin-bottom:6px"><audio controls src="${url}" style="width:220px"></audio></div>`;
+        }
+        function markPendingAudioFailed(id) {
+            const node = messagesEl.querySelector(`[data-optimistic-id="${id}"]`);
+            if (!node) return;
+            const bubble = node.querySelector('.bubble');
+            if (!bubble) return;
+            bubble.innerHTML = `<div style="display:flex; align-items:center; gap:8px; color:#ff6b6b;"><i class="fas fa-exclamation-triangle"></i><span>Voice upload failed</span></div>`;
+        }
 
         async function sendAudioMessage(url, size) {
             const chatId = chatIdFor(currentUser.uid, currentPartner.id);
