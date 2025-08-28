@@ -113,7 +113,9 @@
         }
 
         /* Presence indicator */
-        .status { display: flex; align-items: center; gap: 6px; }
+        .status { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+        .status.status-pill { background: var(--input-background); border: 1px solid var(--border-light); border-radius: 12px; padding: 2px 8px; backdrop-filter: blur(6px); transition: box-shadow .3s ease, border-color .3s ease; }
+        .status.status-pill-online { box-shadow: 0 0 12px rgba(76,175,80,.25), 0 0 18px rgba(0,213,255,.15); border-color: rgba(0,213,255,.25); }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #6c757d; box-shadow: none; }
         .status-online { background: #4CAF50; box-shadow: 0 0 8px rgba(76,175,80,.7); animation: onlinePulse 1.8s ease-in-out infinite; }
         .status-away { background: #FFC107; box-shadow: 0 0 6px rgba(255,193,7,.6); }
@@ -148,7 +150,7 @@
                 <div class="partner">
                     <div>
                         <div class="name gradient-title" id="partnerName">JCHAT</div>
-                        <div class="status" id="partnerStatus" style="display:none"><span id="statusDot" class="status-dot status-offline"></span><span id="statusText">Offline</span></div>
+                        <div class="status status-pill" id="partnerStatus" style="display:none"><span id="statusDot" class="status-dot status-offline"></span><span id="statusText">Offline</span></div>
                     </div>
                 </div>
             </div>
@@ -350,6 +352,8 @@
                         const state = d.online ? 'online' : 'offline';
                         if (statusDot) statusDot.className = 'status-dot ' + (state === 'online' ? 'status-online' : 'status-offline');
                         if (statusText) statusText.textContent = state === 'online' ? 'Online' : 'Offline';
+                        const pill = document.getElementById('partnerStatus');
+                        if (pill) pill.className = 'status status-pill' + (state === 'online' ? ' status-pill-online' : '');
                     });
                 }
             } catch {}
