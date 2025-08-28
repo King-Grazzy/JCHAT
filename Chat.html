@@ -140,7 +140,7 @@
         .status.status-pill-online { box-shadow: 0 0 12px rgba(76,175,80,.25), 0 0 18px rgba(0,213,255,.15); border-color: rgba(0,213,255,.25); }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #6c757d; box-shadow: none; }
         .status-online { background: #4CAF50; box-shadow: 0 0 8px rgba(76,175,80,.7); animation: onlinePulse 1.8s ease-in-out infinite; }
-        .status-away { background: #FFC107; box-shadow: 0 0 6px rgba(255,193,7,.6); }
+        .status-away { background: #FFC107; box-shadow: 0 0 6px rgba(255,193,7,.8); animation: onlinePulse 2s ease-in-out infinite; }
         .status-offline { background: #6c757d; }
         @keyframes onlinePulse { 0%,100%{ transform: scale(1)} 50%{ transform: scale(1.2)} }
         .gradient-title { 
@@ -394,7 +394,10 @@
                             else statusText.textContent = `Offline • ${formatRelativeTime(lastMs)}`;
                         }
                         const pill = document.getElementById('partnerStatus');
-                        if (pill) pill.className = 'status status-pill' + (state === 'online' ? ' status-pill-online' : '');
+                        if (pill) {
+                            pill.className = 'status status-pill' + (state === 'online' ? ' status-pill-online' : '');
+                            pill.style.display = 'flex';
+                        }
                     });
                 }
             } catch {}
