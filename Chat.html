@@ -150,6 +150,9 @@
         .msg.sent .bubble { background: linear-gradient(135deg, var(--blue), var(--pink)); color: white; border-bottom-right-radius: 8px; }
         .msg.recv .bubble { background: rgba(255,255,255,.1); border: 1px solid var(--border-light); color: white; border-bottom-left-radius: 8px; }
         .time { font-size: 11px; opacity: .75; margin-top: 4px; text-align: right; }
+        .msg-actions { display:none; margin-left: 6px; }
+        .msg.sent:hover .msg-actions { display:inline-flex; gap:6px; }
+        .msg-action-btn { background: transparent; border: none; color: inherit; cursor: pointer; opacity: .85; }
         .typing { display: none; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,.1); border: 1px solid var(--border-light); border-radius: 16px; width: fit-content; }
         .typing.show { display: inline-flex; }
         .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-light); animation: pulse 1.2s infinite ease-in-out; }
@@ -236,6 +239,7 @@
                 <button class="icon-btn" id="voiceCallBtn" title="Voice Call"><i class="fas fa-phone"></i></button>
                 <button class="icon-btn" id="videoCallBtn" title="Video Call"><i class="fas fa-video"></i></button>
                 <button class="icon-btn" id="infoBtn" title="Chat Info"><i class="fas fa-info-circle"></i></button>
+                <button class="icon-btn" id="clearChatBtn" title="Clear chat"><i class="fas fa-trash"></i></button>
                 <div id="headerProfile" title="My Profile" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
                     <img id="headerProfilePic" src="https://placehold.co/36x36/ff2e92/ffffff?text=U" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border-light);object-fit:cover;" alt="Me">
                     <i id="headerProfileIcon" class="fas fa-user" style="display:none;"></i>
@@ -947,7 +951,8 @@
             } else {
                 content = escapeHtml(m.text || '');
             }
-            bubble.innerHTML = `${content}<div class="time">${timeStr}${statusIcon}</div>`;
+            const actions = m.sender === 'current' ? `<span class="msg-actions"><button class="msg-action-btn" title="Delete" data-del-id="${m.id}"><i class="fas fa-trash"></i></button></span>` : '';
+            bubble.innerHTML = `${content}<div class="time">${timeStr}${statusIcon}${actions}</div>`;
             wrap.appendChild(bubble);
             messagesEl.appendChild(wrap);
         }
