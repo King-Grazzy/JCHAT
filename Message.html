@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>JCHAT - Messages</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/1a1a2e/ffffff?text=J">
+    <meta name="apple-mobile-web-app-title" content="JCHAT">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+    <style>
+        :root {
+            --pink: #ff2e92;
+            --blue: #00d5ff;
+            --white: #fff;
+            --text-light: rgba(255,255,255,.7);
+            --background-color-primary: #1a1a2e;
+            --background-color-secondary: #0f0f1f;
+            --header-background: linear-gradient(135deg, rgba(10,10,10,.85), rgba(10,10,10,.75));
+            --card-background: linear-gradient(145deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+            --border-light: rgba(255,255,255,.08);
+            --input-background: rgba(255,255,255,.05);
+            --button-background: linear-gradient(90deg, var(--blue), var(--pink));
+            --button-shadow: 0 4px 15px var(--blue), 0 4px 15px var(--pink);
+            --accent-color: var(--blue);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background-color-primary) 0%, var(--background-color-secondary) 100%);
+            color: var(--white);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            backdrop-filter: blur(20px);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--header-background);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .back-btn { background: none; border: none; color: var(--white); font-size: 18px; cursor: pointer; }
+
+        .partner { display: flex; align-items: center; gap: 10px; }
+        .partner img { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--border-light); object-fit: cover; }
+        .partner .name { font-family: 'Poppins', sans-serif; font-weight: 600; }
+        .status { font-size: 12px; color: var(--text-light); }
+
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { background: none; border: none; color: var(--text-light); font-size: 18px; cursor: pointer; padding: 8px; border-radius: 50%; }
+        .icon-btn:hover { background: var(--border-light); color: var(--white); }
+
+        .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { display: flex; }
+        .msg.sent { justify-content: flex-end; }
+        .bubble { max-width: 70%; padding: 10px 14px; border-radius: 18px; font-size: 14px; line-height: 1.4; }
+        .msg.sent .bubble { background: linear-gradient(135deg, var(--blue), var(--pink)); color: white; border-bottom-right-radius: 8px; }
+        .msg.recv .bubble { background: rgba(255,255,255,.1); border: 1px solid var(--border-light); color: white; border-bottom-left-radius: 8px; }
+        .time { font-size: 11px; opacity: .75; margin-top: 4px; text-align: right; }
+
+        .input-bar { display: flex; align-items: flex-end; gap: 10px; padding: 12px 16px; background: var(--header-background); border-top: 1px solid var(--border-light); }
+        .input-wrap { flex: 1; display: flex; align-items: center; background: var(--input-background); border: 1px solid var(--border-light); border-radius: 20px; }
+        .input { flex: 1; border: none; background: none; color: white; padding: 10px 12px; outline: none; resize: none; max-height: 120px; min-height: 40px; }
+        .actions { display: flex; align-items: center; padding: 0 6px; gap: 6px; }
+        .action-btn { background: none; border: none; color: var(--text-light); font-size: 18px; cursor: pointer; padding: 8px; border-radius: 50%; }
+        .action-btn:hover { background: var(--border-light); color: var(--accent-color); }
+        .send { width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--button-background); color: white; box-shadow: var(--button-shadow); cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <button class="back-btn" id="backBtn" title="Back"><i class="fas fa-arrow-left"></i></button>
+                <div class="partner">
+                    <img id="partnerAvatar" alt="Avatar" src="https://placehold.co/42x42/00d5ff/ffffff?text=U">
+                    <div>
+                        <div class="name" id="partnerName">Loading...</div>
+                        <div class="status" id="partnerStatus">Offline</div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="icon-btn" id="infoBtn" title="Chat Info"><i class="fas fa-info-circle"></i></button>
+                <div id="headerProfile" title="My Profile" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <img id="headerProfilePic" src="https://placehold.co/36x36/ff2e92/ffffff?text=U" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border-light);object-fit:cover;" alt="Me">
+                    <i id="headerProfileIcon" class="fas fa-user" style="display:none;"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="input-bar">
+            <div class="input-wrap">
+                <textarea class="input" id="messageInput" placeholder="Type a message..." rows="1" maxlength="4000"></textarea>
+                <div class="actions">
+                    <button class="action-btn" id="attachBtn" title="Attach"><i class="fas fa-paperclip"></i></button>
+                    <button class="action-btn" id="emojiBtn" title="Emoji"><i class="fas fa-smile"></i></button>
+                </div>
+            </div>
+            <button class="send" id="sendBtn" title="Send"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+        // Firebase config (same pattern as Profile.html)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebasestorage.app",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Cloudinary config (same shape used in Profile.html)
+        const cloudinaryConfig = {
+            cloudName: "dxld01rcp",
+            uploadPreset: "Storage_preset"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Helpers: Cloudinary URL
+        function getCloudinaryImageUrl(urlOrPublicId, transformations = "w_auto,f_auto,q_auto") {
+            if (!urlOrPublicId) return null;
+            if (urlOrPublicId.startsWith('http://') || urlOrPublicId.startsWith('https://')) {
+                if (urlOrPublicId.includes('res.cloudinary.com')) {
+                    const parts = urlOrPublicId.split('/upload/');
+                    if (parts.length === 2) return `${parts[0]}/upload/${transformations}/${parts[1]}`;
+                }
+                return urlOrPublicId;
+            }
+            return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${transformations}/${urlOrPublicId}`;
+        }
+
+        function displayProfilePicture(imgElement, iconElement, profilePicId, usernameInitial, transformations) {
+            if (!imgElement || !iconElement) return;
+            if (profilePicId) {
+                const imageUrl = getCloudinaryImageUrl(profilePicId, transformations);
+                imgElement.src = imageUrl;
+                imgElement.style.display = 'block';
+                iconElement.style.display = 'none';
+                imgElement.onerror = () => {
+                    imgElement.src = `https://placehold.co/36x36/ff2e92/ffffff?text=${usernameInitial}`;
+                    imgElement.style.display = 'block';
+                    iconElement.style.display = 'none';
+                };
+            } else {
+                imgElement.src = `https://placehold.co/36x36/ff2e92/ffffff?text=${usernameInitial}`;
+                imgElement.style.display = 'block';
+                iconElement.style.display = 'none';
+            }
+        }
+
+        // Friends logic (reads same collections/shape as Find_Friends.html)
+        async function loadFriendProfile(friendId) {
+            const friendRef = doc(db, "artifacts", appId, "users", friendId, "profiles", "user_profile");
+            const snap = await getDoc(friendRef);
+            if (!snap.exists()) return null;
+            const d = snap.data();
+            return {
+                id: friendId,
+                displayName: d.displayName || d.username || 'JCHAT User',
+                profilePicId: d.profilePicId || null,
+                lastSeen: d.lastSeen || Date.now()
+            };
+        }
+
+        // URL params: partnerId
+        const params = new URLSearchParams(window.location.search);
+        const partnerId = params.get('partnerId') || params.get('partner');
+
+        let currentUser = null;
+        let currentPartner = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = '/Login.html'; return; }
+            currentUser = user;
+            await setupHeader(user);
+            if (!partnerId) return;
+            currentPartner = await loadFriendProfile(partnerId);
+            if (currentPartner) updatePartnerHeader(currentPartner);
+            startMessagesListener();
+        });
+
+        async function setupHeader(user) {
+            const userProfileRef = doc(db, "artifacts", appId, "users", user.uid, "profiles", "user_profile");
+            const snap = await getDoc(userProfileRef);
+            const displayName = snap.exists() ? (snap.data().displayName || snap.data().username || user.email || 'JCHAT User') : (user.displayName || user.email || 'JCHAT User');
+            const profilePicId = snap.exists() ? (snap.data().profilePicId || user.photoURL || null) : (user.photoURL || null);
+            const initial = displayName.charAt(0).toUpperCase();
+            displayProfilePicture(document.getElementById('headerProfilePic'), document.getElementById('headerProfileIcon'), profilePicId, initial, "w_36,h_36,c_fill,g_face,r_max");
+            document.getElementById('headerProfile').onclick = () => window.location.href = '/Profile.html';
+        }
+
+        function updatePartnerHeader(partner) {
+            const nameEl = document.getElementById('partnerName');
+            const statusEl = document.getElementById('partnerStatus');
+            const avatarEl = document.getElementById('partnerAvatar');
+            nameEl.textContent = partner.displayName;
+            const initial = partner.displayName.charAt(0).toUpperCase();
+            if (partner.profilePicId) {
+                const url = getCloudinaryImageUrl(partner.profilePicId, "w_42,h_42,c_fill,g_face,r_max");
+                avatarEl.src = url;
+                avatarEl.onerror = () => avatarEl.src = `https://placehold.co/42x42/00d5ff/ffffff?text=${initial}`;
+            } else {
+                avatarEl.src = `https://placehold.co/42x42/00d5ff/ffffff?text=${initial}`;
+            }
+            statusEl.textContent = 'Last seen recently';
+        }
+
+        // Messaging logic
+        const messagesEl = document.getElementById('messages');
+        const inputEl = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const backBtn = document.getElementById('backBtn');
+        backBtn.onclick = () => history.back();
+
+        inputEl.addEventListener('input', () => {
+            inputEl.style.height = 'auto';
+            inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
+        });
+
+        sendBtn.addEventListener('click', async () => {
+            const text = inputEl.value.trim();
+            if (!text || !currentUser || !currentPartner) return;
+            inputEl.value = '';
+            inputEl.dispatchEvent(new Event('input'));
+            await sendMessage(text);
+        });
+
+        function chatIdFor(u1, u2) { return [u1, u2].sort().join('_'); }
+
+        async function sendMessage(text) {
+            const chatId = chatIdFor(currentUser.uid, currentPartner.id);
+            const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+            await addDoc(messagesRef, {
+                text,
+                senderId: currentUser.uid,
+                receiverId: currentPartner.id,
+                timestamp: serverTimestamp(),
+                status: 'sent',
+                chatId
+            });
+        }
+
+        function startMessagesListener() {
+            if (!currentUser || !currentPartner) return;
+            const chatId = chatIdFor(currentUser.uid, currentPartner.id);
+            const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+            const q = query(messagesRef, orderBy('timestamp', 'asc'));
+            onSnapshot(q, (snap) => {
+                messagesEl.innerHTML = '';
+                snap.forEach(docSnap => {
+                    const m = docSnap.data();
+                    renderMessage({
+                        id: docSnap.id,
+                        text: m.text,
+                        sender: m.senderId === currentUser.uid ? 'current' : 'partner',
+                        timestamp: m.timestamp?.toMillis?.() || Date.now()
+                    });
+                });
+                messagesEl.scrollTop = messagesEl.scrollHeight;
+            });
+        }
+
+        function renderMessage(m) {
+            const wrap = document.createElement('div');
+            wrap.className = `msg ${m.sender === 'current' ? 'sent' : 'recv'}`;
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerHTML = `${escapeHtml(m.text)}<div class="time">${new Date(m.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>`;
+            wrap.appendChild(bubble);
+            messagesEl.appendChild(wrap);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
+
