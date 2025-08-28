@@ -169,7 +169,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, getDocs, limit, runTransaction } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
         import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-storage.js";
 
         // Firebase config (same pattern as Profile.html)
@@ -406,7 +406,8 @@
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
             const timeStr = new Date(m.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            const statusIcon = m.sender === 'current' ? `<span style="margin-left:6px;opacity:.85;">${renderStatusIcon(m.status || 'delivered')}</span>` : '';
+            const showStatus = m.sender === 'current' && (m.type !== 'system');
+            const statusIcon = showStatus ? `<span style="margin-left:6px;opacity:.85;">${renderStatusIcon(m.status || 'delivered')}</span>` : '';
             let content = '';
             if (m.type === 'file' && m.fileUrl) {
                 if (m.fileUrl.match(/\.(png|jpe?g|gif|webp)$/i)) {
@@ -416,6 +417,8 @@
                 } else {
                     content = `<div style="margin-bottom:6px"><a href="${m.fileUrl}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">${escapeHtml(m.fileName||'File')}</a></div>`;
                 }
+            } else if (m.type === 'system') {
+                content = `<div style="font-size:12px;opacity:.9">${escapeHtml(m.text || '')}</div>`;
             } else {
                 content = escapeHtml(m.text || '');
             }
@@ -547,7 +550,60 @@
                 const arr = (await Promise.all(loads)).filter(Boolean);
                 friendsData = arr;
                 renderFriends();
+                // Trigger welcome system message if new friendship and empty chat
+                for (const f of friendsData) {
+                    await maybeSendFriendWelcome(currentUser.uid, f.id, f.displayName);
+                }
             });
+        }
+
+        // Send a welcome system message to both parties upon new friendship
+        async function maybeSendFriendWelcome(userId, friendId, friendName) {
+            const chatId = chatIdFor(userId, friendId);
+            const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+            const metaWelcomeRef = doc(db, "artifacts", appId, "chats", chatId, "meta", "welcome_friend");
+
+            try {
+                await runTransaction(db, async (tx) => {
+                    const welcomeSnap = await tx.get(metaWelcomeRef);
+                    if (welcomeSnap.exists() && welcomeSnap.data()?.sent === true) return; // already sent
+
+                    const oneMsgQuery = query(messagesRef, limit(1));
+                    const oneMsgSnap = await getDocs(oneMsgQuery);
+                    if (!oneMsgSnap.empty) {
+                        // There are messages already, set flag to avoid future attempts
+                        tx.set(metaWelcomeRef, { sent: true, reason: 'messages_exist', at: serverTimestamp() }, { merge: true });
+                        return;
+                    }
+
+                    // Compose symmetric messages for both users
+                    const friendlyForUser = `You and ${friendName} are now friends! Say hi 👋`;
+                    const friendlyForFriend = `You and a new friend are connected! Say hi 👋`;
+
+                    // Create two system messages (from server) visible to both sides
+                    tx.set(doc(messagesRef), {
+                        type: 'system',
+                        text: friendlyForUser,
+                        timestamp: serverTimestamp(),
+                        status: 'delivered',
+                        senderId: 'system',
+                        receiverId: friendId,
+                        chatId
+                    });
+                    tx.set(doc(messagesRef), {
+                        type: 'system',
+                        text: friendlyForFriend,
+                        timestamp: serverTimestamp(),
+                        status: 'delivered',
+                        senderId: 'system',
+                        receiverId: userId,
+                        chatId
+                    });
+                    tx.set(metaWelcomeRef, { sent: true, at: serverTimestamp(), reason: 'empty_chat' }, { merge: true });
+                });
+            } catch (e) {
+                // Best-effort. Ignore errors to avoid blocking UI.
+            }
         }
 
         function renderFriends() {
