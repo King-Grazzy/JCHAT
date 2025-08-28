@@ -1507,17 +1507,7 @@
 
                 console.log('JCHAT_DEBUG: Starting friends sync from Find_Friends.html');
 
-                // Try to get friends from localStorage (if Find_Friends.html has stored them)
-                const storedFriends = localStorage.getItem('jchat-friends');
-                if (storedFriends) {
-                    try {
-                        const friendsData = JSON.parse(storedFriends);
-                        friendsList = new Set(friendsData);
-                        console.log('JCHAT_DEBUG: Found stored friends:', friendsList.size);
-                    } catch (error) {
-                        console.log('JCHAT_DEBUG: No stored friends found, will fetch from Firebase');
-                    }
-                }
+                // Use EXACT same logic as Find_Friends.html - no localStorage, direct Firebase sync
 
                 // Fetch friends from Firebase (same collection used in Find_Friends.html)
                 if (currentUser) {
@@ -1548,7 +1538,7 @@
             }
         }
 
-        // Fetch friends from Firebase (same logic as Find_Friends.html)
+        // Fetch friends from Firebase (EXACT same logic as Find_Friends.html)
         async function fetchFriendsFromFirebase() {
             try {
                 if (!db || !currentUser) {
@@ -1558,28 +1548,40 @@
 
                 console.log('JCHAT_DEBUG: Fetching friends for user:', currentUser.uid);
 
-                // Use the exact same collection path as Find_Friends.html
+                // Use the EXACT same collection path and logic as Find_Friends.html
                 const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
-                const friendsSnapshot = await getDocs(publicFriendsRef);
                 
-                friendsList.clear();
-                
-                friendsSnapshot.forEach((doc) => {
-                    const friendData = doc.data();
-                    if (friendData.user1Id === currentUser.uid) {
-                        friendsList.add(friendData.user2Id);
-                        console.log('JCHAT_DEBUG: Added friend:', friendData.user2Id);
-                    } else if (friendData.user2Id === currentUser.uid) {
-                        friendsList.add(friendData.user1Id);
-                        console.log('JCHAT_DEBUG: Added friend:', friendData.user1Id);
+                // Use onSnapshot for real-time updates (same as Find_Friends.html)
+                onSnapshot(publicFriendsRef, (snapshot) => {
+                    friendsList.clear();
+                    snapshot.forEach(docSnap => {
+                        const friendData = docSnap.data();
+                        if (friendData.user1Id === currentUser.uid) {
+                            friendsList.add(friendData.user2Id);
+                            console.log('JCHAT_DEBUG: Added friend:', friendData.user2Id);
+                        } else if (friendData.user2Id === currentUser.uid) {
+                            friendsList.add(friendData.user1Id);
+                            console.log('JCHAT_DEBUG: Added friend:', friendData.user1Id);
+                        }
+                    });
+                    
+                    console.log('JCHAT_DEBUG: Found friends:', friendsList.size);
+                    console.log('JCHAT_DEBUG: Friends UIDs:', [...friendsList]);
+                    
+                    // Update friends count and populate dropdown
+                    if (friendsCount) {
+                        friendsCount.textContent = `${friendsList.size} friends`;
                     }
+                    
+                    // Populate dropdown with updated friends
+                    populateFriendsDropdown();
+                    
+                }, (error) => {
+                    console.error('JCHAT_ERROR: Error fetching confirmed friends:', error);
                 });
-
-                console.log('JCHAT_DEBUG: Found friends:', friendsList.size);
-                console.log('JCHAT_DEBUG: Friends UIDs:', [...friendsList]);
                 
             } catch (error) {
-                console.error('JCHAT_ERROR: Error fetching friends from Firebase:', error);
+                console.error('JCHAT_ERROR: Error setting up friends listener:', error);
                 throw error;
             }
         }
