@@ -276,21 +276,36 @@
         function updatePartnerHeader(partner) {
             const nameEl = document.getElementById('partnerName');
             const statusEl = document.getElementById('partnerStatus');
-            const avatarEl = document.getElementById('partnerAvatar');
-            // Keep static JCHAT title per request; do not overwrite
-            if (nameEl) nameEl.textContent = 'JCHAT';
-            const initial = (partner.displayName || 'J').charAt(0).toUpperCase();
-            // Avatar removed by design; guard accesses
-            if (avatarEl) {
-                if (partner.profilePicId) {
-                    const url = getCloudinaryImageUrl(partner.profilePicId, "w_42,h_42,c_fill,g_face,r_max");
-                    avatarEl.src = url;
-                    avatarEl.onerror = () => avatarEl.src = `https://placehold.co/42x42/00d5ff/ffffff?text=${initial}`;
-                } else {
-                    avatarEl.src = `https://placehold.co/42x42/00d5ff/ffffff?text=${initial}`;
-                }
+            const headerProfilePic = document.getElementById('headerProfilePic');
+            const headerProfileIcon = document.getElementById('headerProfileIcon');
+            const headerProfile = document.getElementById('headerProfile');
+
+            // 1) Set title area (left) to friend's name (hide JCHAT)
+            if (nameEl) {
+                nameEl.textContent = partner.displayName || 'JCHAT User';
+                nameEl.classList.remove('gradient-title');
             }
             if (statusEl) statusEl.style.display = 'none';
+
+            // 2) Replace my profile picture (right) with friend's picture
+            if (headerProfilePic && headerProfileIcon && headerProfile) {
+                const initial = (partner.displayName || 'J').charAt(0).toUpperCase();
+                const transformations = "w_36,h_36,c_fill,g_face,r_max";
+                if (partner.profilePicId) {
+                    const url = getCloudinaryImageUrl(partner.profilePicId, transformations);
+                    headerProfilePic.src = url;
+                    headerProfilePic.style.display = 'block';
+                    headerProfileIcon.style.display = 'none';
+                    headerProfilePic.onerror = () => {
+                        headerProfilePic.src = `https://placehold.co/36x36/00d5ff/ffffff?text=${initial}`;
+                    };
+                } else {
+                    headerProfilePic.src = `https://placehold.co/36x36/00d5ff/ffffff?text=${initial}`;
+                    headerProfilePic.style.display = 'block';
+                    headerProfileIcon.style.display = 'none';
+                }
+                headerProfile.title = partner.displayName || 'Friend';
+            }
         }
 
         // Messaging logic
