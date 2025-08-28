@@ -1505,8 +1505,8 @@
             }
 
             const notificationsCollectionRef = collection(db, "artifacts", appId, "users", userId, "notifications");
-            // Query for unread notifications, ordered by timestamp
-            const q = query(notificationsCollectionRef, where('read', '==', false), orderBy('timestamp', 'asc'));
+            // Query for unread notifications only (removed orderBy to avoid composite index requirement)
+            const q = query(notificationsCollectionRef, where('read', '==', false));
 
             if (unsubscribeNotifications) unsubscribeNotifications(); // Clean up previous listener
 
