@@ -3487,19 +3487,17 @@
                     addToBatch((batch) => batch.delete(docRef.ref));
                 });
 
-                // 10. Delete user's entitlements
-                const userEntitlementsDocRef = doc(db, "artifacts", appId, "users", lookedUpUserId, "user_entitlements");
+                // 10. Delete user's entitlements (main location)
+                const userEntitlementsDocRef = doc(db, "artifacts", appId, "users", lookedUpUserId, "profiles", "user_entitlements");
                 addToBatch((batch) => batch.delete(userEntitlementsDocRef));
 
                 // 11. Delete user's shop purchases
                 const shopPurchasesDocRef = doc(db, "artifacts", appId, "users", lookedUpUserId, "shop", "purchases");
                 addToBatch((batch) => batch.delete(shopPurchasesDocRef));
 
-                // 12. Delete user's profile entitlements (alternative location)
-                const profileEntitlementsDocRef = doc(db, "artifacts", appId, "users", lookedUpUserId, "profiles", "user_entitlements");
-                addToBatch((batch) => batch.delete(profileEntitlementsDocRef));
+                // Note: user_entitlements is only stored in profiles subcollection (removed duplicate)
 
-                // 13. Delete shop payment requests made by this user
+                // 12. Delete shop payment requests made by this user
                 const shopPaymentRequestsQuery = query(collection(db, "artifacts", appId, "public", "data", "shop_payment_requests"), where("userId", "==", lookedUpUserId));
                 const shopPaymentRequestsSnapshot = await getDocs(shopPaymentRequestsQuery);
                 console.log(`JCHAT_DEBUG: Found ${shopPaymentRequestsSnapshot.size} shop payment requests to delete`);
@@ -3507,7 +3505,7 @@
                     addToBatch((batch) => batch.delete(docRef.ref));
                 });
 
-                // 14. Delete wallet unlock requests made by this user
+                // 13. Delete wallet unlock requests made by this user
                 const walletUnlockRequestsQuery = query(collection(db, "artifacts", appId, "public", "data", "wallet_unlock_requests"), where("userId", "==", lookedUpUserId));
                 const walletUnlockRequestsSnapshot = await getDocs(walletUnlockRequestsQuery);
                 console.log(`JCHAT_DEBUG: Found ${walletUnlockRequestsSnapshot.size} wallet unlock requests to delete`);
@@ -3515,7 +3513,7 @@
                     addToBatch((batch) => batch.delete(docRef.ref));
                 });
 
-                // 15. Delete feature orders made by this user
+                // 14. Delete feature orders made by this user
                 const featureOrdersQuery = query(collection(db, "artifacts", appId, "public", "data", "feature_orders"), where("userId", "==", lookedUpUserId));
                 const featureOrdersSnapshot = await getDocs(featureOrdersQuery);
                 console.log(`JCHAT_DEBUG: Found ${featureOrdersSnapshot.size} feature orders to delete`);
