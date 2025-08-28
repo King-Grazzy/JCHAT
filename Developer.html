@@ -3403,6 +3403,13 @@
                 return;
             }
 
+            // Unsubscribe from the user listener to prevent "user not found" messages during deletion
+            if (unsubscribeLookedUpUserListener) {
+                unsubscribeLookedUpUserListener();
+                unsubscribeLookedUpUserListener = null;
+                console.log("JCHAT_DEBUG: Unsubscribed from looked-up user listener before deletion.");
+            }
+
             toggleButtonLoading(deleteUserAccountButton, true);
             showMessageBox(`Deleting account for ${lookedUpUserProfileData.username}... This may take a moment.`, 'loading', true, 10000); // Persistent message
 
@@ -3570,6 +3577,8 @@
                 console.error("JCHAT_ERROR: Error deleting user account:", error);
                 showMessageBox(`Failed to delete user account: ${error.message}. Please check console for details.`, 'error', true);
                 playNotificationSound('error');
+                // If deletion failed, we might want to re-establish the listener, but for safety we'll leave it cleared
+                // The user can re-lookup the user if needed
             } finally {
                 toggleButtonLoading(deleteUserAccountButton, false);
             }
