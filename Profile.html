@@ -6190,6 +6190,12 @@
                         if (currentUser && displayedUserId === currentUser.uid) {
                             await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile'), { coverPicId: url, updatedAt: serverTimestamp() });
                             await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.uid), { coverPicId: url, updatedAt: serverTimestamp() });
+                            
+                            // Update profile completion after changing cover picture
+                            if (currentUserProfileData) {
+                                currentUserProfileData.coverPicId = url;
+                                calculateAndUpdateProfileCompletion(currentUserProfileData);
+                            }
                         }
                         showEnhancedSmartSuccess('Cover updated!', 'update');
                     } catch (e) {
@@ -6431,6 +6437,108 @@
         }
 
         /**
+         * Calculates and updates profile completion percentage.
+         * @param {Object} profileData - The user's profile data.
+         */
+        function calculateAndUpdateProfileCompletion(profileData) {
+            if (!profileData) return;
+
+            const completionFields = [
+                { field: 'username', weight: 15, required: true },
+                { field: 'profilePicId', weight: 10, required: false },
+                { field: 'bio', weight: 10, required: false },
+                { field: 'email', weight: 8, required: false },
+                { field: 'location', weight: 8, required: false },
+                { field: 'fullName', weight: 8, required: false },
+                { field: 'dateOfBirth', weight: 6, required: false },
+                { field: 'gender', weight: 5, required: false },
+                { field: 'phone', weight: 5, required: false },
+                { field: 'country', weight: 5, required: false },
+                { field: 'city', weight: 5, required: false },
+                { field: 'language', weight: 4, required: false },
+                { field: 'timezone', weight: 4, required: false },
+                { field: 'school', weight: 6, required: false },
+                { field: 'work', weight: 6, required: false },
+                { field: 'website', weight: 3, required: false },
+                { field: 'socialLinks', weight: 3, required: false },
+                { field: 'interests', weight: 4, required: false }
+            ];
+
+            let totalScore = 0;
+            let maxPossibleScore = 0;
+            let completedFields = [];
+
+            completionFields.forEach(({ field, weight, required }) => {
+                maxPossibleScore += weight;
+                
+                if (profileData[field]) {
+                    const value = profileData[field];
+                    let isValid = false;
+                    
+                    // Check if the field has meaningful content
+                    if (typeof value === 'string') {
+                        isValid = value.trim().length > 0;
+                    } else if (typeof value === 'object') {
+                        isValid = value !== null && Object.keys(value).length > 0;
+                    } else {
+                        isValid = value !== null && value !== undefined;
+                    }
+                    
+                    if (isValid) {
+                        totalScore += weight;
+                        completedFields.push(field);
+                    }
+                }
+            });
+
+            const completionPercentage = Math.round((totalScore / maxPossibleScore) * 100);
+            
+            // Update the UI
+            const completionPercentageEl = document.getElementById('completionPercentage');
+            const completionProgressFill = document.getElementById('completionProgressFill');
+            const completionTip = document.getElementById('completionTip');
+            
+            if (completionPercentageEl) {
+                completionPercentageEl.textContent = `${completionPercentage}%`;
+            }
+            
+            if (completionProgressFill) {
+                completionProgressFill.style.width = `${completionPercentage}%`;
+                
+                // Update progress bar color based on completion
+                if (completionPercentage < 30) {
+                    completionProgressFill.style.background = 'linear-gradient(90deg, #ff6b6b, #ff8e8e)';
+                } else if (completionPercentage < 70) {
+                    completionProgressFill.style.background = 'linear-gradient(90deg, #ffd93d, #ffed4e)';
+                } else {
+                    completionProgressFill.style.background = 'linear-gradient(90deg, #6bcf7f, #8ed8a0)';
+                }
+            }
+            
+            if (completionTip) {
+                if (completionPercentage === 100) {
+                    completionTip.textContent = '🎉 Profile complete! You\'ve unlocked all features!';
+                    completionTip.style.color = '#6bcf7f';
+                } else if (completionPercentage >= 80) {
+                    completionTip.textContent = 'Almost there! Just a few more details to complete your profile.';
+                    completionTip.style.color = '#ffd93d';
+                } else if (completionPercentage >= 50) {
+                    completionTip.textContent = 'Good progress! Keep adding details to unlock more features.';
+                    completionTip.style.color = '#ffd93d';
+                } else {
+                    completionTip.textContent = 'Complete your profile to unlock more features!';
+                    completionTip.style.color = '#ff6b6b';
+                }
+            }
+
+            // Log completion details for debugging
+            console.log(`JCHAT_DEBUG: Profile completion: ${completionPercentage}% (${completedFields.length}/${completionFields.length} fields)`);
+            console.log('JCHAT_DEBUG: Completed fields:', completedFields);
+            
+            return completionPercentage;
+        }
+
+        /**
          * Displays the profile picture or a default icon.
          * @param {HTMLElement} imgElement - The <img> element to update.
          * @param {HTMLElement} iconElement - The <i> element to display if no image.
@@ -6646,6 +6754,9 @@
                 if (updatedProfileSnap.exists()) {
                     currentUserProfileData = updatedProfileSnap.data();
                     displayedUserProfileData = currentUserProfileData; // Ensure consistency
+                    
+                    // Update profile completion after changing profile picture
+                    calculateAndUpdateProfileCompletion(displayedUserProfileData);
                 }
 
             }
@@ -6762,6 +6873,9 @@
                 if (updatedProfileSnap.exists()) {
                     currentUserProfileData = updatedProfileSnap.data();
                     displayedUserProfileData = currentUserProfileData; // Ensure consistency
+                    
+                    // Update profile completion after saving changes
+                    calculateAndUpdateProfileCompletion(displayedUserProfileData);
                 }
 
             } catch (error) {
@@ -8578,6 +8692,9 @@
                     
                     // IMPORTANT: Ensure userId is always part of displayedUserProfileData
                     displayedUserProfileData.userId = userIdToDisplay;
+                    
+                    // Calculate and update profile completion immediately after loading data
+                    calculateAndUpdateProfileCompletion(displayedUserProfileData);
 
                     console.log(`JCHAT_DEBUG: Fetched profile data for ${userIdToDisplay}:`, displayedUserProfileData);
 
@@ -8946,9 +9063,15 @@
 
                         // Show toggle button for account settings
                         if (toggleAccountSettingsButton) toggleAccountSettingsButton.style.display = 'inline-flex';
+                        
+                        // Calculate and update profile completion for current user
+                        calculateAndUpdateProfileCompletion(displayedUserProfileData);
 
                         // NEW: Show unlocked rewards for owner
                         await fetchAndDisplayUnlockedRewards();
+                        
+                        // Calculate and update profile completion
+                        calculateAndUpdateProfileCompletion(displayedUserProfileData);
 
                     } else if (currentUser) { // If logged in and viewing another user
                         // Hide all owner-specific buttons and editing sections
@@ -8987,6 +9110,9 @@
                         if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
+                        
+                        // Calculate and update profile completion for other users
+                        calculateAndUpdateProfileCompletion(displayedUserProfileData);
                     } else { // Not logged in, viewing any profile
                         
 
@@ -9020,6 +9146,9 @@
                         if (toggleInterestsVisibility) toggleInterestsVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleWebsiteVisibility) toggleWebsiteVisibility.closest('.privacy-toggle-group').style.display = 'none';
                         if (toggleSocialLinksVisibility) toggleSocialLinksVisibility.closest('.privacy-toggle-group').style.display = 'none';
+                        
+                        // Calculate and update profile completion for non-logged in users
+                        calculateAndUpdateProfileCompletion(displayedUserProfileData);
                     }
 
                     // Load user's posts (if desired on profile page)
@@ -9548,6 +9677,12 @@
                 await updateDoc(privateProfileDocRef, {
                     visibility: privacySettings
                 });
+
+                // Update profile completion after saving privacy settings
+                if (currentUserProfileData) {
+                    currentUserProfileData.visibility = privacySettings;
+                    calculateAndUpdateProfileCompletion(currentUserProfileData);
+                }
 
                 // Hide loading message and show success
                 showEnhancedSmartSuccess('Privacy settings saved successfully!', 'update');
