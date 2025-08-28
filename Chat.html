@@ -749,58 +749,201 @@
             }
         }
 
-        /* Friends Toggle */
-        .friends-toggle-container {
+        /* Friends Dropdown */
+        .friends-dropdown-container {
             position: absolute;
             top: 15px;
             right: 120px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
             z-index: 101;
         }
 
-        .friends-toggle-label {
-            font-size: 12px;
-            color: var(--text-color-secondary);
-            font-weight: 500;
-        }
-
-        .friends-toggle {
-            position: relative;
-            width: 44px;
-            height: 24px;
+        .friends-dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             background: var(--input-background);
             border: 1px solid var(--border-light);
             border-radius: 12px;
+            padding: 6px 12px;
             cursor: pointer;
             transition: all 0.3s ease;
-            overflow: hidden;
+            color: var(--text-color-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 80px;
         }
 
-        .friends-toggle::before {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 18px;
-            height: 18px;
-            background: var(--text-color-secondary);
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        .friends-dropdown-trigger:hover {
+            background: var(--border-light);
+            border-color: var(--accent-color);
+            color: var(--text-color-primary);
         }
 
-        .friends-toggle.active {
+        .friends-dropdown-trigger.active {
             background: var(--button-background);
             border-color: transparent;
+            color: #ffffff;
             box-shadow: 0 0 15px rgba(0, 213, 255, 0.3), 0 0 15px rgba(255, 46, 146, 0.3);
         }
 
-        .friends-toggle.active::before {
-            transform: translateX(20px);
-            background: #ffffff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        .friends-dropdown-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .friends-dropdown-trigger.active .friends-dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .friends-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: var(--card-background);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            min-width: 250px;
+            max-width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .friends-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .friends-dropdown-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-color-primary);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .friends-dropdown-search {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .friends-search-input {
+            width: 100%;
+            background: var(--input-background);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text-color-primary);
+            font-size: 12px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .friends-search-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.2);
+        }
+
+        .friends-dropdown-list {
+            padding: 5px 0;
+        }
+
+        .friend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .friend-item:hover {
+            background: var(--border-light);
+        }
+
+        .friend-item:last-child {
+            border-bottom: none;
+        }
+
+        .friend-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--border-light);
+            object-fit: cover;
+        }
+
+        .friend-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .friend-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-color-primary);
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .friend-status {
+            font-size: 11px;
+            color: var(--text-color-secondary);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .friend-status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--status-offline);
+        }
+
+        .friend-status-dot.online {
+            background: var(--status-online);
+            box-shadow: 0 0 6px var(--status-online);
+        }
+
+        .friends-dropdown-empty {
+            padding: 30px 20px;
+            text-align: center;
+            color: var(--text-color-secondary);
+            font-size: 13px;
+        }
+
+        .friends-dropdown-loading {
+            padding: 20px;
+            text-align: center;
+            color: var(--text-color-secondary);
+            font-size: 13px;
+        }
+
+        .friends-dropdown-menu::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .friends-dropdown-menu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .friends-dropdown-menu::-webkit-scrollbar-thumb {
+            background: var(--border-light);
+            border-radius: 2px;
         }
 
         /* Custom Message Box */
@@ -945,10 +1088,27 @@
                 </div>
             </div>
             
-            <!-- Friends Toggle -->
-            <div class="friends-toggle-container" id="friendsToggleContainer">
-                <span class="friends-toggle-label">Friends Only</span>
-                <div class="friends-toggle" id="friendsToggle" title="Toggle Friends Only Mode"></div>
+            <!-- Friends Dropdown -->
+            <div class="friends-dropdown-container" id="friendsDropdownContainer">
+                <div class="friends-dropdown-trigger" id="friendsDropdownTrigger">
+                    <i class="fas fa-users"></i>
+                    <span>Friends</span>
+                    <i class="fas fa-chevron-down friends-dropdown-arrow"></i>
+                </div>
+                <div class="friends-dropdown-menu" id="friendsDropdownMenu">
+                    <div class="friends-dropdown-header">
+                        <i class="fas fa-users"></i>
+                        <span>Choose Friend to Chat</span>
+                    </div>
+                    <div class="friends-dropdown-search">
+                        <input type="text" class="friends-search-input" id="friendsSearchInput" placeholder="Search friends...">
+                    </div>
+                    <div class="friends-dropdown-list" id="friendsDropdownList">
+                        <div class="friends-dropdown-loading">
+                            <i class="fas fa-spinner fa-spin"></i> Loading friends...
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="chat-header-right">
@@ -1078,8 +1238,13 @@
         let isTyping = false;
         let typingTimeout = null;
         let lastSeenTimestamp = Date.now();
-        let friendsOnlyMode = false;
         let messageBox = null;
+        
+        // Friends system variables (from Find_Friends.html)
+        let currentUsersFriends = new Set(); // Stores friend UIDs
+        let friendsData = []; // Stores detailed friend information
+        let filteredFriendsData = []; // Stores filtered friends for search
+        let friendsDropdownOpen = false;
 
         // Initialize the chat application
         document.addEventListener('DOMContentLoaded', function() {
@@ -1223,7 +1388,8 @@
             const backButton = document.getElementById('backButton');
             const attachFileBtn = document.getElementById('attachFileBtn');
             const fileInput = document.getElementById('fileInput');
-            const friendsToggle = document.getElementById('friendsToggle');
+            const friendsDropdownTrigger = document.getElementById('friendsDropdownTrigger');
+            const friendsSearchInput = document.getElementById('friendsSearchInput');
 
             // Message input events
             messageInput.addEventListener('input', handleInputChange);
@@ -1247,8 +1413,16 @@
             document.getElementById('voiceCallBtn').addEventListener('click', startVoiceCall);
             document.getElementById('chatInfoBtn').addEventListener('click', openChatInfo);
 
-            // Friends toggle event
-            friendsToggle.addEventListener('click', toggleFriendsOnlyMode);
+            // Friends dropdown events
+            friendsDropdownTrigger.addEventListener('click', toggleFriendsDropdown);
+            friendsSearchInput.addEventListener('input', handleFriendsSearch);
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (event) => {
+                if (!event.target.closest('.friends-dropdown-container')) {
+                    closeFriendsDropdown();
+                }
+            });
 
             // Auto-resize textarea
             autoResizeTextarea(messageInput);
@@ -1257,42 +1431,195 @@
             window.addEventListener('resize', scrollToBottom);
         }
 
-        // Toggle friends only mode
-        function toggleFriendsOnlyMode() {
-            friendsOnlyMode = !friendsOnlyMode;
-            const friendsToggle = document.getElementById('friendsToggle');
+        // Toggle friends dropdown
+        function toggleFriendsDropdown() {
+            const trigger = document.getElementById('friendsDropdownTrigger');
+            const menu = document.getElementById('friendsDropdownMenu');
             
-            if (friendsOnlyMode) {
-                friendsToggle.classList.add('active');
-                showMessageBox('Friends Only Mode Enabled! 👥', 'success', false, 2000);
-                localStorage.setItem('jchat_friends_only_mode', 'true');
+            if (friendsDropdownOpen) {
+                closeFriendsDropdown();
             } else {
-                friendsToggle.classList.remove('active');
-                showMessageBox('Friends Only Mode Disabled', 'info', false, 2000);
-                localStorage.setItem('jchat_friends_only_mode', 'false');
+                openFriendsDropdown();
+            }
+        }
+
+        // Open friends dropdown
+        function openFriendsDropdown() {
+            const trigger = document.getElementById('friendsDropdownTrigger');
+            const menu = document.getElementById('friendsDropdownMenu');
+            
+            friendsDropdownOpen = true;
+            trigger.classList.add('active');
+            menu.classList.add('show');
+            
+            // Load friends if not already loaded
+            if (friendsData.length === 0) {
+                loadFriends();
+            }
+        }
+
+        // Close friends dropdown
+        function closeFriendsDropdown() {
+            const trigger = document.getElementById('friendsDropdownTrigger');
+            const menu = document.getElementById('friendsDropdownMenu');
+            
+            friendsDropdownOpen = false;
+            trigger.classList.remove('active');
+            menu.classList.remove('show');
+        }
+
+        // Handle friends search
+        function handleFriendsSearch(event) {
+            const searchTerm = event.target.value.toLowerCase();
+            filteredFriendsData = friendsData.filter(friend => 
+                friend.username.toLowerCase().includes(searchTerm) ||
+                friend.displayName.toLowerCase().includes(searchTerm)
+            );
+            renderFriendsList();
+        }
+
+        // Load friends from Firebase (adapted from Find_Friends.html)
+        async function loadFriends() {
+            if (!currentUser || !db) {
+                showFriendsError("Authentication required");
+                return;
+            }
+
+            try {
+                const { collection, query, where, onSnapshot, doc, getDoc } = window.firebaseImports;
+                
+                // Listen for current user's friends
+                const publicFriendsRef = collection(db, "artifacts", appId, "confirmed_friends");
+                const userFriendsQuery = query(publicFriendsRef, where("user1Id", "==", currentUser.uid));
+                const userFriendsQuery2 = query(publicFriendsRef, where("user2Id", "==", currentUser.uid));
+
+                // Clear existing friends
+                currentUsersFriends.clear();
+                friendsData = [];
+
+                // Set up real-time listener for friends
+                onSnapshot(userFriendsQuery, async (snapshot) => {
+                    for (const docSnap of snapshot.docs) {
+                        const friendData = docSnap.data();
+                        const friendId = friendData.user2Id;
+                        currentUsersFriends.add(friendId);
+                        await loadFriendDetails(friendId);
+                    }
+                    renderFriendsList();
+                });
+
+                onSnapshot(userFriendsQuery2, async (snapshot) => {
+                    for (const docSnap of snapshot.docs) {
+                        const friendData = docSnap.data();
+                        const friendId = friendData.user1Id;
+                        currentUsersFriends.add(friendId);
+                        await loadFriendDetails(friendId);
+                    }
+                    renderFriendsList();
+                });
+
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error loading friends:", error);
+                showFriendsError("Failed to load friends");
+            }
+        }
+
+        // Load individual friend details
+        async function loadFriendDetails(friendId) {
+            try {
+                const { doc, getDoc, collection } = window.firebaseImports;
+                
+                // Get friend's profile data
+                const friendProfileRef = doc(db, "artifacts", appId, "users", friendId, "profiles", "user_profile");
+                const friendProfileSnap = await getDoc(friendProfileRef);
+                
+                if (friendProfileSnap.exists()) {
+                    const profileData = friendProfileSnap.data();
+                    const friendInfo = {
+                        id: friendId,
+                        username: profileData.username || 'Unknown User',
+                        displayName: profileData.displayName || profileData.username || 'Unknown User',
+                        profilePicId: profileData.profilePicId || null,
+                        status: 'offline', // Would be updated with real-time presence
+                        lastSeen: profileData.lastSeen || Date.now()
+                    };
+                    
+                    // Add or update friend in friendsData
+                    const existingIndex = friendsData.findIndex(f => f.id === friendId);
+                    if (existingIndex >= 0) {
+                        friendsData[existingIndex] = friendInfo;
+                    } else {
+                        friendsData.push(friendInfo);
+                    }
+                }
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error loading friend details:", error);
+            }
+        }
+
+        // Render friends list
+        function renderFriendsList() {
+            const friendsList = document.getElementById('friendsDropdownList');
+            const dataToRender = filteredFriendsData.length > 0 ? filteredFriendsData : friendsData;
+            
+            if (dataToRender.length === 0) {
+                friendsList.innerHTML = `
+                    <div class="friends-dropdown-empty">
+                        <i class="fas fa-user-friends" style="font-size: 24px; margin-bottom: 8px; opacity: 0.5;"></i>
+                        <div>No friends found</div>
+                        <div style="font-size: 11px; margin-top: 4px;">Add friends to start chatting</div>
+                    </div>
+                `;
+                return;
             }
             
-            // Apply the mode to current chat
-            applyFriendsOnlyMode();
+            const friendsHTML = dataToRender.map(friend => {
+                const usernameInitial = friend.displayName.charAt(0).toUpperCase();
+                let avatarHTML = '';
+                
+                if (friend.profilePicId) {
+                    const imageUrl = getCloudinaryImageUrl(friend.profilePicId, "w_32,h_32,c_fill,g_face,r_max");
+                    avatarHTML = `<img src="${imageUrl}" alt="${friend.displayName}" class="friend-avatar" onerror="this.src='https://placehold.co/32x32/CCCCCC/000000?text=${usernameInitial}';">`;
+                } else {
+                    avatarHTML = `<img src="https://placehold.co/32x32/CCCCCC/000000?text=${usernameInitial}" alt="${friend.displayName}" class="friend-avatar">`;
+                }
+                
+                return `
+                    <div class="friend-item" data-friend-id="${friend.id}" onclick="selectFriend('${friend.id}')">
+                        ${avatarHTML}
+                        <div class="friend-info">
+                            <div class="friend-name">${friend.displayName}</div>
+                            <div class="friend-status">
+                                <div class="friend-status-dot ${friend.status === 'online' ? 'online' : ''}"></div>
+                                ${friend.status === 'online' ? 'Online' : 'Offline'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            friendsList.innerHTML = friendsHTML;
         }
 
-        // Apply friends only mode
-        function applyFriendsOnlyMode() {
-            if (friendsOnlyMode && currentPartner) {
-                // Check if current partner is a friend
-                checkFriendshipStatus(currentPartner.id).then(isFriend => {
-                    if (!isFriend) {
-                        showMessageBox('⚠️ This user is not in your friends list. Some features may be limited.', 'warning', false, 4000);
-                    }
-                });
+        // Select a friend to chat with
+        function selectFriend(friendId) {
+            const friend = friendsData.find(f => f.id === friendId);
+            if (friend) {
+                // Navigate to chat with this friend
+                window.location.href = `/Chat.html?partnerId=${friendId}`;
+                closeFriendsDropdown();
             }
         }
 
-        // Check friendship status (placeholder function)
-        async function checkFriendshipStatus(userId) {
-            // This would connect to your Firebase friends collection
-            // For now, return a random result for demonstration
-            return Math.random() > 0.5;
+        // Show friends error
+        function showFriendsError(message) {
+            const friendsList = document.getElementById('friendsDropdownList');
+            friendsList.innerHTML = `
+                <div class="friends-dropdown-empty">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 24px; margin-bottom: 8px; color: var(--warning-color);"></i>
+                    <div>${message}</div>
+                </div>
+            `;
         }
 
         // Handle input changes
@@ -1500,28 +1827,38 @@
         }
 
         // Load partner information
-        function loadPartnerInfo(partnerId) {
-            // Load friends only mode state
-            const savedFriendsMode = localStorage.getItem('jchat_friends_only_mode');
-            if (savedFriendsMode === 'true') {
-                friendsOnlyMode = true;
-                document.getElementById('friendsToggle').classList.add('active');
+        async function loadPartnerInfo(partnerId) {
+            if (!db || !partnerId) {
+                showError('Invalid partner ID or database connection');
+                return;
             }
 
-            // Simulate API call (replace with actual Firebase implementation)
-            setTimeout(() => {
-                const partnerInfo = {
-                    id: partnerId,
-                    name: 'Chat Partner',
-                    profilePicId: null, // This would come from Firebase user data
-                    status: 'online',
-                    lastSeen: Date.now() - 300000 // 5 minutes ago
-                };
+            try {
+                const { doc, getDoc } = window.firebaseImports;
+                
+                // Get partner's profile data from Firebase
+                const partnerProfileRef = doc(db, "artifacts", appId, "users", partnerId, "profiles", "user_profile");
+                const partnerProfileSnap = await getDoc(partnerProfileRef);
+                
+                if (partnerProfileSnap.exists()) {
+                    const profileData = partnerProfileSnap.data();
+                    const partnerInfo = {
+                        id: partnerId,
+                        name: profileData.displayName || profileData.username || 'JCHAT User',
+                        profilePicId: profileData.profilePicId || null,
+                        status: 'offline', // Would be updated with real-time presence
+                        lastSeen: profileData.lastSeen || Date.now()
+                    };
 
-                updatePartnerUI(partnerInfo);
-                currentPartner = partnerInfo;
-                applyFriendsOnlyMode();
-            }, 500);
+                    updatePartnerUI(partnerInfo);
+                    currentPartner = partnerInfo;
+                } else {
+                    showError('User not found');
+                }
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error loading partner info:", error);
+                showError('Failed to load partner information');
+            }
         }
 
         // Update partner UI
@@ -1572,52 +1909,80 @@
 
         // Load current user
         function loadCurrentUser() {
-            // Get from localStorage or set default
-            currentUser = JSON.parse(localStorage.getItem('jchat_current_user')) || {
-                id: 'user_' + Math.random().toString(36).substr(2, 9),
-                name: 'You',
-                avatar: 'https://placehold.co/45x45/ff2e92/ffffff?text=Y'
-            };
+            if (window.firebaseImports && auth) {
+                const { onAuthStateChanged } = window.firebaseImports;
+                
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        currentUser = user;
+                        // Load friends after user is authenticated
+                        loadFriends();
+                    } else {
+                        // Redirect to login if not authenticated
+                        window.location.href = '/Login.html';
+                    }
+                });
+            } else {
+                // Fallback for development
+                currentUser = {
+                    uid: 'dev_user',
+                    displayName: 'Development User',
+                    email: 'dev@jchat.app'
+                };
+            }
         }
 
         // Load chat data
-        function loadChatData() {
-            // Simulate loading messages (replace with actual API call)
-            setTimeout(() => {
-                // Add some sample messages for demonstration
-                const sampleMessages = [
-                    {
-                        id: 'msg_1',
-                        text: 'Hey! How are you?',
-                        sender: 'partner',
-                        timestamp: Date.now() - 3600000,
-                        status: 'read'
-                    },
-                    {
-                        id: 'msg_2',
-                        text: 'I\'m doing great! Thanks for asking. How about you?',
-                        sender: 'current',
-                        timestamp: Date.now() - 3580000,
-                        status: 'read'
-                    },
-                    {
-                        id: 'msg_3',
-                        text: 'Awesome! I wanted to chat about the new project.',
-                        sender: 'partner',
-                        timestamp: Date.now() - 3560000,
-                        status: 'read'
-                    }
-                ];
+        async function loadChatData() {
+            if (!currentUser || !currentPartner || !db) {
+                return;
+            }
 
-                // Only load sample messages if no URL parameters indicate a fresh chat
-                const urlParams = new URLSearchParams(window.location.search);
-                if (!urlParams.get('fresh')) {
-                    sampleMessages.forEach(message => {
+            try {
+                const { collection, query, orderBy, onSnapshot, where } = window.firebaseImports;
+                
+                // Create chat ID (consistent ordering)
+                const chatId = [currentUser.uid, currentPartner.id].sort().join('_');
+                
+                // Listen for messages in real-time
+                const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+                const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+                
+                onSnapshot(messagesQuery, (snapshot) => {
+                    // Clear existing messages
+                    messages = [];
+                    const messagesContainer = document.getElementById('messagesContainer');
+                    const existingMessages = messagesContainer.querySelectorAll('.message');
+                    existingMessages.forEach(msg => msg.remove());
+                    
+                    // Add messages from Firebase
+                    snapshot.forEach((doc) => {
+                        const messageData = doc.data();
+                        const message = {
+                            id: doc.id,
+                            text: messageData.text,
+                            sender: messageData.senderId === currentUser.uid ? 'current' : 'partner',
+                            timestamp: messageData.timestamp?.toMillis() || Date.now(),
+                            status: messageData.status || 'delivered'
+                        };
                         addMessageToUI(message);
                     });
-                    hideEmptyState();
-                }
-            }, 1000);
+                    
+                    // Show empty state if no messages
+                    if (messages.length === 0) {
+                        showEmptyState();
+                    } else {
+                        hideEmptyState();
+                    }
+                }, (error) => {
+                    console.error("JCHAT_ERROR: Error loading messages:", error);
+                    showError('Failed to load messages');
+                });
+                
+            } catch (error) {
+                console.error("JCHAT_ERROR: Error setting up message listener:", error);
+                showError('Failed to setup message listener');
+            }
         }
 
         // Send typing status
@@ -1752,24 +2117,7 @@
             }
         });
 
-        // Simulate receiving messages (for demonstration)
-        setTimeout(() => {
-            if (Math.random() > 0.7) {
-                showTypingIndicator(currentPartner?.name || 'Partner');
-                setTimeout(() => {
-                    hideTypingIndicator();
-                    const receivedMessage = {
-                        id: generateMessageId(),
-                        text: 'Thanks for using JCHAT! 🚀',
-                        sender: 'partner',
-                        timestamp: Date.now(),
-                        status: 'delivered'
-                    };
-                    addMessageToUI(receivedMessage);
-                    hideEmptyState();
-                }, 3000);
-            }
-        }, 10000);
+
 
         // Handle page visibility for read receipts
         document.addEventListener('visibilitychange', function() {
