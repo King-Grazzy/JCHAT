@@ -209,6 +209,8 @@
                         <div class="friends-list" id="friendsList"><div style="padding:12px;color:var(--text-light);font-size:12px;">Loading friends...</div></div>
                     </div>
                 </div>
+                <button class="icon-btn" id="voiceCallBtn" title="Voice Call"><i class="fas fa-phone"></i></button>
+                <button class="icon-btn" id="videoCallBtn" title="Video Call"><i class="fas fa-video"></i></button>
                 <button class="icon-btn" id="infoBtn" title="Chat Info"><i class="fas fa-info-circle"></i></button>
                 <div id="headerProfile" title="My Profile" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
                     <img id="headerProfilePic" src="https://placehold.co/36x36/ff2e92/ffffff?text=U" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border-light);object-fit:cover;" alt="Me">
@@ -228,6 +230,7 @@
                 <div class="actions">
                     <button class="action-btn" id="attachBtn" title="Attach"><i class="fas fa-paperclip"></i></button>
                     <button class="action-btn" id="emojiBtn" title="Emoji"><i class="fas fa-smile"></i></button>
+                    <button class="action-btn" id="voiceMsgBtn" title="Voice Message"><i class="fas fa-microphone"></i></button>
                 </div>
             </div>
             <button class="send" id="sendBtn" title="Send"><i class="fas fa-paper-plane"></i></button>
@@ -236,6 +239,23 @@
         <div class="emoji-panel" id="emojiPanel">
             <div class="emoji-header" id="emojiTabs"></div>
             <div class="emoji-scroll"><div class="emoji-grid" id="emojiGrid"></div></div>
+        </div>
+        <!-- Call Modal -->
+        <div id="callModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter: blur(4px); z-index:300; align-items:center; justify-content:center;">
+            <div style="background:var(--card-background); border:1px solid var(--border-light); border-radius:12px; padding:12px; width:90%; max-width:520px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                    <div id="callTitle" style="font-weight:600;">Call</div>
+                    <button id="endCallBtn" class="icon-btn" title="End Call" style="color:#ff4d4f"><i class="fas fa-phone-slash"></i></button>
+                </div>
+                <div id="videoWrap" style="display:none; position:relative; background:#000; border-radius:8px; overflow:hidden;">
+                    <video id="remoteVideo" autoplay playsinline style="width:100%; height:auto;"></video>
+                    <video id="localVideo" autoplay muted playsinline style="position:absolute; right:8px; bottom:8px; width:120px; border-radius:6px; box-shadow:0 6px 16px rgba(0,0,0,.5);"></video>
+                </div>
+                <div id="voiceWrap" style="display:none; text-align:center; padding:24px;">
+                    <i class="fas fa-phone" style="font-size:36px; color:var(--accent-color);"></i>
+                    <div id="callStatus" style="margin-top:8px; color:var(--text-light);">Connecting…</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -464,6 +484,16 @@
         const emojiPanel = document.getElementById('emojiPanel');
         const emojiGrid = document.getElementById('emojiGrid');
         const emojiTabs = document.getElementById('emojiTabs');
+        const voiceMsgBtn = document.getElementById('voiceMsgBtn');
+        const voiceCallBtn = document.getElementById('voiceCallBtn');
+        const videoCallBtn = document.getElementById('videoCallBtn');
+        const callModal = document.getElementById('callModal');
+        const callTitle = document.getElementById('callTitle');
+        const endCallBtn = document.getElementById('endCallBtn');
+        const voiceWrap = document.getElementById('voiceWrap');
+        const videoWrap = document.getElementById('videoWrap');
+        const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
         backBtn.onclick = () => history.back();
 
         // Emoji setup with categories and ~500 emojis
@@ -547,6 +577,83 @@
                 emojiPanel.style.display = 'none';
             }
         });
+
+        // Voice message
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        voiceMsgBtn?.addEventListener('click', async () => {
+            try {
+                if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    recordedChunks = [];
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                    mediaRecorder.ondataavailable = e => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
+                    mediaRecorder.onstop = async () => {
+                        const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                        const url = await uploadToCloudinary(blob);
+                        if (url) {
+                            await sendAudioMessage(url, blob.size);
+                        }
+                        stream.getTracks().forEach(t => t.stop());
+                    };
+                    mediaRecorder.start();
+                    voiceMsgBtn.title = 'Stop Recording';
+                    voiceMsgBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                } else if (mediaRecorder.state === 'recording') {
+                    mediaRecorder.stop();
+                    voiceMsgBtn.title = 'Voice Message';
+                    voiceMsgBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                }
+            } catch (e) {}
+        });
+
+        async function sendAudioMessage(url, size) {
+            const chatId = chatIdFor(currentUser.uid, currentPartner.id);
+            const messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatId, "messages");
+            await ensureChatDoc(chatId);
+            await addDoc(messagesRef, {
+                text: 'Voice message',
+                type: 'audio',
+                fileUrl: url,
+                fileName: 'voice.webm',
+                senderId: currentUser.uid,
+                receiverId: currentPartner.id,
+                timestamp: serverTimestamp(),
+                status: 'sent',
+                chatId
+            });
+        }
+
+        // Calls (simplified skeleton)
+        let pc = null;
+        endCallBtn?.addEventListener('click', endCall);
+        voiceCallBtn?.addEventListener('click', () => startCall(false));
+        videoCallBtn?.addEventListener('click', () => startCall(true));
+
+        async function startCall(isVideo) {
+            if (!currentPartner) return;
+            callModal.style.display = 'flex';
+            callTitle.textContent = isVideo ? 'Video Call' : 'Voice Call';
+            voiceWrap.style.display = isVideo ? 'none' : 'block';
+            videoWrap.style.display = isVideo ? 'block' : 'none';
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: isVideo });
+                if (isVideo) localVideo.srcObject = stream;
+                pc = new RTCPeerConnection();
+                stream.getTracks().forEach(t => pc.addTrack(t, stream));
+                pc.ontrack = (e) => { if (isVideo) remoteVideo.srcObject = e.streams[0]; };
+                // Signaling would be implemented here using Firestore documents
+            } catch (e) {
+                callModal.style.display = 'none';
+            }
+        }
+
+        function endCall() {
+            try { pc && pc.getSenders().forEach(s => s.track && s.track.stop()); } catch {}
+            try { pc && pc.close(); } catch {}
+            pc = null;
+            callModal.style.display = 'none';
+        }
 
         inputEl.addEventListener('input', () => {
             inputEl.style.height = 'auto';
@@ -695,6 +802,8 @@
                 } else {
                     content = `<div style="margin-bottom:6px"><a href="${m.fileUrl}" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">${escapeHtml(m.fileName||'File')}</a></div>`;
                 }
+            } else if (m.type === 'audio' && m.fileUrl) {
+                content = `<div style="margin-bottom:6px"><audio controls src="${m.fileUrl}" style="width:220px"></audio></div>`;
             } else {
                 content = escapeHtml(m.text || '');
             }
