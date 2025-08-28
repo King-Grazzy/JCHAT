@@ -769,8 +769,16 @@
                     if (text) text.textContent = cached.state === 'online' ? 'Online' : (cached.state === 'away' ? `Away • ${formatRelativeTime(cached.lastMs)}` : `Offline • ${formatRelativeTime(cached.lastMs)}`);
                 }
             });
+            // Blur messages while menu open
+            const messages = document.getElementById('messages');
+            if (messages) messages.classList.add('hidden-while-friends');
         }
-        function closeFriends() { friendsMenu.classList.remove('show'); }
+        function closeFriends() {
+            friendsMenu.classList.remove('show');
+            // Unblur messages when menu closes
+            const messages = document.getElementById('messages');
+            if (messages) messages.classList.remove('hidden-while-friends');
+        }
 
         async function loadFriends() {
             if (!currentUser) return;
@@ -817,6 +825,8 @@
                 el.addEventListener('click', async () => {
                     const fid = el.getAttribute('data-id');
                     closeFriends();
+                    const messages = document.getElementById('messages');
+                    if (messages) messages.classList.remove('hidden-while-friends');
                     currentPartner = await loadFriendProfile(fid);
                     if (currentPartner) {
                         updatePartnerHeader(currentPartner);
