@@ -210,6 +210,9 @@
         </div>
     </div>
 
+    <!-- Notification sound -->
+    <audio id="newMessageSound" src="/ne.mp3" preload="auto"></audio>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
@@ -295,6 +298,8 @@
         let typingTimer = null;
         let unsubscribeMessages = null;
         let unsubscribeTyping = null;
+        let messagesInitialLoad = true;
+        let latestSeenMessageMs = 0;
 
         // Apply theme from Home.html (localStorage: 'jchat-theme')
         function applySavedTheme() {
@@ -479,8 +484,15 @@
                 messagesEl.querySelectorAll('.msg:not([data-optimistic-id])').forEach(node => node.remove());
                 const emptyLabel = document.getElementById('emptyLabel');
                 if (emptyLabel) emptyLabel.style.display = snap.empty ? 'block' : 'none';
+                let newestMsInSnap = latestSeenMessageMs;
+                const newPartnerMessages = [];
                 snap.forEach(docSnap => {
                     const m = docSnap.data();
+                    const tsMs = m.timestamp?.toMillis?.() || Date.now();
+                    if (tsMs > newestMsInSnap) newestMsInSnap = tsMs;
+                    if (!messagesInitialLoad && m.senderId !== currentUser.uid && tsMs > latestSeenMessageMs) {
+                        newPartnerMessages.push(m);
+                    }
                     renderMessage({
                         id: docSnap.id,
                         text: m.text,
@@ -497,6 +509,15 @@
                     messagesEl.querySelectorAll('[data-optimistic-id]').forEach(node => node.remove());
                 }
                 messagesEl.scrollTop = messagesEl.scrollHeight;
+
+                // Play sound for new partner messages (skip initial load)
+                if (!messagesInitialLoad && newPartnerMessages.length > 0) {
+                    playNotificationSoundOnce();
+                }
+
+                // Update latest seen marker
+                latestSeenMessageMs = newestMsInSnap;
+                messagesInitialLoad = false;
             });
             // Typing listener (presence doc under chat)
             const typingDocRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId, "presence", "typing");
@@ -595,6 +616,21 @@
             try { await setDoc(typingDocRef, { [currentUser.uid]: isTyping }, { merge: true }); } catch {}
             clearTimeout(typingTimer);
             if (isTyping) typingTimer = setTimeout(() => handleTyping(false), 1200);
+        }
+
+        // Notification sound helper
+        let soundPlayedLock = false;
+        function playNotificationSoundOnce() {
+            try {
+                const el = document.getElementById('newMessageSound');
+                if (!el) return;
+                // Play once per burst; reset lock shortly after to allow subsequent messages later
+                if (soundPlayedLock) return;
+                soundPlayedLock = true;
+                el.currentTime = 0;
+                el.play().catch(() => {});
+                setTimeout(() => { soundPlayedLock = false; }, 800);
+            } catch {}
         }
 
         // Read receipts
