@@ -491,6 +491,13 @@
                 const ti = document.getElementById('typingIndicator');
                 if (!ti) return;
                 if (isPartnerTyping) ti.classList.add('show'); else ti.classList.remove('show');
+                // Update header pill text when typing
+                const statusTextEl = document.getElementById('statusText');
+                if (statusTextEl) {
+                    if (isPartnerTyping) {
+                        statusTextEl.textContent = 'Typing…';
+                    }
+                }
             });
             // Delivered/read receipts listener
             const receiptsRef = doc(db, "artifacts", appId, "public", "data", "chats", chatId, "presence", "receipts");
