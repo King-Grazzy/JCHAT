@@ -358,10 +358,12 @@
                 };
                 post();
                 if (heartbeatTimer) clearInterval(heartbeatTimer);
-                heartbeatTimer = setInterval(post, 30000);
-                window.addEventListener('online', post);
-                window.addEventListener('offline', post);
-                document.addEventListener('visibilitychange', post);
+                heartbeatTimer = setInterval(post, 15000);
+                const debounced = () => { post(); };
+                window.addEventListener('online', debounced);
+                window.addEventListener('offline', debounced);
+                document.addEventListener('visibilitychange', debounced);
+                window.addEventListener('pagehide', () => { try { post(); } catch {} });
                 window.addEventListener('beforeunload', () => { try { post(); } catch {} });
             } catch {}
         }

@@ -1283,7 +1283,6 @@
         .notification-badge:empty {
             display: none;
         }
-
         /* Additional cool effects for notification icon */
         .notification-icon-wrapper a:active {
             transform: scale(0.98);
@@ -1933,7 +1932,6 @@
                 transform: translateY(0);
             }
         }
-
         @keyframes announcementPulse {
             0%, 100% {
                 transform: scale(1);
@@ -2579,7 +2577,6 @@
             border-color: rgba(0, 213, 255, 0.6);
             box-shadow: 0 0 0 3px rgba(0, 213, 255, 0.2);
         }
-
         .modal-content .button-group {
             display: flex;
             justify-content: flex-end;
@@ -8505,6 +8502,20 @@
         onAuthStateChanged(auth, async (user) => {
             console.log("JCHAT_DEBUG: onAuthStateChanged triggered. User:", user ? user.uid : "null");
             if (user) {
+                // Presence heartbeat (online + lastActive)
+                try {
+                    const userDocRef = doc(db, "artifacts", appId, "public", "data", "users", user.uid);
+                    const computeOnline = () => navigator.onLine && document.visibilityState === 'visible';
+                    const post = async () => { try { await setDoc(userDocRef, { online: computeOnline(), lastActive: serverTimestamp() }, { merge: true }); } catch {} };
+                    post();
+                    const debounced = () => { post(); };
+                    window.addEventListener('online', debounced);
+                    window.addEventListener('offline', debounced);
+                    document.addEventListener('visibilitychange', debounced);
+                    window.addEventListener('pagehide', () => { try { post(); } catch {} });
+                    window.addEventListener('beforeunload', () => { try { post(); } catch {} });
+                } catch {}
+
                 currentUser = user;
                 isAuthReady = true; // Set to true early so profile fetching can proceed.
                 await fetchAndDisplayHeaderProfile(user); // This sets currentUserProfileData and updates UI.
