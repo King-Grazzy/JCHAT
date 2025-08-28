@@ -248,6 +248,8 @@
         let friendsData = [];
         let filteredFriends = [];
         let typingTimer = null;
+        let unsubscribeMessages = null;
+        let unsubscribeTyping = null;
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = '/Login.html'; return; }
@@ -329,7 +331,8 @@
             const chatId = chatIdFor(currentUser.uid, currentPartner.id);
             const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
             const q = query(messagesRef, orderBy('timestamp', 'asc'));
-            onSnapshot(q, (snap) => {
+            if (unsubscribeMessages) { try { unsubscribeMessages(); } catch {} }
+            unsubscribeMessages = onSnapshot(q, (snap) => {
                 // Preserve typing indicator while clearing messages
                 messagesEl.querySelectorAll('.msg').forEach(node => node.remove());
                 snap.forEach(docSnap => {
@@ -349,7 +352,8 @@
             });
             // Typing listener (presence doc under chat)
             const typingDocRef = doc(db, "artifacts", appId, "chats", chatId, "presence", "typing");
-            onSnapshot(typingDocRef, (snap) => {
+            if (unsubscribeTyping) { try { unsubscribeTyping(); } catch {} }
+            unsubscribeTyping = onSnapshot(typingDocRef, (snap) => {
                 const data = snap.data() || {};
                 const isPartnerTyping = !!data[currentPartner.id];
                 const ti = document.getElementById('typingIndicator');
@@ -539,6 +543,14 @@
                 });
             });
         }
+
+        // Visibility-based read receipts
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && currentUser && currentPartner) {
+                const chatId = chatIdFor(currentUser.uid, currentPartner.id);
+                markRead(chatId);
+            }
+        });
     </script>
 </body>
 </html>
