@@ -984,13 +984,6 @@
             uploadPreset: "Storage_preset" // Your Cloudinary Upload Preset
         };
 
-        // Cloudinary Image URL Builder
-        function getCloudinaryImageUrl(publicId, transformations = "") {
-            if (!publicId) return null;
-            const baseUrl = `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/`;
-            return transformations ? `${baseUrl}${transformations}/${publicId}` : `${baseUrl}${publicId}`;
-        }
-
         // Initialize Firebase services
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
