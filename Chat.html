@@ -103,7 +103,24 @@
         .friends-root { position: relative; }
         .friends-trigger { width: 40px; height: 40px; border-radius: 50%; background: var(--input-background); border: 1px solid var(--border-light); color: var(--text-light); display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .friends-trigger:hover, .friends-trigger.active { background: var(--border-light); color: var(--white); }
-        .friends-menu { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: clamp(300px, 92vw, 400px); max-height: 70vh; overflow: hidden; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 14px; box-shadow: 0 18px 60px rgba(0,0,0,.5); display: none; z-index: 999; }
+        .friends-menu {
+            position: fixed;
+            left: 50%;
+            right: auto;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: min(96vw, 420px);
+            max-width: 96vw;
+            max-height: 75vh;
+            overflow: hidden;
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            box-shadow: 0 18px 60px rgba(0,0,0,.5);
+            display: none;
+            z-index: 999;
+            box-sizing: border-box;
+        }
         .friends-menu.show { display: block; }
         .friends-search { padding: 10px; border-bottom: 1px solid var(--border-light); position: sticky; top: 0; background: var(--card-background); z-index: 1; }
         .friends-search input { width: 100%; background: var(--input-background); border: 1px solid var(--border-light); border-radius: 8px; padding: 8px 10px; color: white; outline: none; }
