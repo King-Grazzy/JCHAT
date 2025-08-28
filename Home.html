@@ -344,7 +344,6 @@
             box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4), 0 6px 20px rgba(139, 92, 246, 0.4);
             border-color: rgba(59, 130, 246, 0.4);
         }
-
         body.theme-dark-mode .theme-switcher-btn {
             background: linear-gradient(45deg, #00d5ff, #ff2e92);
             box-shadow: 0 4px 15px rgba(0, 213, 255, 0.3), 0 4px 15px rgba(255, 46, 146, 0.3);
@@ -664,7 +663,6 @@
             --delete-button-color: #ef4444;
             --warning-color: #f59e0b;
         }
-
         /* Neon Theme - Premium Digital Matrix with Code Rain */
         body.theme-neon-mode {
             background: linear-gradient(135deg, #0f172a, #1e293b, #334155, #475569) !important;
@@ -1005,7 +1003,6 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         /* Theme picker styling */
         .theme-picker {
             position: fixed;
@@ -1355,7 +1352,6 @@
         .toast-notification.toast-info {
             border-left: 4px solid #2196f3;
         }
-
         .toast-notification.toast-warning {
             border-left: 4px solid #ff9800;
         }
@@ -1700,7 +1696,6 @@
             touch-action: pan-y pinch-zoom;
             overscroll-behavior-x: none;
         }
-
         /* Daily Inspiration Section */
         .daily-inspiration-section {
             background: var(--card-background);
@@ -2041,7 +2036,6 @@
             justify-content: flex-end;
             gap: 0.8rem;
         }
-
         .post-creation-section .post-button {
             background: var(--button-background);
             color: var(--white);
@@ -2390,7 +2384,6 @@
             word-wrap: break-word;
             display: inline; /* Keep on same line as author for short comments */
         }
-
         .comment-item .comment-timestamp {
             font-size: 0.75rem;
             color: rgba(255, 255, 255, 0.5);
@@ -2741,7 +2734,6 @@
             font-size: 10px;
             color: #000;
         }
-
         .vip-badge {
             background: linear-gradient(135deg, #C0C0C0, #E5E4E2);
             border: 2px solid #C0C0C0;
@@ -3086,7 +3078,6 @@
             position: relative;
             overflow: hidden;
         }
-
         #sidebarToggleFab::before {
             content: '';
             position: absolute;
@@ -3747,7 +3738,6 @@
 
 
     <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Skip to main content</a>
-
     <main id="main-content">
         <div class="content-wrapper">
             <!-- Daily Inspiration Section -->
@@ -3789,6 +3779,17 @@
                     </div>
                 </div>
             </div>
+            </div>
+
+            <!-- Stories Strip -->
+            <div id="storiesStrip" style="display:none; margin: 16px auto; max-width: 900px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                    <div style="font-family: 'Poppins', sans-serif; font-weight:700; color: var(--white);">Stories</div>
+                    <button id="addStoryBtn" class="icon-btn" title="Add Story" style="border:1px solid var(--border-color); border-radius:10px; padding:6px 10px;"><i class="fas fa-plus"></i></button>
+                </div>
+                <div id="storiesScroller" style="display:flex; gap:12px; overflow-x:auto; padding:8px; border:1px solid var(--border-color); border-radius:12px; background: var(--card-background);">
+                </div>
+                <input type="file" id="storyFileInput" accept="image/*,video/*" style="display:none">
             </div>
 
             <!-- Global Announcements Section -->
@@ -4090,7 +4091,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Edit Post Modal -->
             <div id="editPostModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="editPostModalTitle">
                 <div class="modal-content">
@@ -4417,7 +4417,6 @@
         // --- ADMIN UID ---
         // The specific UID for the administrator, used for feature toggling and permissions.
         const ADMIN_UID = 'cc96gdhCRPO72NFZtleRCujHvIq2';
-
         // --- DOM Elements (Initialize after DOM is loaded) ---
         let themeSwitcherBtn, headerProfilePic, headerAvatarIcon, headerDisplayName;
         let notificationCountElement, adminIconLink, profileLink;
@@ -4747,12 +4746,92 @@
                     } else {
                         hideGlobalAnnouncement();
                     }
+                    // Show stories strip
+                    try { await loadAndRenderStories(); } catch (e) { console.warn('Stories failed:', e); }
                 }
             } catch (error) {
                 console.error("JCHAT_ERROR: Error checking global announcements:", error);
             }
         }
 
+        // ===== STORIES =====
+        async function loadAndRenderStories() {
+            const storiesStrip = document.getElementById('storiesStrip');
+            const scroller = document.getElementById('storiesScroller');
+            const addBtn = document.getElementById('addStoryBtn');
+            if (!storiesStrip || !scroller) return;
+            storiesStrip.style.display = 'block';
+            scroller.innerHTML = '';
+            // Load latest stories (flat list under stories)
+            const storiesCol = collection(db, 'artifacts', appId, 'public', 'data', 'stories');
+            const qStories = query(storiesCol, orderBy('createdAt', 'desc'));
+            const snap = await getDocs(qStories);
+            const seenKey = 'jchat_story_seen';
+            const seen = JSON.parse(localStorage.getItem(seenKey) || '{}');
+            snap.forEach(docSnap => {
+                const s = docSnap.data();
+                if (!s || !s.mediaUrl) return;
+                const item = document.createElement('div');
+                item.style.display = 'flex';
+                item.style.flexDirection = 'column';
+                item.style.alignItems = 'center';
+                item.style.gap = '6px';
+                const ring = document.createElement('div');
+                ring.style.width = '58px';
+                ring.style.height = '58px';
+                ring.style.borderRadius = '50%';
+                ring.style.padding = '3px';
+                ring.style.background = seen[docSnap.id] ? 'rgba(255,255,255,0.15)' : 'linear-gradient(45deg, var(--blue), var(--pink))';
+                const img = document.createElement('img');
+                img.src = s.thumbnailUrl || s.mediaUrl;
+                img.alt = 'Story';
+                img.style.width = '52px';
+                img.style.height = '52px';
+                img.style.borderRadius = '50%';
+                img.style.objectFit = 'cover';
+                ring.appendChild(img);
+                const label = document.createElement('div');
+                label.textContent = s.username || 'Story';
+                label.style.fontSize = '12px';
+                label.style.maxWidth = '64px';
+                label.style.color = 'var(--white)';
+                label.style.whiteSpace = 'nowrap';
+                label.style.overflow = 'hidden';
+                label.style.textOverflow = 'ellipsis';
+                item.appendChild(ring);
+                item.appendChild(label);
+                item.addEventListener('click', () => openStoryViewer(docSnap.id, s));
+                scroller.appendChild(item);
+            });
+            addBtn?.addEventListener('click', () => document.getElementById('storyFileInput')?.click());
+            document.getElementById('storyFileInput')?.addEventListener('change', async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                try {
+                    const url = await uploadToCloudinary(file);
+                    const storiesCol = collection(db, 'artifacts', appId, 'public', 'data', 'stories');
+                    await addDoc(storiesCol, {
+                        userId: currentUser?.uid || 'anon',
+                        username: currentUserProfileData?.username || 'Me',
+                        mediaUrl: url,
+                        thumbnailUrl: url,
+                        type: file.type.startsWith('video/') ? 'video' : 'image',
+                        createdAt: serverTimestamp(),
+                        expiresAt: null
+                    });
+                    await loadAndRenderStories();
+                } catch(err) { console.error('Story upload failed', err); }
+            }, { once: true });
+        }
+
+        function openStoryViewer(storyId, story) {
+            // Placeholder: can open a modal; for now navigate to media
+            window.open(story.mediaUrl, '_blank');
+            const seenKey = 'jchat_story_seen';
+            const seen = JSON.parse(localStorage.getItem(seenKey) || '{}');
+            seen[storyId] = Date.now();
+            localStorage.setItem(seenKey, JSON.stringify(seen));
+        }
         /**
          * Displays a global announcement to the user
          */
@@ -5070,7 +5149,6 @@
                 }
             });
         }
-
         // Function to initialize all DOM elements safely
         function initializeDOMElements() {
             try {
@@ -5419,7 +5497,6 @@
                 otherRewards: otherRewards
             };
         }
-
         // --- NEW: Pending Activity Reward Creation Function ---
         /**
          * Creates a pending activity reward document for admin review.
@@ -6043,7 +6120,6 @@
                 }
             });
         }
-
         /**
          * Uploads a media file (image or video) to Cloudinary.
          * @param {File|Blob} file - The file to upload.
@@ -6387,7 +6463,6 @@
                 setTimeout(() => {
                     hideLoader();
                 }, 1000); // Small delay for smooth transition
-
             } catch (error) {
                 console.error("JCHAT_ERROR: Error fetching or creating profile for header:", error);
                 // Fallback UI update in case of error.
@@ -7734,7 +7809,6 @@
                             element.remove();
                         }
                     });
-
                     // Display "No posts yet" message if the feed is empty.
                     if (querySnapshot.empty) {
                         if (!document.getElementById('noPostsMessage')) {
@@ -8084,7 +8158,6 @@
             // Re-evaluate daily bonus button state.
             checkAndStartDailyBonusTimer();
         }
-
         // WebRTC STUN/TURN servers (NEW)
         // Configuration for ICE servers, essential for WebRTC connection establishment.
         const iceServers = {
@@ -8427,7 +8500,6 @@
             const seconds = callDuration % 60;
             callTimerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
-
         /**
          * Ends the call and cleans up all WebRTC resources and UI.
          * @param {boolean} updateFirestore - Whether to update the Firestore call status to 'ended'.
@@ -8769,7 +8841,6 @@
                 }
             }
         });
-
         // --- Event Listeners for static elements ---
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize theme switcher
@@ -9118,7 +9189,6 @@
                 sidebarNav.classList.add('sidebar-hidden');
             }
         }
-
         // Prevent sidebar auto-toggle during scroll
         function handleScroll() {
             isScrolling = true;
@@ -9433,7 +9503,6 @@
             // Fetch system settings early to render announcement ASAP
             if (navigator.onLine) fetchSystemSettings().catch(()=>{});
         });
-
         // Comment like/unlike with user-specific toggle
         async function likeComment(postId, commentId, buttonEl) {
             try {
@@ -9767,7 +9836,6 @@
                 customizeInspirationModal.dataset.boundOutsideClick = '1';
             }
         }
-
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize DOM elements first
             initializeDOMElements();
@@ -10109,7 +10177,6 @@
                 console.error("JCHAT_ERROR: Failed to load premium status:", error);
             }
         }
-
         // Activate Premium Features
         function activatePremiumFeatures() {
             console.log("JCHAT_DEBUG: Activating premium features for tier:", userPremiumStatus);
