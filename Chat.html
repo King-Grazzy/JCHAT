@@ -319,7 +319,8 @@
             const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
             const q = query(messagesRef, orderBy('timestamp', 'asc'));
             onSnapshot(q, (snap) => {
-                messagesEl.innerHTML = '';
+                // Preserve typing indicator while clearing messages
+                messagesEl.querySelectorAll('.msg').forEach(node => node.remove());
                 snap.forEach(docSnap => {
                     const m = docSnap.data();
                     renderMessage({
@@ -341,6 +342,7 @@
                 const data = snap.data() || {};
                 const isPartnerTyping = !!data[currentPartner.id];
                 const ti = document.getElementById('typingIndicator');
+                if (!ti) return;
                 if (isPartnerTyping) ti.classList.add('show'); else ti.classList.remove('show');
             });
             // Mark read on open
