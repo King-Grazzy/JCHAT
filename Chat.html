@@ -532,7 +532,7 @@
                 tab.className = 'emoji-tab' + (cat.key === activeKey ? ' active' : '');
                 tab.type = 'button';
                 tab.textContent = cat.label;
-                tab.addEventListener('click', () => renderEmojis(cat.key));
+                tab.setAttribute('data-key', cat.key);
                 emojiTabs.appendChild(tab);
             });
         }
@@ -571,6 +571,15 @@
                 renderEmojis();
                 emojiPanel.style.display = 'block';
             }
+        });
+        // Delegate tab clicks to container for reliability
+        emojiTabs.addEventListener('click', (e) => {
+            const t = e.target.closest('.emoji-tab');
+            if (!t) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const key = t.getAttribute('data-key');
+            if (key) renderEmojis(key);
         });
         document.addEventListener('click', (e) => {
             if (!e.target.closest('#emojiPanel') && !e.target.closest('#emojiBtn')) {
