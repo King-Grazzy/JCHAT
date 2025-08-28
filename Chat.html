@@ -307,12 +307,11 @@
             try {
                 const userDocRef = doc(db, "artifacts", appId, "public", "data", "users", currentUser.uid);
                 const post = async () => {
-                    try { await setDoc(userDocRef, { online: navigator.onLine && document.visibilityState === 'visible', lastActive: serverTimestamp() }, { merge: true }); } catch {}
+                    try { await setDoc(userDocRef, { online: navigator.onLine, lastActive: serverTimestamp() }, { merge: true }); } catch {}
                 };
                 post();
                 if (heartbeatTimer) clearInterval(heartbeatTimer);
                 heartbeatTimer = setInterval(post, 30000);
-                window.addEventListener('visibilitychange', post);
                 window.addEventListener('online', post);
                 window.addEventListener('offline', post);
             } catch {}
@@ -348,18 +347,9 @@
                     const partnerDoc = doc(db, "artifacts", appId, "public", "data", "users", currentPartner.id);
                     onSnapshot(partnerDoc, (snap) => {
                         const d = snap.data() || {};
-                        const last = d.lastActive?.toMillis ? d.lastActive.toMillis() : (d.lastActive || 0);
-                        const now = Date.now();
-                        let state = 'offline';
-                        if (d.online) state = 'online';
-                        else if (now - last <= 5 * 60 * 1000) state = (now - last <= 3 * 60 * 1000) ? 'away' : 'offline';
-                        // Apply UI
-                        if (statusDot) {
-                            statusDot.className = 'status-dot ' + (state === 'online' ? 'status-online' : state === 'away' ? 'status-away' : 'status-offline');
-                        }
-                        if (statusText) {
-                            statusText.textContent = state === 'online' ? 'Online' : (state === 'away' ? 'Recently active' : 'Offline');
-                        }
+                        const state = d.online ? 'online' : 'offline';
+                        if (statusDot) statusDot.className = 'status-dot ' + (state === 'online' ? 'status-online' : 'status-offline');
+                        if (statusText) statusText.textContent = state === 'online' ? 'Online' : 'Offline';
                     });
                 }
             } catch {}
@@ -714,15 +704,11 @@
                 const ref = doc(db, "artifacts", appId, "public", "data", "users", friendId);
                 const unsub = onSnapshot(ref, (snap) => {
                     const d = snap.data() || {};
-                    const last = d.lastActive?.toMillis ? d.lastActive.toMillis() : (d.lastActive || 0);
-                    const now = Date.now();
-                    let state = 'offline';
-                    if (d.online) state = 'online';
-                    else if (now - last <= 5 * 60 * 1000) state = (now - last <= 3 * 60 * 1000) ? 'away' : 'offline';
+                    const state = d.online ? 'online' : 'offline';
                     const dot = document.querySelector(`[data-presence-id="${friendId}"]`);
                     const text = document.querySelector(`[data-presence-text-id="${friendId}"]`);
-                    if (dot) dot.className = 'friend-dot ' + (state === 'online' ? 'online' : state === 'away' ? 'away' : '');
-                    if (text) text.textContent = state === 'online' ? 'Online' : (state === 'away' ? 'Recently active' : 'Offline');
+                    if (dot) dot.className = 'friend-dot ' + (state === 'online' ? 'online' : '');
+                    if (text) text.textContent = state === 'online' ? 'Online' : 'Offline';
                 });
                 friendPresenceUnsubs.set(friendId, unsub);
             } catch {}
