@@ -785,7 +785,6 @@
         .notification-icon-wrapper i:hover {
             transform: scale(1.1);
         }
-
         .notification-badge {
             position: absolute;
             top: -5px;
@@ -1574,7 +1573,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .user-id-container::after {
             content: '';
             position: absolute;
@@ -2349,7 +2347,6 @@
         .contact-modal-body {
             padding: 25px 30px 30px;
         }
-
         /* Mobile responsive for contact modal */
         @media (max-width: 768px) {
             .contact-icon {
@@ -3143,7 +3140,6 @@
             font-weight: 600;
             color: var(--white);
         }
-
         /* NEW: Enhanced Friend Item Styles */
         .friend-item {
             display: flex;
@@ -3933,7 +3929,6 @@
                 opacity: 0;
             }
         }
-
         @keyframes smartSuccessIconPop {
             0% {
                 transform: scale(0) rotate(-180deg);
@@ -4733,7 +4728,6 @@
             resize: vertical;
             min-height: 80px;
         }
-
         .edit-form-actions {
             display: flex;
             gap: 1rem;
@@ -9081,6 +9075,7 @@
                     if (privacySettingsBtn) privacySettingsBtn.style.display = 'none';
                     if (toggleEmailVisibility) toggleEmailVisibility.closest('.privacy-toggle-group').style.display = 'none';
                     if (toggleLocationVisibility) toggleLocationVisibility.closest('.privacy-toggle-group').style.display = 'none';
+                    if (toggleUserIdVisibility) toggleUserIdVisibility.closest('.privacy-toggle-group').style.display = 'none';
                     if (toggleOnlineStatusVisibility) toggleOnlineStatusVisibility.closest('.privacy-toggle-group').style.display = 'none';
                     if (toggleFriendRequests) toggleFriendRequests.closest('.privacy-toggle-group').style.display = 'none';
                     if (toggleMessages) toggleMessages.closest('.privacy-toggle-group').style.display = 'none';
@@ -9155,6 +9150,16 @@
                     await fetchAndDisplayUserProfile(displayedUserId);
                     fetchNotificationCount(user.uid); // Fetch notification count
                     
+                    // Presence heartbeat
+                    try {
+                        const userDocRef = doc(db, "artifacts", appId, "public", "data", "users", user.uid);
+                        const post = async () => { try { await setDoc(userDocRef, { online: navigator.onLine, lastActive: serverTimestamp() }, { merge: true }); } catch {} };
+                        post();
+                        window.addEventListener('online', post);
+                        window.addEventListener('offline', post);
+                        window.addEventListener('beforeunload', () => { try { navigator.sendBeacon && navigator.sendBeacon('/'); } catch {} });
+                    } catch {}
+
                     // Hide loader after profile is fully loaded
                     hideLoader();
 
@@ -9310,7 +9315,6 @@
             // Initialize button state
             updateScrollToggleState();
         }
-
         // --- User Information Toggle Functionality ---
         function initializeUserInfoToggle() {
             const userInfoToggle = document.getElementById('userInfoToggle');

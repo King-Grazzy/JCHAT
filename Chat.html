@@ -611,7 +611,7 @@
 
         async function sendFileMessage(file, url) {
             const chatId = chatIdFor(currentUser.uid, currentPartner.id);
-            const messagesRef = collection(db, "artifacts", appId, "chats", chatId, "messages");
+            const messagesRef = collection(db, "artifacts", appId, "public", "data", "chats", chatId, "messages");
             await addDoc(messagesRef, {
                 text: file.type.startsWith('image/') ? 'Photo' : (file.type.startsWith('video/') ? 'Video' : 'Attachment'),
                 type: 'file',

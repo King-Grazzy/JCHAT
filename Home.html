@@ -632,7 +632,6 @@
             --delete-button-color: #ef4444;
             --warning-color: #f59e0b;
         }
-
         /* Retro Theme - Premium 80s Synthwave with Grid Animation */
         body.theme-retro-mode {
             background: linear-gradient(135deg, #581c87, #7c3aed, #a855f7, #c084fc) !important;
@@ -1281,7 +1280,6 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
-
         .notification-badge:empty {
             display: none;
         }
@@ -1924,7 +1922,6 @@
             color: #28a745;
             border-color: rgba(40, 167, 69, 0.3);
         }
-
         /* Announcement animations */
         @keyframes announcementSlideIn {
             from {
@@ -2565,7 +2562,6 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-
         .modal-content textarea {
             width: 100%;
             padding: 0.8rem 1rem;
@@ -3213,10 +3209,6 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease;
-        }
-        #callOverlay.active {
-            opacity: 1;
-            visibility: visible;
         }
         #callOverlay .call-status-icon {
             font-size: 5rem;
@@ -4892,7 +4884,6 @@
             document.body.appendChild(themePickerEl);
             return themePickerEl;
         }
-
         // Theme icons mapping
         const themeIcons = {
             'theme-light-mode': 'fas fa-sun',
@@ -5526,7 +5517,6 @@
                 claimDailyBonusButton.querySelector('.button-text').textContent = `Next in ${hours}h ${minutes}m ${seconds}s`;
             }
         }
-
         /**
          * Checks the daily bonus status and starts/stops the countdown timer.
          * This is called on auth state change and after claiming a bonus.
@@ -8510,7 +8500,6 @@
             }
             callRef = null; // Clear call reference.
         }
-
         // --- Authentication State Listener ---
         // This is the primary entry point after the DOM is loaded.
         onAuthStateChanged(auth, async (user) => {
