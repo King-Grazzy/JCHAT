@@ -686,16 +686,37 @@
         }
 
         .friend-avatar {
-            width: 32px;
-            height: 32px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--accent-color);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .friend-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .friend-avatar .default-avatar {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--accent-color);
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
         }
 
         .friend-info {
@@ -1336,6 +1357,13 @@
             uploadPreset: "Storage_preset" // Your Cloudinary Upload Preset
         };
 
+        // Cloudinary Image URL Builder (EXACT same as Find_Friends.html)
+        function getCloudinaryImageUrl(publicId, transformations = "") {
+            if (!publicId) return null;
+            const baseUrl = `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/`;
+            return transformations ? `${baseUrl}${transformations}/${publicId}` : `${baseUrl}${publicId}`;
+        }
+
         // Initialize Firebase services
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -1735,12 +1763,23 @@
                     friendItem.className = 'friend-item';
                     friendItem.dataset.friendId = friend.uid;
                     
+                    // Build profile picture HTML (EXACT same logic as Find_Friends.html)
+                    const usernameInitial = friend.username ? friend.username.charAt(0).toUpperCase() : 'F';
+                    let profileImageHtml = '';
+                    
+                    if (friend.profilePicture) {
+                        profileImageHtml = `<img src="${friend.profilePicture}" alt="${friend.username}'s Profile Picture" 
+                            style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;" 
+                            onerror="this.onerror=null;this.src='https://placehold.co/60x60/CCCCCC/000000?text=${usernameInitial}';">`;
+                    } else {
+                        profileImageHtml = `<div class="default-avatar" style="width: 100%; height: 100%; background: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;">
+                            ${usernameInitial}
+                        </div>`;
+                    }
+
                     friendItem.innerHTML = `
                         <div class="friend-avatar">
-                            ${friend.profilePicture ? 
-                                `<img src="${friend.profilePicture}" alt="${friend.username}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` :
-                                `<div style="width: 100%; height: 100%; background: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">${friend.username ? friend.username.charAt(0).toUpperCase() : 'F'}</div>`
-                            }
+                            ${profileImageHtml}
                         </div>
                         <div class="friend-info">
                             <div class="friend-name">${friend.username || 'Unknown User'}</div>
@@ -1788,10 +1827,11 @@
                         if (userDoc.exists()) {
                             const userData = userDoc.data();
                             
-                            // Build profile picture URL (same logic as Find_Friends.html)
+                            // Build profile picture URL (EXACT same logic as Find_Friends.html)
+                            const profilePicId = userData.profilePicId || null;
                             let profilePictureUrl = null;
-                            if (userData.profilePicId) {
-                                profilePictureUrl = `https://res.cloudinary.com/dxld01rcp/image/upload/c_fill,w_150,h_150,q_auto,f_auto/${userData.profilePicId}`;
+                            if (profilePicId && userData.visibility?.profilePic !== false) {
+                                profilePictureUrl = getCloudinaryImageUrl(profilePicId, "w_120,h_120,c_fill,g_face,r_max");
                             }
                             
                             profiles.push({
