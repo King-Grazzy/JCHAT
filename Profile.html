@@ -6440,16 +6440,10 @@
          */
         function displayProfilePicture(imgElement, iconElement, profilePicId, usernameInitial, transformations) {
             if (!imgElement) return;
-            const initial = (usernameInitial || 'U').toUpperCase();
-            const placeholder = `https://placehold.co/120x120/CCCCCC/000000?text=${initial}`;
+            const placeholder = '/assets/User.png';
             if (profilePicId) {
                 const imageUrl = getCloudinaryImageUrl(profilePicId, transformations);
-                imgElement.onerror = () => {
-                    console.warn(`JCHAT_WARN: Failed to load profile picture: ${profilePicId}. Using placeholder.`);
-                    imgElement.onerror = null;
-                    imgElement.src = placeholder;
-                    if (iconElement) iconElement.style.display = 'none';
-                };
+                imgElement.onerror = () => { imgElement.onerror = null; imgElement.src = placeholder; if (iconElement) iconElement.style.display = 'none'; };
                 imgElement.src = imageUrl || placeholder;
                 imgElement.style.display = 'block';
                 if (iconElement) iconElement.style.display = 'none';
