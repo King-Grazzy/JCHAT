@@ -70,6 +70,22 @@
         .icon-btn { background: none; border: none; color: var(--text-light); font-size: 18px; cursor: pointer; padding: 8px; border-radius: 50%; }
         .icon-btn:hover { background: var(--border-light); color: var(--white); }
 
+        /* Friends dropdown */
+        .friends-root { position: relative; }
+        .friends-trigger { width: 40px; height: 40px; border-radius: 50%; background: var(--input-background); border: 1px solid var(--border-light); color: var(--text-light); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .friends-trigger:hover { background: var(--border-light); color: var(--white); }
+        .friends-menu { position: absolute; right: 0; top: calc(100% + 10px); min-width: 280px; max-width: 320px; max-height: 420px; overflow: hidden; background: var(--card-background); border: 1px solid var(--border-light); border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.4); display: none; }
+        .friends-menu.show { display: block; }
+        .friends-search { padding: 10px; border-bottom: 1px solid var(--border-light); }
+        .friends-search input { width: 100%; background: var(--input-background); border: 1px solid var(--border-light); border-radius: 8px; padding: 8px 10px; color: white; outline: none; }
+        .friends-list { max-height: 320px; overflow-y: auto; }
+        .friend-item { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.05); cursor: pointer; }
+        .friend-item:hover { background: rgba(255,255,255,.05); }
+        .friend-item img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border-light); object-fit: cover; }
+        .friend-meta { min-width: 0; }
+        .friend-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .friend-sub { font-size: 11px; color: var(--text-light); }
+
         .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
         .msg { display: flex; }
         .msg.sent { justify-content: flex-end; }
@@ -101,6 +117,13 @@
                 </div>
             </div>
             <div class="header-right">
+                <div class="friends-root" id="friendsRoot">
+                    <div class="friends-trigger" id="friendsTrigger" title="Chat with Friends"><i class="fas fa-users"></i></div>
+                    <div class="friends-menu" id="friendsMenu">
+                        <div class="friends-search"><input type="text" id="friendsSearch" placeholder="Search friends..."></div>
+                        <div class="friends-list" id="friendsList"><div style="padding:12px;color:var(--text-light);font-size:12px;">Loading friends...</div></div>
+                    </div>
+                </div>
                 <button class="icon-btn" id="infoBtn" title="Chat Info"><i class="fas fa-info-circle"></i></button>
                 <div id="headerProfile" title="My Profile" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
                     <img id="headerProfilePic" src="https://placehold.co/36x36/ff2e92/ffffff?text=U" style="width:36px;height:36px;border-radius:50%;border:2px solid var(--border-light);object-fit:cover;" alt="Me">
@@ -201,11 +224,14 @@
 
         let currentUser = null;
         let currentPartner = null;
+        let friendsData = [];
+        let filteredFriends = [];
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = '/Login.html'; return; }
             currentUser = user;
             await setupHeader(user);
+            await loadFriends();
             if (!partnerId) return;
             currentPartner = await loadFriendProfile(partnerId);
             if (currentPartner) updatePartnerHeader(currentPartner);
@@ -307,6 +333,88 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        // Friends dropdown logic
+        const friendsTrigger = document.getElementById('friendsTrigger');
+        const friendsMenu = document.getElementById('friendsMenu');
+        const friendsListEl = document.getElementById('friendsList');
+        const friendsSearchEl = document.getElementById('friendsSearch');
+
+        friendsTrigger.addEventListener('click', () => {
+            const isOpen = friendsMenu.classList.contains('show');
+            if (isOpen) closeFriends(); else openFriends();
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#friendsRoot')) closeFriends();
+        });
+
+        friendsSearchEl.addEventListener('input', () => {
+            const term = friendsSearchEl.value.trim().toLowerCase();
+            if (!term) {
+                filteredFriends = [];
+            } else {
+                filteredFriends = friendsData.filter(f => (f.displayName||'').toLowerCase().includes(term) || (f.username||'').toLowerCase().includes(term));
+            }
+            renderFriends();
+        });
+
+        function openFriends() { friendsMenu.classList.add('show'); renderFriends(); }
+        function closeFriends() { friendsMenu.classList.remove('show'); }
+
+        async function loadFriends() {
+            if (!currentUser) return;
+            // Same collection path as Find_Friends.html public friends list
+            const publicFriendsRef = collection(db, "artifacts", appId, "public", "data", "friends");
+            onSnapshot(publicFriendsRef, async (snapshot) => {
+                const friendIds = new Set();
+                snapshot.forEach(docSnap => {
+                    const d = docSnap.data();
+                    if (d.user1Id === currentUser.uid) friendIds.add(d.user2Id);
+                    else if (d.user2Id === currentUser.uid) friendIds.add(d.user1Id);
+                });
+                const loads = Array.from(friendIds).map(async (fid) => {
+                    const profRef = doc(db, "artifacts", appId, "users", fid, "profiles", "user_profile");
+                    const ps = await getDoc(profRef);
+                    if (!ps.exists()) return null;
+                    const pd = ps.data();
+                    return { id: fid, displayName: pd.displayName || pd.username || `User_${fid.slice(0,8)}`, username: pd.username || '', profilePicId: pd.profilePicId || null };
+                });
+                const arr = (await Promise.all(loads)).filter(Boolean);
+                friendsData = arr;
+                renderFriends();
+            });
+        }
+
+        function renderFriends() {
+            const data = filteredFriends.length ? filteredFriends : friendsData;
+            if (!data.length) {
+                friendsListEl.innerHTML = '<div style="padding:12px;color:var(--text-light);font-size:12px;">No friends found</div>';
+                return;
+            }
+            friendsListEl.innerHTML = data.map(f => {
+                const initial = (f.displayName||'U').charAt(0).toUpperCase();
+                const avatar = f.profilePicId ? getCloudinaryImageUrl(f.profilePicId, 'w_36,h_36,c_fill,g_face,r_max') : `https://placehold.co/36x36/00d5ff/ffffff?text=${initial}`;
+                return `<div class="friend-item" data-id="${f.id}">
+                    <img src="${avatar}" onerror="this.src='https://placehold.co/36x36/00d5ff/ffffff?text=${initial}'" alt="${initial}">
+                    <div class="friend-meta">
+                        <div class="friend-name">${escapeHtml(f.displayName)}</div>
+                        <div class="friend-sub">Tap to chat</div>
+                    </div>
+                </div>`;
+            }).join('');
+            friendsListEl.querySelectorAll('.friend-item').forEach(el => {
+                el.addEventListener('click', async () => {
+                    const fid = el.getAttribute('data-id');
+                    closeFriends();
+                    currentPartner = await loadFriendProfile(fid);
+                    if (currentPartner) {
+                        updatePartnerHeader(currentPartner);
+                        startMessagesListener();
+                    }
+                });
+            });
         }
     </script>
 </body>
