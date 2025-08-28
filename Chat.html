@@ -32,6 +32,20 @@
             --accent-color: var(--blue);
         }
 
+        /* Light Mode overrides (match Home.html intent) */
+        body.theme-light-mode {
+            --white: #111;
+            --text-light: #555;
+            --background-color-primary: #f0f2f5;
+            --background-color-secondary: #e6e8ee;
+            --header-background: rgba(255,255,255,0.98);
+            --card-background: rgba(255,255,255,0.95);
+            --border-light: rgba(0,0,0,0.1);
+            --input-background: rgba(0,0,0,0.05);
+            --button-background: linear-gradient(90deg, #6dd5ed, #2193b0);
+            --button-shadow: 0 4px 15px rgba(109,213,237,0.4), 0 4px 15px rgba(33,147,176,0.4);
+        }
+
         body {
             margin: 0;
             padding: 0;
@@ -294,7 +308,9 @@
             } catch {}
         }
 
+        // Apply saved theme or default to light if explicitly set elsewhere
         applySavedTheme();
+        // Reactive theme change across tabs
         window.addEventListener('storage', (e) => {
             if (e.key === 'jchat-theme') applySavedTheme();
         });
