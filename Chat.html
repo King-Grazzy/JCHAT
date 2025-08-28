@@ -337,14 +337,17 @@
         function startPresenceHeartbeat() {
             try {
                 const userDocRef = doc(db, "artifacts", appId, "public", "data", "users", currentUser.uid);
+                const computeOnline = () => navigator.onLine && document.visibilityState === 'visible';
                 const post = async () => {
-                    try { await setDoc(userDocRef, { online: navigator.onLine, lastActive: serverTimestamp() }, { merge: true }); } catch {}
+                    try { await setDoc(userDocRef, { online: computeOnline(), lastActive: serverTimestamp() }, { merge: true }); } catch {}
                 };
                 post();
                 if (heartbeatTimer) clearInterval(heartbeatTimer);
                 heartbeatTimer = setInterval(post, 30000);
                 window.addEventListener('online', post);
                 window.addEventListener('offline', post);
+                document.addEventListener('visibilitychange', post);
+                window.addEventListener('beforeunload', () => { try { navigator.sendBeacon && navigator.sendBeacon('/'); } catch {} post(); });
             } catch {}
         }
 
@@ -378,9 +381,18 @@
                     const partnerDoc = doc(db, "artifacts", appId, "public", "data", "users", currentPartner.id);
                     onSnapshot(partnerDoc, (snap) => {
                         const d = snap.data() || {};
-                        const state = d.online ? 'online' : 'offline';
-                        if (statusDot) statusDot.className = 'status-dot ' + (state === 'online' ? 'status-online' : 'status-offline');
-                        if (statusText) statusText.textContent = state === 'online' ? 'Online' : 'Offline';
+                        const lastMs = d.lastActive?.toMillis ? d.lastActive.toMillis() : (d.lastActive || 0);
+                        const now = Date.now();
+                        let state = 'offline';
+                        if (d.online) state = 'online';
+                        else if (now - lastMs <= 5 * 60 * 1000) state = 'away';
+                        const dotClass = state === 'online' ? 'status-online' : (state === 'away' ? 'status-away' : 'status-offline');
+                        if (statusDot) statusDot.className = 'status-dot ' + dotClass;
+                        if (statusText) {
+                            if (state === 'online') statusText.textContent = 'Online';
+                            else if (state === 'away') statusText.textContent = `Away • ${formatRelativeTime(lastMs)}`;
+                            else statusText.textContent = `Offline • ${formatRelativeTime(lastMs)}`;
+                        }
                         const pill = document.getElementById('partnerStatus');
                         if (pill) pill.className = 'status status-pill' + (state === 'online' ? ' status-pill-online' : '');
                     });
@@ -602,6 +614,15 @@
             return '';
         }
 
+        function formatRelativeTime(tsMs) {
+            if (!tsMs) return 'unknown';
+            const diff = Date.now() - tsMs;
+            if (diff < 60 * 1000) return 'just now';
+            if (diff < 3600 * 1000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 24 * 3600 * 1000) return `${Math.floor(diff / 3600000)}h ago`;
+            return `${Math.floor(diff / 86400000)}d ago`;
+        }
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
@@ -779,11 +800,15 @@
                 const ref = doc(db, "artifacts", appId, "public", "data", "users", friendId);
                 const unsub = onSnapshot(ref, (snap) => {
                     const d = snap.data() || {};
-                    const state = d.online ? 'online' : 'offline';
+                    const lastMs = d.lastActive?.toMillis ? d.lastActive.toMillis() : (d.lastActive || 0);
+                    const now = Date.now();
+                    let state = 'offline';
+                    if (d.online) state = 'online';
+                    else if (now - lastMs <= 5*60*1000) state = 'away';
                     const dot = document.querySelector(`[data-presence-id="${friendId}"]`);
                     const text = document.querySelector(`[data-presence-text-id="${friendId}"]`);
-                    if (dot) dot.className = 'friend-dot ' + (state === 'online' ? 'online' : '');
-                    if (text) text.textContent = state === 'online' ? 'Online' : 'Offline';
+                    if (dot) dot.className = 'friend-dot ' + (state === 'online' ? 'online' : state === 'away' ? 'away' : '');
+                    if (text) text.textContent = state === 'online' ? 'Online' : (state === 'away' ? `Away • ${formatRelativeTime(lastMs)}` : `Offline • ${formatRelativeTime(lastMs)}`);
                 });
                 friendPresenceUnsubs.set(friendId, unsub);
             } catch {}
