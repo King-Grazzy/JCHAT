@@ -522,6 +522,76 @@
             text-overflow: ellipsis;
         }
 
+        /* Online Status Styling */
+        .friend-avatar-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .friend-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex-grow: 1;
+        }
+
+        .friend-username {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-color-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid var(--background-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+        }
+
+        .status-indicator.online {
+            background-color: var(--status-online);
+            color: var(--status-online);
+        }
+
+        .status-indicator.away {
+            background-color: var(--status-away);
+            color: var(--status-away);
+        }
+
+        .status-indicator.offline {
+            background-color: var(--status-offline);
+            color: var(--status-offline);
+        }
+
+        .status-text {
+            font-size: 0.8rem;
+            font-weight: 400;
+        }
+
+        .status-text.online {
+            color: var(--status-online);
+        }
+
+        .status-text.away {
+            color: var(--status-away);
+        }
+
+        .status-text.offline {
+            color: var(--status-offline);
+        }
+
         .friend-actions {
             display: flex;
             gap: 10px;
@@ -1333,10 +1403,60 @@
                     ? `<img src="${getCloudinaryImageUrl(friend.profilePicId, 'w_90,h_90,c_fill,g_face,r_max')}" alt="${friend.username}'s profile picture" onerror="this.onerror=null;this.src='https://placehold.co/45x45/CCCCCC/000000?text=${usernameInitial}';">`
                     : `<div class="default-avatar"><i class="fas fa-user-circle"></i></div>`;
 
+                // Get status indicator
+                const getStatusIndicator = (status) => {
+                    switch (status) {
+                        case 'online':
+                            return '<span class="status-indicator online" title="Online"><i class="fas fa-circle"></i></span>';
+                        case 'away':
+                            return '<span class="status-indicator away" title="Away"><i class="fas fa-circle"></i></span>';
+                        case 'offline':
+                        default:
+                            return '<span class="status-indicator offline" title="Offline"><i class="fas fa-circle"></i></span>';
+                    }
+                };
+
+                // Get status text
+                const getStatusText = (status, lastOnline) => {
+                    switch (status) {
+                        case 'online':
+                            return '<span class="status-text online">Online</span>';
+                        case 'away':
+                            return '<span class="status-text away">Away</span>';
+                        case 'offline':
+                        default:
+                            if (lastOnline && lastOnline.toDate) {
+                                const lastSeenTime = lastOnline.toDate();
+                                const now = new Date();
+                                const timeDiff = now - lastSeenTime;
+                                
+                                if (timeDiff < 60 * 1000) {
+                                    return '<span class="status-text offline">Last seen just now</span>';
+                                } else if (timeDiff < 60 * 60 * 1000) {
+                                    const minutes = Math.floor(timeDiff / (60 * 1000));
+                                    return `<span class="status-text offline">Last seen ${minutes}m ago</span>`;
+                                } else if (timeDiff < 24 * 60 * 60 * 1000) {
+                                    const hours = Math.floor(timeDiff / (60 * 60 * 1000));
+                                    return `<span class="status-text offline">Last seen ${hours}h ago</span>`;
+                                } else {
+                                    const days = Math.floor(timeDiff / (24 * 60 * 60 * 1000));
+                                    return `<span class="status-text offline">Last seen ${days}d ago</span>`;
+                                }
+                            }
+                            return '<span class="status-text offline">Offline</span>';
+                    }
+                };
+
                 friendItem.innerHTML = `
                     <div class="friend-info" data-user-id="${friend.userId}">
-                        ${profilePicHtml}
-                        <span>${friend.username || 'Unknown User'}</span>
+                        <div class="friend-avatar-container">
+                            ${profilePicHtml}
+                            ${getStatusIndicator(friend.onlineStatus)}
+                        </div>
+                        <div class="friend-details">
+                            <span class="friend-username">${friend.username || 'Unknown User'}</span>
+                            ${getStatusText(friend.onlineStatus, friend.lastOnline)}
+                        </div>
                     </div>
                     <div class="friend-actions">
                         <button class="chat-btn" data-user-id="${friend.userId}"><i class="fas fa-comment"></i> Chat</button>
