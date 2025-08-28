@@ -479,8 +479,9 @@
                         const lastMs = d.lastActive?.toMillis ? d.lastActive.toMillis() : (d.lastActive || 0);
                         const now = Date.now();
                         const fresh = now - lastMs <= 60000; // 60s freshness guard
+                        const withinGrace = now - lastMs <= 2 * 60 * 1000; // 2-minute grace before Away
                         let state = 'offline';
-                        if (d.online && fresh) state = 'online';
+                        if ((d.online && fresh) || (!d.online && withinGrace)) state = 'online';
                         else if (now - lastMs <= 5 * 60 * 1000) state = 'away';
                         const dotClass = state === 'online' ? 'status-online' : (state === 'away' ? 'status-away' : 'status-offline');
                         if (statusDot) statusDot.className = 'status-dot ' + dotClass;
@@ -1310,8 +1311,9 @@
                     const lastMs = d.lastActive?.toMillis ? d.lastActive.toMillis() : (d.lastActive || 0);
                     const now = Date.now();
                     const fresh = now - lastMs <= 60000; // 60s freshness guard
+                    const withinGrace = now - lastMs <= 2*60*1000; // 2-minute grace
                     let state = 'offline';
-                    if (d.online && fresh) state = 'online';
+                    if ((d.online && fresh) || (!d.online && withinGrace)) state = 'online';
                     else if (now - lastMs <= 5*60*1000) state = 'away';
                     friendPresenceCache.set(friendId, { state, lastMs });
                     const dot = document.querySelector(`[data-presence-id="${friendId}"]`);
