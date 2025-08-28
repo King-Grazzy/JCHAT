@@ -1481,12 +1481,7 @@
             uploadPreset: "Storage_preset" // Your Cloudinary Upload Preset
         };
 
-        // Cloudinary Image URL Builder (EXACT same as Find_Friends.html)
-        function getCloudinaryImageUrl(publicId, transformations = "") {
-            if (!publicId) return null;
-            const baseUrl = `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/`;
-            return transformations ? `${baseUrl}${transformations}/${publicId}` : `${baseUrl}${publicId}`;
-        }
+
 
         // Initialize Firebase services
         const app = initializeApp(firebaseConfig);
@@ -1951,11 +1946,12 @@
                         if (userDoc.exists()) {
                             const userData = userDoc.data();
                             
-                            // Build profile picture URL (EXACT same logic as Find_Friends.html)
+                            // Build profile picture URL (simplified approach)
                             const profilePicId = userData.profilePicId || null;
                             let profilePictureUrl = null;
                             if (profilePicId && userData.visibility?.profilePic !== false) {
-                                profilePictureUrl = getCloudinaryImageUrl(profilePicId, "w_120,h_120,c_fill,g_face,r_max");
+                                // Build Cloudinary URL directly (same as Find_Friends.html approach)
+                                profilePictureUrl = `https://res.cloudinary.com/dxld01rcp/image/upload/w_120,h_120,c_fill,g_face,r_max/${profilePicId}`;
                             }
                             
                             profiles.push({
