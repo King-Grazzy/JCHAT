@@ -1,59 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <!-- Last updated: 2025-08-21T18:19:29Z -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JCHAT - Welcome & Account Access</title>
-
-    <!-- Google Fonts: Poppins for headings, Inter for body text -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Preconnect to Firebase domains for faster loading -->
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://*.firebaseio.com" crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-
-    <style>
-        /* Universal box-sizing for consistent layout */
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
-        /* Global CSS Variables (consistent with admin_groups.html) */
-        :root {
-            --pink: #e03a8c; /* Adjusted to match admin_groups.html */
-            --blue: #00b8e0; /* Adjusted to match admin_groups.html */
-            --gradient-main: linear-gradient(90deg, var(--blue), var(--pink));
-
-            --glass-base: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --radius: 16px; /* Adjusted to match admin_groups.html */
-            --transition: 0.4s ease; /* Adjusted to match admin_groups.html */
-
-            --white: #f0f0f0;
-            --text-light: #b0b0b0;
-
-            --background-main: #1a1a2e;
-            --background-gradient-1: rgba(0, 184, 224, 0.08); /* Adjusted to match admin_groups.html */
-            --background-gradient-2: rgba(224, 58, 140, 0.08); /* Adjusted to match admin_groups.html */
-            --card-background: rgba(25, 25, 40, 0.6);
-            --input-background: rgba(255, 255, 255, 0.08);
-            --button-background-gradient: linear-gradient(90deg, var(--blue), var(--pink));
-            --button-shadow: 0 6px 20px rgba(0, 184, 224, 0.25), 0 6px 20px rgba(224, 58, 140, 0.25);
-            --border-color: rgba(255, 255, 255, 0.08);
-
-            --success-color: #28a745;
-            --success-color-dark: #1e7e34;
-            --success-color-light: #34ce57;
-        }
-    </style>
+    <title>Login</title>
 </head>
 <body>
-    <!-- Your body content goes here -->
+    <h1>Login Page</h1>
+    <form>
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
 </body>
 </html>
