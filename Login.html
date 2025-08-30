@@ -30,13 +30,32 @@
         }
 
         .login-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 
+                0 32px 64px rgba(0, 0, 0, 0.15),
+                0 16px 32px rgba(236, 72, 153, 0.1),
+                0 8px 16px rgba(79, 70, 229, 0.1);
             overflow: hidden;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(236, 72, 153, 0.05) 0%, 
+                rgba(79, 70, 229, 0.05) 50%, 
+                rgba(6, 182, 212, 0.05) 100%);
+            z-index: -1;
         }
 
         .login-header {
@@ -130,27 +149,41 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
             font-size: 14px;
+            letter-spacing: 0.5px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
+            padding: 16px 20px;
+            border: 2px solid rgba(236, 72, 153, 0.2);
+            border-radius: 12px;
             font-size: 16px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            position: relative;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #ec4899;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 
+                0 0 0 4px rgba(236, 72, 153, 0.1),
+                0 8px 25px rgba(79, 70, 229, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .form-group input:hover {
+            border-color: rgba(79, 70, 229, 0.4);
+            background: rgba(255, 255, 255, 0.9);
         }
 
         .form-group input::placeholder {
@@ -249,10 +282,10 @@
 
         .divider {
             text-align: center;
-            margin: 25px 0;
+            margin: 30px 0;
             position: relative;
-            color: #a0a0a0;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .divider::before {
@@ -261,16 +294,25 @@
             top: 50%;
             left: 0;
             right: 0;
-            height: 1px;
-            background: #e1e5e9;
+            height: 2px;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 50%, #06b6d4 100%);
+            border-radius: 1px;
             z-index: 1;
+            opacity: 0.3;
         }
 
         .divider span {
-            background: white;
-            padding: 0 15px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 8px 20px;
             position: relative;
             z-index: 2;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
         }
 
         .social-login {
@@ -283,19 +325,20 @@
             flex: 1;
             padding: 15px;
             border: 2px solid transparent;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            font-size: 14px;
-            font-weight: 500;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 600;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .social-btn::before {
@@ -305,8 +348,8 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.5s ease;
+            background: linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.2), rgba(79, 70, 229, 0.2), transparent);
+            transition: left 0.6s ease;
         }
 
         .social-btn:hover::before {
@@ -314,54 +357,166 @@
         }
 
         .social-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(31, 41, 55, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 
+                0 15px 35px rgba(236, 72, 153, 0.3),
+                0 5px 15px rgba(79, 70, 229, 0.2);
             border-color: #ec4899;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+        }
+
+        .social-btn.loading {
+            pointer-events: none;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+            box-shadow: 
+                0 0 20px rgba(236, 72, 153, 0.6),
+                0 0 40px rgba(79, 70, 229, 0.4),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
         .github-icon {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             fill: currentColor;
+            transition: all 0.3s ease;
+        }
+
+        .github-spinner {
+            width: 22px;
+            height: 22px;
+            border: 2px solid transparent;
+            border-top: 2px solid #ffffff;
+            border-right: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            animation: githubSpin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes githubSpin {
+            0% { 
+                transform: rotate(0deg);
+                box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+            }
+            50% { 
+                box-shadow: 0 0 20px rgba(79, 70, 229, 0.7);
+            }
+            100% { 
+                transform: rotate(360deg);
+                box-shadow: 0 0 10px rgba(236, 72, 153, 0.5);
+            }
+        }
+
+        .social-btn.loading .github-icon {
+            display: none;
+        }
+
+        .social-btn.loading .github-spinner {
+            display: block;
         }
 
         .signup-link {
             text-align: center;
-            color: #666;
+            color: #6b7280;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .signup-link a {
-            color: #667eea;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 700;
+            position: relative;
+            transition: all 0.3s ease;
         }
 
         .signup-link a:hover {
-            color: #764ba2;
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scale(1.05);
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .forgot-password {
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scale(1.05);
         }
 
         .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 12px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+            padding: 14px 18px;
+            border-radius: 12px;
             margin-bottom: 20px;
             font-size: 14px;
+            font-weight: 500;
             display: none;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .error-message::before {
+            content: '⚠';
+            margin-right: 8px;
+            font-size: 16px;
         }
 
         /* Signup mode styles */
         .login-container.signup-mode .login-header {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: geminiSignupGradient 8s ease infinite;
+        }
+
+        @keyframes geminiSignupGradient {
+            0% { background-position: 0% 50%; }
+            33% { background-position: 100% 0%; }
+            66% { background-position: 0% 100%; }
+            100% { background-position: 0% 50%; }
         }
 
         .login-container.signup-mode .login-btn {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: geminiSignupButtonGradient 6s ease infinite;
+        }
+
+        @keyframes geminiSignupButtonGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .login-container.signup-mode .login-btn:hover {
-            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+            box-shadow: 
+                0 15px 35px rgba(6, 182, 212, 0.3),
+                0 5px 15px rgba(139, 92, 246, 0.2),
+                0 0 30px rgba(236, 72, 153, 0.2);
         }
 
         /* Loading state */
@@ -593,9 +748,90 @@
         /* Enhanced textarea styling */
         textarea:focus {
             outline: none !important;
-            border-color: #667eea !important;
-            background: white !important;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+            border-color: #ec4899 !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 
+                0 0 0 4px rgba(236, 72, 153, 0.1) !important,
+                0 8px 25px rgba(79, 70, 229, 0.15) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        /* Floating particles */
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 8s linear infinite;
+        }
+
+        .particle.pink {
+            background: #ec4899;
+            box-shadow: 0 0 10px #ec4899;
+        }
+
+        .particle.blue {
+            background: #4f46e5;
+            box-shadow: 0 0 10px #4f46e5;
+        }
+
+        .particle.cyan {
+            background: #06b6d4;
+            box-shadow: 0 0 10px #06b6d4;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-10vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Gemini-style input focus glow */
+        .form-group input:focus,
+        textarea:focus {
+            position: relative;
+        }
+
+        .form-group input:focus::after,
+        textarea:focus::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #ec4899, #4f46e5, #06b6d4);
+            border-radius: 14px;
+            z-index: -1;
+            opacity: 0.3;
+            animation: inputGlow 2s ease infinite;
+        }
+
+        @keyframes inputGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
         }
 
         @media (max-width: 480px) {
@@ -614,6 +850,9 @@
     </style>
 </head>
 <body>
+    <!-- Floating Particles -->
+    <div class="floating-particles" id="floatingParticles"></div>
+
     <div class="login-container">
         <div class="login-header">
             <div class="jchat-title">JCHAT</div>
@@ -722,11 +961,12 @@
             </div>
             
             <div class="social-login">
-                <button type="button" class="social-btn" onclick="loginWithGithub()" style="width: 100%;">
+                <button type="button" class="social-btn" id="githubBtn" onclick="loginWithGithub()" style="width: 100%;">
                     <svg class="github-icon" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.30.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                     </svg>
-                    Continue with GitHub
+                    <div class="github-spinner"></div>
+                    <span class="github-text">Continue with GitHub</span>
                 </button>
             </div>
             
@@ -830,6 +1070,13 @@
 
 
         window.loginWithGithub = function() {
+            // Show GitHub button loading state
+            const githubBtn = document.getElementById('githubBtn');
+            const githubText = document.querySelector('.github-text');
+            
+            githubBtn.classList.add('loading');
+            githubText.textContent = 'Connecting to GitHub...';
+            
             // Generate a random state parameter for security
             const state = generateRandomString(32);
             localStorage.setItem('github_oauth_state', state);
@@ -839,10 +1086,11 @@
             const redirectUri = encodeURIComponent(window.location.origin + '/auth/github/callback.html');
             const scope = 'user:email';
             
-            // Redirect to GitHub OAuth
-            const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
-            
-            window.location.href = githubAuthUrl;
+            // Redirect to GitHub OAuth after a brief delay to show the animation
+            setTimeout(() => {
+                const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+                window.location.href = githubAuthUrl;
+            }, 800);
         };
 
         window.goToSignup = function() {
@@ -1423,14 +1671,57 @@
             }
         };
 
+        // Create floating particles
+        function createFloatingParticles() {
+            const particleContainer = document.getElementById('floatingParticles');
+            const colors = ['pink', 'blue', 'cyan'];
+            
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = `particle ${colors[Math.floor(Math.random() * colors.length)]}`;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                particleContainer.appendChild(particle);
+            }
+        }
+
+        // Add Gemini-style hover effects
+        function addGeminiEffects() {
+            const container = document.querySelector('.login-container');
+            
+            container.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02) translateY(-5px)';
+                this.style.boxShadow = `
+                    0 40px 80px rgba(0, 0, 0, 0.2),
+                    0 20px 40px rgba(236, 72, 153, 0.15),
+                    0 10px 20px rgba(79, 70, 229, 0.15)`;
+            });
+            
+            container.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) translateY(0)';
+                this.style.boxShadow = `
+                    0 32px 64px rgba(0, 0, 0, 0.15),
+                    0 16px 32px rgba(236, 72, 153, 0.1),
+                    0 8px 16px rgba(79, 70, 229, 0.1)`;
+            });
+        }
+
         // Add some interactive effects
         document.addEventListener('DOMContentLoaded', function() {
+            // Create floating particles
+            createFloatingParticles();
+            
+            // Add Gemini hover effects
+            addGeminiEffects();
+            
             // Add focus effects to inputs
             const inputs = document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"], textarea');
             
             inputs.forEach(input => {
                 input.addEventListener('focus', function() {
                     this.parentElement.style.transform = 'translateY(-2px)';
+                    this.parentElement.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
                 });
                 
                 input.addEventListener('blur', function() {
