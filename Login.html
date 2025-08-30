@@ -325,10 +325,7 @@
             </div>
             
             <div class="social-login">
-                <button type="button" class="social-btn" onclick="loginWithGoogle()">
-                    🔍 Google
-                </button>
-                <button type="button" class="social-btn" onclick="loginWithGithub()">
+                <button type="button" class="social-btn" onclick="loginWithGithub()" style="width: 100%;">
                     🐙 GitHub
                 </button>
             </div>
@@ -343,7 +340,7 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
@@ -361,14 +358,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const googleProvider = new GoogleAuthProvider();
-
-        // Configure Google provider
-        googleProvider.addScope('profile');
-        googleProvider.addScope('email');
-        googleProvider.setCustomParameters({
-            prompt: 'select_account'
-        });
 
         // Check for OAuth callback parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -397,29 +386,7 @@
             }
         };
 
-        window.loginWithGoogle = async function() {
-            try {
-                showLoading('Signing in with Google...');
-                const result = await signInWithPopup(auth, googleProvider);
-                const user = result.user;
-                
-                // Save user data to Firestore
-                await saveUserData(user, 'google');
-                
-                hideLoading();
-                showSuccess('Successfully signed in with Google!');
-                
-                // Redirect to home page
-                setTimeout(() => {
-                    window.location.href = '/Home.html';
-                }, 1500);
-                
-            } catch (error) {
-                hideLoading();
-                console.error('Google login error:', error);
-                showError('Failed to sign in with Google. Please try again.');
-            }
-        };
+
 
         window.loginWithGithub = function() {
             // Generate a random state parameter for security
