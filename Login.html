@@ -72,10 +72,46 @@
             50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
+        .jchat-title {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 
+                0 1px 0 #ec4899,
+                0 2px 0 #4f46e5,
+                0 3px 0 #06b6d4,
+                0 4px 0 rgba(236, 72, 153, 0.8),
+                0 5px 0 rgba(79, 70, 229, 0.6),
+                0 6px 0 rgba(6, 182, 212, 0.4),
+                0 7px 10px rgba(0, 0, 0, 0.3);
+            transform: perspective(500px) rotateX(15deg);
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+            animation: jchatGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes jchatGlow {
+            0% { 
+                filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.5));
+                transform: perspective(500px) rotateX(15deg) translateY(0px);
+            }
+            100% { 
+                filter: drop-shadow(0 0 20px rgba(79, 70, 229, 0.7));
+                transform: perspective(500px) rotateX(15deg) translateY(-2px);
+            }
+        }
+
         .login-header h1 {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 300;
             margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
         }
 
         .login-header p {
@@ -523,6 +559,45 @@
             transform: translateY(-1px);
         }
 
+        /* Signup form enhancements */
+        .signup-only {
+            transition: all 0.3s ease;
+        }
+
+        .username-feedback {
+            font-size: 12px;
+            margin-top: 5px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .username-feedback.available {
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            color: white;
+            display: block;
+        }
+
+        .username-feedback.taken {
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            color: white;
+            display: block;
+        }
+
+        .username-feedback.checking {
+            background: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+            color: white;
+            display: block;
+        }
+
+        /* Enhanced textarea styling */
+        textarea:focus {
+            outline: none !important;
+            border-color: #667eea !important;
+            background: white !important;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+        }
+
         @media (max-width: 480px) {
             .login-container {
                 margin: 10px;
@@ -541,6 +616,7 @@
 <body>
     <div class="login-container">
         <div class="login-header">
+            <div class="jchat-title">JCHAT</div>
             <h1>Welcome Back</h1>
             <p>Please sign in to your account</p>
         </div>
@@ -550,6 +626,28 @@
                 Invalid email or password. Please try again.
             </div>
             
+            <!-- Signup-only fields -->
+            <div class="form-group signup-only" style="display: none;">
+                <label for="fullName">Full Name</label>
+                <input 
+                    type="text" 
+                    id="fullName" 
+                    name="fullName" 
+                    placeholder="Enter your full name"
+                >
+            </div>
+
+            <div class="form-group signup-only" style="display: none;">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Choose a unique username"
+                >
+                <div class="username-feedback" id="usernameFeedback"></div>
+            </div>
+
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input 
@@ -573,6 +671,38 @@
                 <button type="button" class="password-toggle" onclick="togglePassword()">
                     👁️
                 </button>
+            </div>
+
+            <!-- Signup-only fields continued -->
+            <div class="form-group signup-only" style="display: none;">
+                <label for="confirmPassword">Confirm Password</label>
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    name="confirmPassword" 
+                    placeholder="Confirm your password"
+                >
+            </div>
+
+            <div class="form-group signup-only" style="display: none;">
+                <label for="bio">Bio (Optional)</label>
+                <textarea 
+                    id="bio" 
+                    name="bio" 
+                    placeholder="Tell us about yourself..."
+                    rows="3"
+                    style="resize: vertical; font-family: inherit; padding: 15px 20px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 16px; background: #f8f9fa; transition: all 0.3s ease;"
+                ></textarea>
+            </div>
+
+            <div class="form-group signup-only" style="display: none;">
+                <label for="location">Location (Optional)</label>
+                <input 
+                    type="text" 
+                    id="location" 
+                    name="location" 
+                    placeholder="Enter your location"
+                >
             </div>
             
             <div class="remember-forgot">
@@ -651,8 +781,8 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken, sendPasswordResetEmail, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
@@ -858,17 +988,78 @@
 
         // Sign up user
         async function signUpUser(email, password) {
+            // Get additional signup fields
+            const fullName = document.getElementById('fullName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const bio = document.getElementById('bio').value.trim();
+            const location = document.getElementById('location').value.trim();
+            
+            // Enhanced validation for signup
+            if (!fullName) {
+                showErrorModal('Please enter your full name.');
+                return;
+            }
+            
+            if (!username) {
+                showErrorModal('Please choose a username.');
+                return;
+            }
+            
+            if (username.length < 3) {
+                showErrorModal('Username must be at least 3 characters long.');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showErrorModal('Passwords do not match. Please check and try again.');
+                return;
+            }
+            
+            // Check username availability
+            if (!(await checkUsernameAvailability(username))) {
+                showErrorModal('This username is already taken. Please choose a different one.');
+                return;
+            }
+            
             showSmartLoader('Creating Account', 'Setting up your JCHAT profile...');
             
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                // Save user data to Firestore
-                await saveUserData(user, 'email');
+                // Update Firebase Auth profile with display name
+                await updateProfile(user, {
+                    displayName: fullName
+                });
+                
+                // Save comprehensive user data to Firestore
+                const userData = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: fullName,
+                    username: username,
+                    fullName: fullName,
+                    bio: bio || '',
+                    location: location || '',
+                    provider: 'email',
+                    createdAt: serverTimestamp(),
+                    lastLogin: serverTimestamp(),
+                    isNewUser: true,
+                    profileCompletion: calculateInitialCompletion(fullName, username, bio, location),
+                    // Profile visibility settings
+                    visibility: {
+                        email: false,
+                        location: !!location,
+                        bio: !!bio,
+                        fullName: true
+                    }
+                };
+                
+                await saveUserData(user, 'email', userData);
                 
                 hideSmartLoader();
-                showSuccessModal('Account created successfully! Welcome to JCHAT!', () => {
+                showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully.`, () => {
                     window.location.href = '/Home.html';
                 });
                 
@@ -1072,6 +1263,7 @@
             const submitBtn = document.querySelector('.login-btn');
             const signupLink = document.querySelector('.signup-link');
             const rememberForgot = document.querySelector('.remember-forgot');
+            const signupOnlyFields = document.querySelectorAll('.signup-only');
             
             if (container.classList.contains('signup-mode')) {
                 // Switch to login mode
@@ -1081,6 +1273,11 @@
                 submitBtn.textContent = 'Sign In';
                 signupLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="goToSignup()">Sign up here</a>';
                 rememberForgot.style.display = 'flex';
+                
+                // Hide signup-only fields
+                signupOnlyFields.forEach(field => {
+                    field.style.display = 'none';
+                });
             } else {
                 // Switch to signup mode
                 container.classList.add('signup-mode');
@@ -1089,6 +1286,11 @@
                 submitBtn.textContent = 'Create Account';
                 signupLink.innerHTML = 'Already have an account? <a href="#" onclick="goToSignup()">Sign in here</a>';
                 rememberForgot.style.display = 'none';
+                
+                // Show signup-only fields
+                signupOnlyFields.forEach(field => {
+                    field.style.display = 'block';
+                });
             }
             
             hideError();
@@ -1102,6 +1304,70 @@
                 window.location.href = '/Home.html';
             }
         });
+
+        // Username availability checking
+        async function checkUsernameAvailability(username) {
+            try {
+                // Check if username is taken by querying Firestore
+                const usernameQuery = query(
+                    collection(db, 'users'),
+                    where('username', '==', username.toLowerCase())
+                );
+                const querySnapshot = await getDocs(usernameQuery);
+                return querySnapshot.empty;
+            } catch (error) {
+                console.error('Error checking username:', error);
+                return false;
+            }
+        }
+
+        // Real-time username validation
+        function setupUsernameValidation() {
+            const usernameInput = document.getElementById('username');
+            const feedback = document.getElementById('usernameFeedback');
+            let timeoutId;
+            
+            usernameInput.addEventListener('input', function() {
+                const username = this.value.trim();
+                
+                clearTimeout(timeoutId);
+                
+                if (username.length === 0) {
+                    feedback.className = 'username-feedback';
+                    return;
+                }
+                
+                if (username.length < 3) {
+                    feedback.className = 'username-feedback taken';
+                    feedback.textContent = 'Username must be at least 3 characters';
+                    return;
+                }
+                
+                feedback.className = 'username-feedback checking';
+                feedback.textContent = 'Checking availability...';
+                
+                timeoutId = setTimeout(async () => {
+                    const isAvailable = await checkUsernameAvailability(username);
+                    if (isAvailable) {
+                        feedback.className = 'username-feedback available';
+                        feedback.textContent = '✓ Username is available';
+                    } else {
+                        feedback.className = 'username-feedback taken';
+                        feedback.textContent = '✗ Username is already taken';
+                    }
+                }, 500);
+            });
+        }
+
+        // Calculate initial profile completion
+        function calculateInitialCompletion(fullName, username, bio, location) {
+            let completion = 0;
+            if (fullName) completion += 25;
+            if (username) completion += 25;
+            if (bio) completion += 25;
+            if (location) completion += 25;
+            return completion;
+        }
 
         // Reset Password Functions
         window.showResetPasswordModal = function() {
@@ -1160,7 +1426,7 @@
         // Add some interactive effects
         document.addEventListener('DOMContentLoaded', function() {
             // Add focus effects to inputs
-            const inputs = document.querySelectorAll('input[type="email"], input[type="password"]');
+            const inputs = document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"], textarea');
             
             inputs.forEach(input => {
                 input.addEventListener('focus', function() {
@@ -1171,6 +1437,9 @@
                     this.parentElement.style.transform = 'translateY(0)';
                 });
             });
+
+            // Setup username validation
+            setupUsernameValidation();
 
             // Close modals when clicking outside
             document.addEventListener('click', function(e) {
