@@ -4,24 +4,24 @@
     <!-- Last updated: 2025-08-21T18:19:29Z -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>JCHAT - Home</title>
+    <title>Termux King-Grazzy - Home</title>
     <link rel="canonical" href="https://jchat.app/Home.html">
     <link rel="manifest" href="/manifest.webmanifest">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="https://placehold.co/192x192/1a1a2e/ffffff?text=J">
-    <meta name="apple-mobile-web-app-title" content="JCHAT">
+    <meta name="apple-mobile-web-app-title" content="Termux King-Grazzy">
     
     <!-- Security Meta Tags -->
     <meta name="referrer" content="strict-origin-when-cross-origin">
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="JCHAT - Modern social chat platform with levels, JCoins, and community features">
+    <meta name="description" content="Termux King-Grazzy - Modern social chat platform with levels, JCoins, and community features">
     <meta name="keywords" content="chat, social, messaging, community, levels, gaming">
     <meta name="author" content="JCHAT Team">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#1a1a2e">
-    <meta property="og:title" content="JCHAT - Home">
+    <meta property="og:title" content="Termux King-Grazzy - Home">
     <meta property="og:description" content="Modern social chat platform with levels, JCoins, and community features">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://placehold.co/1200x630/1a1a2e/ffffff?text=JCHAT">
@@ -1133,13 +1133,13 @@
         header {
             background: var(--header-background);
             border-bottom: 1px solid var(--border-light);
-            padding: 10px 0;
+            padding: 15px 0;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 55px;
+            height: 80px;
             z-index: 10;
             display: flex;
             justify-content: center;
@@ -1676,7 +1676,7 @@
         main {
             flex-grow: 1;
             padding: 40px 0;
-            padding-top: 55px; /* Back to original header spacing */
+            padding-top: 100px; /* Updated for larger header */
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -3591,6 +3591,28 @@
                 gap: 16px;
             }
             
+            /* Responsive header adjustments */
+            header {
+                height: 70px;
+                padding: 10px 0;
+            }
+            
+            .logo span {
+                font-size: 1.8rem !important;
+            }
+            
+            .logo i {
+                font-size: 1.5rem !important;
+            }
+            
+            main {
+                padding-top: 85px !important;
+            }
+            
+            header .header-content-wrapper {
+                padding: 0 15px;
+            }
+            
             .global-announcements-section {
                 width: 95%;
                 padding: 1rem;
@@ -3676,7 +3698,7 @@
                 <div class="particle"></div>
                 <div class="particle"></div>
             </div>
-            <div class="loader-text">JCHAT</div>
+            <div class="loader-text">Termux King-Grazzy</div>
             <div class="loader-subtext">
                 Loading your experience
                 <span class="loader-dots">
@@ -3695,7 +3717,8 @@
                 <i class="fas fa-bars"></i>
             </button>
             <a href="/Home.html" class="logo" style="display:flex;align-items:center;gap:10px">
-                <span>JCHAT</span>
+                <i class="fas fa-folder" style="font-size: 2rem; color: var(--blue);"></i>
+                <span style="font-size: 2.5rem; font-weight: bold; background: linear-gradient(135deg, var(--blue), var(--pink)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">Termux King-Grazzy</span>
             </a>
             <!-- Removed Header Navigation (Home, Profile) -->
             <div class="user-profile-header" style="display:flex;align-items:center;gap:10px;">
@@ -4169,7 +4192,7 @@
     <!-- Sidebar Navigation -->
     <aside id="sidebarNav" class="sidebar-hidden" role="navigation" aria-label="Main Navigation">
         <div class="sidebar-header">
-            <span class="sidebar-title">JCHAT Menu</span>
+            <span class="sidebar-title">Termux King-Grazzy Menu</span>
             <button id="sidebarCloseBtn" aria-label="Close Menu">
                 <i class="fas fa-times"></i>
             </button>
