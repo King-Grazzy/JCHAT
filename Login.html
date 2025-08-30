@@ -231,6 +231,31 @@
             display: none;
         }
 
+        /* Signup mode styles */
+        .login-container.signup-mode .login-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .login-container.signup-mode .login-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .login-container.signup-mode .login-btn:hover {
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Loading state */
+        .login-btn:disabled {
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Success message styling */
+        .error-message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
         @media (max-width: 480px) {
             .login-container {
                 margin: 10px;
@@ -314,9 +339,52 @@
         </form>
     </div>
 
-    <script>
-        // Toggle password visibility
-        function togglePassword() {
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+        // Firebase configuration (using your existing config)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebasestorage.app",
+            messagingSenderId: "328479683167",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Configure Google provider
+        googleProvider.addScope('profile');
+        googleProvider.addScope('email');
+        googleProvider.setCustomParameters({
+            prompt: 'select_account'
+        });
+
+        // Check for OAuth callback parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const githubCode = urlParams.get('code');
+        const githubState = urlParams.get('state');
+        const authError = urlParams.get('error');
+
+        // Handle GitHub OAuth callback
+        if (githubCode && githubState) {
+            handleGitHubCallback(githubCode, githubState);
+        } else if (authError) {
+            showError(`Authentication error: ${authError}`);
+        }
+
+        // Make functions globally available
+        window.togglePassword = function() {
             const passwordInput = document.getElementById('password');
             const toggleBtn = document.querySelector('.password-toggle');
             
@@ -327,15 +395,161 @@
                 passwordInput.type = 'password';
                 toggleBtn.textContent = '👁️';
             }
+        };
+
+        window.loginWithGoogle = async function() {
+            try {
+                showLoading('Signing in with Google...');
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                
+                // Save user data to Firestore
+                await saveUserData(user, 'google');
+                
+                hideLoading();
+                showSuccess('Successfully signed in with Google!');
+                
+                // Redirect to home page
+                setTimeout(() => {
+                    window.location.href = '/Home.html';
+                }, 1500);
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Google login error:', error);
+                showError('Failed to sign in with Google. Please try again.');
+            }
+        };
+
+        window.loginWithGithub = function() {
+            // Generate a random state parameter for security
+            const state = generateRandomString(32);
+            localStorage.setItem('github_oauth_state', state);
+            
+            // GitHub OAuth configuration
+            const githubClientId = 'Ov23liHpMKo1Rz3s6TIu'; // Your GitHub OAuth app client ID
+            const redirectUri = encodeURIComponent(window.location.origin + '/auth/github/callback.html');
+            const scope = 'user:email';
+            
+            // Redirect to GitHub OAuth
+            const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${githubClientId}&redirect_uri=${redirectUri}&scope=${scope}&state=${state}`;
+            
+            window.location.href = githubAuthUrl;
+        };
+
+        window.goToSignup = function() {
+            // Toggle to signup mode
+            toggleSignupMode();
+        };
+
+        // Handle GitHub OAuth callback
+        async function handleGitHubCallback(code, state) {
+            try {
+                showLoading('Processing GitHub authentication...');
+                
+                // Verify state parameter
+                const savedState = localStorage.getItem('github_oauth_state');
+                if (state !== savedState) {
+                    throw new Error('Invalid state parameter');
+                }
+                
+                // Exchange code for access token (this would typically be done on your backend)
+                const response = await fetch('/api/auth/github/callback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code, state })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to authenticate with GitHub');
+                }
+                
+                const data = await response.json();
+                
+                // Create a custom token for Firebase (this would come from your backend)
+                if (data.firebaseToken) {
+                    const userCredential = await signInWithCustomToken(auth, data.firebaseToken);
+                    const user = userCredential.user;
+                    
+                    // Save user data
+                    await saveUserData(user, 'github', data.githubUser);
+                    
+                    hideLoading();
+                    showSuccess('Successfully signed in with GitHub!');
+                    
+                    // Redirect to home
+                    setTimeout(() => {
+                        window.location.href = '/Home.html';
+                    }, 1500);
+                }
+                
+                // Clean up
+                localStorage.removeItem('github_oauth_state');
+                
+            } catch (error) {
+                hideLoading();
+                console.error('GitHub authentication error:', error);
+                showError('Failed to authenticate with GitHub. Please try again.');
+                
+                // Clean up
+                localStorage.removeItem('github_oauth_state');
+            }
+        }
+
+        // Save user data to Firestore
+        async function saveUserData(user, provider, additionalData = {}) {
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userRef);
+                
+                const userData = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                    provider: provider,
+                    lastLogin: serverTimestamp(),
+                    ...additionalData
+                };
+                
+                if (!userDoc.exists()) {
+                    // New user
+                    userData.createdAt = serverTimestamp();
+                    userData.isNewUser = true;
+                    await setDoc(userRef, userData);
+                } else {
+                    // Existing user
+                    await updateDoc(userRef, {
+                        lastLogin: serverTimestamp(),
+                        provider: provider
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error saving user data:', error);
+            }
+        }
+
+        // Generate random string for OAuth state
+        function generateRandomString(length) {
+            const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += charset.charAt(Math.floor(Math.random() * charset.length));
+            }
+            return result;
         }
 
         // Handle form submission
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const remember = document.getElementById('remember').checked;
+            const isSignupMode = document.querySelector('.login-container').classList.contains('signup-mode');
             
             // Basic validation
             if (!email || !password) {
@@ -348,12 +562,105 @@
                 return;
             }
             
-            // Hide error message
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters long.');
+                return;
+            }
+            
             hideError();
             
-            // Simulate login process
-            loginUser(email, password, remember);
+            try {
+                if (isSignupMode) {
+                    await signUpUser(email, password);
+                } else {
+                    await loginUser(email, password, remember);
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showError(error.message || 'Authentication failed. Please try again.');
+            }
         });
+
+        // Sign up user
+        async function signUpUser(email, password) {
+            showLoading('Creating your account...');
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Save user data to Firestore
+                await saveUserData(user, 'email');
+                
+                hideLoading();
+                showSuccess('Account created successfully! Welcome to JCHAT!');
+                
+                // Redirect to home
+                setTimeout(() => {
+                    window.location.href = '/Home.html';
+                }, 1500);
+                
+            } catch (error) {
+                hideLoading();
+                let errorMessage = 'Failed to create account. Please try again.';
+                
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'An account with this email already exists.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak. Please choose a stronger password.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                }
+                
+                showError(errorMessage);
+            }
+        }
+
+        // Login user
+        async function loginUser(email, password, remember) {
+            showLoading('Signing you in...');
+            
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Update last login
+                await saveUserData(user, 'email');
+                
+                hideLoading();
+                showSuccess('Successfully signed in! Welcome back!');
+                
+                // Redirect to home
+                setTimeout(() => {
+                    window.location.href = '/Home.html';
+                }, 1500);
+                
+            } catch (error) {
+                hideLoading();
+                let errorMessage = 'Invalid email or password.';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Incorrect password.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed attempts. Please try again later.';
+                        break;
+                }
+                
+                showError(errorMessage);
+            }
+        }
 
         // Email validation
         function isValidEmail(email) {
@@ -364,6 +671,7 @@
         // Show error message
         function showError(message) {
             const errorDiv = document.getElementById('errorMessage');
+            resetErrorStyles();
             errorDiv.textContent = message;
             errorDiv.style.display = 'block';
         }
@@ -374,47 +682,79 @@
             errorDiv.style.display = 'none';
         }
 
-        // Simulate login process
-        function loginUser(email, password, remember) {
-            // Show loading state
+        // Show loading state
+        function showLoading(message) {
             const loginBtn = document.querySelector('.login-btn');
-            const originalText = loginBtn.textContent;
-            loginBtn.textContent = 'Signing in...';
+            loginBtn.textContent = message;
             loginBtn.disabled = true;
+            loginBtn.style.opacity = '0.7';
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            const loginBtn = document.querySelector('.login-btn');
+            const isSignupMode = document.querySelector('.login-container').classList.contains('signup-mode');
+            loginBtn.textContent = isSignupMode ? 'Create Account' : 'Sign In';
+            loginBtn.disabled = false;
+            loginBtn.style.opacity = '1';
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.background = '#d4edda';
+            errorDiv.style.color = '#155724';
+            errorDiv.style.border = '1px solid #c3e6cb';
+            errorDiv.style.display = 'block';
+        }
+
+        // Reset error message styles
+        function resetErrorStyles() {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.background = '#fee';
+            errorDiv.style.color = '#c33';
+            errorDiv.style.border = 'none';
+        }
+
+        // Toggle between login and signup modes
+        function toggleSignupMode() {
+            const container = document.querySelector('.login-container');
+            const header = document.querySelector('.login-header h1');
+            const subtitle = document.querySelector('.login-header p');
+            const submitBtn = document.querySelector('.login-btn');
+            const signupLink = document.querySelector('.signup-link');
+            const rememberForgot = document.querySelector('.remember-forgot');
             
-            // Simulate API call
-            setTimeout(() => {
-                // Reset button
-                loginBtn.textContent = originalText;
-                loginBtn.disabled = false;
-                
-                // For demo purposes, show success or error
-                if (email === 'demo@example.com' && password === 'demo123') {
-                    alert('Login successful! Welcome back.');
-                    // In a real app, redirect to dashboard
-                    // window.location.href = '/dashboard';
-                } else {
-                    showError('Invalid email or password. Try demo@example.com / demo123');
-                }
-            }, 1500);
+            if (container.classList.contains('signup-mode')) {
+                // Switch to login mode
+                container.classList.remove('signup-mode');
+                header.textContent = 'Welcome Back';
+                subtitle.textContent = 'Please sign in to your account';
+                submitBtn.textContent = 'Sign In';
+                signupLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="goToSignup()">Sign up here</a>';
+                rememberForgot.style.display = 'flex';
+            } else {
+                // Switch to signup mode
+                container.classList.add('signup-mode');
+                header.textContent = 'Join JCHAT';
+                subtitle.textContent = 'Create your account to get started';
+                submitBtn.textContent = 'Create Account';
+                signupLink.innerHTML = 'Already have an account? <a href="#" onclick="goToSignup()">Sign in here</a>';
+                rememberForgot.style.display = 'none';
+            }
+            
+            hideError();
         }
 
-        // Social login functions
-        function loginWithGoogle() {
-            alert('Google login would be implemented here');
-            // In a real app, integrate with Google OAuth
-        }
-
-        function loginWithGithub() {
-            alert('GitHub login would be implemented here');
-            // In a real app, integrate with GitHub OAuth
-        }
-
-        // Navigate to signup
-        function goToSignup() {
-            alert('Redirect to signup page');
-            // In a real app: window.location.href = '/signup';
-        }
+        // Check authentication state
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, redirect to home
+                console.log('User already authenticated:', user.email);
+                window.location.href = '/Home.html';
+            }
+        });
 
         // Add some interactive effects
         document.addEventListener('DOMContentLoaded', function() {
