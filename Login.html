@@ -13,12 +13,20 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #4f46e5 0%, #ec4899 25%, #06b6d4 50%, #8b5cf6 75%, #f59e0b 100%);
+            background-size: 300% 300%;
+            animation: geminiGradient 8s ease infinite;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+        }
+
+        @keyframes geminiGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .login-container {
@@ -32,10 +40,36 @@
         }
 
         .login-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 50%, #06b6d4 100%);
+            background-size: 200% 200%;
+            animation: geminiHeaderGradient 6s ease infinite;
             color: white;
             text-align: center;
             padding: 40px 20px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes geminiHeaderGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes shimmer {
+            0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
 
         .login-header h1 {
@@ -131,7 +165,9 @@
 
         .login-btn {
             width: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 50%, #06b6d4 100%);
+            background-size: 200% 200%;
+            animation: geminiButtonGradient 4s ease infinite;
             color: white;
             border: none;
             padding: 15px;
@@ -141,15 +177,38 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
         }
 
         .login-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 15px 30px rgba(236, 72, 153, 0.4);
         }
 
         .login-btn:active {
             transform: translateY(0);
+        }
+
+        @keyframes geminiButtonGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .divider {
@@ -186,23 +245,48 @@
 
         .social-btn {
             flex: 1;
-            padding: 12px;
-            border: 2px solid #e1e5e9;
+            padding: 15px;
+            border: 2px solid transparent;
             border-radius: 10px;
-            background: white;
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            color: white;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             font-size: 14px;
             font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .social-btn:hover::before {
+            left: 100%;
         }
 
         .social-btn:hover {
-            border-color: #667eea;
-            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(31, 41, 55, 0.3);
+            border-color: #ec4899;
+        }
+
+        .github-icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
         }
 
         .signup-link {
@@ -252,8 +336,191 @@
 
         /* Success message styling */
         .error-message.success {
-            background: #d4edda;
-            color: #155724;
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            color: white;
+            border: none;
+        }
+
+        /* Smart Loader Styles */
+        .smart-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loader-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loader-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 50%, #06b6d4 100%);
+            background-size: 200% 200%;
+            animation: geminiProgress 2s ease infinite;
+        }
+
+        @keyframes geminiProgress {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .gemini-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #ec4899;
+            border-right: 4px solid #4f46e5;
+            border-bottom: 4px solid #06b6d4;
+            border-radius: 50%;
+            animation: geminiSpin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes geminiSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            font-size: 18px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .loader-subtext {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /* Custom Modal Styles */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .modal-icon.success {
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            color: white;
+        }
+
+        .modal-icon.error {
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            color: white;
+        }
+
+        .modal-icon.info {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-message {
+            color: #6b7280;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-1px);
         }
 
         @media (max-width: 480px) {
@@ -313,7 +580,7 @@
                     <input type="checkbox" id="remember" name="remember">
                     <label for="remember">Remember me</label>
                 </div>
-                <a href="#" class="forgot-password">Forgot password?</a>
+                <a href="#" class="forgot-password" onclick="showResetPasswordModal()">Forgot password?</a>
             </div>
             
             <button type="submit" class="login-btn">
@@ -326,7 +593,10 @@
             
             <div class="social-login">
                 <button type="button" class="social-btn" onclick="loginWithGithub()" style="width: 100%;">
-                    🐙 GitHub
+                    <svg class="github-icon" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    Continue with GitHub
                 </button>
             </div>
             
@@ -336,11 +606,52 @@
         </form>
     </div>
 
+    <!-- Smart Loader -->
+    <div class="smart-loader" id="smartLoader">
+        <div class="loader-content">
+            <div class="gemini-spinner"></div>
+            <div class="loader-text" id="loaderText">Processing...</div>
+            <div class="loader-subtext" id="loaderSubtext">Please wait while we authenticate you</div>
+        </div>
+    </div>
+
+    <!-- Custom Modal -->
+    <div class="custom-modal" id="customModal">
+        <div class="modal-content">
+            <div class="modal-icon" id="modalIcon">
+                ✓
+            </div>
+            <div class="modal-title" id="modalTitle">Success</div>
+            <div class="modal-message" id="modalMessage">Your action was completed successfully.</div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="modalPrimaryBtn" onclick="closeModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="custom-modal" id="resetPasswordModal">
+        <div class="modal-content">
+            <div class="modal-icon info">
+                🔑
+            </div>
+            <div class="modal-title">Reset Password</div>
+            <div class="modal-message">Enter your email address and we'll send you a link to reset your password.</div>
+            <div style="margin: 20px 0;">
+                <input type="email" id="resetEmail" placeholder="Enter your email" style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px;">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeResetModal()">Cancel</button>
+                <button class="modal-btn primary" onclick="sendResetEmail()">Send Reset Link</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script type="module">
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithCustomToken, sendPasswordResetEmail, signOut } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
@@ -412,7 +723,7 @@
         // Handle GitHub OAuth callback
         async function handleGitHubCallback(code, state) {
             try {
-                showLoading('Processing GitHub authentication...');
+                showSmartLoader('GitHub Authentication', 'Processing your GitHub credentials...');
                 
                 // Verify state parameter
                 const savedState = localStorage.getItem('github_oauth_state');
@@ -443,22 +754,19 @@
                     // Save user data
                     await saveUserData(user, 'github', data.githubUser);
                     
-                    hideLoading();
-                    showSuccess('Successfully signed in with GitHub!');
-                    
-                    // Redirect to home
-                    setTimeout(() => {
+                    hideSmartLoader();
+                    showSuccessModal(`Welcome to JCHAT, ${data.githubUser?.name || user.email}!`, () => {
                         window.location.href = '/Home.html';
-                    }, 1500);
+                    });
                 }
                 
                 // Clean up
                 localStorage.removeItem('github_oauth_state');
                 
             } catch (error) {
-                hideLoading();
+                hideSmartLoader();
                 console.error('GitHub authentication error:', error);
-                showError('Failed to authenticate with GitHub. Please try again.');
+                showErrorModal('Failed to authenticate with GitHub. Please try again or contact support if the issue persists.');
                 
                 // Clean up
                 localStorage.removeItem('github_oauth_state');
@@ -550,7 +858,7 @@
 
         // Sign up user
         async function signUpUser(email, password) {
-            showLoading('Creating your account...');
+            showSmartLoader('Creating Account', 'Setting up your JCHAT profile...');
             
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -559,37 +867,34 @@
                 // Save user data to Firestore
                 await saveUserData(user, 'email');
                 
-                hideLoading();
-                showSuccess('Account created successfully! Welcome to JCHAT!');
-                
-                // Redirect to home
-                setTimeout(() => {
+                hideSmartLoader();
+                showSuccessModal('Account created successfully! Welcome to JCHAT!', () => {
                     window.location.href = '/Home.html';
-                }, 1500);
+                });
                 
             } catch (error) {
-                hideLoading();
+                hideSmartLoader();
                 let errorMessage = 'Failed to create account. Please try again.';
                 
                 switch (error.code) {
                     case 'auth/email-already-in-use':
-                        errorMessage = 'An account with this email already exists.';
+                        errorMessage = 'An account with this email already exists. Would you like to sign in instead?';
                         break;
                     case 'auth/weak-password':
-                        errorMessage = 'Password is too weak. Please choose a stronger password.';
+                        errorMessage = 'Password is too weak. Please choose a stronger password with at least 6 characters.';
                         break;
                     case 'auth/invalid-email':
                         errorMessage = 'Please enter a valid email address.';
                         break;
                 }
                 
-                showError(errorMessage);
+                showErrorModal(errorMessage);
             }
         }
 
         // Login user
         async function loginUser(email, password, remember) {
-            showLoading('Signing you in...');
+            showSmartLoader('Signing In', 'Authenticating your credentials...');
             
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -598,34 +903,31 @@
                 // Update last login
                 await saveUserData(user, 'email');
                 
-                hideLoading();
-                showSuccess('Successfully signed in! Welcome back!');
-                
-                // Redirect to home
-                setTimeout(() => {
+                hideSmartLoader();
+                showSuccessModal(`Welcome back, ${user.displayName || user.email}!`, () => {
                     window.location.href = '/Home.html';
-                }, 1500);
+                });
                 
             } catch (error) {
-                hideLoading();
+                hideSmartLoader();
                 let errorMessage = 'Invalid email or password.';
                 
                 switch (error.code) {
                     case 'auth/user-not-found':
-                        errorMessage = 'No account found with this email.';
+                        errorMessage = 'No account found with this email. Would you like to create a new account?';
                         break;
                     case 'auth/wrong-password':
-                        errorMessage = 'Incorrect password.';
+                        errorMessage = 'Incorrect password. Please check your password and try again.';
                         break;
                     case 'auth/invalid-email':
                         errorMessage = 'Please enter a valid email address.';
                         break;
                     case 'auth/too-many-requests':
-                        errorMessage = 'Too many failed attempts. Please try again later.';
+                        errorMessage = 'Too many failed attempts. Please try again later or reset your password.';
                         break;
                 }
                 
-                showError(errorMessage);
+                showErrorModal(errorMessage);
             }
         }
 
@@ -649,6 +951,28 @@
             errorDiv.style.display = 'none';
         }
 
+        // Smart Loader Functions
+        function showSmartLoader(title, subtitle) {
+            const loader = document.getElementById('smartLoader');
+            const loaderText = document.getElementById('loaderText');
+            const loaderSubtext = document.getElementById('loaderSubtext');
+            
+            loaderText.textContent = title;
+            loaderSubtext.textContent = subtitle;
+            loader.style.display = 'flex';
+            
+            // Disable form
+            document.getElementById('loginForm').style.pointerEvents = 'none';
+        }
+
+        function hideSmartLoader() {
+            const loader = document.getElementById('smartLoader');
+            loader.style.display = 'none';
+            
+            // Re-enable form
+            document.getElementById('loginForm').style.pointerEvents = 'auto';
+        }
+
         // Show loading state
         function showLoading(message) {
             const loginBtn = document.querySelector('.login-btn');
@@ -664,6 +988,62 @@
             loginBtn.textContent = isSignupMode ? 'Create Account' : 'Sign In';
             loginBtn.disabled = false;
             loginBtn.style.opacity = '1';
+        }
+
+        // Custom Modal Functions
+        function showCustomModal(type, title, message, callback = null) {
+            const modal = document.getElementById('customModal');
+            const icon = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const messageEl = document.getElementById('modalMessage');
+            const primaryBtn = document.getElementById('modalPrimaryBtn');
+            
+            // Set icon and styling based on type
+            icon.className = `modal-icon ${type}`;
+            switch(type) {
+                case 'success':
+                    icon.textContent = '✓';
+                    break;
+                case 'error':
+                    icon.textContent = '✕';
+                    break;
+                case 'info':
+                    icon.textContent = 'ℹ';
+                    break;
+                case 'question':
+                    icon.textContent = '?';
+                    break;
+            }
+            
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            
+            // Set up callback
+            if (callback) {
+                primaryBtn.onclick = () => {
+                    closeModal();
+                    callback();
+                };
+            } else {
+                primaryBtn.onclick = closeModal;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('customModal');
+            modal.style.display = 'none';
+        }
+
+        // Enhanced show success with custom modal
+        function showSuccessModal(message, callback = null) {
+            showCustomModal('success', 'Success!', message, callback);
+        }
+
+        // Enhanced show error with custom modal
+        function showErrorModal(message) {
+            showCustomModal('error', 'Authentication Error', message);
         }
 
         // Show success message
@@ -723,6 +1103,60 @@
             }
         });
 
+        // Reset Password Functions
+        window.showResetPasswordModal = function() {
+            const modal = document.getElementById('resetPasswordModal');
+            modal.style.display = 'flex';
+        };
+
+        window.closeResetModal = function() {
+            const modal = document.getElementById('resetPasswordModal');
+            modal.style.display = 'none';
+            document.getElementById('resetEmail').value = '';
+        };
+
+        window.sendResetEmail = async function() {
+            const email = document.getElementById('resetEmail').value;
+            
+            if (!email) {
+                showCustomModal('error', 'Email Required', 'Please enter your email address.');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showCustomModal('error', 'Invalid Email', 'Please enter a valid email address.');
+                return;
+            }
+            
+            try {
+                showSmartLoader('Sending Reset Email', 'Preparing password reset instructions...');
+                
+                await sendPasswordResetEmail(auth, email);
+                
+                hideSmartLoader();
+                closeResetModal();
+                showSuccessModal('Password reset email sent! Check your inbox and follow the instructions to reset your password.');
+                
+            } catch (error) {
+                hideSmartLoader();
+                let errorMessage = 'Failed to send reset email. Please try again.';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email address.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many reset attempts. Please try again later.';
+                        break;
+                }
+                
+                showCustomModal('error', 'Reset Failed', errorMessage);
+            }
+        };
+
         // Add some interactive effects
         document.addEventListener('DOMContentLoaded', function() {
             // Add focus effects to inputs
@@ -736,6 +1170,17 @@
                 input.addEventListener('blur', function() {
                     this.parentElement.style.transform = 'translateY(0)';
                 });
+            });
+
+            // Close modals when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('custom-modal')) {
+                    if (e.target.id === 'customModal') {
+                        closeModal();
+                    } else if (e.target.id === 'resetPasswordModal') {
+                        closeResetModal();
+                    }
+                }
             });
         });
     </script>
