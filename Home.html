@@ -2016,6 +2016,22 @@
             display: none;
         }
 
+        .remove-media-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .remove-media-btn:hover {
+            background: #c82333;
+        }
+
         .post-creation-section .media-preview {
             max-width: 100px;
             max-height: 100px;
@@ -3901,6 +3917,9 @@
                         <i class="fas fa-image"></i> Add Media
                     </label>
                     <input type="file" id="postMediaUpload" accept="image/*,video/*" disabled>
+                    <button id="removeMediaButton" class="remove-media-btn" style="display: none;" aria-label="Remove Media">
+                        <i class="fas fa-times"></i> Remove Media
+                    </button>
                     <img id="mediaImagePreview" class="media-preview" src="" alt="Image Preview" loading="lazy" decoding="async" style="display: none;">
                     <video id="mediaVideoPreview" class="media-preview" src="" controls preload="metadata" playsinline style="display: none;"></video>
                 </div>
@@ -4434,7 +4453,7 @@
         let inspirationQuoteElement, inspirationAuthorElement, sharePostInspirationButton;
         let customizeInspirationButton, claimDailyBonusButton, customizeInspirationModal;
         let inspirationTypeRadios, cancelCustomizeButton, saveCustomizeButton;
-        let postCreationSection, postContentInput, postMediaUpload, mediaImagePreview, mediaVideoPreview;
+        let postCreationSection, postContentInput, postMediaUpload, mediaImagePreview, mediaVideoPreview, removeMediaButton;
         let createPostButton, postsFeed, loadingPostsMessage, postTypeFilter, postSearchInput;
         let postDateFromInput, postDateToInput, exportPostsCsvButton, exportPostsJsonButton;
         let showSavedOnlyCheckbox, showFollowedOnlyCheckbox, trendingHashtagsDiv, editPostModal, editPostContentInput;
@@ -5389,6 +5408,7 @@
                 postMediaUpload = document.getElementById('postMediaUpload');
                 mediaImagePreview = document.getElementById('mediaImagePreview');
                 mediaVideoPreview = document.getElementById('mediaVideoPreview');
+                removeMediaButton = document.getElementById('removeMediaButton');
                 createPostButton = document.getElementById('createPostButton');
                 postsFeed = document.getElementById('postsFeed');
                 loadingPostsMessage = document.getElementById('loadingPostsMessage');
@@ -7016,6 +7036,44 @@
                 showMessageBox(`Failed to save inspiration type: ${error.message}`, 'error');
             }
         }
+
+        /**
+         * Updates the post button state based on content and media presence
+         */
+        function updatePostButtonState() {
+            if (!createPostButton) return;
+            
+            const hasContent = postContentInput && postContentInput.value.trim().length > 0;
+            const hasMedia = currentMediaFile !== null;
+            const isEnabled = hasContent || hasMedia;
+            
+            console.log('JCHAT_DEBUG: updatePostButtonState called', {
+                hasContent,
+                hasMedia,
+                isEnabled,
+                isAuthReady,
+                hasCurrentUser: !!currentUser,
+                enablePostCreation: currentSystemSettings.enablePostCreation,
+                isAdmin: currentUser?.uid === ADMIN_UID
+            });
+            
+            // Default to allowing post creation if settings haven't loaded yet
+            const postCreationAllowed = currentSystemSettings.enablePostCreation !== false || currentUser?.uid === ADMIN_UID;
+            
+            if (isAuthReady && currentUser && postCreationAllowed) {
+                createPostButton.disabled = !isEnabled;
+                if (isEnabled) {
+                    createPostButton.style.opacity = '1';
+                    createPostButton.style.cursor = 'pointer';
+                } else {
+                    createPostButton.style.opacity = '0.6';
+                    createPostButton.style.cursor = 'not-allowed';
+                }
+            } else {
+                console.log('JCHAT_DEBUG: Post creation not allowed or user not ready');
+            }
+        }
+
         // Event listener for post media upload input.
         if (postMediaUpload) {
             postMediaUpload.addEventListener('change', (event) => {
@@ -7028,6 +7086,22 @@
                 if (mediaVideoPreview) mediaVideoPreview.src = '';
 
                 if (file) {
+                    // Validate file size (max 50MB)
+                    if (file.size > 50 * 1024 * 1024) {
+                        showMessageBox('File size must be less than 50MB', 'error');
+                        postMediaUpload.value = '';
+                        currentMediaFile = null;
+                        return;
+                    }
+
+                    // Validate file type
+                    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+                        showMessageBox('Please select an image or video file', 'error');
+                        postMediaUpload.value = '';
+                        currentMediaFile = null;
+                        return;
+                    }
+
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         if (file.type.startsWith('image/')) {
@@ -7041,8 +7115,26 @@
                                 mediaVideoPreview.style.display = 'block';
                             }
                         }
+                        // Show remove media button
+                        if (removeMediaButton) {
+                            removeMediaButton.style.display = 'inline-block';
+                        }
+                        // Enable post button if content or media is present
+                        updatePostButtonState();
+                    };
+                    reader.onerror = () => {
+                        showMessageBox('Error reading file. Please try again.', 'error');
+                        postMediaUpload.value = '';
+                        currentMediaFile = null;
                     };
                     reader.readAsDataURL(file); // Read file as Data URL for preview.
+                } else {
+                    currentMediaFile = null;
+                    // Hide remove media button
+                    if (removeMediaButton) {
+                        removeMediaButton.style.display = 'none';
+                    }
+                    updatePostButtonState();
                 }
             });
         }
@@ -8788,6 +8880,11 @@
                 isAuthReady = true; // Set to true early so profile fetching can proceed.
                 await fetchAndDisplayHeaderProfile(user); // This sets currentUserProfileData and updates UI.
                 console.log("JCHAT_DEBUG: Auth is ready. User ID:", currentUser.uid, "isAuthReady:", isAuthReady);
+                
+                // Update post button state after authentication
+                if (typeof updatePostButtonState === 'function') {
+                    updatePostButtonState();
+                }
 
                 // Start listening to system settings in real-time and render announcement & chips
                 const unsubscribeSettings = onSnapshot(SYSTEM_SETTINGS_DOC_REF, (docSnap) => {
@@ -8796,6 +8893,11 @@
                         console.log("JCHAT_DEBUG: Real-time system settings update:", currentSystemSettings);
                         // Apply system settings immediately for faster announcement display
                         applySystemSettings(currentSystemSettings);
+                        
+                        // Update post button state after settings are loaded
+                        if (typeof updatePostButtonState === 'function') {
+                            updatePostButtonState();
+                        }
                         
                         // Check for global announcements
                         if (currentSystemSettings.globalAnnouncement && typeof currentSystemSettings.globalAnnouncement === 'object') {
@@ -9345,6 +9447,37 @@
         if (shareModal) shareModal.addEventListener('click', (evt)=> { if (evt.target === shareModal) closeShareInspirationModal(); });
 
         if (createPostButton) createPostButton.addEventListener('click', createNewPost);
+
+        // Add event listeners for post content input to enable/disable button
+        if (postContentInput) {
+            postContentInput.addEventListener('input', updatePostButtonState);
+            postContentInput.addEventListener('paste', () => {
+                // Use setTimeout to allow paste content to be processed
+                setTimeout(updatePostButtonState, 100);
+            });
+        }
+
+        // Add event listener for remove media button
+        if (removeMediaButton) {
+            removeMediaButton.addEventListener('click', () => {
+                // Clear media file and previews
+                currentMediaFile = null;
+                if (postMediaUpload) postMediaUpload.value = '';
+                if (mediaImagePreview) {
+                    mediaImagePreview.style.display = 'none';
+                    mediaImagePreview.src = '';
+                }
+                if (mediaVideoPreview) {
+                    mediaVideoPreview.style.display = 'none';
+                    mediaVideoPreview.src = '';
+                }
+                // Hide the remove button
+                removeMediaButton.style.display = 'none';
+                // Update post button state
+                updatePostButtonState();
+                showMessageBox('Media removed', 'success');
+            });
+        }
 
         if (cancelEditPostButton) cancelEditPostButton.addEventListener('click', closeEditPostModal);
         if (saveEditedPostButton) saveEditedPostButton.addEventListener('click', saveEditedPost);
