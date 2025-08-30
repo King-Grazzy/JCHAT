@@ -1941,141 +1941,7 @@
             }
         }
 
-        /* Post Creation Section */
-        .post-creation-section {
-            background: var(--card-background);
-            border: 1px solid var(--glass-blue);
-            backdrop-filter: blur(10px) saturate(180%);
-            border-radius: var(--radius);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, .3);
-            padding: 1.5rem;
-            width: 100%;
-            max-width: 600px; /* Max width for post creation */
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            margin-top: 20px; /* Space from inspiration section */
-        }
 
-        .post-creation-section h3 {
-            font-family: 'Poppins', sans-serif;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--white);
-            margin-bottom: 0.5rem;
-        }
-
-        .post-creation-section textarea {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border-radius: 15px;
-            background: var(--input-background);
-            border: 1px solid var(--border-light);
-            color: var(--white);
-            font-size: 1rem;
-            outline: none;
-            transition: border-color var(--transition), box-shadow var(--transition);
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .post-creation-section textarea:focus {
-            border-color: rgba(0, 213, 255, 0.6);
-            box-shadow: 0 0 0 3px rgba(0, 213, 255, 0.2);
-        }
-
-        .post-creation-section .media-upload-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .post-creation-section .file-input-label {
-            background: linear-gradient(90deg, var(--blue), var(--pink));
-            color: var(--white);
-            border: none; /* Changed from border to none */
-            border-radius: 12px;
-            padding: 8px 15px;
-            cursor: pointer;
-            font-weight: 700;
-            transition: all var(--transition);
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.9rem;
-        }
-
-        .post-creation-section .file-input-label:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px var(--blue), 0 44px 15px var(--pink);
-        }
-
-        .post-creation-section input[type="file"] {
-            display: none;
-        }
-
-        .remove-media-btn {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-left: 10px;
-            transition: background 0.3s ease;
-        }
-
-        .remove-media-btn:hover {
-            background: #c82333;
-        }
-
-        .post-creation-section .media-preview {
-            max-width: 200px;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 2px solid var(--blue);
-            margin: 10px 0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .post-creation-section .post-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.8rem;
-        }
-
-        .post-creation-section .post-button {
-            background: var(--button-background);
-            color: var(--white);
-            border: none;
-            border-radius: 15px;
-            padding: 0.7rem 1.2rem;
-            font-size: 0.9rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: var(--button-shadow);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .post-creation-section .post-button:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--blue), 0 6px 20px var(--pink);
-        }
-        .post-creation-section .post-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background: var(--text-light);
-            box-shadow: none;
-        }
 
         /* Posts Feed Section */
         .posts-feed-section {
@@ -3375,20 +3241,7 @@
                 padding: 0.7rem 1.2rem;
                 font-size: 0.8rem;
             }
-            .post-creation-section {
-                padding: 1rem;
-            }
-            .post-creation-section h3 {
-                font-size: 1.1rem;
-            }
-            .post-creation-section textarea {
-                padding: 0.7rem 0.9rem;
-                font-size: 0.9rem;
-            }
-            .post-creation-section .post-button {
-                padding: 0.6rem 1rem;
-                font-size: 0.8rem;
-            }
+
             .post-card {
                 padding: 1rem;
             }
@@ -3898,54 +3751,7 @@
             </div>
 
 
-            <!-- Post Creation Section -->
-            <div class="post-creation-section" id="postCreationSection">
-                <h3>Create New Post</h3>
-                <textarea id="postContent" placeholder="What's on your mind?" maxlength="50000" disabled aria-label="Post Content"></textarea>
-                <div class="media-upload-area">
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                        <label for="postMediaUpload" class="file-input-label" aria-label="Add Media to Post">
-                            <i class="fas fa-image"></i> Add Media
-                        </label>
-                        <input type="file" id="postMediaUpload" accept="image/*,video/*" disabled>
-                        <button id="removeMediaButton" class="remove-media-btn" style="display: none;" aria-label="Remove Media">
-                            <i class="fas fa-times"></i> Remove Media
-                        </button>
-                    </div>
-                    <div class="media-preview-container" style="margin-top: 10px;">
-                        <img id="mediaImagePreview" class="media-preview" src="" alt="Image Preview" loading="lazy" decoding="async" style="display: none;">
-                        <video id="mediaVideoPreview" class="media-preview" src="" controls preload="metadata" playsinline style="display: none;"></video>
-                    </div>
-                </div>
-                <div style="margin:8px 0; display:flex; align-items:center; gap:10px;">
-                    <label style="display:flex; align-items:center; gap:6px;">
-                        <input type="checkbox" id="addPollCheckbox"> Add Poll
-                    </label>
-                    <div id="pollComposer" style="display:none; flex-direction:column; gap:6px; width:100%;">
-                        <input type="text" class="poll-option-input" placeholder="Option 1" maxlength="100">
-                        <input type="text" class="poll-option-input" placeholder="Option 2" maxlength="100">
-                        <button id="addPollOptionBtn" class="post-control-button" type="button" style="width:max-content;">Add Option</button>
-                    </div>
-                </div>
-                <div class="post-actions">
-                    <button id="createPostButton" class="post-button" disabled aria-label="Create Post">
-                        <span class="button-text">Post</span>
-                    </button>
-                </div>
-                
-                <!-- Premium Post Options -->
-                <div class="premium-post-options" id="premiumPostOptions" style="display: none;">
-                    <div class="premium-post-option" onclick="togglePremiumPostOption('priority')">
-                        <i class="fas fa-star"></i> Priority Post
-                    </div>
-                    <div class="premium-post-option" onclick="togglePremiumPostOption('exclusive')">
-                        <i class="fas fa-crown"></i> Exclusive Content
-                    </div>
-                    <div class="premium-post-option" onclick="togglePremiumPostOption('custom')">
-                        <i class="fas fa-magic"></i> Custom Styling
-                    </div>
-                </div>
-            </div>
+
 
             <div id="trendingHashtags" style="margin:8px 0;color:var(--text-light);font-size:0.9rem;"></div>
 
@@ -4447,8 +4253,7 @@
         let inspirationQuoteElement, inspirationAuthorElement, sharePostInspirationButton;
         let customizeInspirationButton, claimDailyBonusButton, customizeInspirationModal;
         let inspirationTypeRadios, cancelCustomizeButton, saveCustomizeButton;
-        let postCreationSection, postContentInput, postMediaUpload, mediaImagePreview, mediaVideoPreview, removeMediaButton;
-        let createPostButton, postsFeed, loadingPostsMessage, postTypeFilter, postSearchInput;
+        let postsFeed, loadingPostsMessage, postTypeFilter, postSearchInput;
         let postDateFromInput, postDateToInput, exportPostsCsvButton, exportPostsJsonButton;
         let showSavedOnlyCheckbox, showFollowedOnlyCheckbox, trendingHashtagsDiv, editPostModal, editPostContentInput;
         let editPostMediaUpload, editMediaImagePreview, editMediaVideoPreview, removeEditMediaButton;
@@ -5396,14 +5201,7 @@
                 cancelCustomizeButton = document.getElementById('cancelCustomize');
                 saveCustomizeButton = document.getElementById('saveCustomize');
 
-                // Post Creation section elements
-                postCreationSection = document.getElementById('postCreationSection');
-                postContentInput = document.getElementById('postContent');
-                postMediaUpload = document.getElementById('postMediaUpload');
-                mediaImagePreview = document.getElementById('mediaImagePreview');
-                mediaVideoPreview = document.getElementById('mediaVideoPreview');
-                removeMediaButton = document.getElementById('removeMediaButton');
-                createPostButton = document.getElementById('createPostButton');
+                // Post Creation section elements removed
                 postsFeed = document.getElementById('postsFeed');
                 loadingPostsMessage = document.getElementById('loadingPostsMessage');
                 postTypeFilter = document.getElementById('postTypeFilter');
@@ -5480,7 +5278,7 @@
         let currentUserProfileData = null; // Stores the authenticated user's own profile data from Firestore.
         let inspirationIntervalId = null; // Interval ID for refreshing daily inspiration.
         let dailyBonusCountdownInterval = null; // Interval for daily bonus cooldown countdown.
-        let currentMediaFile = null; // Stores the file object for new post media.
+
         let currentEditPostId = null; // Stores the ID of the post being edited.
         let currentEditMediaFile = null; // Stores the new file object for edited post media.
         let currentEditMediaUrl = null; // Stores the existing media URL for edited post.
@@ -6407,9 +6205,7 @@
             if (sharePostInspirationButton) sharePostInspirationButton.disabled = !finalEnableState;
             if (customizeInspirationButton) customizeInspirationButton.disabled = !finalEnableState;
             if (claimDailyBonusButton) claimDailyBonusButton.disabled = !finalEnableState;
-            if (postContentInput) postContentInput.disabled = !finalEnableState;
-            if (postMediaUpload) postMediaUpload.disabled = !finalEnableState;
-            if (createPostButton) createPostButton.disabled = !finalEnableState;
+
 
             // Dynamically created elements (posts, comments) - these will be refined by applySystemSettings later.
             // These are selected globally and then their disabled state is set.
@@ -6480,7 +6276,7 @@
                 guideLink.style.opacity = finalEnableState ? '1' : '0.5';
             }
 
-            console.log(`JCHAT_DEBUG: Finished toggling interactive elements. Post content input disabled state: ${postContentInput ? postContentInput.disabled : 'N/A (element not found)'}`);
+            console.log(`JCHAT_DEBUG: Finished toggling interactive elements.`);
         }
 
         /**
@@ -7031,242 +6827,11 @@
             }
         }
 
-        /**
-         * Updates the post button state based on content and media presence
-         */
-        function updatePostButtonState() {
-            if (!createPostButton) {
-                console.log('JCHAT_DEBUG: createPostButton not found');
-                return;
-            }
-            
-            const hasContent = postContentInput && postContentInput.value.trim().length > 0;
-            const hasMedia = currentMediaFile !== null;
-            const isEnabled = hasContent || hasMedia;
-            
-            console.log('JCHAT_DEBUG: updatePostButtonState called', {
-                hasContent,
-                hasMedia,
-                isEnabled,
-                isAuthReady,
-                hasCurrentUser: !!currentUser,
-                enablePostCreation: currentSystemSettings.enablePostCreation,
-                isAdmin: currentUser?.uid === ADMIN_UID,
-                postContentInputDisabled: postContentInput?.disabled,
-                postMediaUploadDisabled: postMediaUpload?.disabled
-            });
-            
-            // Check if post creation is allowed by system settings
-            const postCreationAllowed = currentSystemSettings.enablePostCreation !== false || (currentUser && currentUser.uid === ADMIN_UID);
-            
-            // Check if inputs are disabled (which means post creation section is disabled)
-            const inputsDisabled = postContentInput?.disabled || postMediaUpload?.disabled;
-            
-            if (isAuthReady && currentUser && postCreationAllowed && !inputsDisabled) {
-                createPostButton.disabled = !isEnabled;
-                createPostButton.style.opacity = isEnabled ? '1' : '0.6';
-                createPostButton.style.cursor = isEnabled ? 'pointer' : 'not-allowed';
-                console.log('JCHAT_DEBUG: Post button enabled, content/media required:', !isEnabled);
-            } else {
-                createPostButton.disabled = true;
-                createPostButton.style.opacity = '0.6';
-                createPostButton.style.cursor = 'not-allowed';
-                console.log('JCHAT_DEBUG: Post button disabled - auth/settings/inputs issue');
-            }
-        }
 
-        // Event listener for post media upload input.
-        if (postMediaUpload) {
-            postMediaUpload.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                currentMediaFile = file; // Store the selected file.
-                // Reset previews.
-                if (mediaImagePreview) mediaImagePreview.style.display = 'none';
-                if (mediaVideoPreview) mediaVideoPreview.style.display = 'none';
-                if (mediaImagePreview) mediaImagePreview.src = '';
-                if (mediaVideoPreview) mediaVideoPreview.src = '';
 
-                if (file) {
-                    // Validate file size (max 50MB)
-                    if (file.size > 50 * 1024 * 1024) {
-                        showMessageBox('File size must be less than 50MB', 'error');
-                        postMediaUpload.value = '';
-                        currentMediaFile = null;
-                        return;
-                    }
 
-                    // Validate file type
-                    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-                        showMessageBox('Please select an image or video file', 'error');
-                        postMediaUpload.value = '';
-                        currentMediaFile = null;
-                        return;
-                    }
 
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        console.log('JCHAT_DEBUG: File loaded successfully', file.type, file.name);
-                        if (file.type.startsWith('image/')) {
-                            if (mediaImagePreview) {
-                                mediaImagePreview.src = e.target.result;
-                                mediaImagePreview.style.display = 'block';
-                                console.log('JCHAT_DEBUG: Image preview shown');
-                            } else {
-                                console.log('JCHAT_DEBUG: mediaImagePreview element not found');
-                            }
-                        } else if (file.type.startsWith('video/')) {
-                            if (mediaVideoPreview) {
-                                mediaVideoPreview.src = e.target.result;
-                                mediaVideoPreview.style.display = 'block';
-                                console.log('JCHAT_DEBUG: Video preview shown');
-                            } else {
-                                console.log('JCHAT_DEBUG: mediaVideoPreview element not found');
-                            }
-                        }
-                        // Show remove media button
-                        if (removeMediaButton) {
-                            removeMediaButton.style.display = 'inline-block';
-                            console.log('JCHAT_DEBUG: Remove media button shown');
-                        } else {
-                            console.log('JCHAT_DEBUG: removeMediaButton element not found');
-                        }
-                        // Enable post button if content or media is present
-                        updatePostButtonState();
-                    };
-                    reader.onerror = () => {
-                        showMessageBox('Error reading file. Please try again.', 'error');
-                        postMediaUpload.value = '';
-                        currentMediaFile = null;
-                    };
-                    reader.readAsDataURL(file); // Read file as Data URL for preview.
-                } else {
-                    currentMediaFile = null;
-                    // Hide remove media button
-                    if (removeMediaButton) {
-                        removeMediaButton.style.display = 'none';
-                    }
-                    updatePostButtonState();
-                }
-            });
-        }
 
-        /**
-         * Creates a new post with content and optional media.
-         * Handles media upload, Firestore transaction, and pending reward creation.
-         */
-        async function createNewPost() {
-            if (!isAuthReady || !currentUser || !currentUserProfileData) {
-                showMessageBox("Please log in to create a post.", 'error');
-                return;
-            }
-
-            // Check if post creation is enabled by system settings (unless current user is admin).
-            if (!currentSystemSettings.enablePostCreation && currentUser.uid !== ADMIN_UID) {
-                showMessageBox("Post creation is currently disabled by administrators.", 'warning');
-                return;
-            }
-
-            const content = postContentInput.value.trim();
-            if (!content && !currentMediaFile) {
-                showMessageBox("Post content or media cannot be empty.", 'info');
-                return;
-            }
-
-            toggleButtonLoading(createPostButton, true); // Show loading spinner.
-            showMessageBox("Creating post...", 'loading', true); // Show persistent loading message.
-
-            let mediaUrl = null;
-            let mediaType = 'text';
-
-            try {
-                if (currentMediaFile) {
-                    showMessageBox('Uploading media...', 'loading', true);
-                    let fileToUpload = currentMediaFile;
-                    // Resize image files before upload for optimization.
-                    if (currentMediaFile.type.startsWith('image/')) {
-                        fileToUpload = await resizeImage(currentMediaFile);
-                    }
-                    mediaUrl = await uploadMediaToCloudinary(fileToUpload);
-                    if (mediaUrl) {
-                        mediaType = currentMediaFile.type.startsWith('image/') ? 'image' : 'video';
-                        showMessageBox('Media uploaded!', 'success');
-                    } else {
-                        throw new Error("Failed to upload media."); // Throw error if Cloudinary upload fails.
-                    }
-                }
-
-                // Poll handling
-                const pollEnabled = !!document.getElementById('addPollCheckbox')?.checked;
-                let poll = null;
-                if (pollEnabled) {
-                    const optionEls = [...document.querySelectorAll('#pollComposer .poll-option-input')];
-                    const options = optionEls.map(o => o.value.trim()).filter(Boolean).slice(0,6);
-                    if (options.length >= 2) {
-                        poll = { options: options.map(o => ({ text:o, votes:0 })), allowMultiple:false };
-                    }
-                }
-
-                const postData = {
-                    authorId: currentUser.uid,
-                    username: currentUserProfileData.username || "JCHAT User",
-                    profilePhoto: currentUserProfileData.profilePicId || null,
-                    content: content,
-                    timestamp: serverTimestamp(),
-                    likesCount: 0,
-                    commentsCount: 0,
-                    isEdited: false,
-                    status: 'active',
-                    reactions: { like: 0, love: 0, haha: 0 },
-                    mediaUrl: mediaUrl,
-                    mediaType: mediaType,
-                    visibility: 'public',
-                    tags: [],
-                    location: {},
-                    poll: poll
-                };
-
-                let postId = null; // To store the ID of the newly created post.
-
-                // Use a Firestore transaction to ensure atomicity for post creation.
-                await runTransaction(db, async (transaction) => {
-                    // Note: totalPosts update is removed here as it's now handled by admin approval of pending reward.
-                    const newPostRef = doc(collection(db, "artifacts", appId, "public", "data", "posts"));
-                    transaction.set(newPostRef, postData);
-                    postId = newPostRef.id; // Get the ID of the new post.
-                });
-
-                // Create a pending reward for post creation for admin review.
-                if (postId) {
-                    await createPendingActivityReward(
-                        currentUser.uid,
-                        currentUserProfileData.username,
-                        'post_creation',
-                        20, // Suggested XP for post creation.
-                        5,  // Suggested JCoins for post creation.
-                        null, // No specific activityId for post creation itself.
-                        postId // Link to the created post.
-                    );
-                }
-
-                showMessageBox("Post created successfully! 20 XP and 5 JCoins are pending admin review.", 'success', true);
-                playNotificationSound('success');
-                // Clear input fields and previews after successful post creation.
-                postContentInput.value = '';
-                if (postMediaUpload) postMediaUpload.value = '';
-                if (mediaImagePreview) mediaImagePreview.style.display = 'none';
-                if (mediaVideoPreview) mediaVideoPreview.style.display = 'none';
-                if (mediaImagePreview) mediaImagePreview.src = '';
-                if (mediaVideoPreview) mediaVideoPreview.src = '';
-                currentMediaFile = null;
-
-            } catch (error) {
-                console.error("JCHAT_ERROR: Error creating post:", error);
-                showMessageBox(`Failed to create post: ${error.message}`, 'error');
-                playNotificationSound('error');
-            } finally {
-                toggleButtonLoading(createPostButton, false); // Hide loading spinner.
-            }
-        }
         /**
          * Handles user reactions (like, love, haha) to a post.
          * Uses a transaction to update reaction counts and user's reaction status.
@@ -8359,20 +7924,7 @@
             // For admins, these will apply normally. For regular users, if maintenance was ON,
             // this part is skipped. If maintenance was OFF, these apply normally.
 
-            // Post Creation Section visibility and input states.
-            if (postCreationSection) {
-                if (settings.enablePostCreation || isCurrentUserAdmin) { // Admin can always see/use.
-                    postCreationSection.style.display = 'flex';
-                    if (postContentInput) postContentInput.disabled = false;
-                    if (postMediaUpload) postMediaUpload.disabled = false;
-                    // Don't directly set createPostButton.disabled here - let updatePostButtonState handle it
-                } else {
-                    postCreationSection.style.display = 'none';
-                    if (postContentInput) postContentInput.disabled = true;
-                    if (postMediaUpload) postMediaUpload.disabled = true;
-                    if (createPostButton) createPostButton.disabled = true;
-                }
-            }
+            // Post Creation Section removed
 
             // Sidebar links (only if they correspond to features that can be toggled).
             // These need to reflect the feature toggle, but also respect the overall `toggleInteractiveElements` state
@@ -8892,10 +8444,7 @@
                 await fetchAndDisplayHeaderProfile(user); // This sets currentUserProfileData and updates UI.
                 console.log("JCHAT_DEBUG: Auth is ready. User ID:", currentUser.uid, "isAuthReady:", isAuthReady);
                 
-                // Update post button state after authentication
-                if (typeof updatePostButtonState === 'function') {
-                    updatePostButtonState();
-                }
+
 
                 // Start listening to system settings in real-time and render announcement & chips
                 const unsubscribeSettings = onSnapshot(SYSTEM_SETTINGS_DOC_REF, (docSnap) => {
@@ -8905,10 +8454,7 @@
                         // Apply system settings immediately for faster announcement display
                         applySystemSettings(currentSystemSettings);
                         
-                        // Update post button state after settings are loaded
-                        if (typeof updatePostButtonState === 'function') {
-                            updatePostButtonState();
-                        }
+
                         
                         // Check for global announcements
                         if (currentSystemSettings.globalAnnouncement && typeof currentSystemSettings.globalAnnouncement === 'object') {
@@ -9457,38 +9003,7 @@
         if (closeShareModalBtn) closeShareModalBtn.addEventListener('click', closeShareInspirationModal);
         if (shareModal) shareModal.addEventListener('click', (evt)=> { if (evt.target === shareModal) closeShareInspirationModal(); });
 
-        if (createPostButton) createPostButton.addEventListener('click', createNewPost);
 
-        // Add event listeners for post content input to enable/disable button
-        if (postContentInput) {
-            postContentInput.addEventListener('input', updatePostButtonState);
-            postContentInput.addEventListener('paste', () => {
-                // Use setTimeout to allow paste content to be processed
-                setTimeout(updatePostButtonState, 100);
-            });
-        }
-
-        // Add event listener for remove media button
-        if (removeMediaButton) {
-            removeMediaButton.addEventListener('click', () => {
-                // Clear media file and previews
-                currentMediaFile = null;
-                if (postMediaUpload) postMediaUpload.value = '';
-                if (mediaImagePreview) {
-                    mediaImagePreview.style.display = 'none';
-                    mediaImagePreview.src = '';
-                }
-                if (mediaVideoPreview) {
-                    mediaVideoPreview.style.display = 'none';
-                    mediaVideoPreview.src = '';
-                }
-                // Hide the remove button
-                removeMediaButton.style.display = 'none';
-                // Update post button state
-                updatePostButtonState();
-                showMessageBox('Media removed', 'success');
-            });
-        }
 
         if (cancelEditPostButton) cancelEditPostButton.addEventListener('click', closeEditPostModal);
         if (saveEditedPostButton) saveEditedPostButton.addEventListener('click', saveEditedPost);
@@ -9707,118 +9222,9 @@
             return el;
         }
 
-        // Mentions autocomplete (basic)
-        function setupMentionsAutocomplete() {
-            if (!postContentInput) return;
-            let dropdown;
-            postContentInput.addEventListener('input', async () => {
-                const value = postContentInput.value;
-                const atIdx = value.lastIndexOf('@');
-                if (atIdx === -1) { if (dropdown) dropdown.remove(); return; }
-                const fragment = value.slice(atIdx + 1);
-                if (!/^\w{1,30}$/.test(fragment)) { if (dropdown) dropdown.remove(); return; }
-                // Query top users by prefix (fallback local placeholder if Firestore unavailable)
-                let suggestions = [];
-                try {
-                    const usersRef = collection(db, 'artifacts', appId, 'public', 'users');
-                    // Simple contains filter (limit): Firestore doesn't support prefix easily; fetch limited and filter client-side
-                    const snap = await getDocs(query(usersRef, orderBy('username'), limit(20)));
-                    suggestions = snap.docs
-                        .map(d => d.data())
-                        .filter(u => (u.username || '').toLowerCase().startsWith(fragment.toLowerCase()))
-                        .slice(0, 5)
-                        .map(u => ({ username: u.username, handle: (u.handle || u.username || '').replace(/\s+/g,'') }));
-                } catch (_) {
-                    suggestions = [];
-                }
-                if (!dropdown) {
-                    dropdown = document.createElement('div');
-                    dropdown.style.cssText = 'position:absolute; z-index:1000; background: var(--card-background); border:1px solid var(--border-light); border-radius:8px; padding:6px; display:flex; flex-direction:column; gap:4px; max-height:180px; overflow:auto;';
-                    postContentInput.parentElement.style.position = 'relative';
-                    postContentInput.parentElement.appendChild(dropdown);
-                }
-                dropdown.innerHTML = suggestions.map(s => `<button type="button" class="mention-suggestion" data-handle="${s.handle}">@${s.username}</button>`).join('') || '<div style="color:var(--text-light);padding:6px;">No matches</div>';
-                dropdown.querySelectorAll('.mention-suggestion').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const handle = btn.dataset.handle;
-                        postContentInput.value = value.slice(0, atIdx) + '@' + handle + ' ' + value.slice(atIdx + 1 + fragment.length);
-                        dropdown.remove(); dropdown = null;
-                        postContentInput.focus();
-                    });
-                });
-            });
-            document.addEventListener('click', (e) => {
-                if (dropdown && !e.target.closest('.mention-suggestion') && e.target !== postContentInput) {
-                    dropdown.remove(); dropdown = null;
-                }
-            });
-        }
 
-        // Offline post queue with background retry
-        const OFFLINE_POST_QUEUE_KEY = 'jchat_offline_post_queue_v1';
-        function enqueueOfflinePost(data) {
-            try {
-                const q = JSON.parse(localStorage.getItem(OFFLINE_POST_QUEUE_KEY) || '[]');
-                q.push({ ...data, queuedAt: Date.now() });
-                localStorage.setItem(OFFLINE_POST_QUEUE_KEY, JSON.stringify(q));
-                showMessageBox('Post queued. It will be sent when you are online.', 'info');
-            } catch (_) {}
-        }
-        async function flushOfflineQueue() {
-            try {
-                const q = JSON.parse(localStorage.getItem(OFFLINE_POST_QUEUE_KEY) || '[]');
-                if (!q.length) return;
-                const remaining = [];
-                for (const item of q) {
-                    try {
-                        await createNewPostDirect(item.content, item.mediaUrl, item.mediaType, item.pollOptions || null);
-                    } catch (_) {
-                        remaining.push(item);
-                    }
-                }
-                localStorage.setItem(OFFLINE_POST_QUEUE_KEY, JSON.stringify(remaining));
-                if (remaining.length === 0) showMessageBox('All queued posts sent.', 'success');
-            } catch (_) {}
-        }
-        window.addEventListener('online', flushOfflineQueue);
 
-        // Wrapper used by queue to bypass UI state
-        async function createNewPostDirect(content, mediaUrl, mediaType, pollOptions) {
-            if (!isAuthReady || !currentUser || !currentUserProfileData) throw new Error('not ready');
-            const postsRef = collection(db, 'artifacts', appId, 'public', 'posts');
-            const newPost = {
-                authorId: currentUser.uid,
-                username: currentUserProfileData.displayName || 'Anonymous',
-                profilePhoto: currentUserProfileData.profilePicId || null,
-                content: content,
-                mediaUrl: mediaUrl || null,
-                mediaType: mediaType || null,
-                pollOptions: pollOptions || null,
-                reactions: {},
-                commentsCount: 0,
-                createdAt: serverTimestamp(),
-                isEdited: false
-            };
-            await addDoc(postsRef, newPost);
-        }
 
-        // Hook into existing post create to handle offline mode
-        const _origCreateNewPost = createNewPost;
-        createNewPost = async function() {
-            try {
-                await _origCreateNewPost();
-            } catch (err) {
-                if (!navigator.onLine) {
-                    // Gather current composer state
-                    const content = (postContentInput && postContentInput.value) || '';
-                    const mediaUrl = (mediaImagePreview && mediaImagePreview.src && mediaImagePreview.style.display !== 'none') ? mediaImagePreview.src : ((mediaVideoPreview && mediaVideoPreview.src && mediaVideoPreview.style.display !== 'none') ? mediaVideoPreview.src : null);
-                    const mediaType = mediaUrl ? (mediaImagePreview && mediaImagePreview.style.display !== 'none' ? 'image' : 'video') : null;
-                    enqueueOfflinePost({ content, mediaUrl, mediaType });
-                } else {
-                    throw err;
-                }
-            }
-        }
         // Notification permission prompt (deferred)
         async function requestNotificationPermissionIfNeeded() {
             try {
@@ -9834,7 +9240,6 @@
 
         // Initialize enhancements on DOM ready
         document.addEventListener('DOMContentLoaded', () => {
-            setupMentionsAutocomplete();
             requestNotificationPermissionIfNeeded();
             // Fetch system settings early to render announcement ASAP
             if (navigator.onLine) fetchSystemSettings().catch(()=>{});
@@ -10178,12 +9583,7 @@
             // Initialize DOM elements first
             initializeDOMElements();
             
-            // Initialize post button state after DOM elements are ready
-            setTimeout(() => {
-                if (typeof updatePostButtonState === 'function') {
-                    updatePostButtonState();
-                }
-            }, 100);
+
 
             // Ensure inspiration section listeners are attached after elements exist
             attachInspirationEventListeners();
