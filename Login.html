@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCHAT - Login</title>
+    
+    <!-- Google Fonts: Poppins for headings, Inter for body text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Global CSS Variables matching your existing pages */
+        :root {
+            --pink: #ff2e92;
+            --blue: #00d5ff;
+            --glass-black: rgba(10, 10, 10, .75);
+            --glass-blue: rgba(0, 213, 255, .15);
+            --radius: 20px;
+            --transition: .3s ease;
+            --white: #fff;
+            --text-light: rgba(255, 255, 255, .7);
+            --background-main: rgba(10, 10, 10, .75);
+            --background-gradient-1: #00d5ff;
+            --background-gradient-2: #ff2e92;
+            --card-background: linear-gradient(145deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .01));
+            --header-background: linear-gradient(135deg, rgba(10, 10, 10, .85), rgba(10, 10, 10, .75));
+            --border-light: rgba(255, 255, 255, .05);
+            --input-background: rgba(255, 255, 255, 0.05);
+            --button-background: linear-gradient(90deg, var(--blue), var(--pink));
+            --button-shadow: 0 4px 15px var(--blue), 0 4px 15px var(--pink);
+            
+            /* Additional variables for consistency */
+            --background-color-primary: #1a1a2e;
+            --background-color-secondary: #0f0f1f;
+            --text-color-primary: #e0e0e0;
+            --text-color-secondary: #b0b0d0;
+        }
+
+        body {
+            font-family: 'Poppins', 'Inter', 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at top left, var(--background-gradient-1), transparent 100px),
+                        radial-gradient(circle at bottom right, var(--background-gradient-2), transparent 150px),
+                        linear-gradient(135deg, var(--background-color-primary), var(--background-color-secondary));
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: var(--text-color-primary);
+            overflow-x: hidden;
+        }
+
+        .login-container {
+            background: var(--card-background);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            box-shadow: var(--button-shadow);
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            transition: all var(--transition);
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--card-background);
+            z-index: -1;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 
+                0 4px 25px var(--blue), 
+                0 4px 25px var(--pink),
+                0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-header {
+            background: var(--header-background);
+            color: var(--white);
+            text-align: center;
+            padding: 40px 20px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 46, 146, 0.1), transparent);
+            animation: headerShimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes headerShimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .jchat-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 52px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--pink), var(--blue), var(--pink));
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: geminiTitleShimmer 3s ease-in-out infinite;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            filter: drop-shadow(0 4px 8px rgba(255, 46, 146, 0.3)) 
+                    drop-shadow(0 0 20px rgba(0, 213, 255, 0.4));
+            transform: perspective(800px) rotateX(10deg);
+        }
+
+        @keyframes geminiTitleShimmer {
+            0%, 100% { 
+                background-position: 0% 50%;
+                filter: drop-shadow(0 4px 8px rgba(255, 46, 146, 0.3)) 
+                        drop-shadow(0 0 20px rgba(0, 213, 255, 0.4));
+            }
+            50% { 
+                background-position: 100% 50%;
+                filter: drop-shadow(0 6px 12px rgba(0, 213, 255, 0.5)) 
+                        drop-shadow(0 0 30px rgba(255, 46, 146, 0.6));
+            }
+        }
+
+        .login-header h1 {
+            font-size: 24px;
+            font-weight: 300;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .login-header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .login-form {
+            padding: 40px 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            transition: all var(--transition);
+            background: var(--input-background);
+            backdrop-filter: blur(10px);
+            color: var(--white);
+            position: relative;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--pink);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: var(--button-shadow);
+            transform: translateY(-2px);
+        }
+
+        .form-group input:hover {
+            border-color: var(--blue);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-light);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .remember-me input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .forgot-password {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #764ba2;
+        }
+
+        .login-btn {
+            width: 100%;
+            background: var(--button-background);
+            color: var(--white);
+            border: none;
+            padding: 16px;
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all var(--transition);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: var(--button-shadow);
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 6px 20px var(--blue), 
+                0 6px 20px var(--pink),
+                0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            position: relative;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border-light), transparent);
+            z-index: 1;
+        }
+
+        .divider span {
+            background: var(--background-main);
+            padding: 8px 20px;
+            position: relative;
+            z-index: 2;
+            border-radius: var(--radius);
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        
+        
+        
+
+
+
+
+
+
+
+        .oauth-section { display: block; margin: 25px 0; }
+        .oauth-btn { width: 100%; border: 1px solid var(--border-light); border-radius: var(--radius); background: var(--card-background); backdrop-filter: blur(20px); color: var(--white); cursor: pointer; transition: all var(--transition); padding: 14px 16px; font-size: 15px; font-weight: 600; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: none; }
+        .oauth-btn:hover { transform: translateY(-3px); box-shadow: var(--button-shadow); border-color: var(--pink); }
+        .oauth-btn.github { background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); position: relative; overflow: hidden; }
+        .oauth-btn.github::before { content: ""; position: absolute; inset: 0; border-radius: var(--radius); background: linear-gradient(90deg, rgba(0,213,255,.25), rgba(255,46,146,.25), rgba(0,213,255,.25)); background-size: 200% 100%; opacity: .25; filter: blur(12px); transform: translateZ(0); transition: opacity var(--transition); animation: shimmerText 4s ease-in-out infinite; pointer-events: none; }
+        .oauth-btn.github:hover::before { opacity: .45; }
+        .oauth-icon { display: inline-flex; width: 18px; height: 18px; align-items: center; justify-content: center; }
+
+        @keyframes loadingPulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 25px var(--pink),
+                    0 0 50px var(--blue);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 35px var(--pink),
+                    0 0 70px var(--blue);
+            }
+        }
+
+
+
+
+
+
+        .signup-link {
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .signup-link a {
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            font-weight: 700;
+            position: relative;
+            transition: all var(--transition);
+        }
+
+        .signup-link a:hover {
+            background: linear-gradient(90deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scale(1.05);
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .forgot-password {
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all var(--transition);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .forgot-password:hover {
+            background: linear-gradient(90deg, var(--pink), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transform: scale(1.05);
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .error-message::before {
+            content: '⚠';
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        /* Signup mode styles */
+        .login-container.signup-mode .login-header {
+            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: geminiSignupGradient 8s ease infinite;
+        }
+
+        @keyframes geminiSignupGradient {
+            0% { background-position: 0% 50%; }
+            33% { background-position: 100% 0%; }
+            66% { background-position: 0% 100%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-container.signup-mode .login-btn {
+            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%);
+            background-size: 200% 200%;
+            animation: geminiSignupButtonGradient 6s ease infinite;
+        }
+
+        @keyframes geminiSignupButtonGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .login-container.signup-mode .login-btn:hover {
+            box-shadow: 
+                0 15px 35px rgba(6, 182, 212, 0.3),
+                0 5px 15px rgba(139, 92, 246, 0.2),
+                0 0 30px rgba(236, 72, 153, 0.2);
+        }
+
+        /* Loading state */
+        .login-btn:disabled {
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Success message styling */
+        .error-message.success {
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            color: white;
+            border: none;
+        }
+
+        /* Smart Loader Styles matching your pages */
+        .smart-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 30, 0.95));
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loader-content {
+            background: var(--card-background);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            backdrop-filter: blur(20px);
+        }
+
+        .gemini-spinner {
+            width: 80px;
+            height: 80px;
+            border: 4px solid transparent;
+            border-radius: 50%;
+            position: relative;
+            margin: 0 auto 20px;
+            animation: spin 2s linear infinite;
+        }
+
+        .gemini-spinner::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 4px solid transparent;
+            border-top: 4px solid var(--pink);
+            border-right: 4px solid var(--blue);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite reverse;
+            filter: drop-shadow(0 0 20px var(--pink)) drop-shadow(0 0 20px var(--blue));
+        }
+
+        .gemini-spinner::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 3px solid transparent;
+            border-bottom: 3px solid var(--pink);
+            border-left: 3px solid var(--blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            filter: drop-shadow(0 0 15px var(--pink)) drop-shadow(0 0 15px var(--blue));
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-text {
+            color: var(--white);
+            font-size: 18px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--pink), var(--blue), var(--pink));
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmerText 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmerText {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .loader-subtext {
+            color: var(--text-light);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            opacity: 0.7;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Custom Modal Styles */
+        .custom-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px) scale(0.9); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .modal-icon.success {
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            color: white;
+        }
+
+        .modal-icon.error {
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            color: white;
+        }
+
+        .modal-icon.info {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-message {
+            color: #6b7280;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #ec4899 0%, #4f46e5 100%);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Signup form enhancements */
+        .signup-only {
+            transition: all 0.3s ease;
+        }
+
+        .username-feedback {
+            font-size: 12px;
+            margin-top: 5px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .username-feedback.available {
+            background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            color: white;
+            display: block;
+        }
+
+        .username-feedback.taken {
+            background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);
+            color: white;
+            display: block;
+        }
+
+        .username-feedback.checking {
+            background: linear-gradient(135deg, #f59e0b 0%, #eab308 100%);
+            color: white;
+            display: block;
+        }
+
+        /* Enhanced textarea styling */
+        textarea:focus {
+            outline: none !important;
+            border-color: #ec4899 !important;
+            background: rgba(255, 255, 255, 0.95) !important;
+            box-shadow: 
+                0 0 0 4px rgba(236, 72, 153, 0.1) !important,
+                0 8px 25px rgba(79, 70, 229, 0.15) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        /* Floating particles */
+        .floating-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: float 8s linear infinite;
+        }
+
+        .particle.pink {
+            background: var(--pink);
+            box-shadow: 0 0 15px var(--pink);
+        }
+
+        .particle.blue {
+            background: var(--blue);
+            box-shadow: 0 0 15px var(--blue);
+        }
+
+        .particle.cyan {
+            background: var(--blue);
+            box-shadow: 0 0 15px var(--blue);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-10vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Gemini-style input focus glow */
+        .form-group input:focus,
+        textarea:focus {
+            position: relative;
+        }
+
+        .form-group input:focus::after,
+        textarea:focus::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #ec4899, #4f46e5, #06b6d4);
+            border-radius: 14px;
+            z-index: -1;
+            opacity: 0.3;
+            animation: inputGlow 2s ease infinite;
+        }
+
+        @keyframes inputGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Smart validation states */
+        .form-group.valid input {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(0, 213, 255, 0.2);
+        }
+
+        .form-group.invalid input {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+        }
+
+        .form-group.valid::after {
+            content: '✓';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--blue);
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 16px;
+        }
+
+        /* Performance optimizations */
+        * {
+            will-change: auto;
+        }
+
+        .login-container,
+        .login-btn,
+        .form-group input {
+            will-change: transform, box-shadow;
+        }
+
+        /* Smooth animations with hardware acceleration */
+        .login-container,
+        .login-btn,
+        .form-group {
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 10px;
+            }
+            
+            .login-form {
+                padding: 30px 20px;
+            }
+            
+            .login-header {
+                padding: 30px 20px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <div class="floating-particles" id="floatingParticles"></div>
+
+    <div class="login-container">
+        <div class="login-header">
+            <div class="jchat-title">JCHAT</div>
+            <h1>Welcome Back</h1>
+            <p>Please sign in to your account</p>
+        </div>
+        
+        <form class="login-form" id="loginForm">
+            <div class="error-message" id="errorMessage">
+                Invalid email or password. Please try again.
+            </div>
+            
+            <!-- Signup-only fields -->
+            <div class="form-group signup-only" style="display: none;">
+                <label for="fullName">Full Name</label>
+                <input 
+                    type="text" 
+                    id="fullName" 
+                    name="fullName" 
+                    placeholder="Enter your full name"
+                >
+            </div>
+
+            <div class="form-group signup-only" style="display: none;">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Choose a unique username"
+                >
+                <div class="username-feedback" id="usernameFeedback"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="Enter your email"
+                    required
+                >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    placeholder="Enter your password"
+                    required
+                >
+                <button type="button" class="password-toggle" onclick="togglePassword()">
+                    👁️
+                </button>
+            </div>
+
+            <!-- Signup-only fields continued -->
+            <div class="form-group signup-only" style="display: none;">
+                <label for="confirmPassword">Confirm Password</label>
+                <input 
+                    type="password" 
+                    id="confirmPassword" 
+                    name="confirmPassword" 
+                    placeholder="Confirm your password"
+                >
+            </div>
+
+            <div class="form-group signup-only" style="display: none;">
+                <label for="bio">Bio (Optional)</label>
+                <textarea 
+                    id="bio" 
+                    name="bio" 
+                    placeholder="Tell us about yourself..."
+                    rows="3"
+                    style="resize: vertical; font-family: inherit; padding: 15px 20px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 16px; background: #f8f9fa; transition: all 0.3s ease;"
+                ></textarea>
+            </div>
+
+            <div class="form-group signup-only" style="display: none;">
+                <label for="location">Location (Optional)</label>
+                <input 
+                    type="text" 
+                    id="location" 
+                    name="location" 
+                    placeholder="Enter your location"
+                >
+            </div>
+            
+            <div class="remember-forgot">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Remember me</label>
+                </div>
+                <a href="#" class="forgot-password" onclick="showResetPasswordModal()">Forgot password?</a>
+            </div>
+            
+            <button type="submit" class="login-btn">
+                Sign In
+            </button>
+
+            <div class="divider" id="oauthDivider"><span>Or continue with</span></div>
+            <div class="oauth-section" id="oauthSection">
+                <button type="button" class="oauth-btn github" id="githubOauthBtn" aria-label="Continue with GitHub">
+                    <span class="oauth-icon">
+                        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
+                            <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                    </span>
+                    <span>Continue with GitHub</span>
+                </button>
+            </div>
+
+
+            <div class="signup-link">
+                <span id="signup-link-text">Don't have an account? <a href="#" onclick="goToSignup()">Sign up here</a></span>
+                <div id="admin-only-notice" style="display: none; font-size: 0.9rem; color: var(--text-light); margin-top: 0.5rem;">
+                    📧 Account creation is currently invite-only. Please contact an administrator.
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Smart Loader -->
+    <div class="smart-loader" id="smartLoader">
+        <div class="loader-content">
+            <div class="gemini-spinner"></div>
+            <div class="loader-text" id="loaderText">Processing...</div>
+            <div class="loader-subtext" id="loaderSubtext">Please wait while we authenticate you</div>
+        </div>
+    </div>
+
+    <!-- Custom Modal -->
+    <div class="custom-modal" id="customModal">
+        <div class="modal-content">
+            <div class="modal-icon" id="modalIcon">
+                ✓
+            </div>
+            <div class="modal-title" id="modalTitle">Success</div>
+            <div class="modal-message" id="modalMessage">Your action was completed successfully.</div>
+            <div class="modal-buttons">
+                <button class="modal-btn primary" id="modalPrimaryBtn" onclick="closeModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="custom-modal" id="resetPasswordModal">
+        <div class="modal-content">
+            <div class="modal-icon info">
+                🔑
+            </div>
+            <div class="modal-title">Reset Password</div>
+            <div class="modal-message">Enter your email address and we'll send you a link to reset your password.</div>
+            <div style="margin: 20px 0;">
+                <input type="email" id="resetEmail" placeholder="Enter your email" style="width: 100%; padding: 12px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 14px;">
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeResetModal()">Cancel</button>
+                <button class="modal-btn primary" onclick="sendResetEmail()">Send Reset Link</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+        // Firebase configuration (using your existing config)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebasestorage.app",
+            messagingSenderId: "328479683167",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+
+        // Initialize Firebase (allow runtime domain switch)
+        let app = initializeApp(firebaseConfig);
+        let auth = getAuth(app);
+        let db = getFirestore(app);
+        window.__auth_domain = firebaseConfig.authDomain;
+        async function switchAuthDomain(newDomain) {
+            try { await deleteApp(app); } catch (e) {}
+            const cfg = { ...firebaseConfig, authDomain: newDomain };
+            app = initializeApp(cfg);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            window.__auth_domain = newDomain;
+        }
+
+        // Application ID (consistent with other pages)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // System settings reference used across the app
+        const SYSTEM_SETTINGS_DOC_REF = doc(db, "artifacts", appId, "public", "data", "settings", "system_settings");
+        // Public signup flag (default true). Also mirrored to a global used elsewhere in this file
+        let publicSignupEnabled = true;
+        window.__public_signup_enabled = true;
+        
+
+        // Load system settings to determine if public signup is enabled
+        (async function loadSystemSettings() {
+            try {
+                const snap = await getDoc(SYSTEM_SETTINGS_DOC_REF);
+                if (snap.exists()) {
+                    const settings = snap.data();
+                    publicSignupEnabled = settings.enableUserRegistration !== false; // default true if missing
+                    window.__public_signup_enabled = publicSignupEnabled;
+
+
+                    if (!publicSignupEnabled) {
+                        // Ensure UI reflects invite-only mode
+                        const container = document.querySelector('.login-container');
+                        if (container && container.classList.contains('signup-mode')) {
+                            container.classList.remove('signup-mode');
+                        }
+                        showAdminOnlyNotice();
+                    }
+                }
+            } catch (e) {
+                console.warn('JCHAT_WARN: Failed to load system settings; assuming signup enabled.', e);
+                publicSignupEnabled = true;
+                window.__public_signup_enabled = true;
+            }
+        })();
+
+
+
+        // Make functions globally available
+        window.togglePassword = function() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        };
+
+
+
+
+
+
+        window.goToSignup = function() {
+            // Optional guard: allow an environment flag to disable public signup
+            if (typeof __public_signup_enabled !== 'undefined' && __public_signup_enabled === false) {
+                showErrorModal('Account creation is currently invite-only. Please sign in with an existing account or contact an administrator.');
+                showAdminOnlyNotice();
+                return;
+            }
+            // Toggle to signup mode
+            toggleSignupMode();
+        };
+
+        function showAdminOnlyNotice() {
+            const signupLinkText = document.getElementById('signup-link-text');
+            const adminNotice = document.getElementById('admin-only-notice');
+            if (signupLinkText && adminNotice) {
+                signupLinkText.style.display = 'none';
+                adminNotice.style.display = 'block';
+            }
+        }
+
+
+
+        // Save user data to Firestore
+        async function saveUserData(user, provider, additionalData = {}) {
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userRef);
+                
+                const userData = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                    provider: provider,
+                    lastLogin: serverTimestamp(),
+                    ...additionalData
+                };
+                
+                if (!userDoc.exists()) {
+                    // New user
+                    userData.createdAt = serverTimestamp();
+                    userData.isNewUser = true;
+                    await setDoc(userRef, userData);
+                } else {
+                    // Existing user
+                    await updateDoc(userRef, {
+                        lastLogin: serverTimestamp(),
+                        provider: provider
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Error saving user data:', error);
+            }
+        }
+
+
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            const isSignupMode = document.querySelector('.login-container').classList.contains('signup-mode');
+
+            // Basic validation
+            if (!email || !password) {
+                showError('Please fill in all fields.');
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                showError('Please enter a valid email address.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters long.');
+                return;
+            }
+
+            hideError();
+
+            try {
+                if (isSignupMode) {
+                    await signUpUser(email, password);
+                } else {
+                    await loginUser(email, password, remember);
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showError(error.message || 'Authentication failed. Please try again.');
+            }
+        });
+
+
+
+        // Sign up user
+        async function signUpUser(email, password) {
+            // Get additional signup fields
+            const fullName = document.getElementById('fullName').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const bio = document.getElementById('bio').value.trim();
+            const location = document.getElementById('location').value.trim();
+            
+            // Enhanced validation for signup
+            if (!fullName) {
+                showErrorModal('Please enter your full name.');
+                return;
+            }
+            
+            if (!username) {
+                showErrorModal('Please choose a username.');
+                return;
+            }
+            
+            if (username.length < 3) {
+                showErrorModal('Username must be at least 3 characters long.');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showErrorModal('Passwords do not match. Please check and try again.');
+                return;
+            }
+            
+            // Check username availability
+            if (!(await checkUsernameAvailability(username))) {
+                showErrorModal('This username is already taken. Please choose a different one.');
+                return;
+            }
+            
+            showSmartLoader('Creating Account', 'Setting up your JCHAT profile...');
+            
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Update Firebase Auth profile with display name
+                await updateProfile(user, {
+                    displayName: fullName
+                });
+                
+                // Save comprehensive user data to Firestore
+                const userData = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: fullName,
+                    username: username.toLowerCase(),
+                    fullName: fullName,
+                    bio: bio || '',
+                    location: location || '',
+                    provider: 'email',
+                    createdAt: serverTimestamp(),
+                    lastLogin: serverTimestamp(),
+                    isNewUser: true,
+                    profileCompletion: calculateInitialCompletion(fullName, username, bio, location),
+                    // Profile visibility settings
+                    visibility: {
+                        email: false,
+                        location: !!location,
+                        bio: !!bio,
+                        fullName: true
+                    }
+                };
+                
+                await saveUserData(user, 'email', userData);
+
+                // Send email verification
+                try {
+                    await sendEmailVerification(user);
+                    hideSmartLoader();
+                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Please check your email to verify your account.`, () => {
+                        window.location.href = 'Home.html';
+                    });
+                } catch (verificationError) {
+                    console.warn('Email verification failed:', verificationError);
+                    hideSmartLoader();
+                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Note: Email verification could not be sent.`, () => {
+                        window.location.href = 'Home.html';
+                    });
+                }
+                
+            } catch (error) {
+                hideSmartLoader();
+                let errorMessage = 'Failed to create account. Please try again.';
+
+                const code = error && error.code ? String(error.code) : '';
+                const messageText = error && error.message ? String(error.message) : '';
+
+                switch (code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'An account with this email already exists. Would you like to sign in instead?';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak. Please choose a stronger password with at least 6 characters.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/operation-not-allowed':
+                    case 'auth/admin-restricted-operation':
+                        errorMessage = 'Sign up is restricted to administrators. Please sign in with an existing account or contact support.';
+                        break;
+                }
+
+                // Fallback for Identity Toolkit REST error text
+                if (/ADMIN_ONLY_OPERATION/i.test(messageText)) {
+                    errorMessage = 'Account creation is currently invite-only. Please sign in with an existing account or contact an administrator for access.';
+                    showAdminOnlyNotice();
+                }
+
+                showErrorModal(errorMessage);
+            }
+        }
+
+        // Login user
+        async function loginUser(email, password, remember) {
+            showSmartLoader('Signing In', 'Authenticating your credentials...');
+            
+            try {
+                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Update last login
+                await saveUserData(user, 'email');
+                
+                hideSmartLoader();
+                showSuccessModal(`Welcome back, ${user.displayName || user.email}!`, () => {
+                    window.location.href = 'Home.html';
+                });
+
+            } catch (error) {
+                hideSmartLoader();
+                let errorMessage = 'Invalid email or password.';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email. Would you like to create a new account or contact an administrator?';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Incorrect password. Please check your password and try again, or use "Forgot password" to reset it.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/invalid-credential':
+                        errorMessage = 'Invalid login credentials. Please check your email and password.';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'This account has been disabled. Please contact support for assistance.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed attempts. Please try again later, or reset your password.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Network error. Please check your internet connection and try again.';
+                        break;
+                }
+                
+                showErrorModal(errorMessage);
+            }
+        }
+
+        // Email validation
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Show error message with enhanced feedback
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            resetErrorStyles();
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+
+            // Add vibration for mobile devices
+            if (navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]);
+            }
+
+            // Auto-hide after 8 seconds
+            setTimeout(() => {
+                if (errorDiv.style.display === 'block') {
+                    errorDiv.style.opacity = '0';
+                    setTimeout(() => {
+                        errorDiv.style.display = 'none';
+                        errorDiv.style.opacity = '1';
+                    }, 300);
+                }
+            }, 8000);
+        }
+
+        // Hide error message
+        function hideError() {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.display = 'none';
+        }
+
+        // Enhanced Smart Loader Functions with timeout protection
+        function showSmartLoader(title, subtitle) {
+            const loader = document.getElementById('smartLoader');
+            const loaderText = document.getElementById('loaderText');
+            const loaderSubtext = document.getElementById('loaderSubtext');
+
+            loaderText.textContent = title;
+            loaderSubtext.textContent = subtitle;
+            loader.style.display = 'flex';
+
+            // Disable form
+            document.getElementById('loginForm').style.pointerEvents = 'none';
+
+            // Auto-hide loader after 30 seconds as failsafe
+            window.loaderTimeout = setTimeout(() => {
+                hideSmartLoader();
+                showErrorModal('Request took too long. Please try again.');
+            }, 30000);
+        }
+
+        function hideSmartLoader() {
+            const loader = document.getElementById('smartLoader');
+            loader.style.display = 'none';
+
+            // Clear timeout
+            if (window.loaderTimeout) {
+                clearTimeout(window.loaderTimeout);
+                window.loaderTimeout = null;
+            }
+
+            // Re-enable form
+            document.getElementById('loginForm').style.pointerEvents = 'auto';
+        }
+
+        // Show loading state
+        function showLoading(message) {
+            const loginBtn = document.querySelector('.login-btn');
+            loginBtn.textContent = message;
+            loginBtn.disabled = true;
+            loginBtn.style.opacity = '0.7';
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            const loginBtn = document.querySelector('.login-btn');
+            const isSignupMode = document.querySelector('.login-container').classList.contains('signup-mode');
+            loginBtn.textContent = isSignupMode ? 'Create Account' : 'Sign In';
+            loginBtn.disabled = false;
+            loginBtn.style.opacity = '1';
+        }
+
+        // Custom Modal Functions
+        function showCustomModal(type, title, message, callback = null) {
+            const modal = document.getElementById('customModal');
+            const icon = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const messageEl = document.getElementById('modalMessage');
+            const primaryBtn = document.getElementById('modalPrimaryBtn');
+            
+            // Set icon and styling based on type
+            icon.className = `modal-icon ${type}`;
+            switch(type) {
+                case 'success':
+                    icon.textContent = '✓';
+                    break;
+                case 'error':
+                    icon.textContent = '✕';
+                    break;
+                case 'info':
+                    icon.textContent = 'ℹ';
+                    break;
+                case 'question':
+                    icon.textContent = '?';
+                    break;
+            }
+            
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            
+            // Set up callback
+            if (callback) {
+                primaryBtn.onclick = () => {
+                    closeModal();
+                    callback();
+                };
+            } else {
+                primaryBtn.onclick = closeModal;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('customModal');
+            modal.style.display = 'none';
+        }
+
+
+        // Enhanced show success with custom modal
+        function showSuccessModal(message, callback = null) {
+            showCustomModal('success', 'Success!', message, callback);
+        }
+
+        // Enhanced show error with custom modal
+        function showErrorModal(message) {
+            showCustomModal('error', 'Authentication Error', message);
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.background = '#d4edda';
+            errorDiv.style.color = '#155724';
+            errorDiv.style.border = '1px solid #c3e6cb';
+            errorDiv.style.display = 'block';
+        }
+
+        // Reset error message styles
+        function resetErrorStyles() {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.style.background = '#fee';
+            errorDiv.style.color = '#c33';
+            errorDiv.style.border = 'none';
+        }
+
+        // Toggle between login and signup modes
+        function toggleSignupMode() {
+            if (typeof __public_signup_enabled !== 'undefined' && __public_signup_enabled === false) {
+                showErrorModal('Sign up is disabled by administrators. Please sign in or contact support.');
+                return;
+            }
+            const container = document.querySelector('.login-container');
+            const header = document.querySelector('.login-header h1');
+            const subtitle = document.querySelector('.login-header p');
+            const submitBtn = document.querySelector('.login-btn');
+            const signupLink = document.querySelector('.signup-link');
+            const rememberForgot = document.querySelector('.remember-forgot');
+            const signupOnlyFields = document.querySelectorAll('.signup-only');
+            
+            if (container.classList.contains('signup-mode')) {
+                // Switch to login mode
+                container.classList.remove('signup-mode');
+                header.textContent = 'Welcome Back';
+                subtitle.textContent = 'Please sign in to your account';
+                submitBtn.textContent = 'Sign In';
+                signupLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="goToSignup()">Sign up here</a>';
+                rememberForgot.style.display = 'flex';
+
+                // Hide signup-only fields
+                signupOnlyFields.forEach(field => {
+                    field.style.display = 'none';
+                });
+
+                } else {
+                // Switch to signup mode
+                container.classList.add('signup-mode');
+                header.textContent = 'Join JCHAT';
+                subtitle.textContent = 'Create your account to get started';
+                submitBtn.textContent = 'Create Account';
+                signupLink.innerHTML = 'Already have an account? <a href="#" onclick="goToSignup()">Sign in here</a>';
+                rememberForgot.style.display = 'none';
+
+                // Show signup-only fields
+                signupOnlyFields.forEach(field => {
+                    field.style.display = 'block';
+                });
+
+                }
+
+            hideError();
+        }
+
+        // Check authentication state with enhanced loading
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, show loading and redirect to home
+                console.log('User already authenticated:', user.email);
+                showSmartLoader('Welcome Back!', 'Taking you to your account...');
+                setTimeout(() => {
+                    window.location.href = 'Home.html';
+                }, 1000);
+            }
+        });
+
+        // Username availability checking
+        async function checkUsernameAvailability(username) {
+            try {
+                // Check if username is taken by querying Firestore
+                const usernameQuery = query(
+                    collection(db, 'users'),
+                    where('username', '==', username.toLowerCase())
+                );
+                const querySnapshot = await getDocs(usernameQuery);
+                return querySnapshot.empty;
+            } catch (error) {
+                console.error('Error checking username:', error);
+                return false;
+            }
+        }
+
+        // Real-time username validation
+        function setupUsernameValidation() {
+            const usernameInput = document.getElementById('username');
+            const feedback = document.getElementById('usernameFeedback');
+            let timeoutId;
+            
+            usernameInput.addEventListener('input', function() {
+                const username = this.value.trim();
+                
+                clearTimeout(timeoutId);
+                
+                if (username.length === 0) {
+                    feedback.className = 'username-feedback';
+                    return;
+                }
+                
+                if (username.length < 3) {
+                    feedback.className = 'username-feedback taken';
+                    feedback.textContent = 'Username must be at least 3 characters';
+                    return;
+                }
+                
+                feedback.className = 'username-feedback checking';
+                feedback.textContent = 'Checking availability...';
+                
+                timeoutId = setTimeout(async () => {
+                    const isAvailable = await checkUsernameAvailability(username);
+                    if (isAvailable) {
+                        feedback.className = 'username-feedback available';
+                        feedback.textContent = '✓ Username is available';
+                    } else {
+                        feedback.className = 'username-feedback taken';
+                        feedback.textContent = '✗ Username is already taken';
+                    }
+                }, 500);
+            });
+        }
+
+        // Calculate initial profile completion
+        function calculateInitialCompletion(fullName, username, bio, location) {
+            let completion = 0;
+            if (fullName) completion += 25;
+            if (username) completion += 25;
+            if (bio) completion += 25;
+            if (location) completion += 25;
+            return completion;
+        }
+
+        // Reset Password Functions
+        window.showResetPasswordModal = function() {
+            const modal = document.getElementById('resetPasswordModal');
+            modal.style.display = 'flex';
+        };
+
+        window.closeResetModal = function() {
+            const modal = document.getElementById('resetPasswordModal');
+            modal.style.display = 'none';
+            document.getElementById('resetEmail').value = '';
+        };
+
+        window.sendResetEmail = async function() {
+            const email = document.getElementById('resetEmail').value;
+            
+            if (!email) {
+                showCustomModal('error', 'Email Required', 'Please enter your email address.');
+                return;
+            }
+            
+            if (!isValidEmail(email)) {
+                showCustomModal('error', 'Invalid Email', 'Please enter a valid email address.');
+                return;
+            }
+            
+            try {
+                showSmartLoader('Sending Reset Email', 'Preparing password reset instructions...');
+                
+                await sendPasswordResetEmail(auth, email);
+                
+                hideSmartLoader();
+                closeResetModal();
+                showSuccessModal('Password reset email sent! Check your inbox and follow the instructions to reset your password.');
+                
+            } catch (error) {
+                hideSmartLoader();
+                let errorMessage = 'Failed to send reset email. Please try again.';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'No account found with this email address.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many reset attempts. Please try again later.';
+                        break;
+                }
+                
+                showCustomModal('error', 'Reset Failed', errorMessage);
+            }
+        };
+
+        // Create floating particles with performance optimization
+        function createFloatingParticles() {
+            const particleContainer = document.getElementById('floatingParticles');
+            const colors = ['pink', 'blue'];
+            
+            // Use requestAnimationFrame for better performance
+            requestAnimationFrame(() => {
+                for (let i = 0; i < 12; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = `particle ${colors[Math.floor(Math.random() * colors.length)]}`;
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 8 + 's';
+                    particle.style.animationDuration = (6 + Math.random() * 4) + 's';
+                    particle.style.willChange = 'transform, opacity';
+                    particleContainer.appendChild(particle);
+                }
+            });
+        }
+
+        // Performance-optimized hover effects
+        function addGeminiEffects() {
+            const container = document.querySelector('.login-container');
+            let isHovering = false;
+            
+            container.addEventListener('mouseenter', function() {
+                if (!isHovering) {
+                    isHovering = true;
+                    requestAnimationFrame(() => {
+                        this.style.transform = 'translateY(-5px) scale(1.02)';
+                        this.style.boxShadow = `
+                            0 4px 25px var(--blue), 
+                            0 4px 25px var(--pink),
+                            0 20px 40px rgba(0, 0, 0, 0.2)`;
+                    });
+                }
+            });
+            
+            container.addEventListener('mouseleave', function() {
+                if (isHovering) {
+                    isHovering = false;
+                    requestAnimationFrame(() => {
+                        this.style.transform = 'translateY(0) scale(1)';
+                        this.style.boxShadow = `var(--button-shadow)`;
+                    });
+                }
+            });
+        }
+
+        // Smart form validation with real-time feedback
+        function addSmartValidation() {
+            const form = document.getElementById('loginForm');
+            const inputs = form.querySelectorAll('input[required]');
+            
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    const isValid = this.checkValidity();
+                    const formGroup = this.closest('.form-group');
+                    
+                    if (isValid && this.value.length > 0) {
+                        formGroup.classList.add('valid');
+                        formGroup.classList.remove('invalid');
+                    } else if (this.value.length > 0) {
+                        formGroup.classList.add('invalid');
+                        formGroup.classList.remove('valid');
+                    } else {
+                        formGroup.classList.remove('valid', 'invalid');
+                    }
+                });
+            });
+        }
+
+        // Preload critical resources for faster loading
+        function preloadResources() {
+            const preloadLinks = [
+                'https://fonts.googleapis.com',
+                'https://fonts.gstatic.com'
+            ];
+            
+            preloadLinks.forEach(href => {
+                const link = document.createElement('link');
+                link.rel = 'preconnect';
+                link.href = href;
+                document.head.appendChild(link);
+            });
+        }
+
+        // GitHub OAuth via redirect (no Firebase)
+        function handleGithubOAuthRedirect() {
+            const clientId = 'Ov23liaK2pApMKMX2qvT';
+            const redirectUri = 'https://jchathub.netlify.app/auth/github/callback';
+            const scope = 'read:user user:email';
+            const state = Math.random().toString(36).slice(2) + Date.now();
+            try { sessionStorage.setItem('gh_oauth_state', state); } catch (e) {}
+            const url = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}`;
+            window.location.href = url;
+        }
+
+        // Initialize all smart features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Performance optimization - preload resources
+            preloadResources();
+
+            // Verify Firebase Auth iframe connectivity and guide if blocked
+            (function verifyAuthIframe(){
+                try {
+                    const test = document.createElement('iframe');
+                    test.style.position = 'absolute';
+                    test.style.width = '1px';
+                    test.style.height = '1px';
+                    test.style.top = '-100px';
+                    test.referrerPolicy = 'no-referrer';
+                    const authDomain = (typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com';
+                    const apiKey = (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) ? firebaseConfig.apiKey : '';
+                    test.src = `https://${authDomain}/__/auth/iframe?apiKey=${encodeURIComponent(apiKey)}&v=11.8.0`;
+                    let handled = false;
+                    const cleanup = () => { if (test && test.parentNode) test.parentNode.removeChild(test); };
+                    const timer = setTimeout(() => {
+                        if (!handled) {
+                            handled = true;
+                            cleanup();
+                            showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. If you see “refused to connect”, ensure this site (${location.host}) is in Firebase Authentication → Settings → Authorized domains, and that corporate firewalls allow *.firebaseapp.com`);
+                        }
+                    }, 4000);
+                    test.onload = () => { handled = true; clearTimeout(timer); cleanup(); };
+                    test.onerror = async () => { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(e) {} showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. Switched to jchat-1.web.app for auth. Please retry.`); };
+                    document.body.appendChild(test);
+                } catch (e) { /* noop */ }
+            })();
+            
+            // Create floating particles
+            createFloatingParticles();
+            
+            // Add Gemini hover effects
+            addGeminiEffects();
+            
+            // Add smart validation
+            addSmartValidation();
+            
+            // Add focus effects to inputs with performance optimization
+            const inputs = document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"], textarea');
+            
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    requestAnimationFrame(() => {
+                        this.parentElement.style.transform = 'translateY(-2px)';
+                        this.parentElement.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                    });
+                });
+                
+                input.addEventListener('blur', function() {
+                    requestAnimationFrame(() => {
+                        this.parentElement.style.transform = 'translateY(0)';
+                    });
+                });
+            });
+
+            // Setup username validation
+            setupUsernameValidation();
+
+            // Wire GitHub OAuth redirect button
+            const ghBtn = document.getElementById('githubOauthBtn');
+            if (ghBtn) ghBtn.addEventListener('click', handleGithubOAuthRedirect);
+
+
+            // Close modals when clicking outside
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('custom-modal')) {
+                    if (e.target.id === 'customModal') {
+                        closeModal();
+                    } else if (e.target.id === 'resetPasswordModal') {
+                        closeResetModal();
+                    }
+                }
+            });
+
+            // Add keyboard shortcuts for better UX
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    closeResetModal();
+                }
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    const form = document.getElementById('loginForm');
+                    form.dispatchEvent(new Event('submit'));
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
