@@ -1,0 +1,15 @@
+name: Sync to Termux
+
+on: [push]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Termux Sync
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.TERMUX_ACCESS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"repo": "${{ github.repository }}", "ref": "${{ github.ref }}"}' \
+            http://your-termux-server:8080/webhook
