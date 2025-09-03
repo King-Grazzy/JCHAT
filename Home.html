@@ -4384,7 +4384,7 @@
         }
 
         // Import Firebase modules (Updated to v11.8.0 - Latest Stable)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, where, getDocs, addDoc, runTransaction, writeBatch, serverTimestamp, arrayUnion, arrayRemove, onSnapshot, documentId } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
@@ -4461,9 +4461,45 @@
         }
 
         // Initialize Firebase services: App, Auth, and Firestore.
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app = initializeApp(firebaseConfig);
+        let auth = getAuth(app);
+        let db = getFirestore(app);
+        window.__auth_domain = firebaseConfig.authDomain;
+        async function switchAuthDomain(newDomain) {
+            try { await deleteApp(app); } catch (e) {}
+            const cfg = { ...firebaseConfig, authDomain: newDomain };
+            app = initializeApp(cfg);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            window.__auth_domain = newDomain;
+        }
+        function ensureAuthIframeReachable(timeoutMs = 4000) {
+            return new Promise((resolve) => {
+                try {
+                    const test = document.createElement('iframe');
+                    test.style.position = 'absolute';
+                    test.style.width = '1px';
+                    test.style.height = '1px';
+                    test.style.top = '-100px';
+                    test.referrerPolicy = 'no-referrer';
+                    const authDomain = (typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com';
+                    const apiKey = (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) ? firebaseConfig.apiKey : '';
+                    test.src = `https://${authDomain}/__/auth/iframe?apiKey=${encodeURIComponent(apiKey)}&v=11.8.0`;
+                    let done = false;
+                    const cleanup = () => { if (test && test.parentNode) test.parentNode.removeChild(test); };
+                    const timer = setTimeout(async () => {
+                        if (!done) {
+                            done = true; cleanup();
+                            try { await switchAuthDomain('jchat-1.web.app'); } catch (_) {}
+                        }
+                        resolve();
+                    }, timeoutMs);
+                    test.onload = () => { if (!done) { done = true; clearTimeout(timer); cleanup(); resolve(); } };
+                    test.onerror = async () => { if (!done) { done = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch (_) {} resolve(); } };
+                    document.body.appendChild(test);
+                } catch (_) { resolve(); }
+            });
+        }
         if (typeof setLoaderStage === 'function') setLoaderStage('firebase');
 
         // --- ADMIN UID ---
@@ -6545,7 +6581,7 @@
                 showMessageBox("Logged out successfully! 👋", 'success');
                 // Redirect to login page after a short delay.
                 setTimeout(() => {
-                    window.location.href = '/login.html';
+                    window.location.href = 'Login.html';
                 }, 1500);
 
             } catch (error) {
@@ -9089,6 +9125,7 @@ async function fetchAndDisplayPosts() {
 
             } else {
                 console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
+                await ensureAuthIframeReachable();
                 try {
                     if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
@@ -9101,7 +9138,7 @@ async function fetchAndDisplayPosts() {
                     console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
                     if (!auth.currentUser) {
                         hideLoader(); // Hide loader before redirect
-                        window.location.href = '/login.html'; // Redirect to login if all sign-in attempts fail.
+                        window.location.href = 'Login.html'; // Redirect to login if all sign-in attempts fail.
                         return; // Stop further execution.
                     }
                 }
