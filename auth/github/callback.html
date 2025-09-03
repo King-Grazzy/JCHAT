@@ -505,6 +505,29 @@
         const state = urlParams.get('state');
         const error = urlParams.get('error');
         const baseUrl = window.location.origin;
+        function getReturnBase() {
+            try {
+                if (!state) return baseUrl;
+                const parsed = JSON.parse(decodeURIComponent(state));
+                const candidate = parsed && parsed.r ? String(parsed.r) : null;
+                if (!candidate) return baseUrl;
+                const u = new URL(candidate);
+                const host = u.hostname;
+                const allowedSuffixes = [
+                    'netlify.app',
+                    'fly.dev',
+                    'builder.my',
+                    'localhost',
+                    '127.0.0.1',
+                    'jchat.app'
+                ];
+                if (allowedSuffixes.some(sfx => host === sfx || host.endsWith(`.${sfx}`))) {
+                    return `${u.protocol}//${u.host}`;
+                }
+            } catch (_) {}
+            return baseUrl;
+        }
+        let returnBase = getReturnBase();
 
         console.log('GitHub Enhanced Callback - Code:', !!code, 'State:', !!state, 'Error:', error);
 
@@ -635,7 +658,8 @@
             
             setTimeout(() => {
                 console.error('GitHub OAuth Error:', error);
-                window.location.href = `${baseUrl}/Login.html?error=${encodeURIComponent(error)}`;
+                const r = getReturnBase();
+                window.location.href = `${r}/Login.html?error=${encodeURIComponent(error)}`;
             }, 2000);
         }
 
@@ -645,7 +669,7 @@
             statusSubmessage.textContent = "Taking you to your account...";
             
             setTimeout(() => {
-                const redirectUrl = `${baseUrl}/Login.html?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+                const redirectUrl = `${returnBase}/Login.html?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
                 console.log('Redirecting to:', redirectUrl);
                 window.location.href = redirectUrl;
             }, 1000);
@@ -680,7 +704,8 @@
         setTimeout(() => {
             console.warn('Callback timeout reached, forcing redirect...');
             if (code && state) {
-                window.location.href = `${baseUrl}/Login.html?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
+                const r = getReturnBase();
+                window.location.href = `${r}/Login.html?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`;
             } else {
                 window.location.href = `${baseUrl}/Login.html?error=timeout`;
             }
