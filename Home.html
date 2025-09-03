@@ -4386,7 +4386,7 @@
         // Import Firebase modules (Updated to v11.8.0 - Latest Stable)
         import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, where, getDocs, addDoc, runTransaction, writeBatch, serverTimestamp, arrayUnion, arrayRemove, onSnapshot, documentId } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getFirestore, initializeFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, where, getDocs, addDoc, runTransaction, writeBatch, serverTimestamp, arrayUnion, arrayRemove, onSnapshot, documentId } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // --- Firebase & Canvas Environment Configuration ---
         // Firebase configuration, dynamically loaded from Canvas environment variables if available.
@@ -4463,14 +4463,14 @@
         // Initialize Firebase services: App, Auth, and Firestore.
         let app = initializeApp(firebaseConfig);
         let auth = getAuth(app);
-        let db = getFirestore(app);
+        let db = initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false });
         window.__auth_domain = firebaseConfig.authDomain;
         async function switchAuthDomain(newDomain) {
             try { await deleteApp(app); } catch (e) {}
             const cfg = { ...firebaseConfig, authDomain: newDomain };
             app = initializeApp(cfg);
             auth = getAuth(app);
-            db = getFirestore(app);
+            db = initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false });
             window.__auth_domain = newDomain;
         }
         function ensureAuthIframeReachable(timeoutMs = 4000) {
@@ -9126,20 +9126,36 @@ async function fetchAndDisplayPosts() {
             } else {
                 console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
                 await ensureAuthIframeReachable();
-                try {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                        console.log("JCHAT_DEBUG: Signed in with custom token.");
-                    } else {
-                        await signInAnonymously(auth);
-                        console.log("JCHAT_DEBUG: Signed in anonymously.");
+                async function tryAnonymousOrCustomSignIn(maxAttempts = 3) {
+                    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                                console.log("JCHAT_DEBUG: Signed in with custom token.");
+                                return true;
+                            } else {
+                                await signInAnonymously(auth);
+                                console.log("JCHAT_DEBUG: Signed in anonymously.");
+                                return true;
+                            }
+                        } catch (e) {
+                            console.warn(`Auth attempt ${attempt} failed:`, e?.code || e);
+                            if (e && e.code === 'auth/network-request-failed') {
+                                await new Promise(r => setTimeout(r, 800 * attempt));
+                                continue;
+                            }
+                            break;
+                        }
                     }
-                } catch (error) {
-                    console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
+                    return false;
+                }
+                const ok = await tryAnonymousOrCustomSignIn(3);
+                if (!ok) {
+                    console.error("JCHAT_ERROR: Unable to authenticate after retries.");
                     if (!auth.currentUser) {
-                        hideLoader(); // Hide loader before redirect
-                        window.location.href = 'Login.html'; // Redirect to login if all sign-in attempts fail.
-                        return; // Stop further execution.
+                        hideLoader();
+                        window.location.href = 'Login.html';
+                        return;
                     }
                 }
                 // If we reach here, either anonymous sign-in succeeded or custom token worked.
