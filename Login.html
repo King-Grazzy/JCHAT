@@ -1837,7 +1837,8 @@
         // GitHub OAuth via redirect (no Firebase)
         function handleGithubOAuthRedirect() {
             const clientId = 'Ov23liaK2pApMKMX2qvT';
-            const redirectUri = 'https://jchathub.netlify.app/auth/github/callback';
+            const baseUrl = window.location.origin;
+            const redirectUri = `${baseUrl}/auth/github/callback.html`;
             const scope = 'read:user user:email';
             const state = Math.random().toString(36).slice(2) + Date.now();
             try { sessionStorage.setItem('gh_oauth_state', state); } catch (e) {}
