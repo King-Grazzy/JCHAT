@@ -1838,10 +1838,12 @@
         function handleGithubOAuthRedirect() {
             const clientId = 'Ov23liaK2pApMKMX2qvT';
             const baseUrl = window.location.origin;
-            const redirectUri = `${baseUrl}/auth/github/callback.html`;
+            const redirectUri = `https://jchathub.netlify.app/auth/github/callback.html`;
             const scope = 'read:user user:email';
-            const state = Math.random().toString(36).slice(2) + Date.now();
-            try { sessionStorage.setItem('gh_oauth_state', state); } catch (e) {}
+            const nonce = Math.random().toString(36).slice(2) + Date.now();
+            const stateObj = { n: nonce, r: window.location.origin };
+            const state = JSON.stringify(stateObj);
+            try { sessionStorage.setItem('gh_oauth_state', nonce); } catch (e) {}
             const url = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}`;
             try {
                 if (window.top && window.top !== window.self) {
