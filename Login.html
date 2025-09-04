@@ -1010,7 +1010,6 @@
             <div class="social-login-container">
                 <div id="g_id_onload"
                     data-client_id="328479683167-4ib6vvg5easg05upvi2f4cvqs6l76lg7.apps.googleusercontent.com"
-                    data-login_uri="https://jchathub.netlify.app"
                     data-auto_prompt="false"
                     data-callback="handleGoogleSignIn">
                 </div>
@@ -1026,19 +1025,15 @@
             <!-- Handle login response -->
             <script>
             function handleGoogleSignIn(response) {
-              const payload = parseJwt(response.credential);
-              console.log('User Email: ', payload.email);
-              fetch('/api/auth/google', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token: response.credential })
-              }).then(res => res.json())
-                .then(() => {
-                  window.location.href = '/dashboard.html';
-                })
-                .catch(() => {
-                  showCustomModal('error', 'Authentication Error', 'Google sign-in failed. Please try again.');
-                });
+              const responsePayload = parseJwt(response.credential);
+              console.log("ID: " + responsePayload.sub);
+              console.log('Full Name: ' + responsePayload.name);
+              console.log('Email: ' + responsePayload.email);
+              alert("Login Successful! Welcome " + responsePayload.name);
+              window.location.href = "Home.html";
+              localStorage.setItem('userName', responsePayload.name);
+              localStorage.setItem('userEmail', responsePayload.email);
+              localStorage.setItem('userAvatar', responsePayload.picture);
             }
             function parseJwt(token) {
               const base64Url = token.split('.')[1];
