@@ -977,9 +977,12 @@
                     <input type="checkbox" id="remember" name="remember">
                     <label for="remember">Remember me</label>
                 </div>
-                <a href="#" class="forgot-password" onclick="showResetPasswordModal()">Forgot password?</a>
+                <div class="remember-actions">
+                    <a href="#" class="forgot-password" onclick="showResetPasswordModal()">Forgot password?</a>
+                    <a href="#" class="forgot-password" onclick="resendVerificationEmail()">Resend verification email</a>
+                </div>
             </div>
-            
+
             <button type="submit" class="login-btn">
                 Sign In
             </button>
