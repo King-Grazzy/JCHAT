@@ -439,7 +439,7 @@
         }
 
         .error-message::before {
-            content: '⚠';
+            content: '��';
             margin-right: 8px;
             font-size: 16px;
         }
@@ -1402,14 +1402,14 @@
                 try {
                     await sendEmailVerification(user);
                     hideSmartLoader();
-                    hideLoading();
+
                     showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Please check your email to verify your account.`, () => {
                         window.location.href = 'Home.html';
                     });
                 } catch (verificationError) {
                     console.warn('Email verification failed:', verificationError);
                     hideSmartLoader();
-                    hideLoading();
+
                     showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Note: Email verification could not be sent.`, () => {
                         window.location.href = 'Home.html';
                     });
