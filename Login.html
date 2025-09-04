@@ -1410,7 +1410,7 @@
                 await saveUserData(user, 'email');
                 try { localStorage.removeItem('login_failed_attempts'); localStorage.removeItem('login_cooldown_until'); } catch(_) {}
 
-                hideSmartLoader;
+                hideSmartLoader();
                 showSuccessModal(`Welcome back, ${user.displayName || user.email}!`, () => {
                     window.location.href = 'Home.html';
                 });
