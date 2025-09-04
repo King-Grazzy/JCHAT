@@ -875,6 +875,11 @@
                 padding: 30px 20px 25px;
             }
         }
+        /* Social login layout */
+        .social-login-container { display:flex; justify-content:center; align-items:center; margin: 14px 0 6px; }
+        .google-button-container { display:flex; justify-content:center; align-items:center; width:100%; }
+        .g_id_signin { margin: 0 auto; }
+        @media (max-width: 420px) { .social-login-container { margin: 12px 0 4px; } }
     </style>
 </head>
 <body>
@@ -993,14 +998,18 @@
                  data-auto_prompt="false"
                  data-callback="handleGoogleSignIn">
             </div>
-            <div class="g_id_signin"
-                 data-type="standard"
-                 data-size="large"
-                 data-theme="outline"
-                 data-text="signin_with"
-                 data-shape="pill"
-                 data-logo_alignment="left"
-                 data-width="320">
+            <div class="social-login-container">
+                <div class="google-button-container">
+                    <div class="g_id_signin"
+                        data-type="standard"
+                        data-size="large"
+                        data-theme="outline"
+                        data-text="signin_with"
+                        data-shape="pill"
+                        data-logo_alignment="left"
+                        data-width="260">
+                    </div>
+                </div>
             </div>
             <!-- Handle login response -->
             <script>
