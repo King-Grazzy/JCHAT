@@ -4473,7 +4473,7 @@
             db = initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false });
             window.__auth_domain = newDomain;
         }
-        function ensureAuthIframeReachable(timeoutMs = 7000) {
+        function ensureAuthIframeReachable(timeoutMs = 4000) {
             return new Promise((resolve) => {
                 try {
                     const test = document.createElement('iframe');
@@ -9124,10 +9124,7 @@ async function fetchAndDisplayPosts() {
                 fetchNotificationCount(user.uid);
 
             } else {
-                console.log("JCHAT_DEBUG: No user signed in. Redirecting to login page (authorization required).");
-                try { if (typeof hideLoader === 'function') hideLoader(); } catch(e) {}
-                window.location.href = 'Login.html?redirect=Home';
-                return;
+                console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
                 await ensureAuthIframeReachable();
                 async function tryAnonymousOrCustomSignIn(maxAttempts = 3) {
                     let lastError = null;
@@ -9150,7 +9147,7 @@ async function fetchAndDisplayPosts() {
                                 break; // anonymous disabled
                             }
                             if (code === 'auth/network-request-failed') {
-                                await new Promise(r => setTimeout(r, Math.min(1500 * attempt, 4000)));
+                                await new Promise(r => setTimeout(r, 800 * attempt));
                                 continue;
                             }
                             break;
@@ -9183,10 +9180,10 @@ async function fetchAndDisplayPosts() {
                     }
                     return false;
                 }
-                const ok = await tryAnonymousOrCustomSignIn(5);
+                const ok = await tryAnonymousOrCustomSignIn(3);
                 if (!ok) {
                     const last = (()=>{ try { return sessionStorage.getItem('jchat_last_auth_error'); } catch(_) { return null; } })();
-                    console.warn("JCHAT_WARN: Unable to authenticate after retries.", last ? `(last error: ${last})` : '');
+                    console.error("JCHAT_ERROR: Unable to authenticate after retries.", last ? `(last error: ${last})` : '');
                     if (typeof showMessageBox === 'function') {
                         const msg = (last === 'auth/operation-not-allowed')
                             ? 'Guest browsing is disabled. Please sign in.'
