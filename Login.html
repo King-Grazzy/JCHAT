@@ -1400,6 +1400,8 @@
                     } catch (e) {
                         console.warn('Failed to send verification email:', e);
                     }
+                    try { localStorage.setItem('unverified_email', user.email); } catch(_) {}
+                    showUnverifiedBanner(user.email);
                     hideSmartLoader();
                     showCustomModal('info', 'Verify Your Email', `We sent a verification link to ${user.email}. Please verify your email, then sign in again.`, null);
                     try { await signOut(auth); } catch (_) {}
