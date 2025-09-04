@@ -1634,6 +1634,11 @@
             showCustomModal('error', 'Authentication Error', message);
         }
 
+        // Expose modal helpers globally
+        window.showCustomModal = showCustomModal;
+        window.showErrorModal = showErrorModal;
+        window.showSuccessModal = showSuccessModal;
+
         // Show success message
         function showSuccess(message) {
             const errorDiv = document.getElementById('errorMessage');
