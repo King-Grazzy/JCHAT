@@ -1189,7 +1189,7 @@
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const remember = document.getElementById('remember').checked;
             const isSignupMode = document.querySelector('.login-container').classList.contains('signup-mode');
@@ -1323,7 +1323,15 @@
 
                 switch (code) {
                     case 'auth/email-already-in-use':
-                        errorMessage = 'An account with this email already exists. Would you like to sign in instead?';
+                        errorMessage = 'An account with this email already exists. Switching to sign in.';
+                        try {
+                            const emailInput = document.getElementById('email');
+                            if (emailInput) emailInput.value = email;
+                            const container = document.querySelector('.login-container');
+                            if (container && container.classList.contains('signup-mode')) {
+                                toggleSignupMode();
+                            }
+                        } catch (_) {}
                         break;
                     case 'auth/weak-password':
                         errorMessage = 'Password is too weak. Please choose a stronger password with at least 6 characters.';
@@ -1370,7 +1378,20 @@
                 
                 switch (error.code) {
                     case 'auth/user-not-found':
-                        errorMessage = 'No account found with this email. Would you like to create a new account or contact an administrator?';
+                        errorMessage = 'No account found with this email.';
+                        try {
+                            if (typeof __public_signup_enabled === 'undefined' || __public_signup_enabled !== false) {
+                                const currentEmail = document.getElementById('email')?.value.trim();
+                                showCustomModal('info', 'Create Account?', 'We can create a new account with this email. Continue?', () => {
+                                    const emailInput = document.getElementById('email');
+                                    if (emailInput && currentEmail) emailInput.value = currentEmail;
+                                    const container = document.querySelector('.login-container');
+                                    if (container && !container.classList.contains('signup-mode')) {
+                                        toggleSignupMode();
+                                    }
+                                });
+                            }
+                        } catch (_) {}
                         break;
                     case 'auth/wrong-password':
                         errorMessage = 'Incorrect password. Please check your password and try again, or use "Forgot password" to reset it.';
@@ -1501,7 +1522,7 @@
                     icon.textContent = '✕';
                     break;
                 case 'info':
-                    icon.textContent = '���';
+                    icon.textContent = 'ℹ';
                     break;
                 case 'question':
                     icon.textContent = '?';
@@ -1694,7 +1715,7 @@
         };
 
         window.sendResetEmail = async function() {
-            const email = document.getElementById('resetEmail').value;
+            const email = document.getElementById('resetEmail').value.trim();
             
             if (!email) {
                 showCustomModal('error', 'Email Required', 'Please enter your email address.');
