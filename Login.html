@@ -1035,13 +1035,13 @@
               localStorage.setItem('isLoggedIn', 'true'); // Add a flag
               // 3. FORCE redirect to Home.html using replace to avoid history entry
               try {
-                window.location.replace('/Home.html');
+                window.location.replace('Home.html');
               } catch (e) {
-                window.location.href = '/Home.html';
+                window.location.href = 'Home.html';
               }
               // Fallback: ensure redirect happens if something interrupts the navigation
               setTimeout(() => {
-                try { window.location.replace('/Home.html'); } catch (e) { window.location.href = '/Home.html'; }
+                try { window.location.replace('Home.html'); } catch (e) { window.location.href = 'Home.html'; }
               }, 300);
             }
             function parseJwt(token) {
@@ -1108,7 +1108,7 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signInWithCredential } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
@@ -1143,6 +1143,29 @@
             db = getFirestore(app);
             window.__auth_domain = newDomain;
         }
+
+        // Google Identity Services callback -> Firebase sign-in
+        window.handleGoogleSignIn = async function(response) {
+            try {
+                if (typeof showSmartLoader === 'function') showSmartLoader('Google Sign-In', 'Finalizing sign-in...');
+                const credential = GoogleAuthProvider.credential(response.credential);
+                const result = await signInWithCredential(auth, credential);
+                try { await saveUserData(result.user, 'google', { method: 'gis' }); } catch (e) { console.warn('saveUserData failed', e); }
+                if (result && result.user) {
+                    try { localStorage.setItem('userName', result.user.displayName || ''); } catch(e){}
+                    try { localStorage.setItem('userEmail', result.user.email || ''); } catch(e){}
+                    try { localStorage.setItem('userAvatar', result.user.photoURL || ''); } catch(e){}
+                    try { localStorage.setItem('isLoggedIn', 'true'); } catch(e){}
+                }
+                if (typeof hideSmartLoader === 'function') hideSmartLoader();
+                window.location.href = 'Home.html';
+            } catch (err) {
+                console.error('Firebase sign-in using GIS token failed:', err);
+                try { localStorage.setItem('isLoggedIn', 'true'); } catch(e){}
+                if (typeof hideSmartLoader === 'function') hideSmartLoader();
+                window.location.href = 'Home.html';
+            }
+        };
 
         // Application ID (consistent with other pages)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
