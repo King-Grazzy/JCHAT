@@ -1123,7 +1123,7 @@
                 toggleBtn.textContent = '🙈';
             } else {
                 passwordInput.type = 'password';
-                toggleBtn.textContent = '👁️';
+                toggleBtn.textContent = '����️';
             }
         };
 
@@ -1924,6 +1924,22 @@
                     }
                 });
             });
+        }
+
+        function updatePasswordStrength() {
+            const pwd = document.getElementById('password');
+            const bar = document.getElementById('strengthBar');
+            const text = document.getElementById('strengthText');
+            if (!pwd || !bar || !text) return;
+            const v = pwd.value || '';
+            let score = 0;
+            if (v.length >= 8) score++;
+            if (/[a-z]/.test(v) && /[A-Z]/.test(v)) score++;
+            if (/[0-9]/.test(v)) score++;
+            if (/[^A-Za-z0-9]/.test(v)) score++;
+            bar.className = 'strength-bar' + (score ? ' level-' + Math.min(score,4) : '');
+            const labels = ['very weak','weak','fair','strong','very strong'];
+            text.textContent = 'Password strength: ' + labels[Math.min(score,4)];
         }
 
         // Preload critical resources for faster loading
