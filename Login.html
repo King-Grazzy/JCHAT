@@ -1025,15 +1025,16 @@
             <!-- Handle login response -->
             <script>
             function handleGoogleSignIn(response) {
+              // 1. Immediately decode the token to get user info
               const responsePayload = parseJwt(response.credential);
-              console.log("ID: " + responsePayload.sub);
-              console.log('Full Name: ' + responsePayload.name);
-              console.log('Email: ' + responsePayload.email);
-              alert("Login Successful! Welcome " + responsePayload.name);
-              window.location.href = "Home.html";
+              console.log("Login Successful! Welcome ", responsePayload.name);
+              // 2. Store user data in localStorage to persist across pages
               localStorage.setItem('userName', responsePayload.name);
               localStorage.setItem('userEmail', responsePayload.email);
               localStorage.setItem('userAvatar', responsePayload.picture);
+              localStorage.setItem('isLoggedIn', 'true'); // Add a flag
+              // 3. FORCE redirect to Home.html
+              window.location.href = "Home.html"; // This should change the URL immediately
             }
             function parseJwt(token) {
               const base64Url = token.split('.')[1];
