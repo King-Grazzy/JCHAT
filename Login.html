@@ -1238,59 +1238,55 @@
 
 
 
-        // Save user data to Firestore
+        // Save user data to Firestore (copy Google-provided profile fields directly)
         async function saveUserData(user, provider, additionalData = {}) {
             try {
                 const userRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userRef);
 
                 const now = serverTimestamp();
-                const baseData = {
+                // Prefer data from Firebase user object; providerData may have additional fields
+                const pd = (user && user.providerData && user.providerData[0]) ? user.providerData[0] : {};
+                const displayName = user.displayName || pd.displayName || '';
+                const email = user.email || pd.email || '';
+                const photoURL = user.photoURL || pd.photoURL || '';
+                const givenName = pd.givenName || '';
+                const familyName = pd.familyName || '';
+
+                const profileData = {
                     uid: user.uid,
-                    email: user.email || '',
-                    displayName: user.displayName || '',
-                    photoURL: user.photoURL || '',
-                    provider: provider,
+                    email,
+                    displayName,
+                    photoURL,
+                    givenName,
+                    familyName,
+                    provider,
                     lastLogin: now,
                     ...additionalData
                 };
 
-                // Helper: generate unique username from displayName or email
-                async function generateUniqueUsername(displayName, email) {
-                    const base = (displayName && displayName.trim()) ? displayName.replace(/\s+/g, '').toLowerCase().replace(/[^a-z0-9]/g,'') : (email ? email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g,'') : 'user');
-                    let candidate = base || 'user';
-                    let suffix = 0;
-                    while (true) {
-                        const nameToCheck = suffix === 0 ? candidate : `${candidate}${suffix}`;
-                        const q = query(collection(db, 'users'), where('username', '==', nameToCheck));
-                        const snap = await getDocs(q);
-                        if (snap.empty) return nameToCheck;
-                        suffix++;
-                    }
-                }
-
                 if (!userDoc.exists()) {
-                    // New user: ensure username exists and write full profile
-                    const username = additionalData.username || await generateUniqueUsername(baseData.displayName, baseData.email);
+                    // New user: copy Google profile as-is
                     const userData = {
-                        ...baseData,
-                        username,
+                        ...profileData,
+                        // Use displayName as username exactly as provided by Google
+                        username: displayName || '',
                         createdAt: now,
                         isNewUser: true
                     };
                     await setDoc(userRef, userData);
                     return { created: true, userData };
                 } else {
-                    // Existing user: merge updates, but don't overwrite existing profile fields unnecessarily
+                    // Existing user: update lastLogin and provider; do not overwrite existing profile fields
                     const existing = userDoc.data() || {};
                     const updates = { lastLogin: now, provider, ...additionalData };
-                    if (!existing.displayName && baseData.displayName) updates.displayName = baseData.displayName;
-                    if (!existing.photoURL && baseData.photoURL) updates.photoURL = baseData.photoURL;
-                    if (!existing.email && baseData.email) updates.email = baseData.email;
-                    // If username missing in existing, generate one
-                    if (!existing.username) {
-                        updates.username = additionalData.username || await generateUniqueUsername(baseData.displayName, baseData.email);
-                    }
+                    // Copy missing fields from Google if they are absent in existing record
+                    if (!existing.displayName && displayName) updates.displayName = displayName;
+                    if (!existing.email && email) updates.email = email;
+                    if (!existing.photoURL && photoURL) updates.photoURL = photoURL;
+                    if (!existing.givenName && givenName) updates.givenName = givenName;
+                    if (!existing.familyName && familyName) updates.familyName = familyName;
+                    if (!existing.username && displayName) updates.username = displayName; // copy as-is
 
                     await updateDoc(userRef, updates);
                     const merged = { ...existing, ...updates };
