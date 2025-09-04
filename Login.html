@@ -1123,7 +1123,7 @@
                 toggleBtn.textContent = '🙈';
             } else {
                 passwordInput.type = 'password';
-                toggleBtn.textContent = '����️';
+                toggleBtn.textContent = '👁️';
             }
         };
 
@@ -1975,7 +1975,22 @@
             
             // Add smart validation
             addSmartValidation();
-            
+
+            // Password strength live updates
+            const pwdInput = document.getElementById('password');
+            if (pwdInput) {
+                pwdInput.addEventListener('input', updatePasswordStrength);
+                updatePasswordStrength();
+            }
+
+            // Show unverified banner if stored
+            try {
+                const unv = localStorage.getItem('unverified_email');
+                if (unv) {
+                    showUnverifiedBanner(unv);
+                }
+            } catch(_) {}
+
             // Add focus effects to inputs with performance optimization
             const inputs = document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"], textarea');
             
