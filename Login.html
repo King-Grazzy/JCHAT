@@ -1085,6 +1085,15 @@
             db = getFirestore(app);
             window.__auth_domain = newDomain;
         }
+        // Proactively use web.app auth domain on non-Firebase hosts to prevent iframe/cookie blocks
+        (async () => {
+            try {
+                const h = location.hostname;
+                if (!h.endsWith('firebaseapp.com') && !h.endsWith('web.app')) {
+                    await switchAuthDomain('jchat-1.web.app');
+                }
+            } catch (_) {}
+        })();
 
         // Application ID (consistent with other pages)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
