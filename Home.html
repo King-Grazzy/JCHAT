@@ -4464,12 +4464,27 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         let db;
-try {
-    db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true, useFetchStreams: false });
-} catch (e) {
-    db = getFirestore(app);
-}
+        try {
+            db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true, useFetchStreams: false });
+        } catch (e) {
+            db = getFirestore(app);
+        }
         if (typeof setLoaderStage === 'function') setLoaderStage('firebase');
+
+        // Lightweight connectivity probe to Identity Toolkit (auth backend)
+        async function canReachIdentityToolkit(timeoutMs = 3500) {
+            const controller = new AbortController();
+            const t = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const pingUrl = 'https://identitytoolkit.googleapis.com/v1';
+                const res = await fetch(pingUrl, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
+                clearTimeout(t);
+                return true; // If fetch resolves (opaque OK), network path exists
+            } catch (e) {
+                clearTimeout(t);
+                return false;
+            }
+        }
 
         // --- ADMIN UID ---
         // The specific UID for the administrator, used for feature toggling and permissions.
@@ -9102,14 +9117,23 @@ async function fetchAndDisplayPosts() {
                         if (!navigator.onLine) {
                             throw new Error('OFFLINE');
                         }
-                        await signInAnonymously(auth);
+                        const ok = await canReachIdentityToolkit(4000);
+                        if (!ok) {
+                            throw new Error('AUTH_BACKEND_UNREACHABLE');
+                        }
+                        await Promise.race([
+                            signInAnonymously(auth),
+                            new Promise((_, rej) => setTimeout(() => rej(new Error('AUTH_TIMEOUT')), 6000))
+                        ]);
                         console.log("JCHAT_DEBUG: Signed in anonymously.");
                     }
                 } catch (error) {
                     console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
-                    const isOffline = String(error && error.message || '').includes('OFFLINE') || !navigator.onLine;
-                    const isNetworkError = error && (error.code === 'auth/network-request-failed' || /network[- ]request[- ]failed/i.test(String(error.code || error.message || '')));
-                    if (isOffline || isNetworkError) {
+                    const msg = String(error && (error.message || error.code) || '');
+                    const isOffline = msg.includes('OFFLINE') || !navigator.onLine;
+                    const isNetworkError = /auth\/network-request-failed/i.test(msg) || /network[- ]request[- ]failed/i.test(msg);
+                    const isUnreachable = msg.includes('AUTH_BACKEND_UNREACHABLE') || msg.includes('AUTH_TIMEOUT');
+                    if (isOffline || isNetworkError || isUnreachable) {
                         // Graceful offline/blocked-network mode: show guest UI and skip redirect
                         isAuthReady = false;
                         toggleInteractiveElements(false, false);
@@ -9117,7 +9141,7 @@ async function fetchAndDisplayPosts() {
                         if (headerProfilePic) headerProfilePic.style.display = 'none';
                         if (headerAvatarIcon) headerAvatarIcon.style.display = 'block';
                         if (adminIconLink) adminIconLink.style.display = 'none';
-                        showMessageBox("You're offline or the network blocked authentication. Viewing as guest.", 'warning', true, 6000);
+                        showMessageBox("Network cannot reach Google Auth. Viewing as guest.", 'warning', true, 7000);
                         hideLoader();
                         return;
                     }
