@@ -999,12 +999,6 @@
             <!-- Load Google API -->
             <script src="https://accounts.google.com/gsi/client" async defer></script>
             <!-- Google Sign-In Button -->
-            <div id="g_id_onload"
-                 data-client_id="328479683167-4ib6vvg5easg05upvi2f4cvqs6l76lg7.apps.googleusercontent.com"
-                 data-login_uri="https://jchathub.netlify.app/auth-success"
-                 data-auto_prompt="false"
-                 data-callback="handleGoogleSignIn">
-            </div>
             <div class="social-login-container">
                 <div class="google-button-container">
                     <button type="button" class="google-custom-btn" id="googleCustomBtn" onclick="triggerGoogleSignIn()">
@@ -1044,6 +1038,18 @@
             }
             </script>
             <script>
+                // Initialize GIS without FedCM for prompt to avoid NotAllowedError logs
+                window.addEventListener('load', function(){
+                    if (window.google && google.accounts && google.accounts.id) {
+                        google.accounts.id.initialize({
+                            client_id: '328479683167-4ib6vvg5easg05upvi2f4cvqs6l76lg7.apps.googleusercontent.com',
+                            callback: handleGoogleSignIn,
+                            auto_select: false,
+                            cancel_on_tap_outside: true,
+                            use_fedcm_for_prompt: false
+                        });
+                    }
+                });
                 function triggerGoogleSignIn(){
                     if (window.google && google.accounts && google.accounts.id) {
                         try { google.accounts.id.prompt(); } catch (e) { console.error('GSI prompt error', e); }
@@ -1182,7 +1188,7 @@
                 toggleBtn.textContent = '🙈';
             } else {
                 passwordInput.type = 'password';
-                toggleBtn.textContent = '👁️';
+                toggleBtn.textContent = '���️';
             }
         };
 
