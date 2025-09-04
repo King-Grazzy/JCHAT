@@ -1200,6 +1200,23 @@
             const remember = document.getElementById('remember').checked;
             const isSignupMode = document.querySelector('.login-container').classList.contains('signup-mode');
 
+            try {
+                if (remember) {
+                    localStorage.setItem('remembered_email', email);
+                } else {
+                    localStorage.removeItem('remembered_email');
+                }
+            } catch(_) {}
+
+            try {
+                const cd = parseInt(localStorage.getItem('login_cooldown_until') || '0', 10);
+                if (cd && Date.now() < cd) {
+                    const secs = Math.ceil((cd - Date.now()) / 1000);
+                    showErrorModal(`Too many attempts. Try again in ${secs}s.`);
+                    return;
+                }
+            } catch(_) {}
+
             // Basic validation
             if (!email || !password) {
                 showError('Please fill in all fields.');
