@@ -1972,10 +1972,27 @@
             // Setup username validation
             setupUsernameValidation();
 
-            // Wire GitHub OAuth redirect button
+            // Wire provider buttons
             const ghBtn = document.getElementById('githubOauthBtn');
-            if (ghBtn) ghBtn.addEventListener('click', handleGithubOAuthRedirect);
+            if (ghBtn) ghBtn.addEventListener('click', loginWithGithub);
+            const gBtn = document.getElementById('googleOauthBtn');
+            if (gBtn) gBtn.addEventListener('click', loginWithGoogle);
 
+            // Handle redirect results (in case popup was blocked)
+            (async () => {
+                try {
+                    const result = await getRedirectResult(auth);
+                    if (result?.user) {
+                        const providerId = result.providerId || (result._tokenResponse?.providerId) || 'oauth';
+                        const providerLabel = providerId.includes('github') ? 'github' : providerId.includes('google') ? 'google' : 'oauth';
+                        await saveUserData(result.user, providerLabel);
+                        showSmartLoader('Welcome!', 'Redirecting to your account...');
+                        setTimeout(() => { window.location.href = 'Home.html'; }, 600);
+                    }
+                } catch (e) {
+                    // ignore if no redirect result
+                }
+            })();
 
             // Close modals when clicking outside
             document.addEventListener('click', function(e) {
