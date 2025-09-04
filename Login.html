@@ -1622,18 +1622,30 @@
                 hideSmartLoader();
                 hideLoading();
                 let msg = 'Google sign-in failed. Please try again.';
-                if (error && error.code) {
-                    switch (String(error.code)) {
-                        case 'auth/account-exists-with-different-credential':
-                            msg = 'An account already exists with the same email but different sign-in method.';
-                            break;
-                        case 'auth/cancelled-popup-request':
-                            msg = 'Sign-in cancelled. Please try again.';
-                            break;
-                        case 'auth/network-request-failed':
-                            msg = 'Network error. Check your connection and try again.';
-                            break;
-                    }
+                const code = error && error.code ? String(error.code) : '';
+                const messageText = error && error.message ? String(error.message) : '';
+                switch (code) {
+                    case 'auth/account-exists-with-different-credential':
+                        msg = 'An account already exists with the same email but different sign-in method.';
+                        break;
+                    case 'auth/cancelled-popup-request':
+                        msg = 'Sign-in cancelled. Please try again.';
+                        break;
+                    case 'auth/network-request-failed':
+                        msg = 'Network error. Check your connection and try again.';
+                        break;
+                    case 'auth/invalid-api-key':
+                        msg = 'Invalid Firebase API key. Please update your Firebase configuration.';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        msg = 'Google sign-in is disabled for this project. Enable Google provider in Firebase Auth settings.';
+                        break;
+                    case 'auth/configuration-not-found':
+                        msg = 'Firebase project configuration not found. Please check your Firebase config.';
+                        break;
+                }
+                if (/API key not (valid|found)/i.test(messageText)) {
+                    msg = 'Invalid Firebase API key. Please update your Firebase configuration.';
                 }
                 showErrorModal(msg);
             }
