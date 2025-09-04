@@ -444,18 +444,14 @@
             font-size: 16px;
         }
 
-        /* Signup mode styles */
+        /* Signup mode styles: keep header animations identical to default login header */
         .login-container.signup-mode .login-header {
-            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%);
-            background-size: 200% 200%;
-            animation: geminiSignupGradient 8s ease infinite;
-        }
-
-        @keyframes geminiSignupGradient {
-            0% { background-position: 0% 50%; }
-            33% { background-position: 100% 0%; }
-            66% { background-position: 0% 100%; }
-            100% { background-position: 0% 50%; }
+            background: var(--header-background);
+            color: var(--white);
+            text-align: center;
+            padding: 40px 20px 30px;
+            position: relative;
+            overflow: hidden;
         }
 
         .login-container.signup-mode .login-btn {
@@ -703,6 +699,18 @@
         /* Signup form enhancements */
         .signup-only {
             transition: all 0.3s ease;
+        }
+        .form-textarea {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            transition: all var(--transition);
+            background: var(--input-background);
+            color: var(--white);
+            resize: vertical;
         }
 
         .username-feedback {
@@ -970,7 +978,7 @@
                     name="bio" 
                     placeholder="Tell us about yourself..."
                     rows="3"
-                    style="resize: vertical; font-family: inherit; padding: 15px 20px; border: 2px solid #e1e5e9; border-radius: 10px; font-size: 16px; background: #f8f9fa; transition: all 0.3s ease;"
+                    class="form-textarea"
                 ></textarea>
             </div>
 
