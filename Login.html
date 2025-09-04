@@ -1120,12 +1120,25 @@
                 if (typeof showSmartLoader === 'function') showSmartLoader('Google Sign-In', 'Finalizing sign-in...');
                 const credential = GoogleAuthProvider.credential(response.credential);
                 const result = await signInWithCredential(auth, credential);
-                try { await saveUserData(result.user, 'google', { method: 'gis' }); } catch (e) { console.warn('saveUserData failed', e); }
+                let saveResult = { created: false, userData: {} };
+                try { saveResult = await saveUserData(result.user, 'google', { method: 'gis' }); } catch (e) { console.warn('saveUserData failed', e); }
                 if (result && result.user) {
-                    try { localStorage.setItem('userName', result.user.displayName || ''); } catch(e){}
-                    try { localStorage.setItem('userEmail', result.user.email || ''); } catch(e){}
-                    try { localStorage.setItem('userAvatar', result.user.photoURL || ''); } catch(e){}
+                    const u = result.user;
+                    const ud = saveResult && saveResult.userData ? saveResult.userData : {};
+                    const displayName = u.displayName || ud.displayName || '';
+                    const email = u.email || ud.email || '';
+                    const photo = u.photoURL || ud.photoURL || '';
+                    const uid = u.uid;
+                    const username = ud.username || (displayName ? displayName.replace(/\s+/g, '').toLowerCase() : (email ? email.split('@')[0].replace(/[^a-z0-9]/gi,'') : uid));
+
+                    try { localStorage.setItem('userName', displayName); } catch(e){}
+                    try { localStorage.setItem('userEmail', email); } catch(e){}
+                    try { localStorage.setItem('userAvatar', photo); } catch(e){}
+                    try { localStorage.setItem('uid', uid); } catch(e){}
+                    try { localStorage.setItem('username', username); } catch(e){}
+                    try { localStorage.setItem('provider', 'google'); } catch(e){}
                     try { localStorage.setItem('isLoggedIn', 'true'); } catch(e){}
+                    try { localStorage.setItem('isNewUser', saveResult.created ? 'true' : 'false'); } catch(e){}
                 }
                 if (typeof hideSmartLoader === 'function') hideSmartLoader();
                 window.location.href = 'Home.html';
@@ -1230,32 +1243,63 @@
             try {
                 const userRef = doc(db, 'users', user.uid);
                 const userDoc = await getDoc(userRef);
-                
-                const userData = {
+
+                const now = serverTimestamp();
+                const baseData = {
                     uid: user.uid,
-                    email: user.email,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
+                    email: user.email || '',
+                    displayName: user.displayName || '',
+                    photoURL: user.photoURL || '',
                     provider: provider,
-                    lastLogin: serverTimestamp(),
+                    lastLogin: now,
                     ...additionalData
                 };
-                
-                if (!userDoc.exists()) {
-                    // New user
-                    userData.createdAt = serverTimestamp();
-                    userData.isNewUser = true;
-                    await setDoc(userRef, userData);
-                } else {
-                    // Existing user
-                    await updateDoc(userRef, {
-                        lastLogin: serverTimestamp(),
-                        provider: provider
-                    });
+
+                // Helper: generate unique username from displayName or email
+                async function generateUniqueUsername(displayName, email) {
+                    const base = (displayName && displayName.trim()) ? displayName.replace(/\s+/g, '').toLowerCase().replace(/[^a-z0-9]/g,'') : (email ? email.split('@')[0].toLowerCase().replace(/[^a-z0-9]/g,'') : 'user');
+                    let candidate = base || 'user';
+                    let suffix = 0;
+                    while (true) {
+                        const nameToCheck = suffix === 0 ? candidate : `${candidate}${suffix}`;
+                        const q = query(collection(db, 'users'), where('username', '==', nameToCheck));
+                        const snap = await getDocs(q);
+                        if (snap.empty) return nameToCheck;
+                        suffix++;
+                    }
                 }
-                
+
+                if (!userDoc.exists()) {
+                    // New user: ensure username exists and write full profile
+                    const username = additionalData.username || await generateUniqueUsername(baseData.displayName, baseData.email);
+                    const userData = {
+                        ...baseData,
+                        username,
+                        createdAt: now,
+                        isNewUser: true
+                    };
+                    await setDoc(userRef, userData);
+                    return { created: true, userData };
+                } else {
+                    // Existing user: merge updates, but don't overwrite existing profile fields unnecessarily
+                    const existing = userDoc.data() || {};
+                    const updates = { lastLogin: now, provider, ...additionalData };
+                    if (!existing.displayName && baseData.displayName) updates.displayName = baseData.displayName;
+                    if (!existing.photoURL && baseData.photoURL) updates.photoURL = baseData.photoURL;
+                    if (!existing.email && baseData.email) updates.email = baseData.email;
+                    // If username missing in existing, generate one
+                    if (!existing.username) {
+                        updates.username = additionalData.username || await generateUniqueUsername(baseData.displayName, baseData.email);
+                    }
+
+                    await updateDoc(userRef, updates);
+                    const merged = { ...existing, ...updates };
+                    return { created: false, userData: merged };
+                }
+
             } catch (error) {
                 console.error('Error saving user data:', error);
+                return { created: false, userData: {} };
             }
         }
 
