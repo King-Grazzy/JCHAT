@@ -3674,14 +3674,49 @@
 </style>
 <style id="header-overflow-fix">/*header-overflow-fix*/header .header-content-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap}header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;justify-content:flex-end}#profileLink{display:inline-flex;align-items:center;column-gap:8px;row-gap:2px;flex-wrap:wrap;max-width:100%;min-width:0}#profileLink #headerDisplayName{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;flex:0 1 auto}#headerProfilePic,#headerAvatarIcon{flex:0 0 auto}@media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:6px}}</style></head>
 <body class="theme-dark-mode">
+    <style>
+    .user-header { text-align: right; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.06); display: none; align-items: center; gap: 10px; }
+    .user-avatar { border-radius: 50%; vertical-align: middle; width:30px; height:30px; object-fit:cover; }
+    .user-name { margin: 0 10px; color: var(--text-color-primary); font-weight:600; }
+    .logout-btn { background: transparent; border: 1px solid var(--border-light); color: var(--text-color-primary); padding:6px 10px; border-radius:8px; cursor:pointer; }
+    .logout-btn:hover { opacity:0.9; }
+    </style>
+
+    <!-- User header: shown when a user is logged in -->
+    <div id="user-header" class="user-header" role="navigation" aria-label="User header">
+        <img id="user-avatar" class="user-avatar" alt="User avatar">
+        <span id="user-name" class="user-name"></span>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+    </div>
+
     <script>
-    // Check if the user is logged in when Home.html loads
+    // Check login status and populate user header
     window.addEventListener('load', function() {
         const isLoggedIn = localStorage.getItem('isLoggedIn');
-        if (isLoggedIn !== 'true') {
-            // If not logged in, redirect back to login
-            window.location.href = "Login.html";
+        const userName = localStorage.getItem('userName');
+        const userEmail = localStorage.getItem('userEmail');
+        const userAvatar = localStorage.getItem('userAvatar');
+
+        if (isLoggedIn === 'true' && userName) {
+            document.getElementById('user-name').textContent = `Welcome, ${userName}`;
+            const avatarEl = document.getElementById('user-avatar');
+            if (userAvatar) avatarEl.src = userAvatar; else avatarEl.src = '';
+            document.getElementById('user-header').style.display = 'flex';
+            console.log('User is logged in:', userName, userEmail);
+        } else {
+            // Not logged in — redirect to login page
+            console.warn('No login detected — redirecting to Login.html');
+            window.location.href = 'Login.html';
         }
+
+        // Attach logout handler
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userAvatar');
+            window.location.href = 'Login.html';
+        });
     });
     </script>
     <!-- JCHAT Pink & Blue Glowing Loader -->
