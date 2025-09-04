@@ -1131,9 +1131,19 @@
                 window.location.href = 'Home.html';
             } catch (err) {
                 console.error('Firebase sign-in using GIS token failed:', err);
-                try { localStorage.setItem('isLoggedIn', 'true'); } catch(e){}
+                // Ensure any partial state is cleared
+                try { localStorage.removeItem('isLoggedIn'); } catch(e){}
+                try { localStorage.removeItem('userName'); } catch(e){}
+                try { localStorage.removeItem('userEmail'); } catch(e){}
+                try { localStorage.removeItem('userAvatar'); } catch(e){}
                 if (typeof hideSmartLoader === 'function') hideSmartLoader();
-                window.location.href = 'Home.html';
+                // Inform the user and remain on the login page
+                if (typeof showErrorModal === 'function') {
+                    showErrorModal('Google sign-in failed. Please try again or use another sign-in method.');
+                } else {
+                    alert('Google sign-in failed. Please try again.');
+                }
+                return;
             }
         };
 
