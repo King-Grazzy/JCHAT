@@ -1455,7 +1455,19 @@
                         errorMessage = 'Network error. Please check your internet connection and try again.';
                         break;
                 }
-                
+
+                try {
+                    const kA = 'login_failed_attempts';
+                    const kC = 'login_cooldown_until';
+                    let a = parseInt(localStorage.getItem(kA) || '0', 10) + 1;
+                    localStorage.setItem(kA, String(a));
+                    if (a >= 5) {
+                        const until = Date.now() + 60000;
+                        localStorage.setItem(kC, String(until));
+                        localStorage.setItem(kA, '0');
+                    }
+                } catch(_) {}
+
                 showErrorModal(errorMessage);
             }
         }
