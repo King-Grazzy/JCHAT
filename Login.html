@@ -1033,8 +1033,16 @@
               localStorage.setItem('userEmail', responsePayload.email);
               localStorage.setItem('userAvatar', responsePayload.picture);
               localStorage.setItem('isLoggedIn', 'true'); // Add a flag
-              // 3. FORCE redirect to Home.html
-              window.location.href = "Home.html"; // This should change the URL immediately
+              // 3. FORCE redirect to Home.html using replace to avoid history entry
+              try {
+                window.location.replace('/Home.html');
+              } catch (e) {
+                window.location.href = '/Home.html';
+              }
+              // Fallback: ensure redirect happens if something interrupts the navigation
+              setTimeout(() => {
+                try { window.location.replace('/Home.html'); } catch (e) { window.location.href = '/Home.html'; }
+              }, 300);
             }
             function parseJwt(token) {
               const base64Url = token.split('.')[1];
