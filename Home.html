@@ -4386,7 +4386,7 @@
         // Import Firebase modules (Updated to v11.8.0 - Latest Stable)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { initializeFirestore, getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, where, getDocs, addDoc, runTransaction, writeBatch, serverTimestamp, arrayUnion, arrayRemove, onSnapshot, documentId } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, orderBy, where, getDocs, addDoc, runTransaction, writeBatch, serverTimestamp, arrayUnion, arrayRemove, onSnapshot, documentId } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // --- Firebase & Canvas Environment Configuration ---
         // Firebase configuration, dynamically loaded from Canvas environment variables if available.
@@ -4463,28 +4463,9 @@
         // Initialize Firebase services: App, Auth, and Firestore.
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        let db;
-        try {
-            db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true, useFetchStreams: false });
-        } catch (e) {
-            db = getFirestore(app);
-        }
+        const db = getFirestore(app);
         if (typeof setLoaderStage === 'function') setLoaderStage('firebase');
 
-        // Lightweight connectivity probe to Identity Toolkit (auth backend)
-        async function canReachIdentityToolkit(timeoutMs = 3500) {
-            const controller = new AbortController();
-            const t = setTimeout(() => controller.abort(), timeoutMs);
-            try {
-                const pingUrl = 'https://identitytoolkit.googleapis.com/v1';
-                const res = await fetch(pingUrl, { mode: 'no-cors', cache: 'no-store', signal: controller.signal });
-                clearTimeout(t);
-                return true; // If fetch resolves (opaque OK), network path exists
-            } catch (e) {
-                clearTimeout(t);
-                return false;
-            }
-        }
 
         // --- ADMIN UID ---
         // The specific UID for the administrator, used for feature toggling and permissions.
@@ -5535,7 +5516,6 @@
         let currentEditMediaType = null; // Stores the existing media type for edited post.
         let isAuthReady = false; // Flag indicating if Firebase authentication state has been determined.
         let unsubscribeListeners = []; // Array to store all onSnapshot unsubscribe functions for cleanup.
-        let authAttemptInProgress = false; // Prevent duplicate auth attempts when offline or blocked.
         let currentSystemSettings = {}; // Stores global system settings fetched from Firestore.
 
         // --- Notification Badge Management ---
@@ -6566,7 +6546,7 @@
                 showMessageBox("Logged out successfully! 👋", 'success');
                 // Redirect to login page after a short delay.
                 setTimeout(() => {
-                    window.location.href = '/Login.html';
+                    window.location.href = '/login.html';
                 }, 1500);
 
             } catch (error) {
@@ -9109,54 +9089,21 @@ async function fetchAndDisplayPosts() {
                 fetchNotificationCount(user.uid);
 
             } else {
-                if (authAttemptInProgress) {
-                    console.log("JCHAT_DEBUG: Auth attempt already in progress or previously handled.");
-                    return;
-                }
-                authAttemptInProgress = true;
                 console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
                 try {
                     if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
                         console.log("JCHAT_DEBUG: Signed in with custom token.");
-                        authAttemptInProgress = false;
                     } else {
-                        if (!navigator.onLine) {
-                            throw new Error('OFFLINE');
-                        }
-                        const ok = await canReachIdentityToolkit(4000);
-                        if (!ok) {
-                            throw new Error('AUTH_BACKEND_UNREACHABLE');
-                        }
-                        await Promise.race([
-                            signInAnonymously(auth),
-                            new Promise((_, rej) => setTimeout(() => rej(new Error('AUTH_TIMEOUT')), 6000))
-                        ]);
+                        await signInAnonymously(auth);
                         console.log("JCHAT_DEBUG: Signed in anonymously.");
-                        authAttemptInProgress = false;
                     }
                 } catch (error) {
-                    console.warn("JCHAT_WARN: Error during anonymous sign-in or custom token sign-in:", error);
-                    const msg = String(error && (error.message || error.code) || '');
-                    const isOffline = msg.includes('OFFLINE') || !navigator.onLine;
-                    const isNetworkError = /auth\/network-request-failed/i.test(msg) || /network[- ]request[- ]failed/i.test(msg);
-                    const isUnreachable = msg.includes('AUTH_BACKEND_UNREACHABLE') || msg.includes('AUTH_TIMEOUT');
-                    if (isOffline || isNetworkError || isUnreachable) {
-                        // Graceful offline/blocked-network mode: show guest UI and skip redirect
-                        isAuthReady = false;
-                        toggleInteractiveElements(false, false);
-                        if (headerDisplayName) headerDisplayName.textContent = "Guest";
-                        if (headerProfilePic) headerProfilePic.style.display = 'none';
-                        if (headerAvatarIcon) headerAvatarIcon.style.display = 'block';
-                        if (adminIconLink) adminIconLink.style.display = 'none';
-                        showMessageBox("Network cannot reach Google Auth. Viewing as guest.", 'warning', true, 7000);
-                        hideLoader();
-                        return;
-                    }
+                    console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
                     if (!auth.currentUser) {
-                        hideLoader();
-                        window.location.href = '/Login.html';
-                        return;
+                        hideLoader(); // Hide loader before redirect
+                        window.location.href = '/login.html'; // Redirect to login if all sign-in attempts fail.
+                        return; // Stop further execution.
                     }
                 }
                 // If we reach here, either anonymous sign-in succeeded or custom token worked.
