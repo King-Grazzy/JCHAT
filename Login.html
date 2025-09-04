@@ -1014,63 +1014,11 @@
                     </button>
                 </div>
             </div>
-            <!-- Handle login response -->
             <script>
-            function handleGoogleSignIn(response) {
-              const payload = parseJwt(response.credential);
-              console.log("User Email: ", payload.email);
-              fetch('/api/auth/google', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token: response.credential })
-              }).then(res => res.json())
-                .then(data => {
-                  window.location.href = "/dashboard.html";
-                });
-            }
-            function parseJwt(token) {
-              const base64Url = token.split('.')[1];
-              const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-              const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
-                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-              ).join(''));
-              return JSON.parse(jsonPayload);
-            }
-            </script>
-            <script>
-                // Initialize GIS without FedCM for prompt to avoid NotAllowedError logs
-                window.addEventListener('load', function(){
-                    if (window.google && google.accounts && google.accounts.id) {
-                        google.accounts.id.initialize({
-                            client_id: '328479683167-4ib6vvg5easg05upvi2f4cvqs6l76lg7.apps.googleusercontent.com',
-                            callback: handleGoogleSignIn,
-                            auto_select: false,
-                            cancel_on_tap_outside: true,
-                            use_fedcm_for_prompt: false
-                        });
-                    }
-                });
                 function triggerGoogleSignIn(){
-                    if (window.google && google.accounts && google.accounts.id) {
-                        try {
-                            showSmartLoader('Google Sign-In', 'Opening Google...');
-                            google.accounts.id.prompt((notification) => {
-                                try {
-                                    if (notification?.isNotDisplayed?.() || notification?.isSkippedMoment?.()) {
-                                        hideSmartLoader();
-                                    }
-                                    const reason = notification?.getDismissedReason?.();
-                                    if (reason) { hideSmartLoader(); }
-                                } catch (_) {
-                                    hideSmartLoader();
-                                }
-                            });
-                        } catch (e) {
-                            console.error('GSI prompt error', e);
-                            hideSmartLoader();
-                        }
+                    if (window.__loginWithGoogle) {
+                        window.__loginWithGoogle();
                     } else {
-                        console.warn('Google Identity Services not ready');
                         showCustomModal('error', 'Google Sign-In unavailable', 'Please reload the page and try again, or use email/password.');
                     }
                 }
@@ -1130,11 +1078,11 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+        const defaultFirebaseConfig = {
             apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
             authDomain: "jchat-1.web.app",
             projectId: "jchat-1",
@@ -1143,6 +1091,13 @@
             appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
             measurementId: "G-S6Z9GG0R9P"
         };
+        let parsedConfig = {};
+        try {
+            parsedConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) ? JSON.parse(__firebase_config) : {};
+        } catch (e) {
+            parsedConfig = {};
+        }
+        const firebaseConfig = { ...defaultFirebaseConfig, ...parsedConfig };
 
         // Initialize Firebase (allow runtime domain switch)
         let app = initializeApp(firebaseConfig);
@@ -1639,6 +1594,51 @@
         window.showErrorModal = showErrorModal;
         window.showSuccessModal = showSuccessModal;
 
+        // Google Sign-In via Firebase (popup with redirect fallback)
+        const googleProvider = new GoogleAuthProvider();
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+        window.__loginWithGoogle = async function() {
+            try {
+                showSmartLoader('Google Sign-In', 'Opening Google...');
+                let result;
+                try {
+                    result = await signInWithPopup(auth, googleProvider);
+                } catch (e) {
+                    if (e && (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-closed-by-user')) {
+                        await signInWithRedirect(auth, googleProvider);
+                        return;
+                    }
+                    throw e;
+                }
+                if (result && result.user) {
+                    await saveUserData(result.user, 'google');
+                    hideSmartLoader();
+                    showSuccessModal(`Welcome, ${result.user.displayName || result.user.email}!`, () => { window.location.href = 'Home.html'; });
+                } else {
+                    hideSmartLoader();
+                }
+            } catch (error) {
+                hideSmartLoader();
+                hideLoading();
+                let msg = 'Google sign-in failed. Please try again.';
+                if (error && error.code) {
+                    switch (String(error.code)) {
+                        case 'auth/account-exists-with-different-credential':
+                            msg = 'An account already exists with the same email but different sign-in method.';
+                            break;
+                        case 'auth/cancelled-popup-request':
+                            msg = 'Sign-in cancelled. Please try again.';
+                            break;
+                        case 'auth/network-request-failed':
+                            msg = 'Network error. Check your connection and try again.';
+                            break;
+                    }
+                }
+                showErrorModal(msg);
+            }
+        };
+
         // Show success message
         function showSuccess(message) {
             const errorDiv = document.getElementById('errorMessage');
@@ -1926,6 +1926,15 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Performance optimization - preload resources
             preloadResources();
+
+            // Handle Google redirect result after signInWithRedirect
+            getRedirectResult(auth).then(async (result) => {
+                if (result && result.user) {
+                    await saveUserData(result.user, 'google');
+                    hideSmartLoader();
+                    showSuccessModal(`Welcome, ${result.user.displayName || result.user.email}!`, () => { window.location.href = 'Home.html'; });
+                }
+            }).catch(() => {});
 
             // Verify Firebase Auth iframe connectivity and guide if blocked
             (function verifyAuthIframe(){
