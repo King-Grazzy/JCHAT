@@ -12,12 +12,13 @@
     <!-- Preconnect to Firebase and Cloudinary domains for faster loading -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://*.firebaseio.com" crossorigin>
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
 
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
     <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Tone.js for audio notifications -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 
@@ -1903,6 +1904,10 @@
                             <option value="rejected">Rejected</option>
                             <option value="all">All</option>
                         </select>
+                        <input type="text" id="ordersUserSearch" placeholder="User ID or Email" style="padding:8px 10px; border-radius:8px; border:1px solid var(--border-light); background:var(--input-background); color:var(--white); min-width:200px;" />
+                        <button id="ordersSearchBtn" class="admin-button secondary" style="width:auto; padding:8px 12px;">
+                            <span class="button-text"><i class="fas fa-search"></i> Search</span>
+                        </button>
                     </div>
                     <div id="ordersList" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; width:100%;"></div>
                     <p id="noOrdersMessage" style="display:none; color:var(--text-light); text-align:center;">No orders to display.</p>
@@ -2027,7 +2032,7 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, runTransaction, writeBatch, serverTimestamp, onSnapshot, addDoc, deleteDoc, Timestamp, arrayUnion, arrayRemove, orderBy } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, collectionGroup, query, where, getDocs, runTransaction, writeBatch, serverTimestamp, onSnapshot, addDoc, deleteDoc, Timestamp, arrayUnion, arrayRemove, orderBy } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
         import { getStorage, ref, getDownloadURL, deleteObject, uploadBytes } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-storage.js";
 
         // --- Firebase & Canvas Environment Configuration ---
@@ -2392,7 +2397,7 @@
                 await signOut(auth);
                 showMessageBox("Logged out successfully! 👋", 'success');
                 setTimeout(() => {
-                    window.location.href = '/login.html';
+                    window.location.href = '/Login.html';
                 }, 1000);
             } catch (error) {
                 console.error("JCHAT_ERROR: Error logging out:", error);
@@ -2848,35 +2853,13 @@
                             userIdFound = querySnapshot.docs[0].id;
                         }
                     } else if (searchType === 'email') {
-                        // For email, we need to query the private profiles as email is not public.
-                        // This requires iterating through private user subcollections which is not scalable.
-                        // For a production app, a backend function would be ideal for email lookups.
-                        // For this demo, we'll fetch and filter client-side (less efficient for large datasets).
-                        const allUsersCollectionGroup = collection(db, "artifacts", appId, "users");
-                        const allUsersSnapshot = await getDocs(allUsersCollectionGroup);
-                        const foundDoc = allUsersSnapshot.docs.find(doc => {
-                            const profileSubcollectionRef = collection(doc.ref, "profiles");
-                            // This would require another getDoc call for each user's profile subcollection.
-                            // To avoid N+1 reads, you might need to structure data differently or use a backend.
-                            // Given current security rules, direct query on private email is not allowed for non-admin.
-                            // Admin can read private profiles.
-                            // Let's explicitly fetch the 'user_profile' document for each user to check email.
-                            const userProfileData = doc.data().profiles?.user_profile; // Assuming direct access for admin
-                            return userProfileData && userProfileData.email === searchValue;
-                        });
-
-                        if (foundDoc) {
-                            userIdFound = foundDoc.id;
-                        } else {
-                            // Fallback if direct access to subcollection data fails, try fetching individual profiles
-                            const usersCollectionRef = collection(db, "artifacts", appId, "users");
-                            const usersSnapshot = await getDocs(usersCollectionRef);
-                            for (const userDoc of usersSnapshot.docs) {
-                                const privateProfileDoc = await getDoc(doc(usersCollectionRef, userDoc.id, "profiles", "user_profile"));
-                                if (privateProfileDoc.exists() && privateProfileDoc.data().email === searchValue) {
-                                    userIdFound = userDoc.id;
-                                    break;
-                                }
+                        // Efficient email lookup using collectionGroup on private profiles
+                        const profilesCg = query(collectionGroup(db, 'profiles'), where('email', '==', searchValue));
+                        const profilesSnap = await getDocs(profilesCg);
+                        if (!profilesSnap.empty) {
+                            const match = profilesSnap.docs.find(d => d.id === 'user_profile');
+                            if (match) {
+                                userIdFound = match.ref.parent.parent.id;
                             }
                         }
                     }
@@ -3835,7 +3818,7 @@
             const pendingRewardsCollectionRef = collection(db, "artifacts", appId, "public", "data", "pending_activity_rewards");
             const q = query(pendingRewardsCollectionRef, where("status", "==", "pending"));
 
-            unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const unsubscribe = onSnapshot(q, (querySnapshot) => {
                 console.log("JCHAT_DEBUG: onSnapshot for pending rewards triggered. Count:", querySnapshot.size);
                 pendingRewardsTableBody.innerHTML = ''; // Clear existing rows.
                 allPendingRewardsData.clear(); // Clear the map of all pending rewards.
@@ -4379,8 +4362,8 @@
                     }
                     document.body.style.overflow = 'hidden';
                     // Redirect non-admins if maintenance mode is active.
-                    if (window.location.pathname !== '/login.html') {
-                        window.location.href = '/login.html'; // Redirect to login page
+                    if (window.location.pathname !== '/Login.html') {
+                        window.location.href = '/Login.html'; // Redirect to login page
                         showMessageBox("JCHAT is currently in maintenance mode. Please try again later.", 'warning', true);
                         playNotificationSound('error');
                     }
@@ -4858,7 +4841,7 @@
                     <div><strong>Request ID:</strong> ${requestId}</div>
                     <div><strong>User:</strong> ${req.userId || 'N/A'}</div>
                     <div><strong>Method:</strong> ${req.paymentMethod || 'N/A'}</div>
-                    <div><strong>Amount:</strong> ${req.userCurrencyCode ? `${req.userCurrencyCode} ${req.userCurrencyAmount}` : '₦' + (req.nairaAmount||0).toLocaleString()} | ${req.jcoinAmount||0} JCoins</div>
+                    <div><strong>Amount:</strong> ${req.userCurrencyCode ? `${req.userCurrencyCode} ${req.userCurrencyAmount}` : '���' + (req.nairaAmount||0).toLocaleString()} | ${req.jcoinAmount||0} JCoins</div>
                     ${vipPass ? `<div><strong>VIP:</strong> ${vipPass === 'lifetime' ? 'Lifetime ₦9,999' : 'Yearly ₦2,999'}</div>` : ''}
                     ${subtotalNgn !== null ? `<div><strong>Subtotal:</strong> ₦${subtotalNgn.toLocaleString()}</div>` : ''}
                     ${totalDiscountNgn !== null ? `<div><strong>Discount:</strong> ₦${totalDiscountNgn.toLocaleString()} ${bulkPercent ? `(bulk ${bulkPercent}%)` : ''} ${couponCode ? `+ coupon ${couponCode}${couponPercent?` (${couponPercent}%)`:''}` : ''}</div>` : ''}
@@ -5368,7 +5351,7 @@
                         playNotificationSound('error');
                         setTimeout(async () => {
                             await signOut(auth); // Sign out banned user
-                            window.location.href = '/login.html';
+                            window.location.href = '/Login.html';
                         }, 2000);
                         return; // Stop further execution for banned users
                     }
@@ -5394,7 +5377,7 @@
                 } catch (error) {
                     console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
                     if (!auth.currentUser) {
-                        window.location.href = '/login.html';
+                        window.location.href = '/Login.html';
                         return;
                     }
                 }
@@ -5416,7 +5399,7 @@
                     showMessageBox("Access Denied: Please log in as an administrator.", 'error', true);
                     playNotificationSound('error');
                     setTimeout(() => {
-                        window.location.href = '/login.html';
+                        window.location.href = '/Login.html';
                     }, 2000);
                 }
             }
@@ -5774,7 +5757,7 @@
                         playNotificationSound('error');
                         setTimeout(async () => {
                             await signOut(auth); // Sign out banned user
-                            window.location.href = '/login.html';
+                            window.location.href = '/Login.html';
                         }, 2000);
                         return; // Stop further execution for banned users
                     }
@@ -5800,7 +5783,7 @@
                 } catch (error) {
                     console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
                     if (!auth.currentUser) {
-                        window.location.href = '/login.html';
+                        window.location.href = '/Login.html';
                         return;
                     }
                 }
@@ -5822,7 +5805,7 @@
                     showMessageBox("Access Denied: Please log in as an administrator.", 'error', true);
                     playNotificationSound('error');
                     setTimeout(() => {
-                        window.location.href = '/login.html';
+                        window.location.href = '/Login.html';
                     }, 2000);
                 }
             }
