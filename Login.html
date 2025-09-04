@@ -1867,6 +1867,10 @@
             provider.setCustomParameters({ prompt: 'select_account' });
 
             try {
+                const remember = document.getElementById('remember')?.checked;
+                if (typeof remember === 'boolean') {
+                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                }
                 showSmartLoader('Signing In', 'Opening Google...');
                 await signInWithPopup(auth, provider);
                 // Success via popup will trigger onAuthStateChanged
