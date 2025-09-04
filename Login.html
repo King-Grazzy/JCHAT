@@ -1843,9 +1843,19 @@
                 }
             } catch (error) {
                 hideSmartLoader();
-                let msg = 'Google sign-in failed. Please try again.';
                 const code = error && error.code ? String(error.code) : '';
-                if (code.includes('deleted_client')) msg = 'Google sign-in is temporarily unavailable. Please try again later.';
+                const messageText = error && error.message ? String(error.message) : '';
+                let msg = 'Google sign-in failed. Please try again.';
+                if (code === 'auth/unauthorized-domain') {
+                    msg = 'This domain is not authorized for Google sign-in. Please contact an administrator.';
+                } else if (code === 'auth/operation-not-allowed') {
+                    msg = 'Google sign-in is not enabled. Please contact an administrator.';
+                } else if (code === 'auth/admin-restricted-operation' || /ADMIN_ONLY_OPERATION/i.test(messageText)) {
+                    msg = 'Sign in restricted to existing users. Please contact an administrator for access.';
+                    showAdminOnlyNotice();
+                } else if (code.includes('deleted_client')) {
+                    msg = 'Google sign-in is temporarily unavailable. Please try again later.';
+                }
                 showErrorModal(msg);
             }
         }
