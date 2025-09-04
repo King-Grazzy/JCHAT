@@ -111,7 +111,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         // Firebase configuration (same as Login.html)
         const firebaseConfig = {
@@ -162,37 +162,57 @@
 
         window.testGoogleAuth = async function() {
             const authStatus = document.getElementById('authStatus');
-            authStatus.innerHTML = '<div class="info">🔄 Testing Google authentication...</div>';
+            authStatus.innerHTML = '<div class="info">🔄 Redirecting to Google for authentication...</div>';
             
             try {
                 console.log('Testing Google auth with provider:', googleProvider);
                 console.log('Firebase auth instance:', auth);
-                
-                const result = await signInWithPopup(auth, googleProvider);
-                const user = result.user;
-                
-                authStatus.innerHTML = `
-                    <div class="success">✅ Google authentication successful!</div>
-                    <div class="info">
-                        <strong>User:</strong> ${user.displayName || 'No name'} (${user.email})<br>
-                        <strong>UID:</strong> ${user.uid}<br>
-                        <strong>Provider:</strong> ${user.providerData[0]?.providerId || 'Unknown'}
-                    </div>
-                `;
-                
-                console.log('Auth successful:', user);
+                await signInWithRedirect(auth, googleProvider);
             } catch (error) {
-                console.error('Auth error:', error);
-                
+                console.error('Auth redirect error:', error);
                 let errorMessage = 'Unknown error occurred';
                 if (error.code === 'auth/unauthorized-domain') {
                     errorMessage = 'This domain is not authorized for Google sign-in. Add it to Firebase Console → Authentication → Settings → Authorized domains.';
                 } else if (error.code === 'auth/operation-not-allowed') {
                     errorMessage = 'Google sign-in is not enabled. Enable it in Firebase Console → Authentication → Sign-in method → Google.';
-                } else if (error.code === 'auth/popup-blocked') {
-                    errorMessage = 'Pop-up was blocked. Allow pop-ups for this site.';
-                } else if (error.code === 'auth/popup-closed-by-user') {
-                    errorMessage = 'Authentication popup was closed by user.';
+                } else {
+                    errorMessage = `${error.code}: ${error.message}`;
+                }
+                
+                authStatus.innerHTML = `
+                    <div class="error">❌ Google authentication failed to start</div>
+                    <div class="error">${errorMessage}</div>
+                    <div class="info">
+                        <strong>Error Code:</strong> ${error.code}<br>
+                        <strong>Error Message:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        };
+
+        window.handleRedirectResult = async function() {
+            const authStatus = document.getElementById('authStatus');
+            try {
+                const result = await getRedirectResult(auth);
+                if (result && result.user) {
+                    const user = result.user;
+                    authStatus.innerHTML = `
+                        <div class="success">✅ Google authentication successful!</div>
+                        <div class="info">
+                            <strong>User:</strong> ${user.displayName || 'No name'} (${user.email})<br>
+                            <strong>UID:</strong> ${user.uid}<br>
+                            <strong>Provider:</strong> ${user.providerData[0]?.providerId || 'Unknown'}
+                        </div>
+                    `;
+                    console.log('Auth successful:', user);
+                }
+            } catch (error) {
+                console.error('Auth result error:', error);
+                let errorMessage = 'Unknown error occurred';
+                if (error.code === 'auth/unauthorized-domain') {
+                    errorMessage = 'This domain is not authorized for Google sign-in. Add it to Firebase Console → Authentication → Settings → Authorized domains.';
+                } else if (error.code === 'auth/operation-not-allowed') {
+                    errorMessage = 'Google sign-in is not enabled. Enable it in Firebase Console → Authentication → Sign-in method → Google.';
                 } else {
                     errorMessage = `${error.code}: ${error.message}`;
                 }
@@ -227,9 +247,10 @@
             debugInfo.innerHTML = '<pre>' + JSON.stringify(debug, null, 2) + '</pre>';
         };
 
-        // Auto-check configuration on load
+        // Auto-check configuration on load and handle redirect result
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(checkConfig, 1000);
+            handleRedirectResult();
         });
     </script>
 </body>
