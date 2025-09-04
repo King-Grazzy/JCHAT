@@ -1842,32 +1842,6 @@
             // Performance optimization - preload resources
             preloadResources();
 
-            // Verify Firebase Auth iframe connectivity and guide if blocked
-            (function verifyAuthIframe(){
-                try {
-                    const test = document.createElement('iframe');
-                    test.style.position = 'absolute';
-                    test.style.width = '1px';
-                    test.style.height = '1px';
-                    test.style.top = '-100px';
-                    test.referrerPolicy = 'no-referrer';
-                    const authDomain = (typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com';
-                    const apiKey = (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) ? firebaseConfig.apiKey : '';
-                    test.src = `https://${authDomain}/__/auth/iframe?apiKey=${encodeURIComponent(apiKey)}&v=11.8.0`;
-                    let handled = false;
-                    const cleanup = () => { if (test && test.parentNode) test.parentNode.removeChild(test); };
-                    const timer = setTimeout(() => {
-                        if (!handled) {
-                            handled = true;
-                            cleanup();
-                            showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. If you see “refused to connect”, ensure this site (${location.host}) is in Firebase Authentication → Settings → Authorized domains, and that corporate firewalls allow *.firebaseapp.com`);
-                        }
-                    }, 4000);
-                    test.onload = () => { handled = true; clearTimeout(timer); cleanup(); };
-                    test.onerror = async () => { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(e) {} showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. Switched to jchat-1.web.app for auth. Please retry.`); };
-                    document.body.appendChild(test);
-                } catch (e) { /* noop */ }
-            })();
             
             // Create floating particles
             createFloatingParticles();
