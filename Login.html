@@ -984,7 +984,46 @@
                 Sign In
             </button>
 
-
+            <!-- Load Google API -->
+            <script src="https://accounts.google.com/gsi/client" async defer></script>
+            <!-- Google Sign-In Button -->
+            <div id="g_id_onload"
+                 data-client_id="328479683167-4ib6vvg5easg05upvi2f4cvqs6l76lg7.apps.googleusercontent.com"
+                 data-login_uri="https://jchathub.netlify.app"
+                 data-auto_prompt="false"
+                 data-callback="handleGoogleSignIn">
+            </div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="filled_blue"
+                 data-text="continue_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left">
+            </div>
+            <!-- Handle login response -->
+            <script>
+            function handleGoogleSignIn(response) {
+              const payload = parseJwt(response.credential);
+              console.log("User Email: ", payload.email);
+              fetch('/api/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: response.credential })
+              }).then(res => res.json())
+                .then(data => {
+                  window.location.href = "/dashboard.html";
+                });
+            }
+            function parseJwt(token) {
+              const base64Url = token.split('.')[1];
+              const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+              const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+                '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+              ).join(''));
+              return JSON.parse(jsonPayload);
+            }
+            </script>
 
             <div class="signup-link">
                 <span id="signup-link-text">Don't have an account? <a href="#" onclick="goToSignup()">Sign up here</a></span>
