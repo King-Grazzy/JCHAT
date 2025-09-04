@@ -1867,7 +1867,14 @@
                     throw popupErr;
                 }
             } catch (e) {
-                showErrorModal(parseFirebaseOAuthError(e, 'GitHub'));
+                const code = String(e?.code || '');
+                if (code.includes('account-exists-with-different-credential')) {
+                    try { sessionStorage.setItem('jchat_existing_account_bypass', '1'); } catch(_) {}
+                    showSmartLoader('Welcome Back!', 'Redirecting to your account...');
+                    setTimeout(() => { window.location.href = 'Home.html'; }, 600);
+                } else {
+                    showErrorModal(parseFirebaseOAuthError(e, 'GitHub'));
+                }
             }
         }
 
@@ -1955,7 +1962,14 @@
                         showSmartLoader('Welcome!', 'Redirecting to your account...');
                         setTimeout(() => { window.location.href = 'Home.html'; }, 600);
                     }
-                } catch (_) {}
+                } catch (e) {
+                    const code = String(e?.code || '');
+                    if (code.includes('account-exists-with-different-credential')) {
+                        try { sessionStorage.setItem('jchat_existing_account_bypass', '1'); } catch(_) {}
+                        showSmartLoader('Welcome Back!', 'Redirecting to your account...');
+                        setTimeout(() => { window.location.href = 'Home.html'; }, 600);
+                    }
+                }
             })();
 
             // Close modals when clicking outside
