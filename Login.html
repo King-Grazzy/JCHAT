@@ -1946,7 +1946,23 @@
                     hideSmartLoader();
                     showSuccessModal(`Welcome, ${result.user.displayName || result.user.email}!`, () => { window.location.href = 'Home.html'; });
                 }
-            }).catch(() => {});
+            }).catch((error) => {
+                hideSmartLoader();
+                const code = error && error.code ? String(error.code) : '';
+                let msg = 'Google sign-in failed. Please try again.';
+                switch (code) {
+                    case 'auth/invalid-api-key':
+                        msg = 'Invalid Firebase API key. Please update your Firebase configuration.';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        msg = 'Google sign-in is disabled for this project. Enable Google provider in Firebase Auth settings.';
+                        break;
+                    case 'auth/network-request-failed':
+                        msg = 'Network error. Check your connection and try again.';
+                        break;
+                }
+                showErrorModal(msg);
+            });
 
             // Verify Firebase Auth iframe connectivity and guide if blocked
             (function verifyAuthIframe(){
