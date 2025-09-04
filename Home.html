@@ -4465,6 +4465,14 @@
         let auth = getAuth(app);
         let db = initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false });
         window.__auth_domain = firebaseConfig.authDomain;
+        (async () => {
+            try {
+                const h = location.hostname;
+                if (!h.endsWith('firebaseapp.com') && !h.endsWith('web.app')) {
+                    await switchAuthDomain('jchat-1.web.app');
+                }
+            } catch (_) {}
+        })();
         async function switchAuthDomain(newDomain) {
             try { await deleteApp(app); } catch (e) {}
             const cfg = { ...firebaseConfig, authDomain: newDomain };
@@ -4473,7 +4481,7 @@
             db = initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false });
             window.__auth_domain = newDomain;
         }
-        function ensureAuthIframeReachable(timeoutMs = 4000) {
+        function ensureAuthIframeReachable(timeoutMs = 7000) {
             return new Promise((resolve) => {
                 try {
                     const test = document.createElement('iframe');
@@ -4482,7 +4490,9 @@
                     test.style.height = '1px';
                     test.style.top = '-100px';
                     test.referrerPolicy = 'no-referrer';
-                    const authDomain = (typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com';
+                    const authDomain = (typeof window.__auth_domain === 'string' && window.__auth_domain)
+                        ? window.__auth_domain
+                        : ((typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com');
                     const apiKey = (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) ? firebaseConfig.apiKey : '';
                     test.src = `https://${authDomain}/__/auth/iframe?apiKey=${encodeURIComponent(apiKey)}&v=11.8.0`;
                     let done = false;
@@ -9194,7 +9204,9 @@ async function fetchAndDisplayPosts() {
                     if (typeof showMessageBox === 'function') {
                         const msg = (last === 'auth/operation-not-allowed')
                             ? 'Guest browsing is disabled. Please sign in.'
-                            : 'We could not complete sign-in automatically. You can continue browsing as a guest or sign in.';
+                            : (last === 'auth/network-request-failed'
+                                ? `Could not reach Firebase Auth. Add ${location.hostname} under Firebase Auth → Settings → Authorized domains, allow third-party cookies/popups, then refresh.`
+                                : 'We could not complete sign-in automatically. You can continue browsing as a guest or sign in.');
                         showMessageBox(msg, 'warning', true);
                     }
                     if (!auth.currentUser) {
