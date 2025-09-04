@@ -1129,7 +1129,7 @@
                     const email = u.email || ud.email || '';
                     const photo = u.photoURL || ud.photoURL || '';
                     const uid = u.uid;
-                    const username = ud.username || (displayName ? displayName.replace(/\s+/g, '').toLowerCase() : (email ? email.split('@')[0].replace(/[^a-z0-9]/gi,'') : uid));
+                    const username = ud.username || displayName || '';
 
                     try { localStorage.setItem('userName', displayName); } catch(e){}
                     try { localStorage.setItem('userEmail', email); } catch(e){}
