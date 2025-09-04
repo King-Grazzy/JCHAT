@@ -1556,6 +1556,10 @@
             document.getElementById('loginForm').style.pointerEvents = 'auto';
         }
 
+        // Expose loader helpers globally for non-module scripts
+        window.showSmartLoader = showSmartLoader;
+        window.hideSmartLoader = hideSmartLoader;
+
         // Show loading state
         function showLoading(message) {
             const loginBtn = document.querySelector('.login-btn');
