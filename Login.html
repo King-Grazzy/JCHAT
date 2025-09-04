@@ -1188,7 +1188,7 @@
                 toggleBtn.textContent = '🙈';
             } else {
                 passwordInput.type = 'password';
-                toggleBtn.textContent = '���️';
+                toggleBtn.textContent = '👁️';
             }
         };
 
@@ -1331,6 +1331,7 @@
                 return;
             }
             
+            showLoading('Creating Account...');
             showSmartLoader('Creating Account', 'Setting up your JCHAT profile...');
             
             try {
@@ -1371,12 +1372,14 @@
                 try {
                     await sendEmailVerification(user);
                     hideSmartLoader();
+                    hideLoading();
                     showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Please check your email to verify your account.`, () => {
                         window.location.href = 'Home.html';
                     });
                 } catch (verificationError) {
                     console.warn('Email verification failed:', verificationError);
                     hideSmartLoader();
+                    hideLoading();
                     showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Note: Email verification could not be sent.`, () => {
                         window.location.href = 'Home.html';
                     });
@@ -1384,6 +1387,7 @@
                 
             } catch (error) {
                 hideSmartLoader();
+                hideLoading();
                 let errorMessage = 'Failed to create account. Please try again.';
 
                 const code = error && error.code ? String(error.code) : '';
@@ -1417,6 +1421,7 @@
 
         // Login user
         async function loginUser(email, password, remember) {
+            showLoading('Signing In...');
             showSmartLoader('Signing In', 'Authenticating your credentials...');
             
             try {
@@ -1428,12 +1433,14 @@
                 await saveUserData(user, 'email');
                 
                 hideSmartLoader();
+                hideLoading();
                 showSuccessModal(`Welcome back, ${user.displayName || user.email}!`, () => {
                     window.location.href = 'Home.html';
                 });
 
             } catch (error) {
                 hideSmartLoader();
+                hideLoading();
                 let errorMessage = 'Invalid email or password.';
                 
                 switch (error.code) {
@@ -1785,6 +1792,7 @@
                 
             } catch (error) {
                 hideSmartLoader();
+                hideLoading();
                 let errorMessage = 'Failed to send reset email. Please try again.';
                 
                 switch (error.code) {
