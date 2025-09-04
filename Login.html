@@ -1,148 +1,105 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>JCHAT — Sign In</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    *{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --pink:#ff2e92;
-      --blue:#00d5ff;
-      --white:#fff;
-      --text-light:rgba(255,255,255,.75);
-      --border-light:rgba(255,255,255,.06);
-      --card-background:linear-gradient(145deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-      --header-background:linear-gradient(135deg, rgba(10,10,10,.85), rgba(10,10,10,.75));
-      --radius:18px;
-      --transition:.28s ease;
-      --button-background:linear-gradient(90deg,var(--blue),var(--pink));
-      --button-shadow:0 6px 20px rgba(0,213,255,.08),0 6px 20px rgba(255,46,146,.06);
-      --input-background:rgba(255,255,255,.03);
+      --bg1:#0f1724; --bg2:#0b1220; --pink:#ff2e92; --blue:#00d5ff; --card:#0f1116; --muted:rgba(255,255,255,.75);
+      --radius:14px; --glass:rgba(255,255,255,.03); --accent-gradient:linear-gradient(90deg,var(--blue),var(--pink));
     }
-
+    *{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
-    body{
-      font-family:'Inter', 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background:radial-gradient(circle at 10% 10%, var(--blue), transparent 140px), radial-gradient(circle at 90% 90%, var(--pink), transparent 160px), linear-gradient(135deg,#11121b,#0e0f1a);
-      display:flex;align-items:center;justify-content:center;padding:24px;color:var(--white);
-      min-height:100vh;overflow-x:hidden
-    }
+    body{font-family:Inter, Poppins, system-ui, -apple-system, sans-serif;background:radial-gradient(circle at 10% 20%,var(--blue),transparent 120px),radial-gradient(circle at 90% 80%,var(--pink),transparent 160px),linear-gradient(180deg,var(--bg1),var(--bg2));color:#fff;display:flex;align-items:center;justify-content:center;padding:24px}
 
-    .card{
-      width:100%;max-width:460px;border-radius:var(--radius);background:var(--card-background);backdrop-filter:blur(14px);border:1px solid var(--border-light);box-shadow:var(--button-shadow);overflow:hidden
-    }
+    .auth-card{width:100%;max-width:480px;border-radius:16px;background:linear-gradient(145deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.04);overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+    .auth-header{padding:36px 28px;background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.2));text-align:center}
+    .brand{font-family:Poppins, Inter, sans-serif;font-weight:800;font-size:44px;background:var(--accent-gradient);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .headline{margin-top:8px;font-size:18px;color:var(--muted)}
 
-    .card-header{
-      padding:36px 28px;background:var(--header-background);text-align:center
-    }
+    .auth-body{padding:28px}
+    .form-row{margin-bottom:16px}
+    label.field-label{display:block;font-size:12px;font-weight:600;margin-bottom:8px;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px}
+    input.field-input, button.btn, .link-button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.04);background:var(--glass);color:#fff;font-size:15px}
+    input.field-input:focus{outline:none;box-shadow:0 8px 30px rgba(0,0,0,.6);border-color:var(--pink)}
 
-    .brand{
-      font-family:'Poppins',sans-serif;font-weight:800;font-size:46px;line-height:1;color:transparent;background:linear-gradient(90deg,var(--pink),var(--blue));-webkit-background-clip:text;margin-bottom:8px;text-shadow:0 8px 18px rgba(0,0,0,.45)
-    }
+    .btn{background:var(--accent-gradient);border:none;font-weight:700;cursor:pointer;letter-spacing:0.6px}
+    .muted{color:var(--muted);font-size:13px;text-align:center;margin-top:14px}
+    .mode-toggle{background:none;border:none;color:var(--blue);cursor:pointer;font-weight:700}
 
-    .headline{font-size:20px;font-weight:600;color:var(--white);margin-bottom:6px}
-    .subhead{font-size:13px;color:var(--text-light)}
+    .helper{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;color:var(--muted);font-size:13px}
+    .link-button{background:transparent;border:0;color:var(--muted);text-align:left;padding:0}
 
-    .card-body{padding:30px}
+    .alert{padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:14px}
+    .alert.error{background:linear-gradient(135deg, rgba(239,68,68,0.06), rgba(255,120,90,0.03));color:#ffb4b4;border:1px solid rgba(239,68,68,.14)}
+    .alert.success{background:linear-gradient(135deg,#10b981,#06b6d4);color:#fff}
 
-    .field{margin-bottom:18px}
-    .field label{display:block;font-size:12px;font-weight:700;margin-bottom:8px;color:linear-gradient(90deg,var(--blue),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-    .input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--border-light);background:var(--input-background);color:var(--white);font-size:15px;transition:all var(--transition)}
-    .input:focus{outline:none;box-shadow:0 8px 30px rgba(0,0,0,.5);transform:translateY(-2px);border-color:var(--pink)}
-
-    .actions{margin-top:6px}
-
-    .btn{display:inline-flex;align-items:center;justify-content:center;width:100%;padding:14px;border-radius:12px;border:none;background:var(--button-background);color:var(--white);font-weight:700;letter-spacing:0.6px;cursor:pointer;transition:all var(--transition);box-shadow:var(--button-shadow)}
-    .btn:active{transform:translateY(1px)}
-
-    .muted{color:var(--text-light);font-size:13px;text-align:center;margin-top:16px}
-
-    .toggle-mode{background:none;border:none;color:var(--blue);cursor:pointer;font-weight:700}
-
-    .row{display:flex;gap:12px}
-
-    .small-link{color:var(--text-light);font-size:13px;text-decoration:none}
-
-    .inline-help{font-size:13px;color:var(--text-light);display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-
-    .hidden{display:none}
-
-    .error{background:linear-gradient(135deg, rgba(239,68,68,0.08), rgba(255,150,100,0.04));border:1px solid rgba(239,68,68,.18);color:#ffb4b4;padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:12px}
-
-    .success{background:linear-gradient(135deg,#10b981,#06b6d4);color:#fff;padding:10px 12px;border-radius:10px;font-size:13px;margin-bottom:12px}
-
-    .link-btn{background:none;border:none;color:var(--text-light);text-decoration:underline;cursor:pointer}
-
-    @media (max-width:480px){.brand{font-size:36px}.card{max-width:92vw}.card-header{padding:26px}.card-body{padding:20px}}
+    @media (max-width:480px){.brand{font-size:36px}.auth-header{padding:26px}.auth-body{padding:20px}}
   </style>
 </head>
 <body>
-  <main class="card" role="main">
-    <header class="card-header">
+  <main class="auth-card" role="main">
+    <header class="auth-header">
       <div class="brand">JCHAT</div>
-      <div class="headline" id="modeHeadline">Welcome Back</div>
-      <div class="subhead" id="modeSub">Sign in to continue to your account</div>
+      <div class="headline" id="sub">Sign in to continue</div>
     </header>
 
-    <section class="card-body">
-      <div id="alert" class="hidden" role="status"></div>
+    <section class="auth-body">
+      <div id="alert" class="sr-only" aria-live="polite"></div>
 
       <form id="authForm" novalidate>
-        <div id="signupFields" class="hidden">
-          <div class="field">
-            <label for="displayName">Full name</label>
-            <input id="displayName" name="displayName" class="input" type="text" autocomplete="name" placeholder="Jane Doe">
+        <div id="signupGroup" class="hidden">
+          <div class="form-row">
+            <label class="field-label" for="displayName">Full name</label>
+            <input id="displayName" class="field-input" name="displayName" type="text" autocomplete="name" />
           </div>
-          <div class="field">
-            <label for="username">Username</label>
-            <input id="username" name="username" class="input" type="text" placeholder="janedoe">
+          <div class="form-row">
+            <label class="field-label" for="username">Username</label>
+            <input id="username" class="field-input" name="username" type="text" autocomplete="username" />
           </div>
         </div>
 
-        <div class="field">
-          <label for="emailField">Email address</label>
-          <input id="emailField" name="email" class="input" type="email" required placeholder="you@example.com" autocomplete="email">
+        <div class="form-row">
+          <label class="field-label" for="email">Email</label>
+          <input id="email" class="field-input" name="email" type="email" required autocomplete="email" />
         </div>
 
-        <div class="field">
-          <label for="passwordField">Password</label>
-          <input id="passwordField" name="password" class="input" type="password" required placeholder="Enter password" autocomplete="current-password">
+        <div class="form-row">
+          <label class="field-label" for="password">Password</label>
+          <input id="password" class="field-input" name="password" type="password" required autocomplete="current-password" />
         </div>
 
-        <div id="confirmPassField" class="field hidden">
-          <label for="confirmPassword">Confirm password</label>
-          <input id="confirmPassword" class="input" type="password" placeholder="Confirm password" autocomplete="new-password">
+        <div id="confirmRow" class="form-row hidden">
+          <label class="field-label" for="confirm">Confirm password</label>
+          <input id="confirm" class="field-input" type="password" autocomplete="new-password" />
         </div>
 
-        <div class="inline-help">
-          <label class="row" style="align-items:center">
-            <input id="remember" type="checkbox" style="margin-right:8px" aria-label="Remember me"> Remember me
-          </label>
-          <button type="button" id="forgotBtn" class="link-btn">Forgot?</button>
+        <div class="helper">
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px"><input id="remember" type="checkbox" /> Remember</label>
+          <button type="button" id="forgotBtn" class="link-button">Forgot password?</button>
         </div>
 
-        <div class="field actions">
+        <div id="actionRow" class="form-row">
           <button id="submitBtn" class="btn" type="submit">Sign In</button>
         </div>
 
         <div class="muted">
           <span id="mutedText">Don't have an account?</span>
           &nbsp;
-          <button type="button" id="toggleMode" class="toggle-mode">Create account</button>
+          <button type="button" id="toggleMode" class="mode-toggle">Create account</button>
         </div>
       </form>
-
     </section>
   </main>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js';
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js';
+    import { getFirestore, doc, setDoc, serverTimestamp, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
@@ -158,131 +115,100 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const el = id => document.getElementById(id);
-    const alertEl = el('alert');
-    const form = el('authForm');
-    const submitBtn = el('submitBtn');
-    const toggleModeBtn = el('toggleMode');
-    const signupFields = el('signupFields');
-    const confirmPassField = el('confirmPassField');
-    const modeHeadline = el('modeHeadline');
-    const modeSub = el('modeSub');
-    const mutedText = el('mutedText');
-    const rememberCheckbox = el('remember');
+    const $ = id => document.getElementById(id);
+    const alertEl = $('alert');
+    const authForm = $('authForm');
+    const submitBtn = $('submitBtn');
+    const toggleMode = $('toggleMode');
+    const signupGroup = $('signupGroup');
+    const confirmRow = $('confirmRow');
+    const mutedText = $('mutedText');
+    const sub = $('sub');
 
-    let signupMode = false;
+    let isSignup = false;
 
     function showAlert(message, type='error'){
       alertEl.className = '';
-      alertEl.classList.remove('hidden');
       alertEl.textContent = message;
-      if(type==='error') alertEl.classList.add('error'); else alertEl.classList.add('success');
-      setTimeout(()=>{ alertEl.classList.add('hidden'); }, 7000);
+      alertEl.classList.add('alert');
+      alertEl.classList.add(type==='error' ? 'error' : 'success');
+      alertEl.classList.remove('sr-only');
+      setTimeout(()=>{ alertEl.classList.add('sr-only'); }, 6000);
     }
 
-    function setLoading(loading, text){
-      submitBtn.disabled = loading;
-      submitBtn.textContent = loading ? (text || 'Please wait...') : (signupMode ? 'Create account' : 'Sign In');
-      submitBtn.style.opacity = loading? '0.8' : '1';
-    }
+    function clearAlert(){ alertEl.className='sr-only'; alertEl.textContent=''; }
 
-    function isValidEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+    function setLoading(flag, text){ submitBtn.disabled = flag; submitBtn.textContent = flag ? (text||'Please wait...') : (isSignup ? 'Create account' : 'Sign In'); }
 
-    toggleModeBtn.addEventListener('click', ()=>{
-      signupMode = !signupMode;
-      signupFields.classList.toggle('hidden', !signupMode);
-      confirmPassField.classList.toggle('hidden', !signupMode);
-      modeHeadline.textContent = signupMode ? 'Create your account' : 'Welcome Back';
-      modeSub.textContent = signupMode ? 'Register to start using JCHAT' : 'Sign in to continue to your account';
-      mutedText.textContent = signupMode ? 'Already have an account?' : "Don't have an account?";
-      toggleModeBtn.textContent = signupMode ? 'Sign in' : 'Create account';
-      submitBtn.textContent = signupMode ? 'Create account' : 'Sign In';
+    toggleMode.addEventListener('click', ()=>{
+      isSignup = !isSignup;
+      signupGroup.classList.toggle('hidden', !isSignup);
+      confirmRow.classList.toggle('hidden', !isSignup);
+      mutedText.textContent = isSignup ? 'Already have an account?' : "Don't have an account?";
+      toggleMode.textContent = isSignup ? 'Sign in' : 'Create account';
+      sub.textContent = isSignup ? 'Create your JCHAT account' : 'Sign in to continue';
+      submitBtn.textContent = isSignup ? 'Create account' : 'Sign In';
+      clearAlert();
     });
 
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      const email = el('emailField').value.trim();
-      const password = el('passwordField').value;
-      setAlertHidden();
+    function validEmail(email){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
 
+    authForm.addEventListener('submit', async (e)=>{
+      e.preventDefault(); clearAlert();
+      const email = $('email').value.trim();
+      const password = $('password').value;
       if(!email || !password){ showAlert('Please complete all required fields.'); return; }
-      if(!isValidEmail(email)){ showAlert('Please enter a valid email address.'); return; }
+      if(!validEmail(email)){ showAlert('Please enter a valid email.'); return; }
       if(password.length < 6){ showAlert('Password must be at least 6 characters.'); return; }
 
-      if(signupMode){
-        const confirm = el('confirmPassword').value || '';
-        const displayName = el('displayName').value.trim();
-        const username = el('username').value.trim();
-        if(!displayName){ showAlert('Please provide your full name.'); return; }
-        if(!username || username.length < 3){ showAlert('Please choose a username (3+ chars).'); return; }
+      if(isSignup){
+        const confirm = $('confirm').value;
+        const displayName = $('displayName').value.trim();
+        const username = $('username').value.trim().toLowerCase();
+        if(!displayName){ showAlert('Please enter your full name.'); return; }
+        if(!username || username.length < 3){ showAlert('Choose a username (3+ chars).'); return; }
         if(password !== confirm){ showAlert('Passwords do not match.'); return; }
-        setLoading(true, 'Creating account...');
+
+        setLoading(true,'Creating account...');
         try{
-          const userCred = await createUserWithEmailAndPassword(auth, email, password);
-          const user = userCred.user;
-          await updateProfile(user, { displayName });
-          await setDoc(doc(db, 'users', user.uid), {
-            uid: user.uid, email: user.email, displayName, username: username.toLowerCase(), provider: 'email', createdAt: serverTimestamp()
-          });
+          // prevent duplicate username
+          const q = query(collection(db,'users'), where('username','==',username));
+          const snap = await getDocs(q);
+          if(!snap.empty){ setLoading(false); showAlert('Username already taken.'); return; }
+
+          const cred = await createUserWithEmailAndPassword(auth,email,password);
+          const user = cred.user;
+          await updateProfile(user,{displayName});
+          await setDoc(doc(db,'users',user.uid),{uid:user.uid,email:user.email,displayName,username,provider:'email',createdAt:serverTimestamp()});
           try{ await sendEmailVerification(user); }catch(e){}
-          showAlert('Account created. Redirecting...', 'success');
-          setTimeout(()=> location.href = 'Home.html', 1200);
-        }catch(err){
-          setLoading(false); handleFirebaseError(err);
-        }
+          showAlert('Account created — redirecting...', 'success');
+          setTimeout(()=>location.href='Home.html',900);
+        }catch(err){ setLoading(false); handleError(err); }
+
       } else {
-        setLoading(true, 'Signing in...');
+        setLoading(true,'Signing in...');
         try{
-          await setPersistence(auth, rememberCheckbox.checked ? browserLocalPersistence : browserSessionPersistence);
-          const userCred = await signInWithEmailAndPassword(auth, email, password);
-          const user = userCred.user;
-          await setDoc(doc(db, 'users', user.uid), { lastLogin: serverTimestamp() }, { merge: true });
-          showAlert('Signed in. Redirecting...', 'success');
-          setTimeout(()=> location.href = 'Home.html', 800);
-        }catch(err){ setLoading(false); handleFirebaseError(err); }
+          await setPersistence(auth, $('remember').checked ? browserLocalPersistence : browserSessionPersistence);
+          const cred = await signInWithEmailAndPassword(auth,email,password);
+          const user = cred.user;
+          await setDoc(doc(db,'users',user.uid),{lastLogin:serverTimestamp()}, {merge:true});
+          showAlert('Signed in — redirecting...', 'success');
+          setTimeout(()=>location.href='Home.html',700);
+        }catch(err){ setLoading(false); handleError(err); }
       }
     });
 
-    function setAlertHidden(){ alertEl.classList.add('hidden'); alertEl.className='hidden'; alertEl.textContent=''; }
-
-    function handleFirebaseError(err){
-      const code = err && err.code ? String(err.code) : '';
-      let msg = 'Authentication failed. Please try again.';
-      switch(code){
-        case 'auth/user-not-found': msg = 'No account found with that email.'; break;
-        case 'auth/wrong-password': msg = 'Incorrect password.'; break;
-        case 'auth/email-already-in-use': msg = 'An account with that email already exists.'; break;
-        case 'auth/weak-password': msg = 'Password too weak. Choose a stronger one.'; break;
-        case 'auth/invalid-email': msg = 'Invalid email address.'; break;
-        case 'auth/network-request-failed': msg = 'Network error. Check your connection.'; break;
-      }
-      showAlert(msg);
-    }
-
-    el('forgotBtn').addEventListener('click', async ()=>{
-      const email = el('emailField').value.trim();
+    $('forgotBtn').addEventListener('click', async ()=>{
+      clearAlert(); const email = $('email').value.trim();
       if(!email){ showAlert('Enter your email to receive a reset link.'); return; }
-      if(!isValidEmail(email)){ showAlert('Please enter a valid email address.'); return; }
-      setLoading(true, 'Sending reset...');
-      try{ await sendPasswordResetEmail(auth, email); setLoading(false); showAlert('Reset link sent to your email.', 'success'); }catch(err){ setLoading(false); handleFirebaseError(err); }
+      if(!validEmail(email)){ showAlert('Please enter a valid email.'); return; }
+      setLoading(true,'Sending...');
+      try{ await sendPasswordResetEmail(auth,email); setLoading(false); showAlert('Reset link sent. Check your inbox.','success'); }catch(err){ setLoading(false); handleError(err); }
     });
 
-    onAuthStateChanged(auth, (user)=>{ if(user){ /* auto-redirect if already signed in */ setTimeout(()=> location.href='Home.html', 300); } });
+    function handleError(err){ const code = err && err.code ? String(err.code) : ''; let msg='Operation failed. Please try again.'; switch(code){ case 'auth/user-not-found': msg='No account for that email.'; break; case 'auth/wrong-password': msg='Incorrect password.'; break; case 'auth/email-already-in-use': msg='Email already in use.'; break; case 'auth/weak-password': msg='Password too weak.'; break; case 'auth/invalid-email': msg='Invalid email address.'; break; case 'auth/network-request-failed': msg='Network error.'; break; } showAlert(msg); }
 
-    // Username availability check (basic): prevents duplicate usernames during signup
-    el('username').addEventListener('blur', async ()=>{
-      const username = el('username').value.trim();
-      if(!username) return;
-      try{
-        const q = query(collection(db,'users'), where('username','==',username.toLowerCase()));
-        const snap = await getDocs(q);
-        if(!snap.empty) showAlert('Username already taken. Choose another.');
-      }catch(e){ /* ignore silently */ }
-    });
-
-    // Initialize button label
-    submitBtn.textContent = 'Sign In';
-
+    onAuthStateChanged(auth,user=>{ if(user) setTimeout(()=>location.href='Home.html',350); });
   </script>
 </body>
 </html>
