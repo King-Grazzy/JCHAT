@@ -9166,13 +9166,17 @@ async function fetchAndDisplayPosts() {
                     if (typeof showMessageBox === 'function') {
                         const msg = (last === 'auth/operation-not-allowed')
                             ? 'Guest browsing is disabled. Please sign in.'
-                            : 'We could not complete sign-in automatically. Please sign in.';
+                            : 'We could not complete sign-in automatically. You can continue browsing as a guest or sign in.';
                         showMessageBox(msg, 'warning', true);
                     }
                     if (!auth.currentUser) {
-                        hideLoader();
-                        window.location.href = 'Login.html';
-                        return;
+                        // Only redirect to Login for explicit configuration issues.
+                        if (last === 'auth/operation-not-allowed' || last === 'auth/unauthorized-domain') {
+                            hideLoader();
+                            window.location.href = 'Login.html';
+                            return;
+                        }
+                        // For network-related failures, fall through to guest mode UI below.
                     }
                 }
                 // If we reach here, either anonymous sign-in succeeded or custom token worked.
