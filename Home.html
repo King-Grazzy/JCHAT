@@ -9124,7 +9124,10 @@ async function fetchAndDisplayPosts() {
                 fetchNotificationCount(user.uid);
 
             } else {
-                console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
+                console.log("JCHAT_DEBUG: No user signed in. Redirecting to login page (authorization required).");
+                try { if (typeof hideLoader === 'function') hideLoader(); } catch(e) {}
+                window.location.href = 'Login.html?redirect=Home';
+                return;
                 await ensureAuthIframeReachable();
                 async function tryAnonymousOrCustomSignIn(maxAttempts = 3) {
                     let lastError = null;
