@@ -1886,7 +1886,7 @@
             // Performance optimization - preload resources
             preloadResources();
 
-            // Verify Firebase Auth iframe connectivity and guide if blocked
+            // Verify Firebase Auth iframe connectivity and silently auto-switch if blocked
             (function verifyAuthIframe(){
                 try {
                     const test = document.createElement('iframe');
@@ -1900,17 +1900,16 @@
                     test.src = `https://${authDomain}/__/auth/iframe?apiKey=${encodeURIComponent(apiKey)}&v=11.8.0`;
                     let handled = false;
                     const cleanup = () => { if (test && test.parentNode) test.parentNode.removeChild(test); };
-                    const timer = setTimeout(() => {
+                    const timer = setTimeout(async () => {
                         if (!handled) {
-                            handled = true;
-                            cleanup();
-                            showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. If you see “refused to connect”, ensure this site (${location.host}) is in Firebase Authentication → Settings → Authorized domains, and that corporate firewalls allow *.firebaseapp.com`);
+                            handled = true; cleanup();
+                            try { await switchAuthDomain('jchat-1.web.app'); } catch(_) {}
                         }
-                    }, 4000);
-                    test.onload = () => { handled = true; clearTimeout(timer); cleanup(); };
-                    test.onerror = async () => { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(e) {} showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. Switched to jchat-1.web.app for auth. Please retry.`); };
+                    }, 3000);
+                    test.onload = () => { if (!handled) { handled = true; clearTimeout(timer); cleanup(); } };
+                    test.onerror = async () => { if (!handled) { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(_) {} } };
                     document.body.appendChild(test);
-                } catch (e) { /* noop */ }
+                } catch (_) { /* noop */ }
             })();
             
             // Create floating particles
