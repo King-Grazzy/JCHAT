@@ -1110,6 +1110,14 @@
         }
 
 
+        /* Stop theme animations (disable moving effects) */
+        body[class*="theme-"] *,
+        body[class*="theme-"]::before,
+        body[class*="theme-"]::after {
+            animation: none !important;
+            animation-play-state: paused !important;
+        }
+
         body {
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
@@ -3861,11 +3869,6 @@
                         </div>
                     </div>
                     
-                    <div class="premium-feature-card">
-                        <div class="premium-feature-icon">🚫</div>
-                        <div class="premium-feature-title">Ad-Free Experience</div>
-                        <div class="premium-feature-desc">Enjoy JCHAT without any advertisements</div>
-                    </div>
                     
                     <div class="premium-feature-card">
                         <div class="premium-feature-icon">⚡</div>
