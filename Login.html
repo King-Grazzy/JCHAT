@@ -1939,6 +1939,34 @@
 
 
 
+            // Prefill remembered email
+            try {
+                const remembered = localStorage.getItem('remembered_email');
+                if (remembered) {
+                    const emailInput = document.getElementById('email');
+                    const rememberCb = document.getElementById('remember');
+                    if (emailInput) emailInput.value = remembered;
+                    if (rememberCb) rememberCb.checked = true;
+                }
+            } catch(_) {}
+
+            // Caps Lock warning on password
+            const pwd = document.getElementById('password');
+            const cw = document.getElementById('capsWarning');
+            if (pwd && cw) {
+                const handleCaps = (e) => {
+                    try {
+                        if (e.getModifierState && e.getModifierState('CapsLock')) {
+                            cw.style.display = 'block';
+                        } else {
+                            cw.style.display = 'none';
+                        }
+                    } catch(_) {}
+                };
+                pwd.addEventListener('keyup', handleCaps);
+                pwd.addEventListener('keydown', handleCaps);
+            }
+
             // Close modals when clicking outside
             document.addEventListener('click', function(e) {
                 if (e.target.classList.contains('custom-modal')) {
