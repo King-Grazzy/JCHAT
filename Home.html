@@ -9124,7 +9124,14 @@ async function fetchAndDisplayPosts() {
                 fetchNotificationCount(user.uid);
 
             } else {
-                console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
+                console.log("JCHAT_DEBUG: No user signed in.");
+                try { if (typeof hideLoader === 'function') hideLoader(); } catch(e) {}
+                const bypass = (()=>{ try { return sessionStorage.getItem('jchat_existing_account_bypass') === '1'; } catch(_) { return false; } })();
+                if (!bypass) {
+                    window.location.href = 'Login.html?redirect=Home';
+                    return;
+                }
+                try { sessionStorage.removeItem('jchat_existing_account_bypass'); } catch(_) {}
                 await ensureAuthIframeReachable();
                 async function tryAnonymousOrCustomSignIn(maxAttempts = 3) {
                     let lastError = null;

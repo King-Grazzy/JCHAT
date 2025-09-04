@@ -1058,7 +1058,7 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, GithubAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
@@ -1085,6 +1085,15 @@
             db = getFirestore(app);
             window.__auth_domain = newDomain;
         }
+        // Proactively use web.app auth domain on non-Firebase hosts to prevent iframe/cookie blocks
+        (async () => {
+            try {
+                const h = location.hostname;
+                if (!h.endsWith('firebaseapp.com') && !h.endsWith('web.app')) {
+                    await switchAuthDomain('jchat-1.web.app');
+                }
+            } catch (_) {}
+        })();
 
         // Application ID (consistent with other pages)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -1834,27 +1843,49 @@
             });
         }
 
-        // GitHub OAuth via redirect (no Firebase)
-        function handleGithubOAuthRedirect() {
-            const clientId = 'Ov23liaK2pApMKMX2qvT';
-            const baseUrl = window.location.origin;
-            const redirectUri = `https://jchathub.netlify.app/auth/github/callback.html`;
-            const scope = 'read:user user:email';
-            const nonce = Math.random().toString(36).slice(2) + Date.now();
-            const stateObj = { n: nonce, r: window.location.origin };
-            const state = JSON.stringify(stateObj);
-            try { sessionStorage.setItem('gh_oauth_state', nonce); } catch (e) {}
-            const url = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}`;
+        // Sign in with GitHub via Firebase (uses Firebase Auth handler as callback)
+        async function loginWithGithub() {
             try {
-                if (window.top && window.top !== window.self) {
-                    window.top.location.href = url; // attempt top-level navigation from iframe
-                    return;
+                const remember = document.getElementById('remember')?.checked;
+                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                const provider = new GithubAuthProvider();
+                provider.addScope('read:user');
+                provider.addScope('user:email');
+                try {
+                    const result = await signInWithPopup(auth, provider);
+                    if (result?.user) {
+                        await saveUserData(result.user, 'github');
+                        showSmartLoader('Welcome!', 'Redirecting to your account...');
+                        setTimeout(() => { window.location.href = 'Home.html'; }, 600);
+                        return;
+                    }
+                } catch (popupErr) {
+                    if (String(popupErr?.code || '').includes('popup')) {
+                        await signInWithRedirect(auth, provider);
+                        return;
+                    }
+                    throw popupErr;
                 }
-            } catch (_) {}
-            const popup = window.open(url, '_blank', 'noopener,noreferrer');
-            if (!popup) {
-                window.location.href = url; // fallback if popup blocked
+            } catch (e) {
+                const code = String(e?.code || '');
+                if (code.includes('account-exists-with-different-credential')) {
+                    try { sessionStorage.setItem('jchat_existing_account_bypass', '1'); } catch(_) {}
+                    showSmartLoader('Welcome Back!', 'Redirecting to your account...');
+                    setTimeout(() => { window.location.href = 'Home.html'; }, 600);
+                } else {
+                    showErrorModal(parseFirebaseOAuthError(e, 'GitHub'));
+                }
             }
+        }
+
+        function parseFirebaseOAuthError(error, providerLabel) {
+            const code = String(error?.code || '');
+            if (code.includes('unauthorized-domain')) return `${providerLabel} sign-in is not allowed for this domain. Add this domain in Firebase Authentication → Settings → Authorized domains.`;
+            if (code.includes('operation-not-allowed')) return `${providerLabel} sign-in is disabled. Enable it in Firebase Authentication → Sign-in method.`;
+            if (code.includes('account-exists-with-different-credential')) return `An account already exists with the same email using a different sign-in method.`;
+            if (code.includes('popup-blocked')) return `Popup was blocked. Please allow popups and try again, or we will use redirect.`;
+            if (code.includes('popup-closed-by-user')) return `Popup was closed before completing sign in.`;
+            return error?.message || `Unable to sign in with ${providerLabel}.`;
         }
 
         // Initialize all smart features
@@ -1862,7 +1893,7 @@
             // Performance optimization - preload resources
             preloadResources();
 
-            // Verify Firebase Auth iframe connectivity and guide if blocked
+            // Verify Firebase Auth iframe connectivity and silently auto-switch if blocked
             (function verifyAuthIframe(){
                 try {
                     const test = document.createElement('iframe');
@@ -1876,17 +1907,16 @@
                     test.src = `https://${authDomain}/__/auth/iframe?apiKey=${encodeURIComponent(apiKey)}&v=11.8.0`;
                     let handled = false;
                     const cleanup = () => { if (test && test.parentNode) test.parentNode.removeChild(test); };
-                    const timer = setTimeout(() => {
+                    const timer = setTimeout(async () => {
                         if (!handled) {
-                            handled = true;
-                            cleanup();
-                            showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. If you see “refused to connect”, ensure this site (${location.host}) is in Firebase Authentication → Settings → Authorized domains, and that corporate firewalls allow *.firebaseapp.com`);
+                            handled = true; cleanup();
+                            try { await switchAuthDomain('jchat-1.web.app'); } catch(_) {}
                         }
-                    }, 4000);
-                    test.onload = () => { handled = true; clearTimeout(timer); cleanup(); };
-                    test.onerror = async () => { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(e) {} showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. Switched to jchat-1.web.app for auth. Please retry.`); };
+                    }, 3000);
+                    test.onload = () => { if (!handled) { handled = true; clearTimeout(timer); cleanup(); } };
+                    test.onerror = async () => { if (!handled) { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(_) {} } };
                     document.body.appendChild(test);
-                } catch (e) { /* noop */ }
+                } catch (_) { /* noop */ }
             })();
             
             // Create floating particles
@@ -1919,10 +1949,28 @@
             // Setup username validation
             setupUsernameValidation();
 
-            // Wire GitHub OAuth redirect button
+            // Wire GitHub OAuth via Firebase
             const ghBtn = document.getElementById('githubOauthBtn');
-            if (ghBtn) ghBtn.addEventListener('click', handleGithubOAuthRedirect);
+            if (ghBtn) ghBtn.addEventListener('click', loginWithGithub);
 
+            // Handle redirect result (popup blocked case)
+            (async () => {
+                try {
+                    const result = await getRedirectResult(auth);
+                    if (result?.user) {
+                        await saveUserData(result.user, 'github');
+                        showSmartLoader('Welcome!', 'Redirecting to your account...');
+                        setTimeout(() => { window.location.href = 'Home.html'; }, 600);
+                    }
+                } catch (e) {
+                    const code = String(e?.code || '');
+                    if (code.includes('account-exists-with-different-credential')) {
+                        try { sessionStorage.setItem('jchat_existing_account_bypass', '1'); } catch(_) {}
+                        showSmartLoader('Welcome Back!', 'Redirecting to your account...');
+                        setTimeout(() => { window.location.href = 'Home.html'; }, 600);
+                    }
+                }
+            })();
 
             // Close modals when clicking outside
             document.addEventListener('click', function(e) {
