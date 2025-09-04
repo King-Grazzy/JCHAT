@@ -1084,12 +1084,13 @@
         // Firebase configuration (using your existing config)
         const defaultFirebaseConfig = {
             apiKey: "AIzaSyAZo0USayb1i0Xk1mEHc7ZhJUtTC40Z4gE",
-            authDomain: "jchat-1.web.app",
+            authDomain: "jchat-1.firebaseapp.com",
             projectId: "jchat-1",
             storageBucket: "jchat-1.firebasestorage.app",
             messagingSenderId: "328479683167",
             appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
-            measurementId: "G-S6Z9GG0R9P"
+            measurementId: "G-S6Z9GG0R9P",
+            databaseURL: "https://jchat-1-default-rtdb.firebaseio.com"
         };
         let parsedConfig = {};
         try {
@@ -1973,7 +1974,7 @@
                     test.style.height = '1px';
                     test.style.top = '-100px';
                     test.referrerPolicy = 'no-referrer';
-                    const authDomain = (typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.web.app';
+                    const authDomain = (typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com';
                     const apiKey = (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) ? firebaseConfig.apiKey : '';
                     test.src = `https://${authDomain}/__/auth/iframe?apiKey=${encodeURIComponent(apiKey)}&v=11.8.0`;
                     let handled = false;
@@ -1982,11 +1983,11 @@
                         if (!handled) {
                             handled = true;
                             cleanup();
-                            try { await switchAuthDomain('jchat-1.web.app'); } catch (e) {}
+                            try { await switchAuthDomain('jchat-1.firebaseapp.com'); } catch (e) {}
                         }
                     }, 3000);
                     test.onload = () => { handled = true; clearTimeout(timer); cleanup(); };
-                    test.onerror = async () => { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(e) {} };
+                    test.onerror = async () => { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.firebaseapp.com'); } catch(e) {} };
                     document.body.appendChild(test);
                 } catch (e) { /* noop */ }
             })();
