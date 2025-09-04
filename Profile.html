@@ -5788,7 +5788,7 @@
     </div>
     <script type="module">
         // Import Firebase modules (Updated to v11.8.0 - Latest Stable)
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, updateProfile, updateEmail, reauthenticateWithCredential, EmailAuthProvider, updatePassword, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, updateDoc, setDoc, deleteDoc, collection, query, where, getDocs, runTransaction, writeBatch, serverTimestamp, orderBy, addDoc, arrayUnion, documentId, onSnapshot } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-storage.js";
@@ -5813,10 +5813,57 @@
         };
 
         // Initialize Firebase services
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
+        let app = initializeApp(firebaseConfig);
+        let auth = getAuth(app);
+        let db = getFirestore(app);
+        let storage = getStorage(app);
+        window.__auth_domain = firebaseConfig.authDomain;
+        async function switchAuthDomain(newDomain) {
+            try { await deleteApp(app); } catch (_) {}
+            const cfg = { ...firebaseConfig, authDomain: newDomain };
+            app = initializeApp(cfg);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            storage = getStorage(app);
+            window.__auth_domain = newDomain;
+        }
+        (async () => {
+            try {
+                const h = location.hostname;
+                if (!h.endsWith('firebaseapp.com') && !h.endsWith('web.app')) {
+                    await switchAuthDomain('jchat-1.web.app');
+                }
+            } catch (_) {}
+        })();
+        function ensureAuthIframeReachable(timeoutMs = 7000) {
+            return new Promise((resolve) => {
+                try {
+                    const test = document.createElement('iframe');
+                    test.style.position = 'absolute';
+                    test.style.width = '1px';
+                    test.style.height = '1px';
+                    test.style.top = '-100px';
+                    test.referrerPolicy = 'no-referrer';
+                    const authDomain = (typeof window.__auth_domain === 'string' && window.__auth_domain)
+                        ? window.__auth_domain
+                        : ((typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com');
+                    const apiKey = (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) ? firebaseConfig.apiKey : '';
+                    test.src = `https://${authDomain}/__/auth/iframe?apiKey=${encodeURIComponent(apiKey)}&v=11.8.0`;
+                    let done = false;
+                    const cleanup = () => { if (test && test.parentNode) test.parentNode.removeChild(test); };
+                    const timer = setTimeout(async () => {
+                        if (!done) {
+                            done = true; cleanup();
+                            try { await switchAuthDomain('jchat-1.web.app'); } catch(_) {}
+                        }
+                        resolve();
+                    }, timeoutMs);
+                    test.onload = () => { if (!done) { done = true; clearTimeout(timer); cleanup(); resolve(); } };
+                    test.onerror = async () => { if (!done) { done = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(_) {} resolve(); } };
+                    document.body.appendChild(test);
+                } catch (_) { resolve(); }
+            });
+        }
 
         // --- JCHAT Loader Management ---
         const jchatLoader = document.getElementById('jchatLoader');
@@ -9371,6 +9418,7 @@
                 } else {
                 console.log("JCHAT_DEBUG: No user signed in.");
                 try {
+                    await ensureAuthIframeReachable();
                     if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
                         console.log("JCHAT_DEBUG: Signed in with custom token.");
@@ -9380,9 +9428,29 @@
                     }
                     // onAuthStateChanged will be triggered again with the new user
                 } catch (error) {
-                    console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
-                    if (!auth.currentUser) {
-                        window.location.href = '/login.html';
+                    const code = error && error.code ? String(error.code) : '';
+                    console.warn("JCHAT_WARN: Initial sign-in attempt failed:", code || error);
+                    if (code === 'auth/network-request-failed') {
+                        try {
+                            const current = (typeof window.__auth_domain === 'string' && window.__auth_domain) ? window.__auth_domain : (firebaseConfig && firebaseConfig.authDomain ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com');
+                            const alternate = current.includes('firebaseapp.com') ? current.replace('firebaseapp.com', 'web.app') : current.replace('web.app', 'firebaseapp.com');
+                            await switchAuthDomain(alternate);
+                            await ensureAuthIframeReachable();
+                            if (initialAuthToken) { await signInWithCustomToken(auth, initialAuthToken); console.log('JCHAT_DEBUG: Signed in with custom token after domain switch.'); }
+                            else { await signInAnonymously(auth); console.log('JCHAT_DEBUG: Signed in anonymously after domain switch.'); }
+                        } catch (err2) {
+                            console.error("JCHAT_ERROR: Error during anonymous/custom sign-in after domain switch:", err2);
+                            if (!auth.currentUser) {
+                                try { sessionStorage.setItem('jchat_last_auth_error', err2.code || String(err2)); } catch(_) {}
+                                window.location.href = 'Login.html';
+                            }
+                        }
+                    } else {
+                        console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
+                        if (!auth.currentUser) {
+                            try { sessionStorage.setItem('jchat_last_auth_error', code || String(error)); } catch(_) {}
+                            window.location.href = 'Login.html';
+                        }
                     }
                 }
                 isAuthReady = false;
