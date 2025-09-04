@@ -9127,6 +9127,7 @@ async function fetchAndDisplayPosts() {
                 console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
                 await ensureAuthIframeReachable();
                 async function tryAnonymousOrCustomSignIn(maxAttempts = 3) {
+                    let lastError = null;
                     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
                         try {
                             if (initialAuthToken) {
@@ -9139,19 +9140,35 @@ async function fetchAndDisplayPosts() {
                                 return true;
                             }
                         } catch (e) {
-                            console.warn(`Auth attempt ${attempt} failed:`, e?.code || e);
-                            if (e && e.code === 'auth/network-request-failed') {
+                            lastError = e;
+                            const code = e && e.code ? String(e.code) : '';
+                            console.warn(`Auth attempt ${attempt} failed:`, code || e);
+                            if (code === 'auth/operation-not-allowed') {
+                                break; // anonymous disabled
+                            }
+                            if (code === 'auth/network-request-failed') {
                                 await new Promise(r => setTimeout(r, 800 * attempt));
                                 continue;
                             }
                             break;
                         }
                     }
+                    // Propagate last error for diagnostics
+                    if (lastError) {
+                        try { sessionStorage.setItem('jchat_last_auth_error', lastError.code || String(lastError)); } catch(_){}
+                    }
                     return false;
                 }
                 const ok = await tryAnonymousOrCustomSignIn(3);
                 if (!ok) {
-                    console.error("JCHAT_ERROR: Unable to authenticate after retries.");
+                    const last = (()=>{ try { return sessionStorage.getItem('jchat_last_auth_error'); } catch(_) { return null; } })();
+                    console.error("JCHAT_ERROR: Unable to authenticate after retries.", last ? `(last error: ${last})` : '');
+                    if (typeof showMessageBox === 'function') {
+                        const msg = (last === 'auth/operation-not-allowed')
+                            ? 'Guest browsing is disabled. Please sign in.'
+                            : 'We could not complete sign-in automatically. Please sign in.';
+                        showMessageBox(msg, 'warning', true);
+                    }
                     if (!auth.currentUser) {
                         hideLoader();
                         window.location.href = 'Login.html';
