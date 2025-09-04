@@ -1047,7 +1047,7 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
@@ -1508,7 +1508,7 @@
                     icon.textContent = '✕';
                     break;
                 case 'info':
-                    icon.textContent = 'ℹ';
+                    icon.textContent = '���';
                     break;
                 case 'question':
                     icon.textContent = '?';
@@ -1828,25 +1828,38 @@
             });
         }
 
-        // Google Sign-In via Firebase modular SDK
-        async function signInWithGoogle() {
+        // Google Sign-In via Firebase modular SDK (redirect-based)
+        async function handleRedirectResult() {
             try {
-                showSmartLoader('Signing In', 'Connecting to Google...');
-                const provider = new GoogleAuthProvider();
-                provider.addScope('email');
-                provider.addScope('profile');
-                const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-                await saveUserData(user, 'google');
-                hideSmartLoader();
-                showSuccessModal(`Welcome, ${user.displayName || user.email}!`, () => {
-                    window.location.href = 'Home.html';
-                });
+                const result = await getRedirectResult(auth);
+                if (result && result.user) {
+                    showSmartLoader('Signing In', 'Completing Google sign-in...');
+                    const user = result.user;
+                    await saveUserData(user, 'google');
+                    hideSmartLoader();
+                    showSuccessModal(`Welcome, ${user.displayName || user.email}!`, () => {
+                        window.location.href = 'Home.html';
+                    });
+                }
             } catch (error) {
                 hideSmartLoader();
                 let msg = 'Google sign-in failed. Please try again.';
-                if (error && error.code === 'auth/popup-closed-by-user') msg = 'Sign-in popup closed before completing. Please try again.';
-                if (error && error.code === 'auth/cancelled-popup-request') msg = 'Another sign-in attempt was in progress. Please try again.';
+                const code = error && error.code ? String(error.code) : '';
+                if (code.includes('deleted_client')) msg = 'Google sign-in is temporarily unavailable. Please try again later.';
+                showErrorModal(msg);
+            }
+        }
+
+        async function signInWithGoogle() {
+            try {
+                showSmartLoader('Signing In', 'Redirecting to Google...');
+                const provider = new GoogleAuthProvider();
+                provider.addScope('email');
+                provider.addScope('profile');
+                await signInWithRedirect(auth, provider);
+            } catch (error) {
+                hideSmartLoader();
+                let msg = 'Google sign-in failed. Please try again.';
                 showErrorModal(msg);
             }
         }
@@ -1855,6 +1868,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Performance optimization - preload resources
             preloadResources();
+
+            // Check Google redirect result
+            handleRedirectResult();
 
             
             // Create floating particles
