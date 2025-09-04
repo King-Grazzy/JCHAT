@@ -984,13 +984,6 @@
                 Sign In
             </button>
 
-            <div class="divider" id="oauthDivider"><span>Or continue with</span></div>
-            <div class="oauth-section" id="oauthSection">
-                <button type="button" class="oauth-btn google" id="googleOauthBtn" aria-label="Continue with Google">
-                    <span class="oauth-icon">G</span>
-                    <span>Continue with Google</span>
-                </button>
-            </div>
 
 
             <div class="signup-link">
@@ -1047,7 +1040,7 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
@@ -1829,99 +1822,13 @@
         }
 
         // Google Sign-In via Firebase modular SDK (redirect-based)
-        async function handleRedirectResult() {
-            try {
-                const result = await getRedirectResult(auth);
-                if (result && result.user) {
-                    showSmartLoader('Signing In', 'Completing Google sign-in...');
-                    const user = result.user;
-                    await saveUserData(user, 'google');
-                    hideSmartLoader();
-                    showSuccessModal(`Welcome, ${user.displayName || user.email}!`, () => {
-                        window.location.href = 'Home.html';
-                    });
-                }
-            } catch (error) {
-                hideSmartLoader();
-                const code = error && error.code ? String(error.code) : '';
-                const messageText = error && error.message ? String(error.message) : '';
-                let msg = 'Google sign-in failed. Please try again.';
-                if (code === 'auth/unauthorized-domain') {
-                    msg = 'This domain is not authorized for Google sign-in. Please contact an administrator.';
-                } else if (code === 'auth/operation-not-allowed') {
-                    msg = 'Google sign-in is not enabled. Please contact an administrator.';
-                } else if (code === 'auth/admin-restricted-operation' || /ADMIN_ONLY_OPERATION/i.test(messageText)) {
-                    msg = 'Sign in restricted to existing users. Please contact an administrator for access.';
-                    showAdminOnlyNotice();
-                } else if (code.includes('deleted_client')) {
-                    msg = 'Google sign-in is temporarily unavailable. Please try again later.';
-                }
-                showErrorModal(msg);
-            }
-        }
 
-        async function signInWithGoogle() {
-            const provider = new GoogleAuthProvider();
-            provider.addScope('email');
-            provider.addScope('profile');
-            provider.setCustomParameters({ prompt: 'select_account' });
-
-            try {
-                const remember = document.getElementById('remember')?.checked;
-                if (typeof remember === 'boolean') {
-                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-                }
-                showSmartLoader('Signing In', 'Opening Google...');
-                await signInWithPopup(auth, provider);
-                // Success via popup will trigger onAuthStateChanged
-            } catch (error) {
-                const code = error && error.code ? String(error.code) : '';
-                const messageText = error && error.message ? String(error.message) : '';
-
-                if (code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user') {
-                    // Fallback to redirect if popup fails
-                    try {
-                        showSmartLoader('Signing In', 'Redirecting to Google...');
-                        await signInWithRedirect(auth, provider);
-                        return;
-                    } catch (redirectError) {
-                        hideSmartLoader();
-                        const rCode = redirectError && redirectError.code ? String(redirectError.code) : '';
-                        let msg = 'Google sign-in failed. Please try again.';
-                        if (rCode === 'auth/unauthorized-domain') {
-                            msg = 'This domain is not authorized for Google sign-in. Please contact an administrator.';
-                        } else if (rCode === 'auth/operation-not-allowed') {
-                            msg = 'Google sign-in is not enabled. Please contact an administrator.';
-                        } else if (rCode === 'auth/admin-restricted-operation' || /ADMIN_ONLY_OPERATION/i.test(String(redirectError.message || ''))) {
-                            msg = 'Sign in restricted to existing users. Please contact an administrator for access.';
-                            showAdminOnlyNotice();
-                        }
-                        showErrorModal(msg);
-                        return;
-                    }
-                }
-
-                hideSmartLoader();
-                let msg = 'Google sign-in failed. Please try again.';
-                if (code === 'auth/unauthorized-domain') {
-                    msg = 'This domain is not authorized for Google sign-in. Please contact an administrator.';
-                } else if (code === 'auth/operation-not-allowed') {
-                    msg = 'Google sign-in is not enabled. Please contact an administrator.';
-                } else if (code === 'auth/admin-restricted-operation' || /ADMIN_ONLY_OPERATION/i.test(messageText)) {
-                    msg = 'Sign in restricted to existing users. Please contact an administrator for access.';
-                    showAdminOnlyNotice();
-                }
-                showErrorModal(msg);
-            }
-        }
 
         // Initialize all smart features
         document.addEventListener('DOMContentLoaded', function() {
             // Performance optimization - preload resources
             preloadResources();
 
-            // Check Google redirect result
-            handleRedirectResult();
 
             
             // Create floating particles
@@ -1954,9 +1861,6 @@
             // Setup username validation
             setupUsernameValidation();
 
-            // Wire Google OAuth button
-            const gBtn = document.getElementById('googleOauthBtn');
-            if (gBtn) gBtn.addEventListener('click', signInWithGoogle);
 
 
             // Close modals when clicking outside
