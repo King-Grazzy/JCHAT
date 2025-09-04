@@ -987,6 +987,10 @@
                     </span>
                     <span>Continue with GitHub</span>
                 </button>
+                <button type="button" class="oauth-btn google" id="googleOauthBtn" aria-label="Continue with Google">
+                    <span class="oauth-icon">G</span>
+                    <span>Continue with Google</span>
+                </button>
             </div>
 
 
@@ -1044,7 +1048,7 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
@@ -1836,6 +1840,29 @@
             window.location.href = url;
         }
 
+        // Google Sign-In via Firebase modular SDK
+        async function signInWithGoogle() {
+            try {
+                showSmartLoader('Signing In', 'Connecting to Google...');
+                const provider = new GoogleAuthProvider();
+                provider.addScope('email');
+                provider.addScope('profile');
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                await saveUserData(user, 'google');
+                hideSmartLoader();
+                showSuccessModal(`Welcome, ${user.displayName || user.email}!`, () => {
+                    window.location.href = 'Home.html';
+                });
+            } catch (error) {
+                hideSmartLoader();
+                let msg = 'Google sign-in failed. Please try again.';
+                if (error && error.code === 'auth/popup-closed-by-user') msg = 'Sign-in popup closed before completing. Please try again.';
+                if (error && error.code === 'auth/cancelled-popup-request') msg = 'Another sign-in attempt was in progress. Please try again.';
+                showErrorModal(msg);
+            }
+        }
+
         // Initialize all smart features
         document.addEventListener('DOMContentLoaded', function() {
             // Performance optimization - preload resources
@@ -1872,9 +1899,11 @@
             // Setup username validation
             setupUsernameValidation();
 
-            // Wire GitHub OAuth redirect button
+            // Wire OAuth buttons
             const ghBtn = document.getElementById('githubOauthBtn');
             if (ghBtn) ghBtn.addEventListener('click', handleGithubOAuthRedirect);
+            const gBtn = document.getElementById('googleOauthBtn');
+            if (gBtn) gBtn.addEventListener('click', signInWithGoogle);
 
 
             // Close modals when clicking outside
