@@ -439,7 +439,7 @@
         }
 
         .error-message::before {
-            content: '⚠';
+            content: '��';
             margin-right: 8px;
             font-size: 16px;
         }
@@ -1052,9 +1052,26 @@
                 });
                 function triggerGoogleSignIn(){
                     if (window.google && google.accounts && google.accounts.id) {
-                        try { google.accounts.id.prompt(); } catch (e) { console.error('GSI prompt error', e); }
+                        try {
+                            showSmartLoader('Google Sign-In', 'Opening Google...');
+                            google.accounts.id.prompt((notification) => {
+                                try {
+                                    if (notification?.isNotDisplayed?.() || notification?.isSkippedMoment?.()) {
+                                        hideSmartLoader();
+                                    }
+                                    const reason = notification?.getDismissedReason?.();
+                                    if (reason) { hideSmartLoader(); }
+                                } catch (_) {
+                                    hideSmartLoader();
+                                }
+                            });
+                        } catch (e) {
+                            console.error('GSI prompt error', e);
+                            hideSmartLoader();
+                        }
                     } else {
                         console.warn('Google Identity Services not ready');
+                        showCustomModal('error', 'Google Sign-In unavailable', 'Please reload the page and try again, or use email/password.');
                     }
                 }
             </script>
@@ -1188,7 +1205,7 @@
                 toggleBtn.textContent = '🙈';
             } else {
                 passwordInput.type = 'password';
-                toggleBtn.textContent = '���️';
+                toggleBtn.textContent = '👁️';
             }
         };
 
@@ -1371,12 +1388,14 @@
                 try {
                     await sendEmailVerification(user);
                     hideSmartLoader();
+
                     showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Please check your email to verify your account.`, () => {
                         window.location.href = 'Home.html';
                     });
                 } catch (verificationError) {
                     console.warn('Email verification failed:', verificationError);
                     hideSmartLoader();
+
                     showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Note: Email verification could not be sent.`, () => {
                         window.location.href = 'Home.html';
                     });
@@ -1384,6 +1403,7 @@
                 
             } catch (error) {
                 hideSmartLoader();
+                hideLoading();
                 let errorMessage = 'Failed to create account. Please try again.';
 
                 const code = error && error.code ? String(error.code) : '';
@@ -1428,12 +1448,14 @@
                 await saveUserData(user, 'email');
                 
                 hideSmartLoader();
+                hideLoading();
                 showSuccessModal(`Welcome back, ${user.displayName || user.email}!`, () => {
                     window.location.href = 'Home.html';
                 });
 
             } catch (error) {
                 hideSmartLoader();
+                hideLoading();
                 let errorMessage = 'Invalid email or password.';
                 
                 switch (error.code) {
@@ -1534,6 +1556,10 @@
             document.getElementById('loginForm').style.pointerEvents = 'auto';
         }
 
+        // Expose loader helpers globally for non-module scripts
+        window.showSmartLoader = showSmartLoader;
+        window.hideSmartLoader = hideSmartLoader;
+
         // Show loading state
         function showLoading(message) {
             const loginBtn = document.querySelector('.login-btn');
@@ -1607,6 +1633,11 @@
         function showErrorModal(message) {
             showCustomModal('error', 'Authentication Error', message);
         }
+
+        // Expose modal helpers globally
+        window.showCustomModal = showCustomModal;
+        window.showErrorModal = showErrorModal;
+        window.showSuccessModal = showSuccessModal;
 
         // Show success message
         function showSuccess(message) {
@@ -1785,6 +1816,7 @@
                 
             } catch (error) {
                 hideSmartLoader();
+                hideLoading();
                 let errorMessage = 'Failed to send reset email. Please try again.';
                 
                 switch (error.code) {
