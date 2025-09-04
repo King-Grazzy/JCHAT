@@ -5535,6 +5535,7 @@
         let currentEditMediaType = null; // Stores the existing media type for edited post.
         let isAuthReady = false; // Flag indicating if Firebase authentication state has been determined.
         let unsubscribeListeners = []; // Array to store all onSnapshot unsubscribe functions for cleanup.
+        let authAttemptInProgress = false; // Prevent duplicate auth attempts when offline or blocked.
         let currentSystemSettings = {}; // Stores global system settings fetched from Firestore.
 
         // --- Notification Badge Management ---
@@ -9108,11 +9109,17 @@ async function fetchAndDisplayPosts() {
                 fetchNotificationCount(user.uid);
 
             } else {
+                if (authAttemptInProgress) {
+                    console.log("JCHAT_DEBUG: Auth attempt already in progress or previously handled.");
+                    return;
+                }
+                authAttemptInProgress = true;
                 console.log("JCHAT_DEBUG: No user signed in. Attempting anonymous sign-in or redirecting to login page.");
                 try {
                     if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
                         console.log("JCHAT_DEBUG: Signed in with custom token.");
+                        authAttemptInProgress = false;
                     } else {
                         if (!navigator.onLine) {
                             throw new Error('OFFLINE');
@@ -9126,9 +9133,10 @@ async function fetchAndDisplayPosts() {
                             new Promise((_, rej) => setTimeout(() => rej(new Error('AUTH_TIMEOUT')), 6000))
                         ]);
                         console.log("JCHAT_DEBUG: Signed in anonymously.");
+                        authAttemptInProgress = false;
                     }
                 } catch (error) {
-                    console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
+                    console.warn("JCHAT_WARN: Error during anonymous sign-in or custom token sign-in:", error);
                     const msg = String(error && (error.message || error.code) || '');
                     const isOffline = msg.includes('OFFLINE') || !navigator.onLine;
                     const isNetworkError = /auth\/network-request-failed/i.test(msg) || /network[- ]request[- ]failed/i.test(msg);
