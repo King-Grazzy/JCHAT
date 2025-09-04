@@ -1606,6 +1606,22 @@
         }
 
 
+        function showUnverifiedBanner(email) {
+            try {
+                const banner = document.getElementById('unverifiedBanner');
+                const span = document.getElementById('unverifiedEmailText');
+                if (banner && span) {
+                    span.textContent = email || '';
+                    banner.style.display = 'block';
+                }
+            } catch (_) {}
+        }
+
+        function hideUnverifiedBanner() {
+            const banner = document.getElementById('unverifiedBanner');
+            if (banner) banner.style.display = 'none';
+        }
+
         // Enhanced show success with custom modal
         function showSuccessModal(message, callback = null) {
             showCustomModal('success', 'Success!', message, callback);
