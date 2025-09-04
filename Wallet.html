@@ -1,0 +1,2580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Last updated: 2025-08-21T18:19:29Z -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCHAT - My Wallet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --pink: #ff7ac6;
+            --blue: #6aa7ff;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            
+            --border: #e2e8f0;
+            --border-light: #f1f5f9;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --gradient-info: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            --danger: #ef4444;
+        }
+
+        /* Header security logo sizing */
+        .logo img { display:inline-block; vertical-align:middle; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 16px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--bg-primary);
+            padding: 20px 0;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+
+        .username {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-status {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.15), 0 0 10px rgba(255,122,198,0.55), 0 0 20px rgba(106,167,255,0.55);
+        }
+
+        .user-avatar.glow {
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 0 2px rgba(255,255,255,0.15), 0 0 10px rgba(255,122,198,0.55), 0 0 20px rgba(106,167,255,0.55);
+            }
+            50% {
+                box-shadow: 0 0 0 2px rgba(255,255,255,0.18), 0 0 18px rgba(255,122,198,0.75), 0 0 32px rgba(106,167,255,0.75);
+            }
+        }
+
+        /* Balance Cards */
+        .balance-section {
+            padding: 24px 0;
+        }
+
+        .balance-card {
+            background: var(--gradient-primary);
+            border-radius: 24px;
+            padding: 32px 24px;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .balance-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .balance-amount {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .balance-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .balance-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .balance-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Quick Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .stat-icon.income { background: var(--gradient-success); }
+        .stat-icon.expense { background: var(--gradient-warning); }
+        .stat-icon.requests { background: var(--gradient-info); }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Actions Section */
+        .actions-section {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .action-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .action-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            color: white;
+            font-size: 20px;
+        }
+
+        .action-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Transactions */
+        .transactions-section {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+
+        .transactions-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .transactions-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .tx-toggle-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .tx-toggle-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tx-toggle-btn.hidden {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        .tx-toggle-btn.hidden i {
+            transform: rotate(180deg);
+        }
+
+        .tx-content {
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .tx-content.hidden {
+            max-height: 0;
+            opacity: 0;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Settings Section */
+        .settings-section {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-light);
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .close-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .close-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .settings-group {
+            background: var(--bg-tertiary);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-light);
+        }
+
+        .settings-group-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .settings-group-title i {
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        .settings-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .settings-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-info label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .setting-description {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .setting-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-switch {
+            appearance: none;
+            width: 50px;
+            height: 26px;
+            background: var(--border);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch:checked {
+            background: var(--primary);
+        }
+
+        .toggle-switch::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch:checked::before {
+            transform: translateX(24px);
+        }
+
+        .setting-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .setting-select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn.secondary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+            border: 1px solid var(--danger);
+            color: white;
+        }
+
+        .btn.danger:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+        }
+
+        #pinSettings {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        #pinSettings .setting-control {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        #pinSettings input {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        #pinSettings input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--bg-primary);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid var(--border-light);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            padding: 16px 24px 24px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+        }
+
+        /* Clear transactions status */
+        #clearTxStatus {
+            min-height: 18px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-help {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        /* Fee Display */
+        .fee-display {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .fee-display span {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .fee-info {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Transaction Summary */
+        .transaction-summary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item.total {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--primary);
+            border-top: 2px solid var(--border);
+            padding-top: 12px;
+            margin-top: 8px;
+        }
+
+        /* Request Preview */
+        .request-preview {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .request-preview h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 16px 0;
+        }
+
+        .preview-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Swap Styles */
+        .swap-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .swap-from, .swap-to {
+            flex: 1;
+        }
+
+        .swap-from label, .swap-to label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .swap-input-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .swap-input-group .form-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0;
+            margin: 0;
+        }
+
+        .swap-currency {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            min-width: 80px;
+        }
+
+        .swap-currency span {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .swap-currency small {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .swap-arrow {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .swap-direction-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .swap-direction-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: rotate(180deg);
+        }
+
+        .swap-details {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .swap-details > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 14px;
+        }
+
+        .swap-details span:first-child {
+            color: var(--text-muted);
+        }
+
+        .swap-details span:last-child {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .swap-summary {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--bg-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .transaction-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-item:hover {
+            background: var(--bg-tertiary);
+            margin: 0 -24px;
+            padding-left: 24px;
+            padding-right: 24px;
+            border-radius: 12px;
+        }
+
+        .transaction-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--gradient-info);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-right: 16px;
+        }
+
+        .transaction-content {
+            flex: 1;
+        }
+
+        .transaction-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .transaction-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .transaction-amount.positive { color: var(--success); }
+        .transaction-amount.negative { color: var(--danger); }
+        .transaction-amount.neutral { color: var(--text-secondary); }
+
+        .transaction-time {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-muted);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-description {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 12px;
+            }
+            
+            .balance-card {
+                padding: 24px 20px;
+            }
+            
+            .balance-amount {
+                font-size: 32px;
+            }
+            
+            .stats-grid {
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 16px;
+            }
+            
+            .action-grid {
+                gap: 12px;
+            }
+            
+            .action-btn {
+                padding: 16px;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .blurred { filter: blur(4px); }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.warning { border-left: 4px solid var(--warning); }
+        .toast.info { border-left: 4px solid var(--info); }
+    </style>
+<style id="header-overflow-fix">/*header-overflow-fix*/header .header-content-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap}header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;justify-content:flex-end}#profileLink{display:inline-flex;align-items:center;column-gap:8px;row-gap:2px;flex-wrap:wrap;max-width:100%;min-width:0}#profileLink #headerDisplayName{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;flex:0 1 auto}#headerProfilePic,#headerAvatarIcon{flex:0 0 auto}@media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:6px}}</style></head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo" style="display:flex;align-items:center;gap:10px">
+                    <img src="assets/security.png" alt="JCHAT Security" style="height:28px;width:auto" onerror="this.style.display='none'">
+                    <span>JCHAT Wallet</span>
+                </div>
+                <div class="user-profile">
+                    <div class="user-info">
+                        <span class="username" id="headerUsername">User</span>
+                        <span class="user-status" id="userStatus">Online</span>
+                    </div>
+                    <div class="user-avatar glow" id="userAvatar">
+                        <img id="profileImage" src="" alt="Profile" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <span id="avatarInitial">U</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Balance Section -->
+        <section class="balance-section">
+            <div class="balance-card">
+                <div class="balance-label">Total Balance</div>
+                <div class="balance-amount" id="totalBalance">0 JCoins</div>
+                <div class="balance-actions">
+                    <button class="balance-btn" id="sendBtn">
+                        <i class="fas fa-arrow-up"></i> Send
+                    </button>
+                    <button class="balance-btn" id="receiveBtn">
+                        <i class="fas fa-arrow-down"></i> Receive
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Stats -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon income">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="stat-value" id="incomeTotal">0</div>
+                <div class="stat-label">Income</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon expense">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="stat-value" id="expenseTotal">0</div>
+                <div class="stat-label">Expense</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon requests">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <div class="stat-value" id="requestsTotal">0</div>
+                <div class="stat-label">Requests</div>
+            </div>
+        </section>
+
+        <!-- Actions Section -->
+        <section class="actions-section">
+            <h2 class="section-title">Quick Actions</h2>
+            <div class="action-grid">
+                <button class="action-btn" id="sendJCoinsBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <div class="action-label">Send JCoins</div>
+                </button>
+                <a href="#" class="action-btn" id="createPayRequestBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <div class="action-label">Request Payment</div>
+                </a>
+                <a href="#" class="action-btn" id="swapBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="action-label">Swap</div>
+                </a>
+                <a href="#" class="action-btn" id="settingsBtn">
+                    <div class="action-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="action-label">Settings</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Send JCoins Modal -->
+        <div id="sendModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Send JCoins</h3>
+                    <button class="close-btn" id="closeSendModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="recipientId">Recipient User ID</label>
+                        <input type="text" id="recipientId" placeholder="Enter recipient's user ID" class="form-input">
+                        <small class="form-help">Enter the exact user ID of the person you want to send JCoins to</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sendAmount">Amount (JCoins)</label>
+                        <input type="number" id="sendAmount" placeholder="0" min="1" step="1" class="form-input">
+                        <small class="form-help">Minimum amount: 1 JCoin</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sendNote">Note (Optional)</label>
+                        <textarea id="sendNote" placeholder="Add a note to this transaction..." class="form-textarea" rows="3"></textarea>
+                        <small class="form-help">This note will be visible to both you and the recipient</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sendFee">Transaction Fee</label>
+                        <div class="fee-display">
+                            <span id="feeAmount">0</span> JCoins
+                            <small class="fee-info">Standard network fee</small>
+                        </div>
+                    </div>
+                    
+                    <div class="transaction-summary">
+                        <div class="summary-item">
+                            <span>Amount:</span>
+                            <span id="summaryAmount">0 JCoins</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Fee:</span>
+                            <span id="summaryFee">0 JCoins</span>
+                        </div>
+                        <div class="summary-item total">
+                            <span>Total:</span>
+                            <span id="summaryTotal">0 JCoins</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="cancelSend">Cancel</button>
+                    <button class="btn primary" id="confirmSend" disabled>Send JCoins</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Request Payment Modal -->
+        <div id="requestModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Request Payment</h3>
+                    <button class="close-btn" id="closeRequestModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="requestAmount">Amount (JCoins)</label>
+                        <input type="number" id="requestAmount" placeholder="0" min="1" step="1" class="form-input">
+                        <small class="form-help">Enter the amount you want to request</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="requestNote">Note (Optional)</label>
+                        <textarea id="requestNote" placeholder="Explain what this payment is for..." class="form-textarea" rows="3"></textarea>
+                        <small class="form-help">This note will help the payer understand the request</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="requestExpiry">Expiry Time</label>
+                        <select id="requestExpiry" class="form-select">
+                            <option value="3600">1 Hour</option>
+                            <option value="86400" selected>24 Hours</option>
+                            <option value="604800">7 Days</option>
+                            <option value="2592000">30 Days</option>
+                        </select>
+                        <small class="form-help">Payment request will expire after this time</small>
+                    </div>
+                    
+                    <div class="request-preview">
+                        <h4>Payment Request Preview</h4>
+                        <div class="preview-item">
+                            <span>Amount:</span>
+                            <span id="previewAmount">0 JCoins</span>
+                        </div>
+                        <div class="preview-item">
+                            <span>Note:</span>
+                            <span id="previewNote">—</span>
+                        </div>
+                        <div class="preview-item">
+                            <span>Expires:</span>
+                            <span id="previewExpiry">24 Hours</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="cancelRequest">Cancel</button>
+                    <button class="btn primary" id="confirmRequest" disabled>Create Request</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Swap Modal -->
+        <div id="swapModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Swap JCoins</h3>
+                    <button class="close-btn" id="closeSwapModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="swap-container">
+                        <div class="swap-from">
+                            <label>From</label>
+                            <div class="swap-input-group">
+                                <input type="number" id="swapFromAmount" placeholder="0" min="1" step="1" class="form-input">
+                                <div class="swap-currency">
+                                    <span>JCoins</span>
+                                    <small>Balance: <span id="swapBalance">0</span></small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="swap-arrow">
+                            <button id="swapDirectionBtn" class="swap-direction-btn">
+                                <i class="fas fa-exchange-alt"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="swap-to">
+                            <label>To</label>
+                            <div class="swap-input-group">
+                                <input type="number" id="swapToAmount" placeholder="0" class="form-input" readonly>
+                                <div class="swap-currency">
+                                    <span>Gas</span>
+                                    <small>Rate: 1 JCoin = 10 Gas</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="swap-details">
+                        <div class="swap-rate">
+                            <span>Exchange Rate:</span>
+                            <span>1 JCoin = 10 Gas</span>
+                        </div>
+                        <div class="swap-fee">
+                            <span>Swap Fee:</span>
+                            <span>0.5%</span>
+                        </div>
+                        <div class="swap-slippage">
+                            <span>Slippage Tolerance:</span>
+                            <span>1%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="swap-summary">
+                        <div class="summary-item">
+                            <span>You Pay:</span>
+                            <span id="swapPayAmount">0 JCoins</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>You Receive:</span>
+                            <span id="swapReceiveAmount">0 Gas</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Fee:</span>
+                            <span id="swapFeeAmount">0 JCoins</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="cancelSwap">Cancel</button>
+                    <button class="btn primary" id="confirmSwap" disabled>Confirm Swap</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clear Transactions Modal -->
+        <div id="clearTxModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Clear Transactions</h3>
+                    <button class="close-btn" id="closeClearTxModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom:12px;color:var(--text-secondary);">Delete all your wallet transactions from the cloud. This cannot be undone.</p>
+                    <div id="clearTxStatus" class="form-help">Ready</div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="cancelClearTx">Cancel</button>
+                    <button class="btn danger" id="confirmClearTx">Clear Transactions</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clear Data Modal -->
+        <div id="clearDataModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Clear Data</h3>
+                    <button class="close-btn" id="closeClearDataModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom:12px;color:var(--text-secondary);">Remove all local data (cannot be undone).</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn secondary" id="cancelClearData">Cancel</button>
+                    <button class="btn danger" id="confirmClearData">Clear All Data</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <section class="settings-section" id="settingsSection" style="display: none;">
+            <div class="settings-header">
+                <h2 class="section-title">Wallet Settings</h2>
+                <button id="closeSettingsBtn" class="close-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="settings-content">
+                <!-- Security Settings -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Security Settings
+                    </h3>
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="pinToggle">Enable PIN Protection</label>
+                            <span class="setting-description">Require PIN for sensitive operations</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="checkbox" id="pinToggle" class="toggle-switch">
+                            <button id="setPinBtn" class="btn secondary" style="display: none;">Set PIN</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item" id="pinSettings" style="display: none;">
+                        <div class="setting-info">
+                            <label>PIN Configuration</label>
+                            <span class="setting-description">Set or change your wallet PIN</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="password" id="pinInput" placeholder="Enter PIN" maxlength="4" inputmode="numeric">
+                            <input type="password" id="pinConfirm" placeholder="Confirm PIN" maxlength="4" inputmode="numeric">
+                            <button id="savePinBtn" class="btn primary">Save PIN</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Settings -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">
+                        <i class="fas fa-user-secret"></i>
+                        Privacy Settings
+                    </h3>
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="balanceBlur">Blur Balance Amounts</label>
+                            <span class="setting-description">Hide balance amounts for privacy</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="checkbox" id="balanceBlur" class="toggle-switch">
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="autoLock">Auto-lock Wallet</label>
+                            <span class="setting-description">Lock wallet after inactivity</span>
+                        </div>
+                        <div class="setting-control">
+                            <select id="autoLockSelect" class="setting-select">
+                                <option value="0">Never</option>
+                                <option value="300">5 minutes</option>
+                                <option value="600">10 minutes</option>
+                                <option value="1800">30 minutes</option>
+                                <option value="3600">1 hour</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Display Settings -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">
+                        <i class="fas fa-palette"></i>
+                        Display Settings
+                    </h3>
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="themeSelect">Theme</label>
+                            <span class="setting-description">Choose your preferred color scheme</span>
+                        </div>
+                        <div class="setting-control">
+                            <select id="themeSelect" class="setting-select">
+                                <option value="gemini" selected>Gemini (Pink–Blue)</option>
+                                <option value="default">Default</option>
+                                <option value="dark">Dark Mode</option>
+                                <option value="light">Light Mode</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="currencySelect">Currency Display</label>
+                            <span class="setting-description">Choose how to display amounts</span>
+                        </div>
+                        <div class="setting-control">
+                            <select id="currencySelect" class="setting-select">
+                                <option value="jcoins">JCoins</option>
+                                <option value="usd">USD</option>
+                                <option value="eur">EUR</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">
+                        <i class="fas fa-bell"></i>
+                        Notification Settings
+                    </h3>
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="txNotifications">Transaction Notifications</label>
+                            <span class="setting-description">Get notified about transactions</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="checkbox" id="txNotifications" class="toggle-switch" checked>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label for="budgetAlerts">Budget Alerts</label>
+                            <span class="setting-description">Get warned when approaching limits</span>
+                        </div>
+                        <div class="setting-control">
+                            <input type="checkbox" id="budgetAlerts" class="toggle-switch" checked>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Management -->
+                <div class="settings-group">
+                    <h3 class="settings-group-title">
+                        <i class="fas fa-database"></i>
+                        Data Management
+                    </h3>
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label>Export Data</label>
+                            <span class="setting-description">Download your transaction history</span>
+                        </div>
+                        <div class="setting-control">
+                            <button id="exportDataBtn" class="btn secondary">Export CSV</button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label>Clear Data</label>
+                            <span class="setting-description">Remove all local data (cannot be undone)</span>
+                        </div>
+                        <div class="setting-control">
+                            <button id="clearDataBtn" class="btn danger">Clear All Data</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-item">
+                        <div class="setting-info">
+                            <label>Clear Transactions</label>
+                            <span class="setting-description">Delete all your wallet transactions from the cloud</span>
+                        </div>
+                        <div class="setting-control">
+                            <button id="clearTransactionsBtn" class="btn danger">Clear Transactions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions Section -->
+        <section class="transactions-section">
+            <div class="transactions-header">
+                <h2 class="section-title">Recent Transactions</h2>
+                <div class="transactions-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" id="txSearchInput" placeholder="Search transactions...">
+                    </div>
+                    <button id="txToggleBtn" class="tx-toggle-btn" title="Toggle transactions visibility">
+                        <i class="fas fa-eye-slash"></i>
+                        <span>Hide</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="txContent" class="tx-content">
+                <div id="txList">
+                    <!-- Transactions will be rendered here -->
+                </div>
+                
+                <div id="txEmpty" class="empty-state hidden">
+                    <div class="empty-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                    <div class="empty-title">No transactions yet</div>
+                    <div class="empty-description">Your transaction history will appear here once you start using your wallet.</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Info</div>
+
+    <!-- Hidden Elements for Functionality -->
+    <div id="authOverlay" class="hidden">
+        <div class="auth-card">
+            <h3>Sign In Required</h3>
+            <p>Please sign in to manage your wallet.</p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <a href="/Login.html" class="btn primary">Go to Login</a>
+                <a href="/Home.html" class="btn">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, runTransaction, query, orderBy, limit, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            authDomain: "jchat-1.firebaseapp.com",
+            projectId: "jchat-1",
+            storageBucket: "jchat-1.firebasestorage.app",
+            messagingSenderId: "328479683167",
+            appId: "1:328479683167:web:276c0b7e8ea44dd2d6a1ea",
+            measurementId: "G-S6Z9GG0R9P"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // DOM Elements
+        const userAvatar = document.getElementById('userAvatar');
+        const totalBalance = document.getElementById('totalBalance');
+        const incomeTotal = document.getElementById('incomeTotal');
+        const expenseTotal = document.getElementById('expenseTotal');
+        const requestsTotal = document.getElementById('requestsTotal');
+        const txList = document.getElementById('txList');
+        const txEmpty = document.getElementById('txEmpty');
+        const toast = document.getElementById('toast');
+        const authOverlay = document.getElementById('authOverlay');
+
+        // Variables
+        let currentUser = null;
+        let currentProfile = null;
+        let txSearchTerm = ''; // Transaction search term for filtering
+        let transactionsVisible = true; // Track transactions visibility state
+
+        // Functions
+        function showToast(message, type = 'info') {
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function getParams() {
+            const u = new URL(window.location.href);
+            const p = Object.fromEntries(u.searchParams.entries());
+            return p;
+        }
+
+        // Toggle transactions visibility
+        function toggleTransactions() {
+            const txContent = document.getElementById('txContent');
+            const txToggleBtn = document.getElementById('txToggleBtn');
+            const toggleIcon = txToggleBtn.querySelector('i');
+            const toggleText = txToggleBtn.querySelector('span');
+            
+            if (transactionsVisible) {
+                // Hide transactions
+                txContent.classList.add('hidden');
+                txToggleBtn.classList.add('hidden');
+                toggleIcon.className = 'fas fa-eye-slash';
+                toggleText.textContent = 'Show';
+                transactionsVisible = false;
+            } else {
+                // Show transactions
+                txContent.classList.remove('hidden');
+                txToggleBtn.classList.remove('hidden');
+                toggleIcon.className = 'fas fa-eye';
+                toggleText.textContent = 'Hide';
+                transactionsVisible = true;
+            }
+        }
+
+        async function ensureAuthenticated() {
+            try {
+                if (auth.currentUser) return;
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                }
+            } catch (e) {
+                console.error('Auth error', e);
+            }
+        }
+
+        async function loadProfile() {
+            if (!currentUser) return;
+            const profRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
+            const snap = await getDoc(profRef);
+            if (snap.exists()) {
+                currentProfile = snap.data();
+            } else {
+                currentProfile = { jCoins: 0, gas: 0, walletUnlocked: false };
+                await setDoc(profRef, { ...currentProfile, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
+            }
+        }
+
+        // Cloudinary helper (match other pages)
+        const cloudinaryConfig = { cloudName: "dxld01rcp" };
+        function isFullUrl(url) {
+            return typeof url === 'string' && /^(https?:)?\/\//.test(url);
+        }
+        function getCloudinaryImageUrl(urlOrPublicId, transformations = "w_70,h_70,c_fill,g_face,r_max") {
+            if (!urlOrPublicId) return null;
+            if (isFullUrl(urlOrPublicId)) return urlOrPublicId;
+            return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${transformations}/${urlOrPublicId}`;
+        }
+
+        function renderOverview() {
+            const name = currentUser?.displayName || currentUser?.email || currentProfile?.username || 'User';
+            
+            // Update header username and status
+            const headerUsername = document.getElementById('headerUsername');
+            const userStatus = document.getElementById('userStatus');
+            if (headerUsername) headerUsername.textContent = name;
+            if (userStatus) userStatus.textContent = 'Online';
+            
+            // Update profile picture or fallback to initials
+            const profileImage = document.getElementById('profileImage');
+            const avatarInitial = document.getElementById('avatarInitial');
+            const picCandidate = currentProfile?.profilePicId || currentProfile?.profilePicture || currentUser?.photoURL;
+            const url = getCloudinaryImageUrl(picCandidate) || null;
+            if (url) {
+                profileImage.src = url;
+                profileImage.style.display = 'block';
+                avatarInitial.style.display = 'none';
+                profileImage.onerror = () => {
+                    profileImage.style.display = 'none';
+                    avatarInitial.style.display = 'block';
+                    avatarInitial.textContent = name.charAt(0).toUpperCase();
+                };
+            } else {
+                profileImage.style.display = 'none';
+                avatarInitial.style.display = 'block';
+                avatarInitial.textContent = name.charAt(0).toUpperCase();
+            }
+            
+            totalBalance.textContent = `${currentProfile?.jCoins ?? 0} JCoins`;
+        }
+
+        async function renderTransactions() {
+            txList.innerHTML = '';
+            txEmpty.classList.add('hidden');
+            
+            try {
+                const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'), orderBy('timestamp', 'desc'), limit(50));
+                const snap = await getDocs(q);
+                
+                if (snap.empty) {
+                    txEmpty.classList.remove('hidden');
+                    updateStats(0, 0, 0);
+                    return;
+                }
+                
+                let sumIn = 0, sumOut = 0, countReq = 0;
+                
+                for (const d of snap.docs) {
+                    const t = d.data();
+                    const type = (t.type || '').toString();
+                    const isIn = ['p2p_transfer_in','p2p_request_pay_in'].includes(type);
+                    const isOut = ['p2p_transfer_out','p2p_request_pay_out','premium_payment'].includes(type);
+                    const isReq = type.includes('request');
+                    
+                    const noteStr = ((t.note || t.description || '').toString()).toLowerCase();
+                    const cp = (t.counterpartyId || '').toString().toLowerCase();
+                    
+                    if (txSearchTerm && !(noteStr.includes(txSearchTerm) || cp.includes(txSearchTerm) || type.includes(txSearchTerm))) continue;
+
+                    const card = document.createElement('div');
+                    card.className = 'transaction-item';
+                    
+                    const tsDate = t.timestamp?.toDate ? new Date(t.timestamp.toDate()) : new Date();
+                    const amtNum = typeof t.amount === 'number' ? t.amount : null;
+                    const amtStr = amtNum !== null ? (isIn ? `+${amtNum}` : isOut ? `-${amtNum}` : `${amtNum}`) : '';
+                    const amtCls = isIn ? 'positive' : isOut ? 'negative' : 'neutral';
+                    const title = type.replace(/_/g,' ').replace(/\b\w/g, l => l.toUpperCase());
+                    const cpLabel = (t.counterpartyId ? ` • ${t.counterpartyId}` : '');
+                    
+                    card.innerHTML = `
+                        <div class="transaction-avatar">${(t.counterpartyId||'U').toString().slice(0,1).toUpperCase()}</div>
+                        <div class="transaction-content">
+                            <div class="transaction-title">${title}</div>
+                            <div class="transaction-subtitle">${(t.note || t.description || '—')}${cpLabel}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="transaction-amount ${amtCls}">${amtStr}</div>
+                            <div class="transaction-time">${tsDate.toLocaleDateString()}</div>
+                        </div>
+                    `;
+                    
+                    txList.appendChild(card);
+                    
+                    if (isIn && typeof t.amount === 'number') sumIn += t.amount;
+                    if (isOut && typeof t.amount === 'number') sumOut += t.amount;
+                    if (isReq) countReq += 1;
+                }
+                
+                updateStats(sumIn, sumOut, countReq);
+                
+            } catch (e) {
+                console.error('tx load error', e);
+                txEmpty.classList.remove('hidden');
+            }
+        }
+
+        function updateStats(sumIn, sumOut, countReq) {
+            incomeTotal.textContent = sumIn;
+            expenseTotal.textContent = sumOut;
+            requestsTotal.textContent = countReq;
+        }
+
+        // Event Listeners
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadProfile();
+                renderOverview();
+                await renderTransactions();
+            } else {
+                authOverlay.classList.remove('hidden');
+            }
+        });
+
+        // Search functionality
+        document.getElementById('txSearchInput')?.addEventListener('input', (e) => {
+            txSearchTerm = (e.target.value || '').toLowerCase();
+            renderTransactions();
+        });
+
+        // Toggle button functionality
+        document.getElementById('txToggleBtn')?.addEventListener('click', toggleTransactions);
+
+        // Settings functionality
+        let walletSettings = {
+            pinEnabled: false,
+            pinHash: null,
+            balanceBlur: false,
+            autoLock: 0,
+            theme: 'gemini',
+            currency: 'jcoins',
+            txNotifications: true,
+            budgetAlerts: true
+        };
+
+        // Load settings from localStorage
+        function loadSettings() {
+            const saved = localStorage.getItem('jchat-wallet-settings');
+            if (saved) {
+                walletSettings = { ...walletSettings, ...JSON.parse(saved) };
+            }
+            applySettings();
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            localStorage.setItem('jchat-wallet-settings', JSON.stringify(walletSettings));
+        }
+
+        // Capture and apply theme variables for real dark mode
+        const THEME_VARS = ['--bg-primary','--bg-secondary','--bg-tertiary','--text-primary','--text-secondary','--text-muted','--border','--border-light','--primary','--primary-dark','--secondary'];
+        const defaultThemeVars = {};
+        (function captureDefaultVars(){
+            const cs = getComputedStyle(document.documentElement);
+            THEME_VARS.forEach(v=>{ defaultThemeVars[v] = cs.getPropertyValue(v).trim(); });
+        })();
+        function applyVarMap(map){
+            const root = document.documentElement;
+            Object.entries(map).forEach(([k,v])=>{ root.style.setProperty(k, v); });
+        }
+        function resetToDefaultVars(){ applyVarMap(defaultThemeVars); }
+
+        function setTheme(name) {
+            const root = document.documentElement;
+            if (name === 'gemini') {
+                resetToDefaultVars();
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #ff7ac6 0%, #6aa7ff 100%)');
+                document.body.style.background = 'linear-gradient(180deg, rgba(255,122,198,0.12) 0%, rgba(106,167,255,0.12) 100%)';
+            } else if (name === 'dark') {
+                // Real dark mode: set a comprehensive dark palette
+                applyVarMap({
+                    '--bg-primary': '#0b1220',
+                    '--bg-secondary': '#0a0f1a',
+                    '--bg-tertiary': '#111827',
+                    '--text-primary': '#e5e7eb',
+                    '--text-secondary': '#cbd5e1',
+                    '--text-muted': '#94a3b8',
+                    '--border': '#1f2937',
+                    '--border-light': '#374151',
+                    '--primary': '#6aa7ff',
+                    '--primary-dark': '#3a7bff',
+                    '--secondary': '#ff7ac6'
+                });
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #0ea5e9 0%, #a855f7 100%)');
+                document.body.style.background = 'linear-gradient(180deg, rgba(14,165,233,0.08) 0%, rgba(168,85,247,0.08) 100%)';
+            } else if (name === 'light') {
+                resetToDefaultVars();
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
+                document.body.style.background = 'var(--bg-secondary)';
+            } else {
+                resetToDefaultVars();
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
+                document.body.style.background = 'var(--bg-secondary)';
+            }
+        }
+
+        // Apply settings to UI
+        function applySettings() {
+            // Apply PIN toggle
+            const pinToggle = document.getElementById('pinToggle');
+            if (pinToggle) {
+                pinToggle.checked = walletSettings.pinEnabled;
+                const pinSettings = document.getElementById('pinSettings');
+                const setPinBtn = document.getElementById('setPinBtn');
+                if (pinSettings && setPinBtn) {
+                    pinSettings.style.display = walletSettings.pinEnabled ? 'block' : 'none';
+                    setPinBtn.style.display = walletSettings.pinEnabled ? 'none' : 'block';
+                }
+            }
+
+            // Apply balance blur
+            const balanceBlur = document.getElementById('balanceBlur');
+            if (balanceBlur) {
+                balanceBlur.checked = walletSettings.balanceBlur;
+                applyBalanceBlur();
+            }
+
+            // Apply auto-lock
+            const autoLockSelect = document.getElementById('autoLockSelect');
+            if (autoLockSelect) {
+                autoLockSelect.value = walletSettings.autoLock;
+            }
+
+            // Apply theme
+            const themeSelect = document.getElementById('themeSelect');
+            if (themeSelect) {
+                themeSelect.value = walletSettings.theme;
+            }
+            setTheme(walletSettings.theme);
+
+            // Apply currency
+            const currencySelect = document.getElementById('currencySelect');
+            if (currencySelect) {
+                currencySelect.value = walletSettings.currency;
+            }
+
+            // Apply notifications
+            const txNotifications = document.getElementById('txNotifications');
+            if (txNotifications) {
+                txNotifications.checked = walletSettings.txNotifications;
+            }
+
+            const budgetAlerts = document.getElementById('budgetAlerts');
+            if (budgetAlerts) {
+                budgetAlerts.checked = walletSettings.budgetAlerts;
+            }
+        }
+
+        // Apply balance blur effect
+        function applyBalanceBlur() {
+            const balanceElements = document.querySelectorAll('#totalBalance, .stat-value');
+            balanceElements.forEach(el => {
+                if (walletSettings.balanceBlur) {
+                    el.style.filter = 'blur(4px)';
+                    el.style.userSelect = 'none';
+                } else {
+                    el.style.filter = 'none';
+                    el.style.userSelect = 'auto';
+                }
+            });
+        }
+
+        // Show settings
+        function showSettings() {
+            const settingsSection = document.getElementById('settingsSection');
+            if (settingsSection) {
+                settingsSection.style.display = 'block';
+                loadSettings();
+            }
+        }
+
+        // Hide settings
+        function hideSettings() {
+            const settingsSection = document.getElementById('settingsSection');
+            if (settingsSection) {
+                settingsSection.style.display = 'none';
+            }
+        }
+
+        // Export data as CSV
+        function exportData() {
+            // This would export transaction data as CSV
+            showToast('Export functionality coming soon!', 'info');
+        }
+
+        // Clear all data (modal-driven)
+        function showClearDataModal() {
+            const m = document.getElementById('clearDataModal'); if (m) m.style.display = 'flex';
+        }
+        function hideClearDataModal() {
+            const m = document.getElementById('clearDataModal'); if (m) m.style.display = 'none';
+        }
+        function confirmClearData() {
+            localStorage.clear();
+            showToast('All local data removed', 'success');
+            hideClearDataModal();
+            location.reload();
+        }
+
+        // Clear all transactions from Firestore (batched)
+        function showClearTxModal() {
+            const m = document.getElementById('clearTxModal'); if (m) m.style.display = 'flex';
+            const s = document.getElementById('clearTxStatus'); if (s) s.textContent = 'Ready';
+        }
+        function hideClearTxModal() {
+            const m = document.getElementById('clearTxModal'); if (m) m.style.display = 'none';
+        }
+
+        async function clearAllTransactions() {
+            if (!currentUser) { showToast('You must be signed in', 'error'); return; }
+            showClearTxModal();
+        }
+
+        async function confirmClearTransactions() {
+            const statusEl = document.getElementById('clearTxStatus');
+            try {
+                const txCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions');
+                let deleted = 0;
+                // Loop with small yields to avoid long-task warnings
+                while (true) {
+                    statusEl.textContent = 'Fetching next batch...';
+                    const qSnap = await getDocs(query(txCol, orderBy('timestamp','desc'), limit(200)));
+                    if (qSnap.empty) break;
+                    statusEl.textContent = `Deleting ${qSnap.size} transactions...`;
+                    const batch = writeBatch(db);
+                    qSnap.forEach(docSnap => batch.delete(docSnap.ref));
+                    await batch.commit();
+                    deleted += qSnap.size;
+                    statusEl.textContent = `Deleted ${deleted}. Continuing...`;
+                    await new Promise(r => setTimeout(r, 50)); // yield to browser
+                    if (qSnap.size < 200) break;
+                }
+                statusEl.textContent = `Done. Deleted ${deleted} transactions.`;
+                showToast(`Deleted ${deleted} transactions`, 'success');
+                await renderTransactions();
+                updateStats(0,0,0);
+                setTimeout(hideClearTxModal, 700);
+            } catch (e) {
+                console.error('Clear transactions error:', e);
+                statusEl.textContent = 'Error deleting transactions.';
+                showToast('Failed to clear transactions', 'error');
+            }
+        }
+
+        // Quick Actions Functionality
+        // Send JCoins Functions
+        function showSendModal() {
+            const sendModal = document.getElementById('sendModal');
+            if (sendModal) {
+                sendModal.style.display = 'flex';
+                document.getElementById('recipientId').focus();
+                updateSendSummary();
+            }
+        }
+
+        function hideSendModal() {
+            const sendModal = document.getElementById('sendModal');
+            if (sendModal) {
+                sendModal.style.display = 'none';
+                resetSendForm();
+            }
+        }
+
+        function resetSendForm() {
+            document.getElementById('recipientId').value = '';
+            document.getElementById('sendAmount').value = '';
+            document.getElementById('sendNote').value = '';
+            updateSendSummary();
+        }
+
+        function updateSendSummary() {
+            const amount = parseFloat(document.getElementById('sendAmount').value) || 0;
+            const fee = Math.max(1, Math.ceil(amount * 0.01)); // 1% fee, minimum 1
+            const total = amount + fee;
+            
+            document.getElementById('feeAmount').textContent = fee;
+            document.getElementById('summaryAmount').textContent = `${amount} JCoins`;
+            document.getElementById('summaryFee').textContent = `${fee} JCoins`;
+            document.getElementById('summaryTotal').textContent = `${total} JCoins`;
+            
+            // Enable/disable confirm button
+            const confirmBtn = document.getElementById('confirmSend');
+            const recipientId = document.getElementById('recipientId').value.trim();
+            confirmBtn.disabled = amount < 1 || !recipientId || amount > (currentProfile?.jCoins || 0);
+        }
+
+        async function confirmSendTransaction() {
+            const recipientId = document.getElementById('recipientId').value.trim();
+            const amount = parseFloat(document.getElementById('sendAmount').value);
+            const note = document.getElementById('sendNote').value.trim();
+            const fee = Math.max(1, Math.ceil(amount * 0.01));
+            const total = amount + fee;
+            
+            if (!recipientId) {
+                showToast('Please enter recipient ID', 'error');
+                return;
+            }
+            
+            if (amount < 1) {
+                showToast('Amount must be at least 1 JCoin', 'error');
+                return;
+            }
+            
+            if (total > (currentProfile?.jCoins || 0)) {
+                showToast('Insufficient balance', 'error');
+                return;
+            }
+            
+            if (recipientId === currentUser.uid) {
+                showToast('Cannot send to yourself', 'error');
+                return;
+            }
+            
+            try {
+                // Check if recipient exists
+                const recipientRef = doc(db, 'artifacts', appId, 'users', recipientId, 'profiles', 'user_profile');
+                const recipientSnap = await getDoc(recipientRef);
+                
+                if (!recipientSnap.exists()) {
+                    showToast('Recipient not found', 'error');
+                    return;
+                }
+                
+                // Execute transaction
+                await runTransaction(db, async (tx) => {
+                    const senderRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
+                    const senderSnap = await tx.get(senderRef);
+                    
+                    if (!senderSnap.exists()) {
+                        throw new Error('Sender profile not found');
+                    }
+                    
+                    const senderCoins = Number(senderSnap.data().jCoins || 0);
+                    if (senderCoins < total) {
+                        throw new Error('Insufficient balance');
+                    }
+                    
+                    // Update sender balance
+                    tx.update(senderRef, { 
+                        jCoins: senderCoins - total, 
+                        updatedAt: serverTimestamp() 
+                    });
+                    
+                    // Update recipient balance
+                    const recipientCoins = Number(recipientSnap.data().jCoins || 0);
+                    tx.update(recipientRef, { 
+                        jCoins: recipientCoins + amount, 
+                        updatedAt: serverTimestamp() 
+                    });
+                    
+                    // Create transaction records
+                    const senderTxRef = doc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'));
+                    const recipientTxRef = doc(collection(db, 'artifacts', appId, 'users', recipientId, 'transactions'));
+                    
+                    tx.set(senderTxRef, {
+                        type: 'p2p_transfer_out',
+                        amount: amount,
+                        fee: fee,
+                        note: note,
+                        counterpartyId: recipientId,
+                        timestamp: serverTimestamp()
+                    });
+                    
+                    tx.set(recipientTxRef, {
+                        type: 'p2p_transfer_in',
+                        amount: amount,
+                        note: note,
+                        counterpartyId: currentUser.uid,
+                        timestamp: serverTimestamp()
+                    });
+                });
+                
+                showToast('JCoins sent successfully!', 'success');
+                hideSendModal();
+                
+                // Refresh data
+                await loadProfile();
+                renderOverview();
+                await renderTransactions();
+                
+            } catch (error) {
+                console.error('Send transaction error:', error);
+                showToast(error.message || 'Failed to send JCoins', 'error');
+            }
+        }
+
+        // Request Payment Functions
+        function showRequestModal() {
+            const requestModal = document.getElementById('requestModal');
+            if (requestModal) {
+                requestModal.style.display = 'flex';
+                document.getElementById('requestAmount').focus();
+                updateRequestPreview();
+            }
+        }
+
+        function hideRequestModal() {
+            const requestModal = document.getElementById('requestModal');
+            if (requestModal) {
+                requestModal.style.display = 'none';
+                resetRequestForm();
+            }
+        }
+
+        function resetRequestForm() {
+            document.getElementById('requestAmount').value = '';
+            document.getElementById('requestNote').value = '';
+            document.getElementById('requestExpiry').value = '86400';
+            updateRequestPreview();
+        }
+
+        function updateRequestPreview() {
+            const amount = parseFloat(document.getElementById('requestAmount').value) || 0;
+            const note = document.getElementById('requestNote').value.trim();
+            const expiry = document.getElementById('requestExpiry').value;
+            
+            document.getElementById('previewAmount').textContent = `${amount} JCoins`;
+            document.getElementById('previewNote').textContent = note || '—';
+            
+            const expiryText = {
+                '3600': '1 Hour',
+                '86400': '24 Hours',
+                '604800': '7 Days',
+                '2592000': '30 Days'
+            }[expiry] || '24 Hours';
+            
+            document.getElementById('previewExpiry').textContent = expiryText;
+            
+            // Enable/disable confirm button
+            const confirmBtn = document.getElementById('confirmRequest');
+            confirmBtn.disabled = amount < 1;
+        }
+
+        async function createPaymentRequest() {
+            const amount = parseFloat(document.getElementById('requestAmount').value);
+            const note = document.getElementById('requestNote').value.trim();
+            const expiry = parseInt(document.getElementById('requestExpiry').value);
+            
+            if (amount < 1) {
+                showToast('Amount must be at least 1 JCoin', 'error');
+                return;
+            }
+            
+            try {
+                const requestRef = await addDoc(collection(db, 'artifacts', appId, 'payment_requests'), {
+                    requesterId: currentUser.uid,
+                    amount: amount,
+                    note: note,
+                    expiry: expiry,
+                    status: 'pending',
+                    createdAt: serverTimestamp(),
+                    expiresAt: new Date(Date.now() + expiry * 1000)
+                });
+                
+                showToast('Payment request created successfully!', 'success');
+                hideRequestModal();
+                
+                // Generate shareable link
+                const shareLink = `${window.location.origin}/Wallet.html?payreq=${requestRef.id}`;
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'Payment Request',
+                        text: `Please pay me ${amount} JCoins`,
+                        url: shareLink
+                    });
+                } else {
+                    // Fallback: copy to clipboard
+                    navigator.clipboard.writeText(shareLink);
+                    showToast('Payment link copied to clipboard!', 'info');
+                }
+                
+            } catch (error) {
+                console.error('Create request error:', error);
+                showToast('Failed to create payment request', 'error');
+            }
+        }
+
+        // Swap Functions
+        function showSwapModal() {
+            const swapModal = document.getElementById('swapModal');
+            if (swapModal) {
+                swapModal.style.display = 'flex';
+                document.getElementById('swapFromAmount').focus();
+                updateSwapBalance();
+                updateSwapCalculations();
+            }
+        }
+
+        function hideSwapModal() {
+            const swapModal = document.getElementById('swapModal');
+            if (swapModal) {
+                swapModal.style.display = 'none';
+                resetSwapForm();
+            }
+        }
+
+        function resetSwapForm() {
+            document.getElementById('swapFromAmount').value = '';
+            document.getElementById('swapToAmount').value = '';
+            updateSwapCalculations();
+        }
+
+        function updateSwapBalance() {
+            const balance = currentProfile?.jCoins || 0;
+            document.getElementById('swapBalance').textContent = balance;
+        }
+
+        function updateSwapCalculations() {
+            const fromAmount = parseFloat(document.getElementById('swapFromAmount').value) || 0;
+            const exchangeRate = 10; // 1 JCoin = 10 Gas
+            const fee = fromAmount * 0.005; // 0.5% fee
+            const toAmount = (fromAmount - fee) * exchangeRate;
+            
+            document.getElementById('swapToAmount').value = toAmount.toFixed(2);
+            document.getElementById('swapPayAmount').textContent = `${fromAmount} JCoins`;
+            document.getElementById('swapReceiveAmount').textContent = `${toAmount.toFixed(2)} Gas`;
+            document.getElementById('swapFeeAmount').textContent = `${fee.toFixed(2)} JCoins`;
+            
+            // Enable/disable confirm button
+            const confirmBtn = document.getElementById('confirmSwap');
+            confirmBtn.disabled = fromAmount < 1 || fromAmount > (currentProfile?.jCoins || 0);
+        }
+
+        async function confirmSwap() {
+            const fromAmount = parseFloat(document.getElementById('swapFromAmount').value);
+            const exchangeRate = 10;
+            const fee = fromAmount * 0.005;
+            const toAmount = (fromAmount - fee) * exchangeRate;
+            
+            if (fromAmount < 1) {
+                showToast('Amount must be at least 1 JCoin', 'error');
+                return;
+            }
+            
+            if (fromAmount > (currentProfile?.jCoins || 0)) {
+                showToast('Insufficient balance', 'error');
+                return;
+            }
+            
+            try {
+                await runTransaction(db, async (tx) => {
+                    const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profiles', 'user_profile');
+                    const userSnap = await tx.get(userRef);
+                    
+                    if (!userSnap.exists()) {
+                        throw new Error('User profile not found');
+                    }
+                    
+                    const currentJCoins = Number(userSnap.data().jCoins || 0);
+                    const currentGas = Number(userSnap.data().gas || 0);
+                    
+                    if (currentJCoins < fromAmount) {
+                        throw new Error('Insufficient JCoins balance');
+                    }
+                    
+                    // Update balances
+                    tx.update(userRef, {
+                        jCoins: currentJCoins - fromAmount,
+                        gas: currentGas + toAmount,
+                        updatedAt: serverTimestamp()
+                    });
+                    
+                    // Create swap transaction record
+                    const swapTxRef = doc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'transactions'));
+                    tx.set(swapTxRef, {
+                        type: 'swap_jcoins_to_gas',
+                        fromAmount: fromAmount,
+                        toAmount: toAmount,
+                        fee: fee,
+                        exchangeRate: exchangeRate,
+                        timestamp: serverTimestamp()
+                    });
+                });
+                
+                showToast('Swap completed successfully!', 'success');
+                hideSwapModal();
+                
+                // Refresh data
+                await loadProfile();
+                renderOverview();
+                await renderTransactions();
+                
+            } catch (error) {
+                console.error('Swap error:', error);
+                showToast(error.message || 'Failed to complete swap', 'error');
+            }
+        }
+
+        // Initialize
+        ensureAuthenticated();
+
+        // Settings event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Quick Actions event listeners
+            document.getElementById('sendJCoinsBtn')?.addEventListener('click', showSendModal);
+            document.getElementById('createPayRequestBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showRequestModal();
+            });
+            document.getElementById('swapBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSwapModal();
+            });
+
+            // Send JCoins event listeners
+            document.getElementById('closeSendModal')?.addEventListener('click', hideSendModal);
+            document.getElementById('cancelSend')?.addEventListener('click', hideSendModal);
+            document.getElementById('confirmSend')?.addEventListener('click', confirmSendTransaction);
+            
+            // Send form input listeners
+            document.getElementById('recipientId')?.addEventListener('input', updateSendSummary);
+            document.getElementById('sendAmount')?.addEventListener('input', updateSendSummary);
+            
+            // Request Payment event listeners
+            document.getElementById('closeRequestModal')?.addEventListener('click', hideRequestModal);
+            document.getElementById('cancelRequest')?.addEventListener('click', hideRequestModal);
+            document.getElementById('confirmRequest')?.addEventListener('click', createPaymentRequest);
+            
+            // Request form input listeners
+            document.getElementById('requestAmount')?.addEventListener('input', updateRequestPreview);
+            document.getElementById('requestNote')?.addEventListener('input', updateRequestPreview);
+            document.getElementById('requestExpiry')?.addEventListener('change', updateRequestPreview);
+            
+            // Swap event listeners
+            document.getElementById('closeSwapModal')?.addEventListener('click', hideSwapModal);
+            document.getElementById('cancelSwap')?.addEventListener('click', hideSwapModal);
+            document.getElementById('confirmSwap')?.addEventListener('click', confirmSwap);
+            document.getElementById('swapDirectionBtn')?.addEventListener('click', function() {
+                // Toggle swap direction (JCoins ↔ Gas)
+                const fromAmount = document.getElementById('swapFromAmount').value;
+                const toAmount = document.getElementById('swapToAmount').value;
+                
+                if (fromAmount && toAmount) {
+                    document.getElementById('swapFromAmount').value = toAmount;
+                    document.getElementById('swapToAmount').value = fromAmount;
+                    updateSwapCalculations();
+                }
+            });
+            
+            // Swap form input listeners
+            document.getElementById('swapFromAmount')?.addEventListener('input', updateSwapCalculations);
+
+            // Settings button click
+            document.getElementById('settingsBtn')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSettings();
+            });
+
+            // Close settings button
+            document.getElementById('closeSettingsBtn')?.addEventListener('click', hideSettings);
+
+            // PIN toggle
+            document.getElementById('pinToggle')?.addEventListener('change', function() {
+                walletSettings.pinEnabled = this.checked;
+                const pinSettings = document.getElementById('pinSettings');
+                const setPinBtn = document.getElementById('setPinBtn');
+                if (pinSettings && setPinBtn) {
+                    pinSettings.style.display = walletSettings.pinEnabled ? 'block' : 'none';
+                    setPinBtn.style.display = walletSettings.pinEnabled ? 'none' : 'block';
+                }
+                saveSettings();
+            });
+
+            // Set PIN button
+            document.getElementById('setPinBtn')?.addEventListener('click', function() {
+                document.getElementById('pinToggle').checked = true;
+                walletSettings.pinEnabled = true;
+                const pinSettings = document.getElementById('pinSettings');
+                const setPinBtn = document.getElementById('setPinBtn');
+                if (pinSettings && setPinBtn) {
+                    pinSettings.style.display = 'block';
+                    setPinBtn.style.display = 'none';
+                }
+                saveSettings();
+            });
+
+            // Save PIN button
+            document.getElementById('savePinBtn')?.addEventListener('click', function() {
+                const pinInput = document.getElementById('pinInput');
+                const pinConfirm = document.getElementById('pinConfirm');
+                
+                if (pinInput.value.length < 4) {
+                    showToast('PIN must be at least 4 digits', 'error');
+                    return;
+                }
+                
+                if (pinInput.value !== pinConfirm.value) {
+                    showToast('PINs do not match', 'error');
+                    return;
+                }
+                
+                // Simple hash for demo (in production, use proper encryption)
+                walletSettings.pinHash = btoa(pinInput.value);
+                saveSettings();
+                showToast('PIN saved successfully', 'success');
+                
+                pinInput.value = '';
+                pinConfirm.value = '';
+            });
+
+            // Balance blur toggle
+            document.getElementById('balanceBlur')?.addEventListener('change', function() {
+                walletSettings.balanceBlur = this.checked;
+                applyBalanceBlur();
+                saveSettings();
+            });
+
+            // Auto-lock select
+            document.getElementById('autoLockSelect')?.addEventListener('change', function() {
+                walletSettings.autoLock = parseInt(this.value);
+                saveSettings();
+            });
+
+            // Theme select
+            document.getElementById('themeSelect')?.addEventListener('change', function() {
+                walletSettings.theme = this.value;
+                saveSettings();
+                setTheme(this.value);
+                showToast(`Theme changed to ${this.value}`, 'info');
+            });
+
+            // Currency select
+            document.getElementById('currencySelect')?.addEventListener('change', function() {
+                walletSettings.currency = this.value;
+                saveSettings();
+                showToast(`Currency changed to ${this.value}`, 'info');
+            });
+
+            // Notification toggles
+            document.getElementById('txNotifications')?.addEventListener('change', function() {
+                walletSettings.txNotifications = this.checked;
+                saveSettings();
+            });
+
+            document.getElementById('budgetAlerts')?.addEventListener('change', function() {
+                walletSettings.budgetAlerts = this.checked;
+                saveSettings();
+            });
+
+            // Export data button
+            document.getElementById('exportDataBtn')?.addEventListener('click', exportData);
+
+            // Clear data button + modal controls
+            document.getElementById('clearDataBtn')?.addEventListener('click', showClearDataModal);
+            document.getElementById('confirmClearData')?.addEventListener('click', confirmClearData);
+            document.getElementById('cancelClearData')?.addEventListener('click', hideClearDataModal);
+            document.getElementById('closeClearDataModal')?.addEventListener('click', hideClearDataModal);
+
+            // Clear transactions button + modal controls
+            document.getElementById('clearTransactionsBtn')?.addEventListener('click', clearAllTransactions);
+            document.getElementById('confirmClearTx')?.addEventListener('click', confirmClearTransactions);
+            document.getElementById('cancelClearTx')?.addEventListener('click', hideClearTxModal);
+            document.getElementById('closeClearTxModal')?.addEventListener('click', hideClearTxModal);
+
+
+        });
+    </script>
+  
+</body>
+</html>
+
