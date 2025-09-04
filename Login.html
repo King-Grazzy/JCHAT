@@ -343,20 +343,8 @@
         
         
         
+        
 
-
-
-
-
-
-
-        .oauth-section { display: block; margin: 25px 0; }
-        .oauth-btn { width: 100%; border: 1px solid var(--border-light); border-radius: var(--radius); background: var(--card-background); backdrop-filter: blur(20px); color: var(--white); cursor: pointer; transition: all var(--transition); padding: 14px 16px; font-size: 15px; font-weight: 600; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: none; }
-        .oauth-btn:hover { transform: translateY(-3px); box-shadow: var(--button-shadow); border-color: var(--pink); }
-        .oauth-btn.github { background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); position: relative; overflow: hidden; }
-        .oauth-btn.github::before { content: ""; position: absolute; inset: 0; border-radius: var(--radius); background: linear-gradient(90deg, rgba(0,213,255,.25), rgba(255,46,146,.25), rgba(0,213,255,.25)); background-size: 200% 100%; opacity: .25; filter: blur(12px); transform: translateZ(0); transition: opacity var(--transition); animation: shimmerText 4s ease-in-out infinite; pointer-events: none; }
-        .oauth-btn.github:hover::before { opacity: .45; }
-        .oauth-icon { display: inline-flex; width: 18px; height: 18px; align-items: center; justify-content: center; }
 
         @keyframes loadingPulse {
             0%, 100% { 
@@ -370,7 +358,6 @@
                     0 0 70px var(--blue);
             }
         }
-
 
 
 
@@ -1063,7 +1050,7 @@
 
         // Firebase configuration (using your existing config)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            apiKey: "AIzaSyDui0pODEZpaBBqxMCv89ZdwXDPcuEWQv8",
             authDomain: "jchat-1.firebaseapp.com",
             projectId: "jchat-1",
             storageBucket: "jchat-1.firebasestorage.app",
@@ -1123,6 +1110,7 @@
 
 
 
+
         // Make functions globally available
         window.togglePassword = function() {
             const passwordInput = document.getElementById('password');
@@ -1136,6 +1124,7 @@
                 toggleBtn.textContent = '👁️';
             }
         };
+
 
 
 
@@ -1161,6 +1150,7 @@
                 adminNotice.style.display = 'block';
             }
         }
+
 
 
 
@@ -1237,6 +1227,7 @@
                 showError(error.message || 'Authentication failed. Please try again.');
             }
         });
+
 
 
 
