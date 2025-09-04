@@ -417,6 +417,16 @@
             background-clip: text;
             transform: scale(1.05);
         }
+        .unverified-banner { background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(236,72,153,0.12)); border: 1px solid var(--border-light); color: var(--white); padding: 12px 14px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; }
+        .unverified-banner .linklike { background: none; border: none; color: #60a5fa; cursor: pointer; padding: 0 2px; font-weight: 600; }
+        .password-strength { margin-top: 8px; }
+        .strength-bar { height: 6px; border-radius: 6px; background: rgba(255,255,255,0.12); position: relative; overflow: hidden; }
+        .strength-bar::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: linear-gradient(90deg, var(--pink), var(--blue)); transition: width var(--transition); }
+        .strength-bar.level-1::after { width: 25%; }
+        .strength-bar.level-2::after { width: 50%; }
+        .strength-bar.level-3::after { width: 75%; }
+        .strength-bar.level-4::after { width: 100%; }
+        .strength-text { margin-top: 6px; font-size: 12px; color: var(--text-light); }
 
         .error-message {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%);
@@ -875,7 +885,9 @@
         .oauth-btn .oauth-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
         .oauth-btn.google { background: #ffffff; color: #1f2937; border: 1px solid rgba(0,0,0,0.08); }
         .oauth-btn.google:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
-</style>
+.remember-actions { display: flex; gap: 12px; align-items: center; }
+        .caps-warning { display: none; color: #ef4444; font-size: 12px; margin-top: 6px; }
+        </style>
 </head>
 <body>
     <!-- Floating Particles -->
@@ -938,6 +950,7 @@
                 <button type="button" class="password-toggle" onclick="togglePassword()">
                     👁️
                 </button>
+                <div id="capsWarning" class="caps-warning">Caps Lock is ON</div>
             </div>
 
             <!-- Signup-only fields continued -->
@@ -977,20 +990,16 @@
                     <input type="checkbox" id="remember" name="remember">
                     <label for="remember">Remember me</label>
                 </div>
-                <a href="#" class="forgot-password" onclick="showResetPasswordModal()">Forgot password?</a>
+                <div class="remember-actions">
+                    <a href="#" class="forgot-password" onclick="showResetPasswordModal()">Forgot password?</a>
+                    <a href="#" class="forgot-password" onclick="resendVerificationEmail()">Resend verification email</a>
+                </div>
             </div>
-            
+
             <button type="submit" class="login-btn">
                 Sign In
             </button>
 
-            <div class="divider" id="oauthDivider"><span>Or continue with</span></div>
-            <div class="oauth-section" id="oauthSection">
-                <button type="button" class="oauth-btn google" id="googleOauthBtn" aria-label="Continue with Google">
-                    <span class="oauth-icon">G</span>
-                    <span>Continue with Google</span>
-                </button>
-            </div>
 
 
             <div class="signup-link">
@@ -1047,7 +1056,7 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, signOut, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
@@ -1196,10 +1205,27 @@
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const remember = document.getElementById('remember').checked;
             const isSignupMode = document.querySelector('.login-container').classList.contains('signup-mode');
+
+            try {
+                if (remember) {
+                    localStorage.setItem('remembered_email', email);
+                } else {
+                    localStorage.removeItem('remembered_email');
+                }
+            } catch(_) {}
+
+            try {
+                const cd = parseInt(localStorage.getItem('login_cooldown_until') || '0', 10);
+                if (cd && Date.now() < cd) {
+                    const secs = Math.ceil((cd - Date.now()) / 1000);
+                    showErrorModal(`Too many attempts. Try again in ${secs}s.`);
+                    return;
+                }
+            } catch(_) {}
 
             // Basic validation
             if (!email || !password) {
@@ -1263,6 +1289,13 @@
                 showErrorModal('Passwords do not match. Please check and try again.');
                 return;
             }
+
+            // Strong password policy: min 8, at least 1 letter and 1 number
+            const strongPwd = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+            if (!strongPwd.test(password)) {
+                showErrorModal('Password must be at least 8 characters and include at least one letter and one number.');
+                return;
+            }
             
             // Check username availability
             if (!(await checkUsernameAvailability(username))) {
@@ -1310,14 +1343,14 @@
                 try {
                     await sendEmailVerification(user);
                     hideSmartLoader();
-                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Please check your email to verify your account.`, () => {
-                        window.location.href = 'Home.html';
+                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Please verify your email at ${user.email} before signing in.`, () => {
+                        window.location.href = 'Login.html';
                     });
                 } catch (verificationError) {
                     console.warn('Email verification failed:', verificationError);
                     hideSmartLoader();
-                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Note: Email verification could not be sent.`, () => {
-                        window.location.href = 'Home.html';
+                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Email verification could not be sent right now. Please try "Forgot password" later to trigger a new email or contact support.`, () => {
+                        window.location.href = 'Login.html';
                     });
                 }
                 
@@ -1330,7 +1363,15 @@
 
                 switch (code) {
                     case 'auth/email-already-in-use':
-                        errorMessage = 'An account with this email already exists. Would you like to sign in instead?';
+                        errorMessage = 'An account with this email already exists. Switching to sign in.';
+                        try {
+                            const emailInput = document.getElementById('email');
+                            if (emailInput) emailInput.value = email;
+                            const container = document.querySelector('.login-container');
+                            if (container && container.classList.contains('signup-mode')) {
+                                toggleSignupMode();
+                            }
+                        } catch (_) {}
                         break;
                     case 'auth/weak-password':
                         errorMessage = 'Password is too weak. Please choose a stronger password with at least 6 characters.';
@@ -1362,10 +1403,25 @@
                 await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                
+
+                if (!user.emailVerified) {
+                    try {
+                        await sendEmailVerification(user);
+                    } catch (e) {
+                        console.warn('Failed to send verification email:', e);
+                    }
+                    try { localStorage.setItem('unverified_email', user.email); } catch(_) {}
+                    showUnverifiedBanner(user.email);
+                    hideSmartLoader();
+                    showCustomModal('info', 'Verify Your Email', `We sent a verification link to ${user.email}. Please verify your email, then sign in again.`, null);
+                    try { await signOut(auth); } catch (_) {}
+                    return;
+                }
+
                 // Update last login
                 await saveUserData(user, 'email');
-                
+                try { localStorage.removeItem('login_failed_attempts'); localStorage.removeItem('login_cooldown_until'); } catch(_) {}
+
                 hideSmartLoader();
                 showSuccessModal(`Welcome back, ${user.displayName || user.email}!`, () => {
                     window.location.href = 'Home.html';
@@ -1377,7 +1433,20 @@
                 
                 switch (error.code) {
                     case 'auth/user-not-found':
-                        errorMessage = 'No account found with this email. Would you like to create a new account or contact an administrator?';
+                        errorMessage = 'No account found with this email.';
+                        try {
+                            if (typeof __public_signup_enabled === 'undefined' || __public_signup_enabled !== false) {
+                                const currentEmail = document.getElementById('email')?.value.trim();
+                                showCustomModal('info', 'Create Account?', 'We can create a new account with this email. Continue?', () => {
+                                    const emailInput = document.getElementById('email');
+                                    if (emailInput && currentEmail) emailInput.value = currentEmail;
+                                    const container = document.querySelector('.login-container');
+                                    if (container && !container.classList.contains('signup-mode')) {
+                                        toggleSignupMode();
+                                    }
+                                });
+                            }
+                        } catch (_) {}
                         break;
                     case 'auth/wrong-password':
                         errorMessage = 'Incorrect password. Please check your password and try again, or use "Forgot password" to reset it.';
@@ -1398,7 +1467,19 @@
                         errorMessage = 'Network error. Please check your internet connection and try again.';
                         break;
                 }
-                
+
+                try {
+                    const kA = 'login_failed_attempts';
+                    const kC = 'login_cooldown_until';
+                    let a = parseInt(localStorage.getItem(kA) || '0', 10) + 1;
+                    localStorage.setItem(kA, String(a));
+                    if (a >= 5) {
+                        const until = Date.now() + 60000;
+                        localStorage.setItem(kC, String(until));
+                        localStorage.setItem(kA, '0');
+                    }
+                } catch(_) {}
+
                 showErrorModal(errorMessage);
             }
         }
@@ -1508,7 +1589,7 @@
                     icon.textContent = '✕';
                     break;
                 case 'info':
-                    icon.textContent = '���';
+                    icon.textContent = 'ℹ';
                     break;
                 case 'question':
                     icon.textContent = '?';
@@ -1536,6 +1617,22 @@
             modal.style.display = 'none';
         }
 
+
+        function showUnverifiedBanner(email) {
+            try {
+                const banner = document.getElementById('unverifiedBanner');
+                const span = document.getElementById('unverifiedEmailText');
+                if (banner && span) {
+                    span.textContent = email || '';
+                    banner.style.display = 'block';
+                }
+            } catch (_) {}
+        }
+
+        function hideUnverifiedBanner() {
+            const banner = document.getElementById('unverifiedBanner');
+            if (banner) banner.style.display = 'none';
+        }
 
         // Enhanced show success with custom modal
         function showSuccessModal(message, callback = null) {
@@ -1701,7 +1798,7 @@
         };
 
         window.sendResetEmail = async function() {
-            const email = document.getElementById('resetEmail').value;
+            const email = document.getElementById('resetEmail').value.trim();
             
             if (!email) {
                 showCustomModal('error', 'Email Required', 'Please enter your email address.');
@@ -1739,6 +1836,34 @@
                 }
                 
                 showCustomModal('error', 'Reset Failed', errorMessage);
+            }
+        };
+
+        window.resendVerificationEmail = async function() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            if (!email || !isValidEmail(email)) {
+                showCustomModal('error', 'Email Required', 'Enter a valid email in the form to resend verification.');
+                return;
+            }
+            if (!password) {
+                showCustomModal('error', 'Password Required', 'Enter your password to verify account ownership.');
+                return;
+            }
+            try {
+                showSmartLoader('Resending', 'Sending verification email...');
+                const { user } = await signInWithEmailAndPassword(auth, email, password);
+                await sendEmailVerification(user);
+                try { await signOut(auth); } catch(_) {}
+                hideSmartLoader();
+                showSuccessModal(`Verification email sent to ${email}. Please check your inbox.`, () => {});
+            } catch (error) {
+                hideSmartLoader();
+                let msg = 'Could not resend verification email.';
+                if (error.code === 'auth/wrong-password') msg = 'Incorrect password. Please try again.';
+                if (error.code === 'auth/user-not-found') msg = 'No account found with this email.';
+                if (error.code === 'auth/too-many-requests') msg = 'Too many attempts. Please try again later.';
+                showCustomModal('error', 'Resend Failed', msg);
             }
         };
 
@@ -1813,6 +1938,22 @@
             });
         }
 
+        function updatePasswordStrength() {
+            const pwd = document.getElementById('password');
+            const bar = document.getElementById('strengthBar');
+            const text = document.getElementById('strengthText');
+            if (!pwd || !bar || !text) return;
+            const v = pwd.value || '';
+            let score = 0;
+            if (v.length >= 8) score++;
+            if (/[a-z]/.test(v) && /[A-Z]/.test(v)) score++;
+            if (/[0-9]/.test(v)) score++;
+            if (/[^A-Za-z0-9]/.test(v)) score++;
+            bar.className = 'strength-bar' + (score ? ' level-' + Math.min(score,4) : '');
+            const labels = ['very weak','weak','fair','strong','very strong'];
+            text.textContent = 'Password strength: ' + labels[Math.min(score,4)];
+        }
+
         // Preload critical resources for faster loading
         function preloadResources() {
             const preloadLinks = [
@@ -1829,48 +1970,13 @@
         }
 
         // Google Sign-In via Firebase modular SDK (redirect-based)
-        async function handleRedirectResult() {
-            try {
-                const result = await getRedirectResult(auth);
-                if (result && result.user) {
-                    showSmartLoader('Signing In', 'Completing Google sign-in...');
-                    const user = result.user;
-                    await saveUserData(user, 'google');
-                    hideSmartLoader();
-                    showSuccessModal(`Welcome, ${user.displayName || user.email}!`, () => {
-                        window.location.href = 'Home.html';
-                    });
-                }
-            } catch (error) {
-                hideSmartLoader();
-                let msg = 'Google sign-in failed. Please try again.';
-                const code = error && error.code ? String(error.code) : '';
-                if (code.includes('deleted_client')) msg = 'Google sign-in is temporarily unavailable. Please try again later.';
-                showErrorModal(msg);
-            }
-        }
 
-        async function signInWithGoogle() {
-            try {
-                showSmartLoader('Signing In', 'Redirecting to Google...');
-                const provider = new GoogleAuthProvider();
-                provider.addScope('email');
-                provider.addScope('profile');
-                await signInWithRedirect(auth, provider);
-            } catch (error) {
-                hideSmartLoader();
-                let msg = 'Google sign-in failed. Please try again.';
-                showErrorModal(msg);
-            }
-        }
 
         // Initialize all smart features
         document.addEventListener('DOMContentLoaded', function() {
             // Performance optimization - preload resources
             preloadResources();
 
-            // Check Google redirect result
-            handleRedirectResult();
 
             
             // Create floating particles
@@ -1881,7 +1987,22 @@
             
             // Add smart validation
             addSmartValidation();
-            
+
+            // Password strength live updates
+            const pwdInput = document.getElementById('password');
+            if (pwdInput) {
+                pwdInput.addEventListener('input', updatePasswordStrength);
+                updatePasswordStrength();
+            }
+
+            // Show unverified banner if stored
+            try {
+                const unv = localStorage.getItem('unverified_email');
+                if (unv) {
+                    showUnverifiedBanner(unv);
+                }
+            } catch(_) {}
+
             // Add focus effects to inputs with performance optimization
             const inputs = document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"], textarea');
             
@@ -1903,10 +2024,35 @@
             // Setup username validation
             setupUsernameValidation();
 
-            // Wire Google OAuth button
-            const gBtn = document.getElementById('googleOauthBtn');
-            if (gBtn) gBtn.addEventListener('click', signInWithGoogle);
 
+
+            // Prefill remembered email
+            try {
+                const remembered = localStorage.getItem('remembered_email');
+                if (remembered) {
+                    const emailInput = document.getElementById('email');
+                    const rememberCb = document.getElementById('remember');
+                    if (emailInput) emailInput.value = remembered;
+                    if (rememberCb) rememberCb.checked = true;
+                }
+            } catch(_) {}
+
+            // Caps Lock warning on password
+            const pwd = document.getElementById('password');
+            const cw = document.getElementById('capsWarning');
+            if (pwd && cw) {
+                const handleCaps = (e) => {
+                    try {
+                        if (e.getModifierState && e.getModifierState('CapsLock')) {
+                            cw.style.display = 'block';
+                        } else {
+                            cw.style.display = 'none';
+                        }
+                    } catch(_) {}
+                };
+                pwd.addEventListener('keyup', handleCaps);
+                pwd.addEventListener('keydown', handleCaps);
+            }
 
             // Close modals when clicking outside
             document.addEventListener('click', function(e) {
