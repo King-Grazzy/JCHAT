@@ -1046,7 +1046,7 @@
         // Firebase configuration (using your existing config)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
-            authDomain: "jchat-1.firebaseapp.com",
+            authDomain: "jchat-1.web.app",
             projectId: "jchat-1",
             storageBucket: "jchat-1.firebasestorage.app",
             messagingSenderId: "328479683167",
@@ -1831,20 +1831,20 @@
                     test.style.height = '1px';
                     test.style.top = '-100px';
                     test.referrerPolicy = 'no-referrer';
-                    const authDomain = (typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com';
+                    const authDomain = (typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.web.app';
                     const apiKey = (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) ? firebaseConfig.apiKey : '';
                     test.src = `https://${authDomain}/__/auth/iframe?apiKey=${encodeURIComponent(apiKey)}&v=11.8.0`;
                     let handled = false;
                     const cleanup = () => { if (test && test.parentNode) test.parentNode.removeChild(test); };
-                    const timer = setTimeout(() => {
+                    const timer = setTimeout(async () => {
                         if (!handled) {
                             handled = true;
                             cleanup();
-                            showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. If you see “refused to connect”, ensure this site (${location.host}) is in Firebase Authentication → Settings → Authorized domains, and that corporate firewalls allow *.firebaseapp.com`);
+                            try { await switchAuthDomain('jchat-1.web.app'); } catch (e) {}
                         }
-                    }, 4000);
+                    }, 3000);
                     test.onload = () => { handled = true; clearTimeout(timer); cleanup(); };
-                    test.onerror = async () => { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(e) {} showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. Switched to jchat-1.web.app for auth. Please retry.`); };
+                    test.onerror = async () => { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(e) {} };
                     document.body.appendChild(test);
                 } catch (e) { /* noop */ }
             })();
