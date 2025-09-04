@@ -46,6 +46,7 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "identity-credentials-get=(self \"https://accounts.google.com\")"
 
 # Headers for Identity endpoints
 [[headers]]
