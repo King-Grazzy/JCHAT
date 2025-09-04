@@ -1837,12 +1837,24 @@
         // GitHub OAuth via redirect (no Firebase)
         function handleGithubOAuthRedirect() {
             const clientId = 'Ov23liaK2pApMKMX2qvT';
-            const redirectUri = 'https://jchathub.netlify.app/auth/github/callback';
+            const baseUrl = window.location.origin;
+            const redirectUri = `https://jchathub.netlify.app/auth/github/callback.html`;
             const scope = 'read:user user:email';
-            const state = Math.random().toString(36).slice(2) + Date.now();
-            try { sessionStorage.setItem('gh_oauth_state', state); } catch (e) {}
+            const nonce = Math.random().toString(36).slice(2) + Date.now();
+            const stateObj = { n: nonce, r: window.location.origin };
+            const state = JSON.stringify(stateObj);
+            try { sessionStorage.setItem('gh_oauth_state', nonce); } catch (e) {}
             const url = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}`;
-            window.location.href = url;
+            try {
+                if (window.top && window.top !== window.self) {
+                    window.top.location.href = url; // attempt top-level navigation from iframe
+                    return;
+                }
+            } catch (_) {}
+            const popup = window.open(url, '_blank', 'noopener,noreferrer');
+            if (!popup) {
+                window.location.href = url; // fallback if popup blocked
+            }
         }
 
         // Initialize all smart features
