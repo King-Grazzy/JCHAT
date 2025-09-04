@@ -1040,7 +1040,7 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, signOut } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
@@ -1256,6 +1256,13 @@
                 showErrorModal('Passwords do not match. Please check and try again.');
                 return;
             }
+
+            // Strong password policy: min 8, at least 1 letter and 1 number
+            const strongPwd = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+            if (!strongPwd.test(password)) {
+                showErrorModal('Password must be at least 8 characters and include at least one letter and one number.');
+                return;
+            }
             
             // Check username availability
             if (!(await checkUsernameAvailability(username))) {
@@ -1303,14 +1310,14 @@
                 try {
                     await sendEmailVerification(user);
                     hideSmartLoader();
-                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Please check your email to verify your account.`, () => {
-                        window.location.href = 'Home.html';
+                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Please verify your email at ${user.email} before signing in.`, () => {
+                        window.location.href = 'Login.html';
                     });
                 } catch (verificationError) {
                     console.warn('Email verification failed:', verificationError);
                     hideSmartLoader();
-                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Note: Email verification could not be sent.`, () => {
-                        window.location.href = 'Home.html';
+                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Email verification could not be sent right now. Please try "Forgot password" later to trigger a new email or contact support.`, () => {
+                        window.location.href = 'Login.html';
                     });
                 }
                 
@@ -1363,10 +1370,22 @@
                 await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                
+
+                if (!user.emailVerified) {
+                    try {
+                        await sendEmailVerification(user);
+                    } catch (e) {
+                        console.warn('Failed to send verification email:', e);
+                    }
+                    hideSmartLoader();
+                    showCustomModal('info', 'Verify Your Email', `We sent a verification link to ${user.email}. Please verify your email, then sign in again.`, null);
+                    try { await signOut(auth); } catch (_) {}
+                    return;
+                }
+
                 // Update last login
                 await saveUserData(user, 'email');
-                
+
                 hideSmartLoader();
                 showSuccessModal(`Welcome back, ${user.displayName || user.email}!`, () => {
                     window.location.href = 'Home.html';
