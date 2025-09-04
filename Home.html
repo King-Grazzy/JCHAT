@@ -9153,6 +9153,27 @@ async function fetchAndDisplayPosts() {
                             break;
                         }
                     }
+                    // If we consistently hit network failures, try switching auth domain once and make a final attempt.
+                    const code = lastError && lastError.code ? String(lastError.code) : '';
+                    if (code === 'auth/network-request-failed') {
+                        try {
+                            const current = (typeof window.__auth_domain === 'string' && window.__auth_domain) ? window.__auth_domain : (firebaseConfig && firebaseConfig.authDomain ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com');
+                            const alternate = current.includes('firebaseapp.com') ? current.replace('firebaseapp.com', 'web.app') : current.replace('web.app', 'firebaseapp.com');
+                            console.warn(`JCHAT_WARN: Switching auth domain from ${current} to ${alternate} and retrying anonymously.`);
+                            await switchAuthDomain(alternate);
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                                console.log("JCHAT_DEBUG: Signed in with custom token after domain switch.");
+                                return true;
+                            } else {
+                                await signInAnonymously(auth);
+                                console.log("JCHAT_DEBUG: Signed in anonymously after domain switch.");
+                                return true;
+                            }
+                        } catch (e2) {
+                            lastError = e2;
+                        }
+                    }
                     // Propagate last error for diagnostics
                     if (lastError) {
                         try { sessionStorage.setItem('jchat_last_auth_error', lastError.code || String(lastError)); } catch(_){}
@@ -10831,7 +10852,7 @@ async function fetchAndDisplayPosts() {
                 case 'premium': return '🌟';
                 case 'vip': return '💎';
                 case 'elite': return '👑';
-                default: return '🌟';
+                default: return '���';
             }
         }
 
