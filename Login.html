@@ -1038,11 +1038,17 @@
             }
             </script>
             <script>
-                // Initialize GIS without FedCM for prompt to avoid NotAllowedError logs
+                // Initialize GIS without FedCM; allow client ID via query/localStorage/global
                 window.addEventListener('load', function(){
-                    const clientId = (typeof window.__google_client_id !== 'undefined' && window.__google_client_id)
-                        ? window.__google_client_id
-                        : '328479683167-4ib6vvg5easg05upvi2f4cvqs6l76lg7.apps.googleusercontent.com';
+                    function getClientId(){
+                        try {
+                            const p = new URLSearchParams(location.search);
+                            const q = p.get('gsi_client');
+                            if (q) { localStorage.setItem('gsi_client_id', q); return q; }
+                        } catch(e) {}
+                        return window.__google_client_id || localStorage.getItem('gsi_client_id') || '328479683167-4ib6vvg5easg05upvi2f4cvqs6l76lg7.apps.googleusercontent.com';
+                    }
+                    const clientId = getClientId();
                     if (window.google && google.accounts && google.accounts.id) {
                         try {
                             google.accounts.id.initialize({
@@ -1055,14 +1061,28 @@
                         } catch (e) {
                             console.error('GSI init error', e);
                             if (String(e && e.message).includes('origin is not allowed')) {
-                                showCustomModal('error', 'Google Sign-In not configured', `Add ${location.origin} to Authorized JavaScript origins for the OAuth Client ID, or update the client ID for this environment.`);
+                                showCustomModal('error', 'Google Sign-In not configured', `Add ${location.origin} to Authorized JavaScript origins for this client ID: ${clientId}`);
                             }
                         }
                     }
                 });
                 function triggerGoogleSignIn(){
                     if (window.google && google.accounts && google.accounts.id) {
-                        try { google.accounts.id.prompt(); } catch (e) { console.error('GSI prompt error', e); showCustomModal('error', 'Google Sign-In failed', 'Please try again or use email/password.'); }
+                        try {
+                            showSmartLoader('Google Sign-In', 'Opening Google...');
+                            google.accounts.id.prompt((n) => {
+                                try {
+                                    if (!n) { hideSmartLoader(); return; }
+                                    if (n.isNotDisplayed?.() || n.isSkippedMoment?.()) { hideSmartLoader(); }
+                                    const r = n.getDismissedReason?.();
+                                    if (r) { hideSmartLoader(); }
+                                } catch(_) { hideSmartLoader(); }
+                            });
+                        } catch (e) {
+                            console.error('GSI prompt error', e);
+                            hideSmartLoader();
+                            showCustomModal('error', 'Google Sign-In failed', 'Please try again or use email/password.');
+                        }
                     } else {
                         console.warn('Google Identity Services not ready');
                         showCustomModal('error', 'Google Sign-In unavailable', 'Google Sign-In is not ready on this page.');
