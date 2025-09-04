@@ -1861,15 +1861,52 @@
         }
 
         async function signInWithGoogle() {
+            const provider = new GoogleAuthProvider();
+            provider.addScope('email');
+            provider.addScope('profile');
+            provider.setCustomParameters({ prompt: 'select_account' });
+
             try {
-                showSmartLoader('Signing In', 'Redirecting to Google...');
-                const provider = new GoogleAuthProvider();
-                provider.addScope('email');
-                provider.addScope('profile');
-                await signInWithRedirect(auth, provider);
+                showSmartLoader('Signing In', 'Opening Google...');
+                await signInWithPopup(auth, provider);
+                // Success via popup will trigger onAuthStateChanged
             } catch (error) {
+                const code = error && error.code ? String(error.code) : '';
+                const messageText = error && error.message ? String(error.message) : '';
+
+                if (code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user') {
+                    // Fallback to redirect if popup fails
+                    try {
+                        showSmartLoader('Signing In', 'Redirecting to Google...');
+                        await signInWithRedirect(auth, provider);
+                        return;
+                    } catch (redirectError) {
+                        hideSmartLoader();
+                        const rCode = redirectError && redirectError.code ? String(redirectError.code) : '';
+                        let msg = 'Google sign-in failed. Please try again.';
+                        if (rCode === 'auth/unauthorized-domain') {
+                            msg = 'This domain is not authorized for Google sign-in. Please contact an administrator.';
+                        } else if (rCode === 'auth/operation-not-allowed') {
+                            msg = 'Google sign-in is not enabled. Please contact an administrator.';
+                        } else if (rCode === 'auth/admin-restricted-operation' || /ADMIN_ONLY_OPERATION/i.test(String(redirectError.message || ''))) {
+                            msg = 'Sign in restricted to existing users. Please contact an administrator for access.';
+                            showAdminOnlyNotice();
+                        }
+                        showErrorModal(msg);
+                        return;
+                    }
+                }
+
                 hideSmartLoader();
                 let msg = 'Google sign-in failed. Please try again.';
+                if (code === 'auth/unauthorized-domain') {
+                    msg = 'This domain is not authorized for Google sign-in. Please contact an administrator.';
+                } else if (code === 'auth/operation-not-allowed') {
+                    msg = 'Google sign-in is not enabled. Please contact an administrator.';
+                } else if (code === 'auth/admin-restricted-operation' || /ADMIN_ONLY_OPERATION/i.test(messageText)) {
+                    msg = 'Sign in restricted to existing users. Please contact an administrator for access.';
+                    showAdminOnlyNotice();
+                }
                 showErrorModal(msg);
             }
         }
