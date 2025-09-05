@@ -5980,7 +5980,48 @@ function generateProceduralQuote(type) { const t = quoteTemplates[type] || quote
             } catch (e) { console.warn('JCHAT_WARN: getCurrentStreakCount failed', e); }
             return 0;
         }
-        async function checkAndStartDailyBonusTimer() {
+        // Local daily activity counters and unified reward computation for posts, reactions, comments
+function _dailyKey(activity){ const d=new Date(); d.setHours(0,0,0,0); const uid=currentUser?.uid||'guest'; return `jchat-activity-count-${activity}-${uid}-${d.getTime()}`; }
+function getDailyActivityCount(activity){ try{ return parseInt(localStorage.getItem(_dailyKey(activity))||'0',10)||0; }catch{ return 0; } }
+function incrementDailyActivityCount(activity){ try{ const k=_dailyKey(activity); const n=(parseInt(localStorage.getItem(k)||'0',10)||0)+1; localStorage.setItem(k,String(n)); }catch{} }
+async function computeActivityReward(activityType, ctx={}){
+  const streak = await getCurrentStreakCount();
+  const clamp=(v,min,max)=>Math.max(min,Math.min(max,Math.floor(v)));
+  const milestone = (streak>0 && streak%7===0)?{xp:8,jc:1}:{xp:0,jc:0};
+  if (activityType==='post_creation'){
+    const len = clamp(ctx.contentLen||0,0,5000);
+    const mediaType = ctx.mediaType||'text';
+    const hasPoll = !!ctx.poll;
+    let xp = 12 + Math.floor(len/100) + Math.min(streak,30);
+    let jc = 3 + Math.floor(len/180);
+    if (mediaType==='image'){ xp+=6; jc+=2; }
+    else if (mediaType==='video'){ xp+=10; jc+=3; }
+    if (hasPoll){ xp+=3; jc+=1; }
+    const c=getDailyActivityCount('post'); const scale=Math.max(0.45,1-0.18*c);
+    xp=clamp(xp*scale + milestone.xp,6,100); jc=clamp(jc*scale + milestone.jc,1,20);
+    return {xp,jc};
+  }
+  if (activityType && activityType.startsWith('react_')){
+    const rt=ctx.reactionType||'like'; let baseXp=2, baseJ=1; if(rt==='love'||rt==='haha') baseXp+=1;
+    const c=getDailyActivityCount('reaction'); const scale=Math.max(0.2,1-0.08*c);
+    const xp=clamp(baseXp*scale + Math.min(Math.floor(streak/10),4),0,10);
+    let jc=clamp(baseJ*scale,0,3); if(c>30) jc=0; return {xp,jc};
+  }
+  if (activityType==='unreact_like'||activityType==='unreact_love'||activityType==='unreact_haha'){
+    return {xp:-3,jc:-1};
+  }
+  if (activityType==='post_comment'){
+    const len=clamp(ctx.contentLen||0,0,2000); const isReply=!!ctx.isReply; const isFirst=!!ctx.isFirstOnPost;
+    let xp=3+Math.floor(len/60)+Math.min(Math.floor(streak/3),10); let jc=2+Math.floor(len/120);
+    if(isReply) xp+=1; if(isFirst){ xp+=2; jc+=1; }
+    const c=getDailyActivityCount('comment'); const scale=Math.max(0.4,1-0.12*c);
+    xp=clamp(xp*scale + milestone.xp,2,40); jc=clamp(jc*scale + milestone.jc,1,12); return {xp,jc};
+  }
+  if (activityType==='comment_deletion'){ return {xp:-4,jc:-3}; }
+  if (activityType==='post_deletion'){ return {xp:-18,jc:-6}; }
+  return {xp:0,jc:0};
+}
+async function checkAndStartDailyBonusTimer() {
             // Disable button and clear timer if not authenticated or profile not loaded.
             if (!currentUser || !currentUserProfileData) {
                 if (claimDailyBonusButton) {
