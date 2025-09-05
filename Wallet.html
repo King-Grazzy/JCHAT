@@ -2442,6 +2442,20 @@
 
         // Settings event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            try {
+                const fp = document.getElementById('floatingParticles');
+                if (fp) {
+                    for (let i = 0; i < 24; i++) {
+                        const d = document.createElement('div');
+                        d.className = 'particle ' + (i % 2 ? 'pink' : 'blue');
+                        d.style.left = Math.random() * 100 + '%';
+                        d.style.top = Math.random() * 100 + '%';
+                        d.style.animationDelay = (Math.random() * 8).toFixed(2) + 's';
+                        fp.appendChild(d);
+                    }
+                }
+            } catch(_) {}
             // Quick Actions event listeners
             document.getElementById('sendJCoinsBtn')?.addEventListener('click', showSendModal);
             document.getElementById('createPayRequestBtn')?.addEventListener('click', (e) => {
