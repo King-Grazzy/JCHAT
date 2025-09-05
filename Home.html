@@ -7514,8 +7514,8 @@ async function checkAndStartDailyBonusTimer() {
                         // Set/update the user's reaction document.
                         transaction.set(userReactionRef, { type: reactionType, userId: currentUser.uid, timestamp: serverTimestamp() });
                         activityType = `react_${reactionType}`;
-                        xpReward = 3; // Suggested XP for reacting.
-                        jCoinReward = 2; // Suggested JCoins for reacting.
+                        const pos = await computeActivityReward(activityType, { reactionType });
+                        xpReward = pos.xp; jCoinReward = pos.jc;
                     }
 
                     // Update the post document with new reaction counts.
