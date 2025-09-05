@@ -5631,7 +5631,7 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
 
         // --- Inspiration Quotes Data (Local Fallback) ---
         // These are used as the primary source of inspiration quotes.
-        const enableFixedInspirationOverride = true;
+        const enableFixedInspirationOverride = false;
 const fixedInspirationQuote = 'Breathe: peace finds its way in.';
 const fixedInspirationAuthor = 'JCHAT';
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -5642,7 +5642,50 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
             wisdom: { openers:["Growth","Curiosity","Patience","Listening","Kindness"], bridges:[" reveals that "," teaches that "," reminds us "," shows that ",": "], endings:["there's more to learn than to prove.","small habits shape great outcomes.","the quietest lessons echo the longest.","consistency outlives talent.","clarity follows attention."] },
             love: { openers:["Love","Compassion","Care","Gratitude","Warmth"], bridges:[" grows where "," lives when "," begins when "," multiplies when ",": "], endings:["we show up for each other.","we choose patience.","we listen before we speak.","small gestures carry big meaning.","we forgive and rebuild."] }
         };
-        function generateProceduralQuote(type) { const t = quoteTemplates[type] || quoteTemplates.motivational; return { quote: `${pick(t.openers)}${pick(t.bridges)}${pick(t.endings)}`, author: 'JCHAT' }; }
+        // Large-scale combinatorial lexicon per category to yield millions of unique quotes without storing them all.
+const inspirationLexicon = {
+    motivational: {
+        adjectives: ["small","steady","bold","patient","focused","consistent","resilient","brave","curious","determined","calm","disciplined","creative","mindful","grateful","hopeful","humble","persistent","energetic","adaptive"],
+        nouns: ["steps","habits","efforts","actions","choices","dreams","goals","routines","ideas","projects","focus","practice","progress","patience","courage","attention","learning","craft","path","journey"],
+        verbs: ["build","create","shape","fuel","move","grow","become","unlock","guide","strengthen","elevate","refine","transform","anchor","sharpen","accelerate","steady","expand","align","carry"],
+        objects: ["tomorrow","results","momentum","character","mastery","clarity","direction","outcomes","resilience","opportunities","potential","growth","impact","progress","confidence","purpose","vision","skills","habits","change"],
+        adverbs: ["today","each day","with heart","with care","with courage","with patience","with focus","with intent","with kindness","with discipline","with curiosity","with energy","bit by bit","step by step","all the way","steadily","with grace","through effort","through practice","over time"],
+        closers: ["every step counts","start now","progress loves momentum","consistency compounds","small moves build great things","discipline builds destiny","you are closer than you think","make the day proud","begin where you are","keep going","show up and the path appears","practice makes possible","direction beats speed","the work works","tiny wins stack up","persistence rewrites outcomes","be a little braver","craft over chaos","you've got this","let effort lead"]
+    },
+    peaceful: {
+        adjectives: ["slow","gentle","quiet","soft","steady","deep","warm","tender","calm","open","kind","patient","light","spacious","grounded","present","relaxed","centered","clear","soothing"],
+        nouns: ["breath","moments","pauses","mornings","evenings","thoughts","heart","mind","awareness","space","silence","attention","presence","steps","routines","rituals","focus","stillness","gratitude","posture"],
+        verbs: ["welcomes","softens","unclutters","clears","settles","restores","eases","untangles","nourishes","steadies","centers","refreshes","calms","opens","quiets","loosens","brightens","grounds","slows","aligns"],
+        objects: ["the mind","the heart","the day","the noise","the tension","the pace","the storm","the worries","the doubts","the rush","the room","the body","the breath","the chatter","the wall within","the fatigue","the weight","the clutter","the loop","the fog"],
+        adverbs: ["gently","slowly","with ease","with warmth","with patience","with kindness","like a tide","like sunrise","like a whisper","like rain","without force","in silence","in stillness","in small ways","one breath at a time","with grace","softly","kindly","quietly","steadily"],
+        closers: ["peace finds its way in","you return to yourself","clarity appears","softness wins","stillness speaks","you can hear the day again","calm grows from inside","the heart loosens","lightness returns","presence holds you","you are safe here","the moment holds everything","exhale, and begin again","choose gentle over perfect","be here now","ease is allowed","rest is productive","quiet is wisdom","soft is strong","let today be lighter"]
+    },
+    funny: {
+        adjectives: ["legendary","sleepy","spicy","chaotic","accidental","unverified","snack-powered","overcaffeinated","wifi-dependent","bug-friendly","pixel-perfect-ish","keyboard-slammed","tab-hoarding","meme-certified","semi-functional","confetti-ready","deadline-adjacent","lazy","heroic","introverted"],
+        nouns: ["braincells","ideas","deadlines","snacks","tabs","meetings","excuses","dreams","dishes","emails","patches","updates","alarms","calendars","todos","shortcuts","memes","eyebags","pixels","coffee"],
+        verbs: ["chase","debug","ignore","refactor","procrastinate on","speedrun","overthink","optimize","ship","yeet","delay","pretend to schedule","misplace","google","reboot","stretch","nuke","silence","summon","overclock"],
+        objects: ["motivation","laundry","life choices","bugs","feelings","meetings","responsibilities","plots","sleep","notifications","typos","leftovers","gym plans","tasks","calories","adulting","mess","tabs","spreadsheets","confidence"],
+        adverbs: ["after snacks","tomorrow","eventually","with dramatic music","with zero context","like a ninja","like a potato","on airplane mode","with Wi‑Fi permission","under supervision","with flair","in slippers","with caution","with vibes","at 2 AM","with jazz hands","probably","respectfully","unnecessarily","on hard mode"],
+        closers: ["results may vary","send help","at least we tried","nap first","snacks required","chaos contained","ship it anyway","we ball","schedule feelings later","coffee approves","per my last vibe","embrace the scuff","done is fun","pixels forgive us","oops but confident","remember to hydrate","retry after snacks","mission: acceptable","laugh and proceed","still counts"]
+    },
+    wisdom: {
+        adjectives: ["patient","curious","humble","present","attentive","open","honest","steady","thoughtful","deliberate","observant","kind","balanced","reflective","brave","generous","playful","resilient","disciplined","simple"],
+        nouns: ["mind","learner","question","path","habit","choice","craft","process","story","lens","practice","attention","journey","silence","doubt","failure","lesson","data","pattern","principle"],
+        verbs: ["reveals","teaches","reminds","shapes","tests","guides","clarifies","simplifies","widens","focuses","grounds","strengthens","questions","balances","compounds","connects","aligns","lights","organizes","transforms"],
+        objects: ["character","understanding","patience","outcomes","direction","humility","action","clarity","perspective","confidence","purpose","effort","progress","skill","attention","intention","learning","choices","focus","time"],
+        adverbs: ["slowly","through practice","by listening","by observing","over seasons","under pressure","when tested","with others","in solitude","with care","with rigor","with kindness","without ego","with curiosity","in the long run","when repeated","in the margins","with awareness","through failure","with gratitude"],
+        closers: ["small truths outlive loud opinions","consistency beats intensity","listening creates understanding","humility opens every door","skills follow attention","wisdom begins with curiosity","practice changes identity","clarity follows action","trade pride for progress","what you repeat is what you become","the map is not the terrain","start with questions","seek first to understand","simple scales, complex fails","direction is a decision","discipline is liberating","make it obvious","choose long-term over loud","measure what matters","learn, unlearn, relearn"]
+    },
+    love: {
+        adjectives: ["kind","warm","gentle","patient","soft","steady","brave","open","tender","honest","careful","hopeful","loyal","humble","playful","faithful","joyful","present","whole","true"],
+        nouns: ["words","hands","eyes","time","attention","gestures","moments","morning notes","small favors","promises","presence","listening","effort","apologies","boundaries","laughter","memories","choices","gifts","care"],
+        verbs: ["make","carry","build","hold","heal","forgive","notice","choose","guard","nourish","protect","restore","light","soften","anchor","celebrate","welcome","strengthen","grow","multiply"],
+        objects: ["trust","safety","home","hope","us","tomorrow","each other","the hard days","the quiet moments","the little things","honesty","patience","understanding","respect","friendship","joy","grace","we","our story","the bond"],
+        adverbs: ["daily","in small ways","in the mess","when tired","in public and private","when no one sees","without keeping score","with patience","with time","with presence","with laughter","when it’s hard","with gentleness","with wonder","with gratitude","through storms","through change","with steady hands","with open hearts","forever learning"],
+        closers: ["love is a practice","small care builds big trust","kindness is love’s first language","choose each other again","soft is strong","we grow by giving","together beats perfect","show up and stay","make room for grace","we is greater than me","true love is daily work","attention is affection","patience makes love durable","be quick to listen","forgive often, repair always","speak gently, act clearly","gratitude turns houses into homes","hold hands through seasons","care louder than words","let love lead"]
+    }
+};
+function generateProceduralQuote(type) { const t = quoteTemplates[type] || quoteTemplates.motivational; return { quote: `${pick(t.openers)}${pick(t.bridges)}${pick(t.endings)}`, author: 'JCHAT' }; }
         const inspirationalQuotes = {
             motivational: [
                 { quote: "Every sunrise is an invitation to brighten your world.", author: "JCHAT" },
@@ -7049,6 +7092,28 @@ const pick = arr => arr[Math.floor(Math.random() * arr.length)];
             const minute = now.getMinutes();
             const seed = (weekday + 1) * 10000 + (month + 1) * 100 + hour * 10 + Math.floor(minute / 5);
             const type = preferredType && preferredType !== 'off' ? preferredType : selectTypeByTime();
+            const lex = inspirationLexicon[type];
+            if (lex) {
+                const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+                const a1 = pickDeterministic(lex.adjectives, seed + 11);
+                const n1 = pickDeterministic(lex.nouns, seed + 13);
+                const v1 = pickDeterministic(lex.verbs, seed + 17);
+                const oAdj = pickDeterministic(lex.adjectives, seed + 19);
+                const oObj = pickDeterministic(lex.objects, seed + 23);
+                const adv = pickDeterministic(lex.adverbs, seed + 29);
+                const close = pickDeterministic(lex.closers, seed + 31);
+                const pattern = (seed % 3);
+                let sentence;
+                if (pattern === 0) {
+                    sentence = `${cap(a1)} ${n1} ${v1} ${oAdj} ${oObj} ${adv}.`;
+                } else if (pattern === 1) {
+                    sentence = `${cap(v1)} ${oAdj} ${oObj} ${adv}; ${close}.`;
+                } else {
+                    sentence = `When ${a1} ${n1} ${v1} ${oObj}, ${close}.`;
+                }
+                return { quote: sentence, author: 'JCHAT' };
+            }
+            // Fallback to simple templates
             const t = quoteTemplates[type] || quoteTemplates.motivational;
             const open = pickDeterministic(t.openers, seed + 17);
             const bridge = pickDeterministic(t.bridges, seed + 31);
