@@ -1695,7 +1695,7 @@ const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__f
         let transactionsVisible = true; // Track transactions visibility state
 
 // Fiat conversion state
-let jcoinPerNaira = 7.5; // Default; will live-update from Firestore if available
+let nairaPerJcoin = 7.5; // Default; Naira per 1 JCoin; will live-update from Firestore if available
 let fxRateNGNToLocal = 1; // NGN -> local currency FX rate
 let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
 
@@ -1729,7 +1729,7 @@ let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
                 onSnapshot(settingsRef, (snap) => {
                     const data = snap.exists() ? snap.data() : null;
                     const rate = Number(data?.jcoinNairaRate);
-                    if (rate > 0) jcoinPerNaira = rate;
+                    if (rate > 0) nairaPerJcoin = rate;
                     updateFiatUI();
                 }, () => {});
             } catch (_) {}
@@ -1755,8 +1755,8 @@ let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
         function updateFiatUI() {
             try {
                 const j = Number(currentProfile?.jCoins || 0);
-                const ngnValue = jcoinPerNaira > 0 ? (j / jcoinPerNaira) : 0;
-                const oneJcoinInNGN = jcoinPerNaira > 0 ? (1 / jcoinPerNaira) : 0;
+                const ngnValue = nairaPerJcoin > 0 ? (j * nairaPerJcoin) : 0;
+                const oneJcoinInNGN = nairaPerJcoin > 0 ? nairaPerJcoin : 0;
                 const oneEl = document.getElementById('oneJcoinRateDisplay');
                 if (oneEl) oneEl.textContent = `₦${oneJcoinInNGN.toFixed(2)} NGN`;
                 const localEl = document.getElementById('localValueDisplay');
