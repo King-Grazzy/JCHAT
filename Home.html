@@ -9037,7 +9037,8 @@ async function fetchAndDisplayPosts() {
                         currentLevel = Math.max(1, currentLevel);
                         const info = getLevelInfo(currentLevel);
                         if (levelChipIcon) levelChipIcon.className = `${info.icon}`;
-                        levelChipName.textContent = info.name;
+                        const baseName = (info.name || '').replace(/\s+Lv\.?\s*\d+/i, '').trim();
+                        levelChipName.textContent = `${baseName} Lv${currentLevel}`;
                         const gasNeededCurr = getTotalGasRequiredToReachLevel(currentLevel);
                         const gasNeededNext = getTotalGasRequiredToReachLevel(currentLevel + 1);
                         const segSize = Math.max(1, gasNeededNext - gasNeededCurr);
