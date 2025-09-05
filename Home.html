@@ -4418,16 +4418,18 @@
         
         // Offline Detection
         let isOnline = navigator.onLine;
+        if (!isOnline) {
+            window.location.replace('/offline.html');
+        }
         window.addEventListener('online', () => {
             isOnline = true;
-            showMessageBox('🟢 Connection restored! Back online.', 'success');
             console.log('JCHAT_DEBUG: Back online');
         });
-        
+
         window.addEventListener('offline', () => {
             isOnline = false;
-            showMessageBox('🔴 You are offline. Some features may be limited.', 'warning', true);
             console.log('JCHAT_DEBUG: Gone offline');
+            window.location.replace('/offline.html');
         });
 
         // Global Error Handling - Temporarily disabled for debugging
@@ -10663,6 +10665,7 @@ async function fetchAndDisplayPosts() {
         // Load Premium Status
         async function loadPremiumStatus() {
             if (!currentUser) return;
+            if (!navigator.onLine) { deactivatePremiumFeatures(); return; }
 
             try {
                 const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid);
@@ -10753,10 +10756,10 @@ async function fetchAndDisplayPosts() {
                 premiumPostOptions.style.display = 'none';
             }
 
-            // Show premium request button
+            // Hide premium request button (never show this CTA)
             const premiumRequestBtn = document.getElementById('premiumRequestBtn');
             if (premiumRequestBtn) {
-                premiumRequestBtn.style.display = 'flex';
+                premiumRequestBtn.style.display = 'none';
             }
 
             // Remove premium theme
