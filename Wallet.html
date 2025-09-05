@@ -5,6 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JCHAT - My Wallet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -1055,14 +1058,42 @@
         .toast.warning { border-left: 4px solid var(--warning); }
         .toast.info { border-left: 4px solid var(--info); }
     </style>
+<style>
+    /* App-wide UI alignment */
+    body { font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+    /* Floating particles (visual parity with Login/Home) */
+    .floating-particles { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+    .particle { position: absolute; width: 4px; height: 4px; border-radius: 50%; opacity: 0.6; animation: float 8s linear infinite; }
+    .particle.pink { background: var(--pink); box-shadow: 0 0 15px var(--pink); }
+    .particle.blue { background: var(--blue); box-shadow: 0 0 15px var(--blue); }
+
+    /* Buttons - add primary style used across app */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-tertiary); color: var(--text-primary); font-weight: 600; cursor: pointer; transition: all .3s ease; text-decoration: none; }
+    .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); border-color: var(--primary); }
+    .btn.primary { background: linear-gradient(90deg, var(--blue), var(--pink)); color: #fff; border: 1px solid transparent; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
+    .btn.primary:hover { box-shadow: 0 6px 22px rgba(0,0,0,0.2); filter: saturate(1.05); }
+
+    /* Header logo row and assets */
+    .brand-logo { display:flex; align-items:center; gap:10px; }
+    .security-badge { height:28px; width:auto; }
+    .avatar-image { width:100%; height:100%; object-fit: cover; border-radius: 50%; }
+
+    /* Text helpers */
+    .modal-note { margin-bottom:12px; color: var(--text-secondary); }
+
+    /* Layout helpers */
+    .button-row { display:flex; gap:10px; justify-content:center; }
+</style>
 <style id="header-overflow-fix">/*header-overflow-fix*/header .header-content-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap}header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;justify-content:flex-end}#profileLink{display:inline-flex;align-items:center;column-gap:8px;row-gap:2px;flex-wrap:wrap;max-width:100%;min-width:0}#profileLink #headerDisplayName{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;flex:0 1 auto}#headerProfilePic,#headerAvatarIcon{flex:0 0 auto}@media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:6px}}</style></head>
 <body>
+    <div class="floating-particles" id="floatingParticles"></div>
     <!-- Header -->
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <div class="logo" style="display:flex;align-items:center;gap:10px">
-                    <img src="assets/security.png" alt="JCHAT Security" style="height:28px;width:auto" onerror="this.style.display='none'">
+                <div class="logo brand-logo">
+                    <img src="assets/security.png" alt="JCHAT Security" class="security-badge" onerror="this.style.display='none'">
                     <span>JCHAT Wallet</span>
                 </div>
                 <div class="user-profile">
@@ -1071,7 +1102,7 @@
                         <span class="user-status" id="userStatus">Online</span>
                     </div>
                     <div class="user-avatar glow" id="userAvatar">
-                        <img id="profileImage" src="" alt="Profile" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                        <img id="profileImage" class="avatar-image" src="" alt="Profile" style="display: none;">
                         <span id="avatarInitial">U</span>
                     </div>
                 </div>
@@ -1354,7 +1385,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p style="margin-bottom:12px;color:var(--text-secondary);">Delete all your wallet transactions from the cloud. This cannot be undone.</p>
+                    <p class="modal-note">Delete all your wallet transactions from the cloud. This cannot be undone.</p>
                     <div id="clearTxStatus" class="form-help">Ready</div>
                 </div>
                 <div class="modal-footer">
@@ -1374,7 +1405,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p style="margin-bottom:12px;color:var(--text-secondary);">Remove all local data (cannot be undone).</p>
+                    <p class="modal-note">Remove all local data (cannot be undone).</p>
                 </div>
                 <div class="modal-footer">
                     <button class="btn secondary" id="cancelClearData">Cancel</button>
@@ -1598,7 +1629,7 @@
         <div class="auth-card">
             <h3>Sign In Required</h3>
             <p>Please sign in to manage your wallet.</p>
-            <div style="display:flex; gap:10px; justify-content:center;">
+            <div class="button-row">
                 <a href="/Login.html" class="btn primary">Go to Login</a>
                 <a href="/Home.html" class="btn">Back to Home</a>
             </div>
