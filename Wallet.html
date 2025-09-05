@@ -1131,15 +1131,23 @@
         <div class="fiat-value" id="localValueDisplay">≈ —</div>
     </div>
     <div class="fiat-col">
-        <div class="fiat-note">100 JCoins ≈</div>
+        <div class="fiat-note" id="jcoinLabelNote">—</div>
         <div class="fiat-value" id="oneJcoinRateDisplay">—</div>
     </div>
 </div>
+                <div class="balance-actions">
+                    <button class="balance-btn" id="sendBtn">
+                        <i class="fas fa-arrow-up"></i> Send
+                    </button>
+                    <button class="balance-btn" id="receiveBtn">
+                        <i class="fas fa-arrow-down"></i> Receive
+                    </button>
+                </div>
             </div>
         </section>
 
         <!-- Quick Stats -->
-        <section class="stats-grid" style="display: none;">
+        <section class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon income">
                     <i class="fas fa-arrow-down"></i>
@@ -1164,7 +1172,7 @@
         </section>
 
         <!-- Actions Section -->
-        <section class="actions-section" style="display: none;">
+        <section class="actions-section">
             <h2 class="section-title">Quick Actions</h2>
             <div class="action-grid">
                 <button class="action-btn" id="sendJCoinsBtn">
@@ -1600,7 +1608,7 @@
         </section>
 
         <!-- Transactions Section -->
-        <section class="transactions-section" style="display: none;">
+        <section class="transactions-section">
             <div class="transactions-header">
                 <h2 class="section-title">Recent Transactions</h2>
                 <div class="transactions-controls">
@@ -1748,9 +1756,10 @@ let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
             try {
                 const j = Number(currentProfile?.jCoins || 0);
                 const ngnValue = jcoinPerNaira > 0 ? (j / jcoinPerNaira) : 0;
-                const hundredJcoinsInNGN = jcoinPerNaira > 0 ? (100 / jcoinPerNaira) : 0;
+                const noteEl = document.getElementById('jcoinLabelNote');
+                if (noteEl) noteEl.textContent = `${j} JCoins ≈`;
                 const oneEl = document.getElementById('oneJcoinRateDisplay');
-                if (oneEl) oneEl.textContent = `₦${hundredJcoinsInNGN.toFixed(2)} NGN`;
+                if (oneEl) oneEl.textContent = `₦${ngnValue.toFixed(2)} NGN`;
                 const localEl = document.getElementById('localValueDisplay');
                 if (localEl) {
                     if ((userCurrency.code || 'USD') === 'NGN') {
