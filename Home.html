@@ -5728,7 +5728,7 @@
                 jCoinReward = 130 + (500 - 26) * 10 + (level - 500) * 50;
                 gasReward = 50 + (500 - 26) * 5 + (level - 500) * 25;
                 timeEstimate = `${Math.ceil(level / 2)} months`;
-            } else {
+            } else if (level < 1) {
                 // Fallback for any edge cases (align with Profile/Levels)
                 name = `Level ${level}`;
                 icon = "fas fa-question-circle";
