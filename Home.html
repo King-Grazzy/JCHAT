@@ -8165,7 +8165,7 @@ async function checkAndStartDailyBonusTimer() {
                         </div>
                         <div class="comment-reactions-summary">
                             <span data-type="like">👍 <span class="count">${comment.reactions?.like||0}</span></span>
-                            <span data-type="love">❤️ <span class="count">${comment.reactions?.love||0}</span></span>
+                            <span data-type="love">��️ <span class="count">${comment.reactions?.love||0}</span></span>
                             <span data-type="haha">😂 <span class="count">${comment.reactions?.haha||0}</span></span>
                         </div>
                     </div>
@@ -9645,6 +9645,29 @@ async function fetchAndDisplayPosts() {
             url.searchParams.set('prefill', messageText);
             window.location.href = url.toString();
         }
+        function chatIdFor(u1, u2) { return [u1, u2].sort().join('_'); }
+        async function ensureChatDocForHome(chatId, friendId) {
+            try {
+                const chatDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'chats', chatId);
+                const snap = await getDoc(chatDocRef);
+                if (!snap.exists()) {
+                    await setDoc(chatDocRef, { participants: [currentUser.uid, friendId].sort(), createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
+                } else {
+                    await updateDoc(chatDocRef, { updatedAt: serverTimestamp() });
+                }
+            } catch {}
+        }
+        async function sendQuoteToFriend(friendId) {
+            if (!isAuthReady || !currentUser) { showMessageBox('Please log in.', 'warning'); return; }
+            const quote = inspirationQuoteElement ? inspirationQuoteElement.textContent : '';
+            const author = inspirationAuthorElement ? inspirationAuthorElement.textContent : '';
+            const messageText = `${quote} ${author}`.trim();
+            const chatId = chatIdFor(currentUser.uid, friendId);
+            const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'chats', chatId, 'messages');
+            await ensureChatDocForHome(chatId, friendId);
+            await addDoc(messagesRef, { text: messageText, senderId: currentUser.uid, receiverId: friendId, timestamp: serverTimestamp(), status: 'sent', chatId });
+            showMessageBox('Sent to friend!', 'success');
+        }
         async function openFriendPickerAndSend() {
             if (!isAuthReady || !currentUser) { showMessageBox('Please log in.', 'warning'); return; }
             const friendPicker = document.getElementById('friendPicker');
@@ -9697,9 +9720,11 @@ async function fetchAndDisplayPosts() {
                             const row = document.createElement('div');
                             row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.05);margin-bottom:6px;gap:10px;';
                             row.innerHTML = `<div style=\"display:flex;align-items:center;gap:10px;\"><img src=\"${imgUrl}\" alt=\"${f.displayName}\" loading=\"lazy\" decoding=\"async\" style=\"width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid var(--border-light);\"><span>${f.displayName}</span></div><button class=\"btn\" data-fid=\"${f.id}\">Send</button>`;
-                            row.querySelector('button').addEventListener('click', () => {
-                                const msg = `${inspirationQuoteElement ? inspirationQuoteElement.textContent : ''} ${inspirationAuthorElement ? inspirationAuthorElement.textContent : ''}`.trim();
-                                navigateToChatWithPrefill(f.id, msg);
+                            row.querySelector('button').addEventListener('click', async (e) => {
+                                const btn = e.currentTarget;
+                                btn.disabled = true;
+                                try { await sendQuoteToFriend(f.id); btn.textContent = 'Sent'; }
+                                catch (err) { btn.disabled = false; showMessageBox('Failed to send.', 'error'); }
                             });
                             listWrap.appendChild(row);
                         });
