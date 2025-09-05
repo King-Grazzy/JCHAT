@@ -3946,7 +3946,7 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
                     </div>
                     
                     <div class="premium-feature-card">
-                        <div class="premium-feature-icon">⚡</div>
+                        <div class="premium-feature-icon">���</div>
                         <div class="premium-feature-title">Priority Support</div>
                         <div class="premium-feature-desc">Get faster response times from support</div>
                     </div>
@@ -9660,8 +9660,9 @@ async function fetchAndDisplayPosts() {
         async function sendQuoteToFriend(friendId) {
             if (!isAuthReady || !currentUser) { showMessageBox('Please log in.', 'warning'); return; }
             const quote = inspirationQuoteElement ? inspirationQuoteElement.textContent : '';
-            const author = inspirationAuthorElement ? inspirationAuthorElement.textContent : '';
-            const messageText = `${quote} ${author}`.trim();
+            const authorRaw = inspirationAuthorElement ? inspirationAuthorElement.textContent : '';
+            const authorClean = authorRaw.replace(/^[-\s]*/,'').replace(/\bJCHAT\b/gi,'').trim();
+            const messageText = authorClean ? `${quote} - ${authorClean}`.trim() : `${quote}`.trim();
             const chatId = chatIdFor(currentUser.uid, friendId);
             const messagesRef = collection(db, 'artifacts', appId, 'public', 'data', 'chats', chatId, 'messages');
             await ensureChatDocForHome(chatId, friendId);
