@@ -1134,6 +1134,12 @@
         <div class="fiat-note">1 JCoin ≈</div>
         <div class="fiat-value" id="oneJcoinRateDisplay">—</div>
     </div>
+    <div class="fiat-col">
+        <a href="/Developer.html" class="fiat-value" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px" title="Buy JCoins from Developer">
+            <i class="fas fa-store"></i>
+            <span>Buy JCoins</span>
+        </a>
+    </div>
 </div>
                 <div class="balance-actions">
                     <button class="balance-btn" id="sendBtn">
@@ -1695,7 +1701,7 @@ const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__f
         let transactionsVisible = true; // Track transactions visibility state
 
 // Fiat conversion state
-let jcoinPerNaira = 7.5; // Default; will live-update from Firestore if available
+let jcoinPerNaira = 10; // Default; 100 JCoins = 10 NGN; live-updated via Firestore when available
 let fxRateNGNToLocal = 1; // NGN -> local currency FX rate
 let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
 
