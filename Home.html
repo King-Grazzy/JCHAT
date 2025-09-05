@@ -3919,7 +3919,7 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
                     </div>
                     
                     <div class="premium-feature-card">
-                        <div class="premium-feature-icon">🎯</div>
+                        <div class="premium-feature-icon">��</div>
                         <div class="premium-feature-title">Advanced Features</div>
                         <div class="premium-feature-desc">Access to exclusive tools and options</div>
                     </div>
@@ -7605,19 +7605,21 @@ async function checkAndStartDailyBonusTimer() {
 
                 // Create a pending reward for the comment for admin review.
                 if (commentId) {
+                    const reward = await computeActivityReward('post_comment', { contentLen: commentText.length, isReply: !!replyingTo, isFirstOnPost: wasFirstComment });
                     await createPendingActivityReward(
                         currentUser.uid,
                         currentUserProfileData.username,
                         'post_comment',
-                        2, // Suggested XP for commenting.
-                        4,  // Suggested JCoins for commenting.
-                        commentId, // Pass commentId as activityId.
+                        reward.xp,
+                        reward.jc,
+                        commentId,
                         postId
                     );
+                    incrementDailyActivityCount('comment');
                 }
 
                 addComment.replyContext = null;
-                showMessageBox("Comment added! 2 XP and 4 JCoins are pending admin review.", 'success');
+                showMessageBox(`Comment added! +${commentText.length ? '' : ''}${' '}${''} +${''} `, 'success');
                 playNotificationSound('success');
             } catch (error) {
                 console.error("JCHAT_ERROR: Error adding comment:", error);
