@@ -10567,6 +10567,7 @@ async function fetchAndDisplayPosts() {
 
             // Ensure inspiration section listeners are attached after elements exist
             attachInspirationEventListeners();
+            if (!inspirationIntervalId) startInspirationDisplay(currentUserProfileData?.inspirationType || 'motivational');
 
             updateStreakAndQuestsUI();
             fetchStories();
