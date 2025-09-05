@@ -7528,18 +7528,19 @@ async function checkAndStartDailyBonusTimer() {
 
                 // Create a pending reward for the reaction (or deduction for un-reaction).
                 if (xpReward !== 0 || jCoinReward !== 0) {
+                    incrementDailyActivityCount('reaction');
                     await createPendingActivityReward(
                         currentUser.uid,
                         currentUserProfileData.username,
                         activityType,
                         xpReward,
                         jCoinReward,
-                        null, // No specific activityId for reaction itself.
+                        null,
                         postId
                     );
                 }
 
-                showMessageBox(`Reaction recorded! ${xpReward} XP and ${jCoinReward} JCoins are pending admin review.`, 'success');
+                showMessageBox(`Reaction recorded! ${xpReward} XP and ${jCoinReward} JCoins pending admin review.`, 'success');
                 playNotificationSound('info');
             } catch (error) {
                 console.error("JCHAT_ERROR: Error handling reaction (Firestore update failed):", error);
