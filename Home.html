@@ -9124,9 +9124,13 @@ async function fetchAndDisplayPosts() {
                 } catch (error) {
                     console.error("JCHAT_ERROR: Error during anonymous sign-in or custom token sign-in:", error);
                     if (!auth.currentUser) {
-                        hideLoader(); // Hide loader before redirect
-                        window.location.href = '/login.html'; // Redirect to login if all sign-in attempts fail.
-                        return; // Stop further execution.
+                        hideLoader();
+                        if (typeof showMessageBox === 'function') {
+                            showMessageBox('You are not signed in. Some features are limited until you log in.', 'info');
+                        }
+                        isAuthReady = false;
+                        toggleInteractiveElements(false, false);
+                        return;
                     }
                 }
                 // If we reach here, either anonymous sign-in succeeded or custom token worked.
