@@ -2957,17 +2957,49 @@
             display: flex;
             flex-direction: column;
             padding: 20px;
-            transition: transform 0.3s ease-out; /* Smooth slide transition */
             transform: translateX(-100%); /* Hidden by default */
+            transition: transform .38s cubic-bezier(.22,.61,.36,1), box-shadow .2s ease;
+            will-change: transform;
+            overscroll-behavior: contain;
+            touch-action: pan-y;
         }
 
         #sidebarNav.sidebar-visible {
             transform: translateX(0); /* Show sidebar */
+            box-shadow: 8px 0 30px rgba(0,0,0,0.35);
         }
 
-        #sidebarNav.sidebar-hidden {
-            transform: translateX(-100%); /* Hide sidebar */
+        #sidebarNav.sidebar-hidden { transform: translateX(-100%); }
+
+        /* Backdrop behind sidebar */
+        .sidebar-backdrop{
+            position:fixed;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:opacity .25s ease;z-index:85;
         }
+        .sidebar-backdrop.show{opacity:1;visibility:visible}
+
+        /* Staggered link entrance */
+        .sidebar-links .sidebar-nav-item{opacity:0;transform:translateX(-8px)}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item{opacity:1;transform:translateX(0);transition:transform .32s ease,opacity .28s ease}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item:nth-child(1){transition-delay:40ms}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item:nth-child(2){transition-delay:70ms}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item:nth-child(3){transition-delay:100ms}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item:nth-child(4){transition-delay:130ms}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item:nth-child(5){transition-delay:160ms}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item:nth-child(6){transition-delay:190ms}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item:nth-child(7){transition-delay:220ms}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item:nth-child(8){transition-delay:250ms}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item:nth-child(9){transition-delay:280ms}
+        #sidebarNav.sidebar-visible .sidebar-links .sidebar-nav-item:nth-child(10){transition-delay:310ms}
+
+        /* Reduce motion accessibility */
+        @media (prefers-reduced-motion: reduce){
+            #sidebarNav{transition:none}
+            .sidebar-backdrop{transition:none}
+            .sidebar-links .sidebar-nav-item{opacity:1;transform:none;transition:none}
+        }
+
+        /* Shift content slightly when sidebar open */
+        body.sidebar-open header, body.sidebar-open #main-content{transform:translateX(8px);transition:transform .38s cubic-bezier(.22,.61,.36,1)}
 
         .sidebar-header {
             display: flex;
@@ -4202,6 +4234,7 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
         </div>
     </div>
     <!-- Sidebar Navigation -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop" aria-hidden="true"></div>
     <aside id="sidebarNav" class="sidebar-hidden" role="navigation" aria-label="Main Navigation">
         <div class="sidebar-header">
             <span class="sidebar-title">JCHAT Menu</span>
@@ -9548,22 +9581,43 @@ async function fetchAndDisplayPosts() {
         let isScrolling = false; // Track if user is scrolling
         let scrollTimeout; // Timeout for scroll detection
 
+        let sidebarPrevFocus = null;
+        function focusTrap(e){
+            if (e.key !== 'Tab') return;
+            const focusable = sidebarNav.querySelectorAll('a,button,[tabindex]:not([tabindex="-1"])');
+            if (!focusable.length) return;
+            const first = focusable[0], last = focusable[focusable.length-1];
+            if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+        }
+        function openSidebar(){
+            sidebarToggleState = true;
+            document.body.classList.add('sidebar-open');
+            sidebarNav.classList.remove('sidebar-hidden');
+            sidebarNav.classList.add('sidebar-visible');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (backdrop){ backdrop.classList.add('show'); backdrop.addEventListener('click', closeSidebar, { once:true }); }
+            sidebarPrevFocus = document.activeElement;
+            const firstLink = sidebarNav.querySelector('.sidebar-nav-item');
+            if (firstLink) firstLink.focus();
+            document.addEventListener('keydown', handleEscClose);
+            document.addEventListener('keydown', focusTrap);
+        }
+        function closeSidebar(){
+            sidebarToggleState = false;
+            document.body.classList.remove('sidebar-open');
+            sidebarNav.classList.remove('sidebar-visible');
+            sidebarNav.classList.add('sidebar-hidden');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            if (backdrop){ backdrop.classList.remove('show'); }
+            document.removeEventListener('keydown', handleEscClose);
+            document.removeEventListener('keydown', focusTrap);
+            if (sidebarPrevFocus && typeof sidebarPrevFocus.focus === 'function') sidebarPrevFocus.focus();
+        }
+        function handleEscClose(e){ if (e.key === 'Escape') closeSidebar(); }
         function toggleSidebar() {
-            // Only allow manual toggle, not auto-switching
-            if (isScrolling) {
-                console.log('JCHAT_DEBUG: Sidebar toggle blocked during scroll');
-                return;
-            }
-            
-            sidebarToggleState = !sidebarToggleState;
-            
-            if (sidebarToggleState) {
-                sidebarNav.classList.remove('sidebar-hidden');
-                sidebarNav.classList.add('sidebar-visible');
-            } else {
-                sidebarNav.classList.remove('sidebar-visible');
-                sidebarNav.classList.add('sidebar-hidden');
-            }
+            if (isScrolling) { console.log('JCHAT_DEBUG: Sidebar toggle blocked during scroll'); return; }
+            if (sidebarToggleState) closeSidebar(); else openSidebar();
         }
 
         // Prevent sidebar auto-toggle during scroll
@@ -10368,8 +10422,17 @@ async function fetchAndDisplayPosts() {
             sidebarCloseBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                toggleSidebar();
+                closeSidebar();
             });
+        }
+        // Swipe to close
+        let touchStartX=null, touchActive=false;
+        if (sidebarNav){
+            sidebarNav.addEventListener('touchstart', (e)=>{ touchActive=true; touchStartX=e.touches[0].clientX; }, {passive:true});
+            sidebarNav.addEventListener('touchmove', (e)=>{
+                if(!touchActive||touchStartX==null) return; const dx=e.touches[0].clientX - touchStartX; if (dx<-40){ closeSidebar(); touchActive=false; touchStartX=null; }
+            }, {passive:true});
+            sidebarNav.addEventListener('touchend', ()=>{ touchActive=false; touchStartX=null; }, {passive:true});
         }
         if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', handleLogout);
         const sidebarThemeLink = document.getElementById('sidebarThemeLink');
