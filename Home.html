@@ -7422,18 +7422,19 @@ async function checkAndStartDailyBonusTimer() {
 
                 // Create a pending reward for post creation for admin review.
                 if (postId) {
+                    const reward = await computeActivityReward('post_creation', { contentLen: content.length, mediaType, poll });
                     await createPendingActivityReward(
                         currentUser.uid,
                         currentUserProfileData.username,
                         'post_creation',
-                        20, // Suggested XP for post creation.
-                        5,  // Suggested JCoins for post creation.
-                        null, // No specific activityId for post creation itself.
-                        postId // Link to the created post.
+                        reward.xp,
+                        reward.jc,
+                        null,
+                        postId
                     );
+                    incrementDailyActivityCount('post');
+                    showMessageBox(`Post created! +${reward.xp} XP and +${reward.jc} JCoins pending admin review.`, 'success', true);
                 }
-
-                showMessageBox("Post created successfully! 20 XP and 5 JCoins are pending admin review.", 'success', true);
                 playNotificationSound('success');
                 // Clear input fields and previews after successful post creation.
                 postContentInput.value = '';
