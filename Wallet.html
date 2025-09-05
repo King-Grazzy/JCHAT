@@ -1131,7 +1131,7 @@
         <div class="fiat-value" id="localValueDisplay">≈ —</div>
     </div>
     <div class="fiat-col">
-        <div class="fiat-note">1 JCoin ≈</div>
+        <div class="fiat-note">100 JCoins ≈</div>
         <div class="fiat-value" id="oneJcoinRateDisplay">—</div>
     </div>
     <div class="fiat-col">
@@ -1762,9 +1762,9 @@ let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
             try {
                 const j = Number(currentProfile?.jCoins || 0);
                 const ngnValue = jcoinPerNaira > 0 ? (j / jcoinPerNaira) : 0;
-                const oneJcoinInNGN = jcoinPerNaira > 0 ? (1 / jcoinPerNaira) : 0;
+                const hundredJcoinsInNGN = jcoinPerNaira > 0 ? (100 / jcoinPerNaira) : 0;
                 const oneEl = document.getElementById('oneJcoinRateDisplay');
-                if (oneEl) oneEl.textContent = `₦${oneJcoinInNGN.toFixed(2)} NGN`;
+                if (oneEl) oneEl.textContent = `₦${hundredJcoinsInNGN.toFixed(2)} NGN`;
                 const localEl = document.getElementById('localValueDisplay');
                 if (localEl) {
                     if ((userCurrency.code || 'USD') === 'NGN') {
