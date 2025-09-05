@@ -1762,7 +1762,14 @@ let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
                 if (noteEl) noteEl.textContent = '1 JCoin =';
 
                 const oneEl = document.getElementById('oneJcoinRateDisplay');
-                if (oneEl) oneEl.textContent = `₦${ngnPerJcoin.toFixed(2)} NGN`;
+                if (oneEl) {
+                  if ((userCurrency.code || 'USD') === 'NGN') {
+                    oneEl.textContent = `₦${ngnPerJcoin.toFixed(2)} NGN`;
+                  } else {
+                    const oneLocal = ngnPerJcoin * fxRateNGNToLocal;
+                    oneEl.textContent = formatLocalCurrency(oneLocal);
+                  }
+                }
 
                 const localEl = document.getElementById('localValueDisplay');
                 if (localEl) {
