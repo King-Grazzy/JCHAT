@@ -5377,7 +5377,7 @@
                             buildThemePickerList();
                         }
                         
-                        // One-time and incremental unlock notifications per user
+                        // One-time and incremental unlock notifications per user (persisted per user)
                         const premiumThemeKeys = Object.keys(themeCatalog).filter(k => !themeCatalog[k].isFree);
                         const userKeyPrefix = `jchat_theme_unlocks_${userId}`;
                         const countKey = `${userKeyPrefix}_count`;
@@ -5385,15 +5385,24 @@
                         const prevCount = parseInt(localStorage.getItem(countKey) || '0', 10);
                         const currentUnlocked = (Array.isArray(data.themes) ? data.themes : []).filter(k => themeCatalog[k] && !themeCatalog[k].isFree);
                         const currentCount = currentUnlocked.length;
+                        const ackShown = !!data.ackAllThemesShown;
 
-                        if (currentCount === premiumThemeKeys.length && localStorage.getItem(ackKey) !== 'true') {
-                            showMessageBox('🎉 All premium themes unlocked!', 'success');
-                            localStorage.setItem(ackKey, 'true');
-                            localStorage.setItem(countKey, String(currentCount));
-                        } else if (currentCount > prevCount) {
-                            const delta = currentCount - prevCount;
-                            showMessageBox(`🎉 ${delta} premium theme(s) unlocked!`, 'success');
-                            localStorage.setItem(countKey, String(currentCount));
+                        if (!ackShown) {
+                            if (currentCount === premiumThemeKeys.length) {
+                                showMessageBox('🎉 All premium themes unlocked!', 'success');
+                                localStorage.setItem(ackKey, 'true');
+                                localStorage.setItem(countKey, String(currentCount));
+                                try {
+                                    updateDoc(userEntitlementsRef, { ackAllThemesShown: true, ackAllThemesShownAt: serverTimestamp() }).catch(() => {});
+                                } catch (_) {}
+                            } else if (currentCount > prevCount) {
+                                const delta = currentCount - prevCount;
+                                showMessageBox(`🎉 ${delta} premium theme(s) unlocked!`, 'success');
+                                localStorage.setItem(countKey, String(currentCount));
+                            }
+                        } else {
+                            if (localStorage.getItem(ackKey) !== 'true') localStorage.setItem(ackKey, 'true');
+                            if (prevCount !== currentCount) localStorage.setItem(countKey, String(currentCount));
                         }
                     }
                 }
