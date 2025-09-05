@@ -7686,13 +7686,14 @@ async function checkAndStartDailyBonusTimer() {
                 });
 
                 // Create a pending reward for comment deletion (negative XP/JCoins).
+                const pen = await computeActivityReward('comment_deletion');
                 await createPendingActivityReward(
                     commentAuthorId, // The user who originally posted the comment.
                     currentUserProfileData.username, // Using current user's username for logging purposes.
                     'comment_deletion',
-                    -2, // Suggested XP deduction for deleting a comment.
-                    -4,  // Suggested JCoin deduction for deleting a comment.
-                    commentId, // Pass commentId as activityId.
+                    pen.xp,
+                    pen.jc,
+                    commentId,
                     postId
                 );
 
