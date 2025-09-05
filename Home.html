@@ -2972,6 +2972,38 @@
 
         #sidebarNav.sidebar-hidden { transform: translateX(-100%); }
 
+        /* Smart scrollable sidebar enhancements */
+        #sidebarNav {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-gutter: stable both-edges;
+        }
+        #sidebarNav .sidebar-header {
+            position: sticky;
+            top: 0;
+            background: var(--header-background);
+            backdrop-filter: blur(6px) saturate(140%);
+            z-index: 2;
+        }
+        #sidebarNav::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: -1px;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--blue), var(--pink));
+            opacity: 0.9;
+            pointer-events: none;
+        }
+        /* Scrollbar styling */
+        #sidebarNav::-webkit-scrollbar { width: 8px; }
+        #sidebarNav::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--blue), var(--pink)); border-radius: 6px; }
+        #sidebarNav::-webkit-scrollbar-track { background: transparent; }
+        @supports (scrollbar-color: red blue) {
+            #sidebarNav { scrollbar-color: var(--blue) transparent; scrollbar-width: thin; }
+        }
+
         /* Backdrop behind sidebar */
         .sidebar-backdrop{
             position:fixed;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:opacity .25s ease;z-index:85;
