@@ -3810,14 +3810,9 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
                     <button id="sharePostInspirationButton" class="inspiration-action-button" disabled aria-label="Share Inspiration as Post">
                         <i class="fas fa-share-alt"></i> Share / Post
                     </button>
-                    <button id="customizeInspirationButton" class="inspiration-action-button" disabled aria-label="Customize Inspiration Type">
-                        <i class="fas fa-cog"></i> Customize Inspiration
-                    </button>
+                    <button id="customizeInspirationButton" class="inspiration-action-button" aria-label="Customize Inspiration Type" data-bound="1" disabled=""><i class="fas fa-cog"></i> Customize Inspiration </button>
                     <!-- NEW: Daily Bonus Button -->
-                    <button id="claimDailyBonusButton" class="inspiration-action-button" disabled aria-label="Claim Daily Bonus">
-                        <span class="button-text"><i class="fas fa-calendar-check"></i> Claim Daily Bonus</span>
-                        
-                    </button>
+                    <button id="claimDailyBonusButton" class="inspiration-action-button" aria-label="Claim Daily Bonus" data-bound="1" disabled=""><span class="button-text">Login to Claim Bonus</span></button>
                             </div>
             
             <!-- Share Inspiration Modal -->
@@ -3944,14 +3939,14 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
 
 
             <!-- Post Creation Section -->
-            <div class="post-creation-section" id="postCreationSection">
+            <div class="post-creation-section" id="postCreationSection" style="display: flex;">
                 <h3>Create New Post</h3>
-                <textarea id="postContent" placeholder="What's on your mind?" maxlength="50000" disabled aria-label="Post Content"></textarea>
+                <textarea id="postContent" placeholder="What's on your mind?" maxlength="50000" aria-label="Post Content" disabled=""></textarea>
                 <div class="media-upload-area">
                     <label for="postMediaUpload" class="file-input-label" aria-label="Add Media to Post">
                         <i class="fas fa-image"></i> Add Media
                     </label>
-                    <input type="file" id="postMediaUpload" accept="image/*,video/*" disabled>
+                    <input type="file" id="postMediaUpload" accept="image/*,video/*" disabled="">
                     <img id="mediaImagePreview" class="media-preview" src="" alt="Image Preview" loading="lazy" decoding="async" style="display: none;">
                     <video id="mediaVideoPreview" class="media-preview" src="" controls preload="metadata" playsinline style="display: none;"></video>
                 </div>
@@ -3974,7 +3969,7 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
                     </label>
                 </div>
                 <div class="post-actions">
-                    <button id="createPostButton" class="post-button" disabled aria-label="Create Post">
+                    <button id="createPostButton" class="post-button" aria-label="Create Post" disabled="">
                         <span class="button-text">Post</span>
                     </button>
                 </div>
