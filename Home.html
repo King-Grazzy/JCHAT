@@ -4418,16 +4418,18 @@
         
         // Offline Detection
         let isOnline = navigator.onLine;
+        if (!isOnline) {
+            window.location.replace('/offline.html');
+        }
         window.addEventListener('online', () => {
             isOnline = true;
-            showMessageBox('🟢 Connection restored! Back online.', 'success');
             console.log('JCHAT_DEBUG: Back online');
         });
-        
+
         window.addEventListener('offline', () => {
             isOnline = false;
-            showMessageBox('🔴 You are offline. Some features may be limited.', 'warning', true);
             console.log('JCHAT_DEBUG: Gone offline');
+            window.location.replace('/offline.html');
         });
 
         // Global Error Handling - Temporarily disabled for debugging
@@ -5375,12 +5377,23 @@
                             buildThemePickerList();
                         }
                         
-                        // Show notification if themes were just unlocked
-                        const unlockedThemes = data.themes.filter(themeKey => 
-                            themeCatalog[themeKey] && !isThemeLocked(themeKey)
-                        );
-                        if (unlockedThemes.length > 0) {
-                            showMessageBox(`🎉 ${unlockedThemes.length} premium theme(s) unlocked!`, 'success');
+                        // One-time and incremental unlock notifications per user
+                        const premiumThemeKeys = Object.keys(themeCatalog).filter(k => !themeCatalog[k].isFree);
+                        const userKeyPrefix = `jchat_theme_unlocks_${userId}`;
+                        const countKey = `${userKeyPrefix}_count`;
+                        const ackKey = `${userKeyPrefix}_all_ack`;
+                        const prevCount = parseInt(localStorage.getItem(countKey) || '0', 10);
+                        const currentUnlocked = (Array.isArray(data.themes) ? data.themes : []).filter(k => themeCatalog[k] && !themeCatalog[k].isFree);
+                        const currentCount = currentUnlocked.length;
+
+                        if (currentCount === premiumThemeKeys.length && localStorage.getItem(ackKey) !== 'true') {
+                            showMessageBox('🎉 All premium themes unlocked!', 'success');
+                            localStorage.setItem(ackKey, 'true');
+                            localStorage.setItem(countKey, String(currentCount));
+                        } else if (currentCount > prevCount) {
+                            const delta = currentCount - prevCount;
+                            showMessageBox(`🎉 ${delta} premium theme(s) unlocked!`, 'success');
+                            localStorage.setItem(countKey, String(currentCount));
                         }
                     }
                 }
@@ -10652,6 +10665,7 @@ async function fetchAndDisplayPosts() {
         // Load Premium Status
         async function loadPremiumStatus() {
             if (!currentUser) return;
+            if (!navigator.onLine) { deactivatePremiumFeatures(); return; }
 
             try {
                 const userRef = doc(db, 'artifacts', appId, 'users', currentUser.uid);
@@ -10742,10 +10756,10 @@ async function fetchAndDisplayPosts() {
                 premiumPostOptions.style.display = 'none';
             }
 
-            // Show premium request button
+            // Hide premium request button (never show this CTA)
             const premiumRequestBtn = document.getElementById('premiumRequestBtn');
             if (premiumRequestBtn) {
-                premiumRequestBtn.style.display = 'flex';
+                premiumRequestBtn.style.display = 'none';
             }
 
             // Remove premium theme
