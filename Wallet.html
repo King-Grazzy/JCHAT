@@ -1085,7 +1085,15 @@
     /* Layout helpers */
     .button-row { display:flex; gap:10px; justify-content:center; }
 </style>
-<style id="header-overflow-fix">/*header-overflow-fix*/header .header-content-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap}header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;justify-content:flex-end}#profileLink{display:inline-flex;align-items:center;column-gap:8px;row-gap:2px;flex-wrap:wrap;max-width:100%;min-width:0}#profileLink #headerDisplayName{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;flex:0 1 auto}#headerProfilePic,#headerAvatarIcon{flex:0 0 auto}@media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:6px}}</style></head>
+<style id="header-overflow-fix">/*header-overflow-fix*/header .header-content-wrapper{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:nowrap}header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:0;justify-content:flex-end}#profileLink{display:inline-flex;align-items:center;column-gap:8px;row-gap:2px;flex-wrap:wrap;max-width:100%;min-width:0}#profileLink #headerDisplayName{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;flex:0 1 auto}#headerProfilePic,#headerAvatarIcon{flex:0 0 auto}@media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:6px}}</style>
+<style>
+/* Fiat conversion styles */
+.fiat-conversion { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 8px 0 16px; }
+.fiat-col { display: flex; flex-direction: column; gap: 4px; }
+.fiat-note { font-size: 12px; opacity: 0.9; color: rgba(255,255,255,0.9); }
+.fiat-value { font-size: 16px; font-weight: 700; color: #fff; background: rgba(255,255,255,0.18); padding: 8px 12px; border-radius: 10px; backdrop-filter: blur(8px); }
+@media (max-width: 480px) { .fiat-conversion { flex-direction: column; align-items: flex-start; gap: 8px; } }
+</style></head>
 <body>
     <div class="floating-particles" id="floatingParticles"></div>
     <!-- Header -->
@@ -1117,6 +1125,16 @@
             <div class="balance-card">
                 <div class="balance-label">Total Balance</div>
                 <div class="balance-amount" id="totalBalance">0 JCoins</div>
+<div class="fiat-conversion" id="fiatConversion">
+    <div class="fiat-col">
+        <div class="fiat-note">Local value</div>
+        <div class="fiat-value" id="localValueDisplay">≈ —</div>
+    </div>
+    <div class="fiat-col">
+        <div class="fiat-note">1 JCoin ≈</div>
+        <div class="fiat-value" id="oneJcoinRateDisplay">—</div>
+    </div>
+</div>
                 <div class="balance-actions">
                     <button class="balance-btn" id="sendBtn">
                         <i class="fas fa-arrow-up"></i> Send
@@ -1639,9 +1657,11 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, runTransaction, query, orderBy, limit, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection, serverTimestamp, runTransaction, query, orderBy, limit, getDocs, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+        import { setUserCurrencyFromProfile, formatLocalCurrency } from './currency.js';
+
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyDz-8N0totzvMCvonF9pKj9RsoH3J8xL0w",
             authDomain: "jchat-1.firebaseapp.com",
             databaseURL: "https://jchat-1-default-rtdb.firebaseio.com",
@@ -1674,6 +1694,11 @@
         let txSearchTerm = ''; // Transaction search term for filtering
         let transactionsVisible = true; // Track transactions visibility state
 
+// Fiat conversion state
+let jcoinPerNaira = 7.5; // Default; will live-update from Firestore if available
+let fxRateNGNToLocal = 1; // NGN -> local currency FX rate
+let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
+
         // Functions
         function showToast(message, type = 'info') {
             toast.textContent = message;
@@ -1688,6 +1713,62 @@
             const u = new URL(window.location.href);
             const p = Object.fromEntries(u.searchParams.entries());
             return p;
+        }
+
+        // Fiat conversion helpers
+        function determineUserCurrency() {
+            try {
+                const res = setUserCurrencyFromProfile(currentProfile || null);
+                userCurrency = res || userCurrency;
+            } catch (_) {}
+        }
+
+        function subscribeJcoinRate() {
+            try {
+                const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
+                onSnapshot(settingsRef, (snap) => {
+                    const data = snap.exists() ? snap.data() : null;
+                    const rate = Number(data?.jcoinNairaRate);
+                    if (rate > 0) jcoinPerNaira = rate;
+                    updateFiatUI();
+                }, () => {});
+            } catch (_) {}
+        }
+
+        async function refreshFx() {
+            try {
+                if ((userCurrency.code || 'USD') === 'NGN') {
+                    fxRateNGNToLocal = 1;
+                    updateFiatUI();
+                    return;
+                }
+                const res = await fetch(`https://api.exchangerate.host/latest?base=NGN&symbols=${encodeURIComponent(userCurrency.code)}`);
+                const data = await res.json();
+                const r = data?.rates?.[userCurrency.code];
+                if (typeof r === 'number' && r > 0) {
+                    fxRateNGNToLocal = r;
+                }
+            } catch (_) {}
+            updateFiatUI();
+        }
+
+        function updateFiatUI() {
+            try {
+                const j = Number(currentProfile?.jCoins || 0);
+                const ngnValue = jcoinPerNaira > 0 ? (j / jcoinPerNaira) : 0;
+                const oneJcoinInNGN = jcoinPerNaira > 0 ? (1 / jcoinPerNaira) : 0;
+                const oneEl = document.getElementById('oneJcoinRateDisplay');
+                if (oneEl) oneEl.textContent = `₦${oneJcoinInNGN.toFixed(2)} NGN`;
+                const localEl = document.getElementById('localValueDisplay');
+                if (localEl) {
+                    if ((userCurrency.code || 'USD') === 'NGN') {
+                        localEl.textContent = `≈ ₦${ngnValue.toFixed(2)} NGN`;
+                    } else {
+                        const localVal = ngnValue * fxRateNGNToLocal;
+                        localEl.textContent = `≈ ${formatLocalCurrency(localVal)}`;
+                    }
+                }
+            } catch (_) {}
         }
 
         // Toggle transactions visibility
@@ -1778,6 +1859,7 @@
             }
             
             totalBalance.textContent = `${currentProfile?.jCoins ?? 0} JCoins`;
+            updateFiatUI();
         }
 
         async function renderTransactions() {
@@ -1857,7 +1939,11 @@
                 currentUser = user;
                 await loadProfile();
                 renderOverview();
+                determineUserCurrency();
+                subscribeJcoinRate();
+                refreshFx();
                 await renderTransactions();
+                updateFiatUI();
             } else {
                 authOverlay.classList.remove('hidden');
             }
