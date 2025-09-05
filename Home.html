@@ -3896,7 +3896,7 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
                 
                 <div class="premium-features-grid">
                     <div class="premium-feature-card">
-                        <div class="premium-feature-icon">🎨</div>
+                        <div class="premium-feature-icon">����</div>
                         <div class="premium-feature-title">Custom Themes</div>
                         <div class="premium-feature-desc">Choose from exclusive premium themes</div>
                         <div style="margin-top: 10px;">
@@ -5949,6 +5949,37 @@ function generateProceduralQuote(type) { const t = quoteTemplates[type] || quote
          * Checks the daily bonus status and starts/stops the countdown timer.
          * This is called on auth state change and after claiming a bonus.
          */
+        // Compute challenging daily reward amounts based on the user's current streak.
+        function computeDailyBonusFromStreak(streakCount, userId) {
+            const baseXp = 6; // small base to always reward
+            const baseJ = 2;
+            // Scale with streak: linear XP, sublinear JCoins for balance
+            const streakXp = Math.min(streakCount * 2, 80); // caps to avoid abuse
+            const streakJ = Math.min(Math.floor(Math.sqrt(streakCount)), 15);
+            // Weekly milestone boost (every 7th day)
+            const milestoneXp = (streakCount > 0 && streakCount % 7 === 0) ? 10 : 0;
+            const milestoneJ = (streakCount > 0 && streakCount % 7 === 0) ? 2 : 0;
+            // Deterministic tiny variance per day per user (0..2)
+            const dayIndex = Math.floor(Date.now() / 86400000);
+            const salt = (userId || 'guest').split('').reduce((a,c)=>a + c.charCodeAt(0), 0);
+            const variance = (salt + dayIndex * 7) % 3;
+            const xp = baseXp + streakXp + milestoneXp + variance;
+            const jc = baseJ + streakJ + Math.floor(variance / 2);
+            return { xp, jc };
+        }
+        // Read the current streak count for the logged-in user (no side effects)
+        async function getCurrentStreakCount() {
+            try {
+                if (!currentUser) return 0;
+                const streakDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'engagement', 'streak');
+                const streakSnap = await getDoc(streakDocRef);
+                if (streakSnap.exists()) {
+                    const d = streakSnap.data();
+                    return d.count || 0;
+                }
+            } catch (e) { console.warn('JCHAT_WARN: getCurrentStreakCount failed', e); }
+            return 0;
+        }
         async function checkAndStartDailyBonusTimer() {
             // Disable button and clear timer if not authenticated or profile not loaded.
             if (!currentUser || !currentUserProfileData) {
@@ -6007,6 +6038,10 @@ function generateProceduralQuote(type) { const t = quoteTemplates[type] || quote
             try {
                 const userProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
 
+                // Determine challenging reward based on streak
+                const streakCount = await getCurrentStreakCount();
+                const reward = computeDailyBonusFromStreak(streakCount, currentUser.uid);
+
                 // Update the lastLoginBonusClaimed timestamp in the user's private profile.
                 await updateDoc(userProfileDocRef, {
                     lastLoginBonusClaimed: serverTimestamp(),
@@ -6018,11 +6053,11 @@ function generateProceduralQuote(type) { const t = quoteTemplates[type] || quote
                     currentUser.uid,
                     currentUserProfileData.username,
                     'daily_login',
-                    10, // Suggested XP reward for daily login
-                    3  // Suggested JCoin reward for daily login
+                    reward.xp,
+                    reward.jc
                 );
 
-                showMessageBox(`Daily bonus claimed! 10 XP and 3 JCoins are pending admin review.`, 'success');
+                showMessageBox(`Daily bonus claimed! +${reward.xp} XP and +${reward.jc} JCoins (streak-based) pending admin review.`, 'success');
                 playNotificationSound('success');
 
                 // Update local profile data immediately for UI consistency (especially for the timer).
