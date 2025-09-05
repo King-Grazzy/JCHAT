@@ -5484,6 +5484,10 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
                 sharePostInspirationButton = document.getElementById('sharePostInspirationButton');
                 customizeInspirationButton = document.getElementById('customizeInspirationButton');
                 claimDailyBonusButton = document.getElementById('claimDailyBonusButton');
+                if (enableFixedInspirationOverride && customizeInspirationButton) {
+                    customizeInspirationButton.disabled = true;
+                    customizeInspirationButton.setAttribute('title', 'Inspiration is locked by admin.');
+                }
 
                 // Customize Inspiration Modal elements
                 customizeInspirationModal = document.getElementById('customizeInspirationModal');
@@ -5627,7 +5631,10 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
 
         // --- Inspiration Quotes Data (Local Fallback) ---
         // These are used as the primary source of inspiration quotes.
-        const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+        const enableFixedInspirationOverride = true;
+const fixedInspirationQuote = 'Breathe: peace finds its way in.';
+const fixedInspirationAuthor = 'JCHAT';
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
         const quoteTemplates = {
             motivational: { openers:["Keep going","Start small","Believe in yourself","Stay consistent","Trust the process"], bridges:["—"," because ",": ",", and ","; "], endings:["every step counts.","tomorrow thanks you for today's effort.","progress loves momentum.","you're closer than you think.","discipline builds destiny."] },
             peaceful: { openers:["Breathe","Slow down","Be gentle","Find quiet","Let go"], bridges:["—"," and ",", then "," as ",": "], endings:["clarity will meet you.","peace finds its way in.","the heart softens.","the mind untangles.","you return to yourself."] },
@@ -7052,6 +7059,11 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
          * Displays the time-based inspiration quote.
          */
         async function displayInspiration() {
+            if (enableFixedInspirationOverride) {
+                if (inspirationQuoteElement) inspirationQuoteElement.textContent = `"${fixedInspirationQuote}"`;
+                if (inspirationAuthorElement) inspirationAuthorElement.textContent = `- ${fixedInspirationAuthor}`;
+                return;
+            }
             const chosen = (currentUserProfileData?.inspirationType) || null;
             if (chosen === 'off') {
                 if (inspirationQuoteElement) inspirationQuoteElement.textContent = "Inspiration is turned off.";
@@ -7070,6 +7082,11 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
         function startInspirationDisplay(type) {
             if (inspirationIntervalId) {
                 clearInterval(inspirationIntervalId); // Clear any existing interval.
+            }
+            if (enableFixedInspirationOverride) {
+                inspirationIntervalId = null; // Do not rotate when locked.
+                displayInspiration();
+                return;
             }
             if (currentUserProfileData) {
                 currentUserProfileData.inspirationType = type; // Update local profile data.
