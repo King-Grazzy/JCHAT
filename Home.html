@@ -10624,14 +10624,26 @@ async function fetchAndDisplayPosts() {
                 closeSidebar();
             });
         }
-        // Swipe to close
-        let touchStartX=null, touchActive=false;
+        // Swipe to close (horizontal gesture only)
+        let touchStartX = null, touchStartY = null, touchActive = false;
         if (sidebarNav){
-            sidebarNav.addEventListener('touchstart', (e)=>{ touchActive=true; touchStartX=e.touches[0].clientX; }, {passive:true});
-            sidebarNav.addEventListener('touchmove', (e)=>{
-                if(!touchActive||touchStartX==null) return; const dx=e.touches[0].clientX - touchStartX; if (dx<-40){ closeSidebar(); touchActive=false; touchStartX=null; }
+            sidebarNav.addEventListener('touchstart', (e)=>{
+                touchActive = true;
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
             }, {passive:true});
-            sidebarNav.addEventListener('touchend', ()=>{ touchActive=false; touchStartX=null; }, {passive:true});
+            sidebarNav.addEventListener('touchmove', (e)=>{
+                if(!touchActive || touchStartX == null || touchStartY == null) return;
+                const dx = e.touches[0].clientX - touchStartX;
+                const dy = e.touches[0].clientY - touchStartY;
+                if (Math.abs(dx) > Math.abs(dy) && dx < -60){
+                    closeSidebar();
+                    touchActive = false;
+                    touchStartX = null;
+                    touchStartY = null;
+                }
+            }, {passive:true});
+            sidebarNav.addEventListener('touchend', ()=>{ touchActive=false; touchStartX=null; touchStartY=null; }, {passive:true});
         }
         if (sidebarLogoutLink) sidebarLogoutLink.addEventListener('click', handleLogout);
         const sidebarThemeLink = document.getElementById('sidebarThemeLink');
