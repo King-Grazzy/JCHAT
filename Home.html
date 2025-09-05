@@ -7498,8 +7498,8 @@ async function checkAndStartDailyBonusTimer() {
                         if (reactionType === 'like') serverLikesCount = Math.max(0, serverLikesCount - 1);
                         transaction.delete(userReactionRef);
                         activityType = `unreact_${reactionType}`;
-                        xpReward = -3; // Suggested XP deduction for un-reacting.
-                        jCoinReward = -2; // Suggested JCoin deduction for un-reacting.
+                        const neg = await computeActivityReward(activityType, { reactionType, isUndo:true });
+                        xpReward = neg.xp; jCoinReward = neg.jc;
                     } else {
                         // User is reacting or changing reaction:
                         // If there was a previous reaction, decrement its count.
