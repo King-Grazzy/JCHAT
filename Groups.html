@@ -3015,7 +3015,9 @@
             }
 
             if (currentUserProfileData.jCoins < GROUP_CREATION_COST) {
-                showMessageBox(`You need ${GROUP_CREATION_COST} JCoins to create a group. You have ${currentUserProfileData.jCoins}.`, "error");
+                const deficit = GROUP_CREATION_COST - (currentUserProfileData.jCoins || 0);
+                const wantRequest = await showCustomConfirm(`You need ${GROUP_CREATION_COST} JCoins but have ${currentUserProfileData.jCoins}. Submit a top-up request for ${deficit} JCoins?`);
+                if (wantRequest) { await requestJCoinsTopUp(deficit, 'group_creation'); }
                 return;
             }
 
@@ -3248,6 +3250,39 @@
                 console.log(`JCHAT_DEBUG: Pending activity reward created for ${activityType}.`);
             } catch (error) {
                 console.error("JCHAT_ERROR: Error creating pending activity reward:", error);
+            }
+        }
+
+        // Create a JCoin top-up request for admin approval
+        async function requestJCoinsTopUp(requestedJCoins, contextLabel = 'usage') {
+            try {
+                if (!currentUser) { showMessageBox('Please log in.', 'warning'); return false; }
+                const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
+                let jcoinPerNaira = 7.5;
+                try {
+                    const snap = await getDoc(settingsRef);
+                    if (snap.exists() && typeof snap.data().jcoinNairaRate === 'number' && snap.data().jcoinNairaRate > 0) {
+                        jcoinPerNaira = snap.data().jcoinNairaRate;
+                    }
+                } catch(_) {}
+                const requestedNairaPrice = Math.ceil(requestedJCoins / jcoinPerNaira);
+                const reqCol = collection(db, 'artifacts', appId, 'public', 'data', 'jcoin_buy_requests');
+                await addDoc(reqCol, {
+                    userId: currentUser.uid,
+                    username: currentUserProfileData?.username || currentUser.email || 'User',
+                    profilePicId: currentUserProfileData?.profilePicId || null,
+                    requestedJCoins: requestedJCoins,
+                    requestedNairaPrice: requestedNairaPrice,
+                    status: 'pending',
+                    context: contextLabel,
+                    timestamp: serverTimestamp()
+                });
+                showMessageBox('Top-up request submitted for admin approval.', 'success');
+                return true;
+            } catch (e) {
+                console.error('JCHAT_ERROR: Failed to submit JCoin request', e);
+                showMessageBox(e?.message || 'Failed to submit top-up request', 'error');
+                return false;
             }
         }
 
@@ -3602,7 +3637,9 @@
                 return;
             }
             if (!currentUserProfileData || currentUserProfileData.jCoins < cost) {
-                showMessageBox("Insufficient JCoins to activate this boost.", "error");
+                const deficit = cost - (currentUserProfileData?.jCoins || 0);
+                const ok = await showCustomConfirm(`Insufficient JCoins. Submit a top-up request for ${deficit} JCoins to activate this boost?`);
+                if (ok) { await requestJCoinsTopUp(deficit, `group_${type}_boost`); }
                 return;
             }
 
@@ -3675,7 +3712,9 @@
                 return;
             }
             if (donateAmount > currentUserProfileData.jCoins) {
-                showMessageBox("You do not have enough JCoins to donate this amount.", "error");
+                const deficit = donateAmount - (currentUserProfileData.jCoins || 0);
+                const ok = await showCustomConfirm(`You lack ${deficit} JCoins. Submit a top-up request to complete this donation?`);
+                if (ok) { await requestJCoinsTopUp(deficit, 'group_donation'); }
                 return;
             }
 
