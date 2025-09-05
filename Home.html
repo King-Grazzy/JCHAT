@@ -7619,7 +7619,13 @@ async function checkAndStartDailyBonusTimer() {
                 }
 
                 addComment.replyContext = null;
-                showMessageBox(`Comment added! +${commentText.length ? '' : ''}${' '}${''} +${''} `, 'success');
+                // Show result using computed reward
+                if (typeof computeActivityReward === 'function') {
+                    const reward = await computeActivityReward('post_comment', { contentLen: commentText.length, isReply: !!replyingTo, isFirstOnPost: wasFirstComment });
+                    showMessageBox(`Comment added! +${reward.xp} XP and +${reward.jc} JCoins pending admin review.`, 'success');
+                } else {
+                    showMessageBox('Comment added! Pending admin review.', 'success');
+                }
                 playNotificationSound('success');
             } catch (error) {
                 console.error("JCHAT_ERROR: Error adding comment:", error);
