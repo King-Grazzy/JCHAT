@@ -9290,14 +9290,21 @@
                             const isVerified = displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true;
                             const verificationRequested = displayedUserProfileData.verificationRequested === true;
                             if (isCurrentUserProfile) {
-                                if (privacyVerificationSection) privacyVerificationSection.style.display = 'block';
-                                if (verificationStatusText) {
-                                    if (isVerified) verificationStatusText.textContent = 'Status: Verified';
-                                    else if (verificationRequested) verificationStatusText.textContent = 'Status: Requested';
-                                    else verificationStatusText.textContent = 'Status: Not requested';
-                                }
-                                if (requestVerificationBtn) {
-                                    requestVerificationBtn.disabled = isVerified || verificationRequested;
+                                // If already verified, hide the request path completely
+                                if (isVerified) {
+                                    if (privacyVerificationSection) privacyVerificationSection.style.display = 'none';
+                                    if (verificationStatusText) verificationStatusText.textContent = 'Status: Verified';
+                                } else {
+                                    if (privacyVerificationSection) privacyVerificationSection.style.display = 'block';
+                                    if (verificationStatusText) {
+                                        if (verificationRequested) verificationStatusText.textContent = 'Status: Requested';
+                                        else verificationStatusText.textContent = 'Status: Not requested';
+                                    }
+
+                                    if (requestVerificationBtn) {
+                                        // Disable the button if a request is already pending
+                                        requestVerificationBtn.disabled = verificationRequested;
+                                    }
                                 }
                             } else {
                                 if (privacyVerificationSection) privacyVerificationSection.style.display = 'none';
