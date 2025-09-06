@@ -1747,15 +1747,34 @@
                                 <!-- Approve Paid Badge Tool -->
                                 <div class="management-card">
                                     <h4>Approve Paid Badge</h4>
-                                    <p style="margin:0 0 8px 0; color:var(--text-light);">Quickly approve a verified badge for a paid user. You can enter a User ID or Username, or leave empty to use the currently looked-up user.</p>
+                                    <p style="margin:0 0 8px 0; color:var(--text-light);">Quickly approve a verified badge for a paid user. Enter a User ID/Username or leave empty to use the currently looked-up user.</p>
                                     <div class="input-group">
                                         <label for="badgeApprovalUserInput">User ID or Username</label>
                                         <input type="text" id="badgeApprovalUserInput" placeholder="Optional - leave empty to use looked-up user">
                                     </div>
-                                    <div class="button-group">
+
+                                    <div style="display:flex; gap:8px; margin-top:8px;">
                                         <button id="badgeLookupBtn" class="admin-button secondary"><span class="button-text"><i class="fas fa-search"></i> Lookup</span></button>
                                         <button id="badgeApproveBtn" class="admin-button primary"><span class="button-text"><i class="fas fa-check-circle"></i> Approve Badge</span></button>
+                                        <button id="badgeDenyBtn" class="admin-button danger"><span class="button-text"><i class="fas fa-times-circle"></i> Deny Badge</span></button>
                                     </div>
+
+                                    <div style="margin-top:12px;">
+                                        <h5 style="margin:6px 0 4px 0;">Email Template (Verification)</h5>
+                                        <div class="input-group">
+                                            <label for="emailTemplateSubject">Subject</label>
+                                            <input type="text" id="emailTemplateSubject" placeholder="Subject template">
+                                        </div>
+                                        <div class="input-group">
+                                            <label for="emailTemplateBody">Body (use {{username}} and {{admin}})</label>
+                                            <textarea id="emailTemplateBody" rows="4" placeholder="Email body template"></textarea>
+                                        </div>
+                                        <div class="button-group">
+                                            <button id="saveEmailTemplateBtn" class="admin-button secondary"><span class="button-text"><i class="fas fa-save"></i> Save Template</span></button>
+                                            <button id="sendEmailPreviewBtn" class="admin-button"><span class="button-text"><i class="fas fa-envelope"></i> Send Preview</span></button>
+                                        </div>
+                                    </div>
+
                                     <div id="badgeApprovalResult" style="margin-top:8px; color:var(--text-light);"></div>
                                 </div>
 
@@ -2125,7 +2144,14 @@
         const badgeApprovalUserInput = document.getElementById('badgeApprovalUserInput');
         const badgeLookupBtn = document.getElementById('badgeLookupBtn');
         const badgeApproveBtn = document.getElementById('badgeApproveBtn');
+        const badgeDenyBtn = document.getElementById('badgeDenyBtn');
         const badgeApprovalResult = document.getElementById('badgeApprovalResult');
+
+        // Email template elements
+        const emailTemplateSubject = document.getElementById('emailTemplateSubject');
+        const emailTemplateBody = document.getElementById('emailTemplateBody');
+        const saveEmailTemplateBtn = document.getElementById('saveEmailTemplateBtn');
+        const sendEmailPreviewBtn = document.getElementById('sendEmailPreviewBtn');
 
         const currentJCoinsValue = document.getElementById('currentJCoinsValue');
         const jcoinAmountInput = document.getElementById('jcoinAmountInput');
@@ -2330,6 +2356,32 @@
                     timestamp: serverTimestamp()
                 });
 
+                // Enqueue email using template
+                try {
+                    const publicProfileSnap = await getDoc(publicProfileRef);
+                    const publicData = publicProfileSnap.exists() ? publicProfileSnap.data() : {};
+                    const toEmail = publicData?.email || privateData?.email || null;
+                    if (toEmail) {
+                        // fetch template
+                        const tmplRef = doc(db, 'artifacts', appId, 'public', 'data', 'email_templates', 'verification_badge');
+                        const tmplSnap = await getDoc(tmplRef);
+                        const tmpl = tmplSnap.exists() ? tmplSnap.data() : null;
+                        const subject = (tmpl && tmpl.approved && tmpl.approved.subject) ? tmpl.approved.subject : 'Your account is verified';
+                        const bodyTemplate = (tmpl && tmpl.approved && tmpl.approved.body) ? tmpl.approved.body : 'Hi {{username}},\n\nYour account has been verified by {{admin}}.';
+                        const body = (bodyTemplate || '').replace(/{{username}}/g, publicData?.username || privateData?.username || '').replace(/{{admin}}/g, currentUserProfileData?.username || 'Admin');
+                        await addDoc(collection(db, `artifacts/${appId}/public/data/email_queue`), {
+                            to: toEmail,
+                            subject: subject,
+                            body: body,
+                            status: 'pending',
+                            createdAt: serverTimestamp(),
+                            metadata: { action: 'approve_badge', adminId: currentUser?.uid || null, userId }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Failed to enqueue email:', e);
+                }
+
                 badgeApprovalResult.textContent = 'Badge approved successfully.';
                 // Refresh looked up user display if it matches
                 if (lookedUpUserId === userId) {
@@ -2345,7 +2397,90 @@
         // Wire up buttons
         if (badgeLookupBtn) badgeLookupBtn.addEventListener('click', async () => { await lookupUserForBadge(); });
         if (badgeApproveBtn) badgeApproveBtn.addEventListener('click', async () => { const target = badgeTargetUserId || lookedUpUserId; if (!target) { badgeApprovalResult.textContent = 'No user selected. Use lookup first.'; return; } await approveBadgeForUser(target); });
+        if (badgeDenyBtn) badgeDenyBtn.addEventListener('click', async () => { const target = badgeTargetUserId || lookedUpUserId; if (!target) { badgeApprovalResult.textContent = 'No user selected. Use lookup first.'; return; } await denyBadgeForUser(target); });
         const errorSynth = new Tone.Synth().toDestination();
+
+        // Deny badge flow
+        async function denyBadgeForUser(userId) {
+            badgeApprovalResult.textContent = '';
+            try {
+                if (!userId) { badgeApprovalResult.textContent = 'No target user selected.'; return; }
+                const privateProfileRef = doc(db, 'artifacts', appId, 'users', userId, 'profiles', 'user_profile');
+                const publicProfileRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userId);
+
+                // Log denial
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'admin_logs'), {
+                    action: 'deny_badge', adminId: currentUser?.uid || 'unknown', adminUsername: currentUserProfileData?.username || null, userId, timestamp: serverTimestamp()
+                });
+
+                // Optionally clear any pending verification flags (do not set isVerified)
+                await updateDoc(privateProfileRef, { verificationRequested: false, verificationDeniedAt: serverTimestamp(), verificationDeniedBy: currentUser?.uid || null }).catch(()=>{});
+
+                // Send notification
+                await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'notifications'), { title: 'Verification Denied', message: 'Your verification request was denied by an admin.', read: false, timestamp: serverTimestamp() });
+
+                // Enqueue email for denial
+                try {
+                    const publicProfileSnap = await getDoc(publicProfileRef);
+                    const privateSnap = await getDoc(privateProfileRef);
+                    const publicData = publicProfileSnap.exists() ? publicProfileSnap.data() : {};
+                    const privateData = privateSnap.exists() ? privateSnap.data() : {};
+                    const toEmail = publicData?.email || privateData?.email || null;
+                    if (toEmail) {
+                        const tmplRef = doc(db, 'artifacts', appId, 'public', 'data', 'email_templates', 'verification_badge');
+                        const tmplSnap = await getDoc(tmplRef);
+                        const tmpl = tmplSnap.exists() ? tmplSnap.data() : null;
+                        const subject = (tmpl && tmpl.denied && tmpl.denied.subject) ? tmpl.denied.subject : 'Verification request denied';
+                        const bodyTemplate = (tmpl && tmpl.denied && tmpl.denied.body) ? tmpl.denied.body : 'Hi {{username}},\n\nYour verification request has been denied by {{admin}}.';
+                        const body = (bodyTemplate || '').replace(/{{username}}/g, publicData?.username || privateData?.username || '').replace(/{{admin}}/g, currentUserProfileData?.username || 'Admin');
+                        await addDoc(collection(db, `artifacts/${appId}/public/data/email_queue`), { to: toEmail, subject, body, status: 'pending', createdAt: serverTimestamp(), metadata: { action: 'deny_badge', adminId: currentUser?.uid || null, userId } });
+                    }
+                } catch (e) { console.error('Failed to enqueue deny email:', e); }
+
+                badgeApprovalResult.textContent = 'Badge denied and user notified.';
+                if (lookedUpUserId === userId) { if (typeof fetchAndDisplayLookedUpUser === 'function') fetchAndDisplayLookedUpUser(userId); }
+            } catch (err) {
+                console.error('Error denying badge:', err);
+                badgeApprovalResult.textContent = 'Deny failed: ' + (err.message || err);
+            }
+        }
+
+        // Email template management
+        async function loadEmailTemplate() {
+            try {
+                const tmplRef = doc(db, 'artifacts', appId, 'public', 'data', 'email_templates', 'verification_badge');
+                const snapT = await getDoc(tmplRef);
+                if (snapT.exists()) {
+                    const data = snapT.data();
+                    emailTemplateSubject.value = data?.approved?.subject || data?.default?.approved?.subject || '';
+                    emailTemplateBody.value = data?.approved?.body || data?.default?.approved?.body || '';
+                } else {
+                    emailTemplateSubject.value = 'Your account has been verified';
+                    emailTemplateBody.value = 'Hi {{username}},\n\nYour account has been verified by {{admin}}.';
+                }
+            } catch (e) { console.error('Failed to load email template:', e); }
+        }
+
+        async function saveEmailTemplate() {
+            try {
+                const tmplRef = doc(db, 'artifacts', appId, 'public', 'data', 'email_templates', 'verification_badge');
+                await setDoc(tmplRef, { approved: { subject: emailTemplateSubject.value || '', body: emailTemplateBody.value || '' } }, { merge: true });
+                badgeApprovalResult.textContent = 'Template saved.';
+            } catch (e) { console.error('Failed to save email template:', e); badgeApprovalResult.textContent = 'Save failed.'; }
+        }
+
+        if (saveEmailTemplateBtn) saveEmailTemplateBtn.addEventListener('click', saveEmailTemplate);
+        if (sendEmailPreviewBtn) sendEmailPreviewBtn.addEventListener('click', async () => {
+            // send preview to admin email
+            try {
+                const adminEmail = currentUserProfileData?.email || null;
+                if (!adminEmail) { badgeApprovalResult.textContent = 'No admin email available for preview.'; return; }
+                const subject = emailTemplateSubject.value || 'Preview: Verified';
+                const body = (emailTemplateBody.value || 'Hi {{username}},\n\nVerified by {{admin}}').replace(/{{username}}/g, currentUserProfileData?.username || 'User').replace(/{{admin}}/g, currentUserProfileData?.username || 'Admin');
+                await addDoc(collection(db, `artifacts/${appId}/public/data/email_queue`), { to: adminEmail, subject, body, status: 'pending', createdAt: serverTimestamp(), metadata: { preview: true } });
+                badgeApprovalResult.textContent = 'Preview queued to your email.';
+            } catch (e) { console.error('Preview send failed:', e); badgeApprovalResult.textContent = 'Preview failed.'; }
+        });
         const infoSynth = new Tone.Synth().toDestination();
 
         successSynth.oscillator.type = "sine";
