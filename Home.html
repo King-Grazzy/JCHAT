@@ -5982,22 +5982,11 @@ function generateProceduralQuote(type) { const t = quoteTemplates[type] || quote
          * Checks the daily bonus status and starts/stops the countdown timer.
          * This is called on auth state change and after claiming a bonus.
          */
-        // Compute challenging daily reward amounts based on the user's current streak.
+        // Compute daily bonus (Hard mode): only if checklist met AND streak ≥ 3; small 1–3 J
         function computeDailyBonusFromStreak(streakCount, userId) {
-            const baseXp = 6; // small base to always reward
-            const baseJ = 2;
-            // Scale with streak: linear XP, sublinear JCoins for balance
-            const streakXp = Math.min(streakCount * 2, 80); // caps to avoid abuse
-            const streakJ = Math.min(Math.floor(Math.sqrt(streakCount)), 15);
-            // Weekly milestone boost (every 7th day)
-            const milestoneXp = (streakCount > 0 && streakCount % 7 === 0) ? 10 : 0;
-            const milestoneJ = (streakCount > 0 && streakCount % 7 === 0) ? 2 : 0;
-            // Deterministic tiny variance per day per user (0..2)
-            const dayIndex = Math.floor(Date.now() / 86400000);
-            const salt = (userId || 'guest').split('').reduce((a,c)=>a + c.charCodeAt(0), 0);
-            const variance = (salt + dayIndex * 7) % 3;
-            const xp = baseXp + streakXp + milestoneXp + variance;
-            const jc = baseJ + streakJ + Math.floor(variance / 2);
+            const baseXp = 3; // tiny XP
+            const jc = Math.max(0, Math.min(3, streakCount >= 3 ? 1 + Math.floor(Math.sqrt(streakCount)) : 0));
+            const xp = baseXp + Math.min(streakCount, 10);
             return { xp, jc };
         }
         // Read the current streak count for the logged-in user (no side effects)
@@ -6014,45 +6003,48 @@ function generateProceduralQuote(type) { const t = quoteTemplates[type] || quote
             return 0;
         }
         // Local daily activity counters and unified reward computation for posts, reactions, comments
-function _dailyKey(activity){ const d=new Date(); d.setHours(0,0,0,0); const uid=currentUser?.uid||'guest'; return `jchat-activity-count-${activity}-${uid}-${d.getTime()}`; }
+        function _dailyKey(activity){ const d=new Date(); d.setHours(0,0,0,0); const uid=currentUser?.uid||'guest'; return `jchat-activity-count-${activity}-${uid}-${d.getTime()}`; }
 function getDailyActivityCount(activity){ try{ return parseInt(localStorage.getItem(_dailyKey(activity))||'0',10)||0; }catch{ return 0; } }
 function incrementDailyActivityCount(activity){ try{ const k=_dailyKey(activity); const n=(parseInt(localStorage.getItem(k)||'0',10)||0)+1; localStorage.setItem(k,String(n)); }catch{} }
+function _dailyAccruedKey(){ const d=new Date(); d.setHours(0,0,0,0); const uid=currentUser?.uid||'guest'; return `jchat-daily-jc-${uid}-${d.getTime()}`; }
+function _monthlyAccruedKey(){ const uid=currentUser?.uid||'guest'; const y=new Date().getFullYear(); const m=(new Date().getMonth()+1).toString().padStart(2,'0'); return `jchat-monthly-jc-${uid}-${y}${m}`; }
+function getAccrued(name){ try{ return parseInt(localStorage.getItem(name)||'0',10)||0; }catch{ return 0; } }
+function addAccruedDailyMonthly(jc){ try{ localStorage.setItem(_dailyAccruedKey(), String(getAccrued(_dailyAccruedKey())+jc)); localStorage.setItem(_monthlyAccruedKey(), String(getAccrued(_monthlyAccruedKey())+jc)); }catch{} }
+function meetsDailyChecklist(){ return getDailyActivityCount('post')>=15 && getDailyActivityCount('comment')>=50 && getDailyActivityCount('reaction')>=100; }
+function capsReduce(jc){ const DAILY_CAP=10, MONTHLY_CAP=400; const d=getAccrued(_dailyAccruedKey()); const m=getAccrued(_monthlyAccruedKey()); const remainD=Math.max(0,DAILY_CAP-d); const remainM=Math.max(0,MONTHLY_CAP-m); return Math.max(0, Math.min(jc, remainD, remainM)); }
 async function computeActivityReward(activityType, ctx={}){
-  const streak = await getCurrentStreakCount();
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,Math.floor(v)));
-  const milestone = (streak>0 && streak%7===0)?{xp:8,jc:1}:{xp:0,jc:0};
+  // Negative activities pass through
+  if (activityType==='unreact_like'||activityType==='unreact_love'||activityType==='unreact_haha') return {xp:-3,jc:-1};
+  if (activityType==='comment_deletion') return {xp:-4,jc:-3};
+  if (activityType==='post_deletion') return {xp:-18,jc:-6};
+  // Hard mode gate: require checklist before earning JCoins
+  const checklistOK = meetsDailyChecklist();
+  // Minimal XP always; JCoins only if checklist satisfied
   if (activityType==='post_creation'){
     const len = clamp(ctx.contentLen||0,0,5000);
-    const mediaType = ctx.mediaType||'text';
-    const hasPoll = !!ctx.poll;
-    let xp = 12 + Math.floor(len/100) + Math.min(streak,30);
-    let jc = 3 + Math.floor(len/180);
-    if (mediaType==='image'){ xp+=6; jc+=2; }
-    else if (mediaType==='video'){ xp+=10; jc+=3; }
-    if (hasPoll){ xp+=3; jc+=1; }
-    const c=getDailyActivityCount('post'); const scale=Math.max(0.45,1-0.18*c);
-    xp=clamp(xp*scale + milestone.xp,6,100); jc=clamp(jc*scale + milestone.jc,1,20);
-    return {xp,jc};
+    const valid = len>=140; // long-form only
+    let xp = valid ? 6 : 1;
+    let jc = valid && checklistOK ? 0.2 : 0; // 0.2 J per post
+    jc = capsReduce(Math.floor(jc*100)/100); // keep two decimals, then cap
+    if (jc>0) addAccruedDailyMonthly(jc);
+    return { xp, jc };
   }
   if (activityType && activityType.startsWith('react_')){
-    const rt=ctx.reactionType||'like'; let baseXp=2, baseJ=1; if(rt==='love'||rt==='haha') baseXp+=1;
-    const c=getDailyActivityCount('reaction'); const scale=Math.max(0.2,1-0.08*c);
-    const xp=clamp(baseXp*scale + Math.min(Math.floor(streak/10),4),0,10);
-    let jc=clamp(baseJ*scale,0,3); if(c>30) jc=0; return {xp,jc};
-  }
-  if (activityType==='unreact_like'||activityType==='unreact_love'||activityType==='unreact_haha'){
-    return {xp:-3,jc:-1};
+    // Reactions do not pay JCoins; tiny XP only
+    return { xp: 1, jc: 0 };
   }
   if (activityType==='post_comment'){
-    const len=clamp(ctx.contentLen||0,0,2000); const isReply=!!ctx.isReply; const isFirst=!!ctx.isFirstOnPost;
-    let xp=3+Math.floor(len/60)+Math.min(Math.floor(streak/3),10); let jc=2+Math.floor(len/120);
-    if(isReply) xp+=1; if(isFirst){ xp+=2; jc+=1; }
-    const c=getDailyActivityCount('comment'); const scale=Math.max(0.4,1-0.12*c);
-    xp=clamp(xp*scale + milestone.xp,2,40); jc=clamp(jc*scale + milestone.jc,1,12); return {xp,jc};
+    const len = clamp(ctx.contentLen||0,0,5000);
+    const valid = len>=60;
+    let xp = valid ? 2 : 1;
+    let jc = valid && checklistOK ? 0.05 : 0; // 0.05 J per comment
+    jc = capsReduce(Math.floor(jc*100)/100);
+    if (jc>0) addAccruedDailyMonthly(jc);
+    return { xp, jc };
   }
-  if (activityType==='comment_deletion'){ return {xp:-4,jc:-3}; }
-  if (activityType==='post_deletion'){ return {xp:-18,jc:-6}; }
-  return {xp:0,jc:0};
+  // Default: no coins
+  return { xp: 0, jc: 0 };
 }
 async function checkAndStartDailyBonusTimer() {
             // Disable button and clear timer if not authenticated or profile not loaded.
@@ -6110,10 +6102,18 @@ async function checkAndStartDailyBonusTimer() {
             showMessageBox("Claiming daily bonus...", 'loading', true);
 
             try {
+                if (!meetsDailyChecklist()) {
+                    showMessageBox("Complete today’s checklist first: 15 posts, 50 comments, 100 reactions.", 'warning');
+                    return;
+                }
                 const userProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
 
-                // Determine challenging reward based on streak
+                // Determine strict reward based on streak
                 const streakCount = await getCurrentStreakCount();
+                if (streakCount < 3) {
+                    showMessageBox("Build a 3‑day streak to unlock the Daily Bonus.", 'warning');
+                    return;
+                }
                 const reward = computeDailyBonusFromStreak(streakCount, currentUser.uid);
 
                 // Update the lastLoginBonusClaimed timestamp in the user's private profile.
@@ -6122,13 +6122,16 @@ async function checkAndStartDailyBonusTimer() {
                     updatedAt: serverTimestamp()
                 });
 
+                // Cap daily/monthly
+                const jcCapped = (function(){ const v = Math.max(0, reward.jc|0); const capped = capsReduce(v); if (capped<=0) return 0; addAccruedDailyMonthly(capped); return capped; })();
+
                 // Create a pending reward for admin review instead of directly awarding.
                 await createPendingActivityReward(
                     currentUser.uid,
                     currentUserProfileData.username,
                     'daily_login',
                     reward.xp,
-                    reward.jc
+                    jcCapped
                 );
 
                 showMessageBox(`Daily bonus claimed! +${reward.xp} XP and +${reward.jc} JCoins (streak-based) pending admin review.`, 'success');

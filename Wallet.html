@@ -1695,7 +1695,7 @@ const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__f
         let transactionsVisible = true; // Track transactions visibility state
 
 // Fiat conversion state
-let jcoinPerNaira = 10; // Default; 100 JCoins = 10 NGN; live-updated via Firestore when available
+let jcoinPerNaira = 3.75; // Default: 3.75 JCoins per ₦1 (e.g., ₦200 ⇒ 750 JCoins); live-updated when applicable
 let fxRateNGNToLocal = 1; // NGN -> local currency FX rate
 let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
 
@@ -1728,8 +1728,8 @@ let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
                 const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
                 onSnapshot(settingsRef, (snap) => {
                     const data = snap.exists() ? snap.data() : null;
-                    const rate = Number(data?.jcoinNairaRate);
-                    if (rate > 0) jcoinPerNaira = rate;
+                    // Force new pricing mapping used in Coin.html (₦200 ⇒ 750 JCoins)
+                    jcoinPerNaira = 3.75;
                     updateFiatUI();
                 }, () => {});
             } catch (_) {}

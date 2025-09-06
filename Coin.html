@@ -81,7 +81,7 @@
       <div class="panel-hd">
         <div>
           <div class="panel-title">JCoin Shop</div>
-          <div class="hint">Rate: ₦<span id="rateLabel">—</span>/J • 10% bonus from ₦1,000+</div>
+          <div class="hint">$<span id="usdRateLabel">0.0000001</span>/J • Bonus from ₦5,000+</div>
         </div>
         <div class="pill" title="System rate"><i class="fas fa-scale-balanced"></i><span id="ratePill">—</span></div>
       </div>
@@ -116,12 +116,17 @@
     const hdrJc = document.getElementById('hdrJc');
     const hdrGas = document.getElementById('hdrGas');
     const rateLabel = document.getElementById('rateLabel');
+    const usdRateLabel = document.getElementById('usdRateLabel');
     const ratePill = document.getElementById('ratePill');
     const shopGrid = document.getElementById('shopGrid');
     const toast = document.getElementById('coinToast');
 
     let currentProfile = null;
     let jcoinRate = 7.5;
+    const USD_PER_J = 0.0000001;
+    const BASE_J_PER_NAIRA = 3.75; // ₦200 ⇒ 750 JCoins
+    const BONUS_THRESHOLD_NAIRA = 5000;
+    const BONUS_PERCENT = 0.10;
 
     async function ensureAuth(){
       if (auth.currentUser) return;
@@ -160,21 +165,19 @@
           if (typeof s.jcoinNairaRate === 'number' && s.jcoinNairaRate > 0) jcoinRate = s.jcoinNairaRate;
         }
       } catch {}
-      if (rateLabel) rateLabel.textContent = jcoinRate.toString();
-      if (ratePill) ratePill.textContent = jcoinRate.toString();
+      if (usdRateLabel) usdRateLabel.textContent = USD_PER_J.toFixed(7);
+      if (ratePill) ratePill.textContent = '—';
     }
 
-    const JCOIN_BONUS_THRESHOLD_NAIRA = 1000;
-    const JCOIN_BONUS_PERCENTAGE = 0.10;
     function calculateJCoins(naira){
-      const base = Math.floor(naira / jcoinRate);
-      const bonus = naira >= JCOIN_BONUS_THRESHOLD_NAIRA ? Math.floor(base * JCOIN_BONUS_PERCENTAGE) : 0;
+      const base = Math.floor(naira * BASE_J_PER_NAIRA);
+      const bonus = naira >= BONUS_THRESHOLD_NAIRA ? Math.floor(base * BONUS_PERCENT) : 0;
       return { base, bonus, total: base + bonus };
     }
 
     function renderShop(){
       if (!shopGrid) return;
-      const packages = [1000, 2500, 5000, 10000, 20000];
+      const packages = [200, 500, 1000, 2000, 5000, 10000, 20000];
       shopGrid.innerHTML = '';
       packages.forEach(price => {
         const { base, bonus, total } = calculateJCoins(price);
@@ -182,8 +185,8 @@
         card.className = 'card';
         card.innerHTML = `
           <div class="price">₦${price.toLocaleString()}</div>
-          <div class="hint">Rate at ₦${jcoinRate}/J</div>
-          <div class="coins">${total.toLocaleString()} JCoins ${bonus>0?`<span class="hint">(+${bonus.toLocaleString()} bonus)</span>`:''}</div>
+          <div class="hint">${price>=BONUS_THRESHOLD_NAIRA ? `Includes ${(BONUS_PERCENT*100).toFixed(0)}% bonus` : 'No bonus'}</div>
+          <div class="coins">${total.toLocaleString()} JCoins</div>
           <button class="btn primary" data-price="${price}"><i class="fas fa-shopping-cart"></i><span>Purchase</span></button>
         `;
         card.querySelector('button').addEventListener('click', ()=> requestPurchase(price, total));
