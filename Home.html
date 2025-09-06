@@ -3774,6 +3774,21 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
 #premiumRequestBtn{flex:0 0 auto}
 @media (max-width:800px){#headerDisplayName{max-width:180px}}
 @media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:6px}#headerDisplayName{max-width:140px}#premiumRequestBtn span{display:none}}
+</style>
+<style id="responsive-layout">
+@media (min-width: 1024px) {
+  .content-wrapper { display: grid; grid-template-columns: 300px minmax(0,1fr) 320px; gap: 16px; align-items: start; }
+  .content-wrapper > * { min-width: 0; }
+  #engagementPanel { grid-column: 1; position: sticky; top: 84px; }
+  #postCreationSection, #trendingHashtags, #postsFeed { grid-column: 2; }
+  .posts-feed-section { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .posts-feed-section .post-card { margin: 0; }
+  .daily-inspiration-section, #peopleMayKnow, #globalAnnouncementsSection, #homeChipsRow, #premiumFeaturesSection, #highlightsSection, #savedWidgetSection { grid-column: 3; }
+  #peopleMayKnow, .daily-inspiration-section, #globalAnnouncementsSection, #homeChipsRow, #premiumFeaturesSection, #highlightsSection, #savedWidgetSection { width: 100%; max-width: none !important; }
+}
+@media (min-width: 1440px) {
+  .content-wrapper { grid-template-columns: 320px minmax(0, 1fr) 360px; }
+}
 </style></head>
 <body class="theme-dark-mode">
     <!-- JCHAT Pink & Blue Glowing Loader -->
@@ -10818,6 +10833,15 @@ async function fetchAndDisplayPosts() {
             sidebarNav.classList.add('sidebar-hidden');
             sidebarToggleState = false;
         }
+
+        // Device class toggles for responsive targeting
+        const applyDeviceClass = () => {
+            const isDesktop = window.innerWidth >= 1024;
+            document.body.classList.toggle('device-desktop', isDesktop);
+            document.body.classList.toggle('device-mobile', !isDesktop);
+        };
+        applyDeviceClass();
+        window.addEventListener('resize', applyDeviceClass, { passive: true });
         });
 
         // Comment reaction handler
