@@ -48,7 +48,7 @@
     if (!isAllowlisted) {
       if (!hasAuthenticatedUser()) {
         // If not authenticated, send to Login.html
-        window.location.replace('Login.html');
+        window.location.replace(ORIGIN + '/Login.html');
         return;
       }
     }
@@ -65,7 +65,7 @@
     try {
       var p2 = (window.location.pathname || '').toLowerCase();
       if (!/\boffline\.html$/.test(p2)) {
-        window.location.replace('Login.html');
+        window.location.replace(ORIGIN + '/Login.html');
       }
     } catch (_) {}
   }
