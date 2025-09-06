@@ -770,6 +770,16 @@
         }
     </script>
 
+    <script>
+      document.addEventListener('click', function(ev){
+        var a = ev.target.closest('a[href*="/Wallet.html"], a[href*="/wallet.html"]');
+        if (!a) return;
+        var href = a.getAttribute('href')||'';
+        var allowUnlock = /[?&]unlock=1(\b|&|$)/i.test(href);
+        if (!allowUnlock) { ev.preventDefault(); alert('Wallet is locked. Contact admin to unlock.'); }
+      });
+    </script>
+
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
