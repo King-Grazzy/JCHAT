@@ -81,7 +81,7 @@
       <div class="panel-hd">
         <div>
           <div class="panel-title">JCoin Shop</div>
-          <div class="hint">Rate: ₦<span id="rateLabel">—</span>/J • $<span id="usdRateLabel">0.0000001</span>/J • 10% bonus from ₦1,000+</div>
+          <div class="hint">$<span id="usdRateLabel">0.0000001</span>/J • Bonus from ₦5,000+</div>
         </div>
         <div class="pill" title="System rate"><i class="fas fa-scale-balanced"></i><span id="ratePill">—</span></div>
       </div>
@@ -123,8 +123,10 @@
 
     let currentProfile = null;
     let jcoinRate = 7.5;
-    const SHOP_NAIRA_PER_J = 10;
     const USD_PER_J = 0.0000001;
+    const BASE_J_PER_NAIRA = 3.75; // ₦200 ⇒ 750 JCoins
+    const BONUS_THRESHOLD_NAIRA = 5000;
+    const BONUS_PERCENT = 0.10;
 
     async function ensureAuth(){
       if (auth.currentUser) return;
@@ -163,20 +165,19 @@
           if (typeof s.jcoinNairaRate === 'number' && s.jcoinNairaRate > 0) jcoinRate = s.jcoinNairaRate;
         }
       } catch {}
-      if (rateLabel) rateLabel.textContent = SHOP_NAIRA_PER_J.toString();
       if (usdRateLabel) usdRateLabel.textContent = USD_PER_J.toFixed(7);
-      if (ratePill) ratePill.textContent = SHOP_NAIRA_PER_J.toString();
+      if (ratePill) ratePill.textContent = '—';
     }
 
     function calculateJCoins(naira){
-      const base = Math.floor(naira / SHOP_NAIRA_PER_J);
-      const bonus = 0;
+      const base = Math.floor(naira * BASE_J_PER_NAIRA);
+      const bonus = naira >= BONUS_THRESHOLD_NAIRA ? Math.floor(base * BONUS_PERCENT) : 0;
       return { base, bonus, total: base + bonus };
     }
 
     function renderShop(){
       if (!shopGrid) return;
-      const packages = [1000, 2500, 5000, 10000, 20000];
+      const packages = [200, 500, 1000, 2000, 5000, 10000, 20000];
       shopGrid.innerHTML = '';
       packages.forEach(price => {
         const { base, bonus, total } = calculateJCoins(price);
@@ -184,7 +185,7 @@
         card.className = 'card';
         card.innerHTML = `
           <div class="price">₦${price.toLocaleString()}</div>
-          <div class="hint">Rate at ₦${SHOP_NAIRA_PER_J}/J</div>
+          <div class="hint">${price>=BONUS_THRESHOLD_NAIRA ? `Includes ${(BONUS_PERCENT*100).toFixed(0)}% bonus` : 'No bonus'}</div>
           <div class="coins">${total.toLocaleString()} JCoins</div>
           <button class="btn primary" data-price="${price}"><i class="fas fa-shopping-cart"></i><span>Purchase</span></button>
         `;
