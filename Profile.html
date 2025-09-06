@@ -5267,7 +5267,7 @@
                             </label>
                              <!-- NEW: Loading spinner for profile pic -->
                         </div>
-                        <span id="profileVerifiedBadge" class="verified-badge" title="Verified" aria-label="Verified account"><i class="fas fa-check"></i></span>
+                        <span id="profileVerifiedBadge" class="verified-badge" title="Not Verified" aria-label="Not verified account" style="display:none"><i class="fas fa-check"></i></span>
                     </div>
                     <h2 id="profileUsername" class="profile-name">Username</h2>
                     <p id="profileBio" class="profile-bio">No bio provided yet.</p>
@@ -6084,30 +6084,18 @@
         function applyUsernameStyle(isVerified) {
             if (!profileUsername) return;
             profileUsername.classList.remove('username-style-gold', 'username-style-pink', 'username-style-blue');
-
-            // Determine verified state from data or visible badge (robust)
+            // Only trust DB flags (displayedUserProfileData) for verification state
             let verified = false;
             try {
-                // Prefer explicit profile data if available
                 if (typeof displayedUserProfileData !== 'undefined' && displayedUserProfileData) {
                     verified = (displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true);
+                } else {
+                    verified = !!isVerified;
                 }
             } catch (e) {
-                // ignore
+                verified = !!isVerified;
             }
-
-            // Fallback: check the verified badge element title/display if DB flag isn't present
-            const badgeEl = document.getElementById('profileVerifiedBadge');
-            if (!verified && badgeEl) {
-                const badgeTitle = (badgeEl.title || '').toString().toLowerCase();
-                const badgeDisplayed = window.getComputedStyle(badgeEl).display !== 'none';
-                // Only treat as verified when the badge explicitly says 'verified'
-                if (badgeDisplayed && badgeTitle === 'verified') verified = true;
-            }
-
-            if (verified) {
-                profileUsername.classList.add('username-style-gold');
-            }
+            if (verified) profileUsername.classList.add('username-style-gold');
         }
 
         // --- Notification Badge Management ---
@@ -8950,9 +8938,9 @@
 
                     if (profileVerifiedBadge) {
                         const isVerified = (displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true);
-                        const showForOwnerOrAdmin = (isCurrentUserProfile === true) || (currentUser && currentUser.uid === ADMIN_UID);
-                        profileVerifiedBadge.style.display = (isVerified || showForOwnerOrAdmin) ? 'flex' : 'none';
-                        profileVerifiedBadge.title = isVerified ? 'Verified' : (isCurrentUserProfile ? 'Request Verification' : 'Not Verified');
+                        // Only show badge when profile is actually verified in DB
+                        profileVerifiedBadge.style.display = isVerified ? 'flex' : 'none';
+                        profileVerifiedBadge.title = isVerified ? 'Verified' : 'Not Verified';
                         if (profilePicContainer) {
                             if (isVerified) profilePicContainer.classList.add('gold-glow'); else profilePicContainer.classList.remove('gold-glow');
                         } else if (profilePicWrapper) {
