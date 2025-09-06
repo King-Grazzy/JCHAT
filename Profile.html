@@ -5487,15 +5487,6 @@
                                 <input type="text" id="editDisplayName" placeholder="Enter your display name">
                             </div>
 
-                            <div class="form-group" id="usernameStyleGroup" style="display:none;">
-                                <label for="usernameStyleSelect">Username Color (Verified)</label>
-                                <select id="usernameStyleSelect">
-                                    <option value="default">Pink & Blue (Default)</option>
-                                    <option value="gold">Gold</option>
-                                    <option value="pink">Pink</option>
-                                    <option value="blue">Blue</option>
-                                </select>
-                            </div>
 
                             <div class="form-group">
                                 <label for="editEmail">Email</label>
@@ -6089,25 +6080,12 @@
         const languageText = document.getElementById('languageText');
         const profileTimezone = document.getElementById('profileTimezone');
         const timezoneText = document.getElementById('timezoneText');
-        const usernameStyleSelect = document.getElementById('usernameStyleSelect');
 
-        function applyUsernameStyle(style, isVerified) {
+        function applyUsernameStyle(isVerified) {
             if (!profileUsername) return;
             profileUsername.classList.remove('username-style-gold', 'username-style-pink', 'username-style-blue');
-            if (!isVerified) return;
-            switch ((style || 'default')) {
-                case 'gold':
-                    profileUsername.classList.add('username-style-gold');
-                    break;
-                case 'pink':
-                    profileUsername.classList.add('username-style-pink');
-                    break;
-                case 'blue':
-                    profileUsername.classList.add('username-style-blue');
-                    break;
-                default:
-                    // Default pink/blue gradient already applied by .profile-name
-                    break;
+            if (isVerified) {
+                profileUsername.classList.add('username-style-gold');
             }
         }
 
@@ -7026,7 +7004,6 @@
             const newInterests = interestsInput.value.trim(); // NEW
             const newWebsite = websiteInput.value.trim();   // NEW
             const newSocialLinks = socialLinksInput.value.trim(); // NEW
-            const newUsernameStyle = (usernameStyleSelect && (currentUserProfileData?.isVerified === true || currentUserProfileData?.verified === true)) ? usernameStyleSelect.value : 'default';
 
             if (!newDisplayName) {
                 console.error("Display name cannot be empty.");
@@ -7053,7 +7030,7 @@
                     interests: newInterests, // NEW
                     website: newWebsite,   // NEW
                     socialLinks: newSocialLinks, // NEW
-                    usernameStyle: newUsernameStyle,
+
                     updatedAt: serverTimestamp()
                 });
                 console.log("JCHAT_DEBUG: Firestore private profile updated.");
@@ -7069,7 +7046,7 @@
                     interests: newInterests, // NEW
                     website: newWebsite,   // NEW
                     socialLinks: newSocialLinks, // NEW
-                    usernameStyle: newUsernameStyle,
+
                     updatedAt: serverTimestamp()
                 });
                 console.log("JCHAT_DEBUG: Firestore public profile updated.");
@@ -7086,7 +7063,7 @@
                 if (newWebsite) { if (websiteLink) { websiteLink.href = newWebsite; websiteLink.textContent = newWebsite.replace(/^(https?:\/\/)?(www\.)?/, ''); } if (profileWebsite) profileWebsite.style.display = 'block'; } else { if (profileWebsite) profileWebsite.style.display = 'none'; }
                 if (newSocialLinks) { if (socialLinksText) socialLinksText.textContent = newSocialLinks; if (profileSocialLinks) profileSocialLinks.style.display = 'block'; } else { if (profileSocialLinks) profileSocialLinks.style.display = 'none'; }
 
-                applyUsernameStyle(newUsernameStyle, true);
+                applyUsernameStyle(true);
                 showEnhancedSmartSuccess("Profile saved successfully! ✨", 'update');
 
 
@@ -8936,7 +8913,7 @@
                     if (profileUsername) profileUsername.textContent = displayedUserProfileData.username || "JCHAT User"; // Null check
                     const usernameInitial = (displayedUserProfileData.username || "J").charAt(0).toUpperCase();
                     const isVerifiedUser = (displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true);
-                    applyUsernameStyle(displayedUserProfileData.usernameStyle || 'default', isVerifiedUser);
+                    applyUsernameStyle(isVerifiedUser);
 
 
 
@@ -9246,7 +9223,7 @@
                         if (displayNameInput) displayNameInput.value = displayedUserProfileData.username || ""; // Null check
                         if (bioTextarea) bioTextarea.value = displayedUserProfileData.bio || ""; // Null check
                         if (locationInput) locationInput.value = displayedUserProfileData.location || ""; // Null check
-                        if (usernameStyleSelect) { usernameStyleSelect.value = displayedUserProfileData.usernameStyle || 'default'; const styleGroup = document.getElementById('usernameStyleGroup'); const isVerified = (displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true); if (styleGroup) styleGroup.style.display = isVerified ? 'block' : 'none'; }
+                        const styleGroup = document.getElementById('usernameStyleGroup'); if (styleGroup) styleGroup.style.display = 'none';
                         if (schoolInput) schoolInput.value = displayedUserProfileData.school || ""; // NEW
                         if (workInput) workInput.value = displayedUserProfileData.work || ""; // NEW
                         if (interestsInput) interestsInput.value = displayedUserProfileData.interests || ""; // NEW
