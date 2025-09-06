@@ -135,13 +135,80 @@
         const snap = await getDoc(profRef);
         if (!snap.exists()) {
           await setDoc(profRef, { jCoins: 0, gas: 0, username: user.email || 'User', createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
-          hdrJc.textContent = '0'; hdrGas.textContent = '0';
+          hdrJc.textContent = '0'; hdrGas.textContent = '0'; currentProfile = { jCoins:0, gas:0, username: user.email || 'User' };
           return;
         }
-        const p = snap.data();
+        const p = snap.data(); currentProfile = p;
         hdrJc.textContent = Number(p.jCoins||0).toLocaleString();
         hdrGas.textContent = Number(p.gas||0).toLocaleString();
       } catch {}
+    }
+
+    function showToast(message, type='info'){
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      requestAnimationFrame(()=> toast.classList.add('show'));
+      setTimeout(()=> toast.classList.remove('show'), 2800);
+    }
+
+    async function fetchSystemSettings(){
+      try {
+        const ref = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const s = snap.data();
+          if (typeof s.jcoinNairaRate === 'number' && s.jcoinNairaRate > 0) jcoinRate = s.jcoinNairaRate;
+        }
+      } catch {}
+      if (rateLabel) rateLabel.textContent = jcoinRate.toString();
+      if (ratePill) ratePill.textContent = jcoinRate.toString();
+    }
+
+    const JCOIN_BONUS_THRESHOLD_NAIRA = 1000;
+    const JCOIN_BONUS_PERCENTAGE = 0.10;
+    function calculateJCoins(naira){
+      const base = Math.floor(naira / jcoinRate);
+      const bonus = naira >= JCOIN_BONUS_THRESHOLD_NAIRA ? Math.floor(base * JCOIN_BONUS_PERCENTAGE) : 0;
+      return { base, bonus, total: base + bonus };
+    }
+
+    function renderShop(){
+      if (!shopGrid) return;
+      const packages = [1000, 2500, 5000, 10000, 20000];
+      shopGrid.innerHTML = '';
+      packages.forEach(price => {
+        const { base, bonus, total } = calculateJCoins(price);
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="price">₦${price.toLocaleString()}</div>
+          <div class="hint">Rate at ₦${jcoinRate}/J</div>
+          <div class="coins">${total.toLocaleString()} JCoins ${bonus>0?`<span class="hint">(+${bonus.toLocaleString()} bonus)</span>`:''}</div>
+          <button class="btn primary" data-price="${price}"><i class="fas fa-shopping-cart"></i><span>Purchase</span></button>
+        `;
+        card.querySelector('button').addEventListener('click', ()=> requestPurchase(price, total));
+        shopGrid.appendChild(card);
+      });
+    }
+
+    async function requestPurchase(nairaAmount, jcoins){
+      const u = auth.currentUser;
+      if (!u) { showToast('Please log in', 'error'); return; }
+      try {
+        const col = collection(db, 'artifacts', appId, 'coin_requests');
+        await addDoc(col, {
+          userId: u.uid,
+          username: (currentProfile?.username)|| u.email || 'User',
+          amountNaira: nairaAmount,
+          requestedJCoins: jcoins,
+          status: 'pending',
+          timestamp: serverTimestamp()
+        });
+        showToast('Request submitted! Admin will review shortly.', 'success');
+      } catch (e) {
+        console.error('coin request', e);
+        showToast('Failed to submit request', 'error');
+      }
     }
 
     onAuthStateChanged(auth, async (u)=>{
