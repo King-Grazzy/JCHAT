@@ -10437,6 +10437,18 @@ async function fetchAndDisplayPosts() {
                 fetchAndDisplayPosts();
                 return;
             }
+            const walletAnchor = ev.target.closest('a[href*="/Wallet.html"]');
+            if (walletAnchor) {
+                const href = walletAnchor.getAttribute('href') || '';
+                const allowUnlockFlow = /[?&]unlock=1(\b|&|$)/.test(href);
+                const unlocked = !!(currentUserProfileData && currentUserProfileData.walletUnlocked);
+                if (!unlocked && !allowUnlockFlow) {
+                    ev.preventDefault();
+                    const m = document.getElementById('walletLockedModal');
+                    if (m) { m.style.display='block'; setTimeout(()=>m.classList.add('active'),0); }
+                    return;
+                }
+            }
             const followBtn = ev.target.closest('.follow-tag-btn');
             if (followBtn) {
                 const tag = '#' + followBtn.dataset.tag.toLowerCase();
