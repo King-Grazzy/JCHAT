@@ -136,6 +136,23 @@
       <div class="rooms" id="myRooms"></div>
       <div class="panel-header"><div class="panel-title">Discover</div></div>
       <div class="rooms" id="discoverRooms"></div>
+      <div class="panel-header"><div class="panel-title">JCoin Shop</div></div>
+      <div id="coinShopGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;padding:8px 12px 0;"></div>
+      <div id="coinPurchaseBox" style="display:none;padding:10px 12px 12px;">
+        <div class="help" id="coinPurchaseInfo">Buying —</div>
+        <div class="row" style="margin-top:8px;">
+          <label>Upload Payment Receipt</label>
+          <label class="file-input-wrapper" for="coinReceipt" style="margin-top:4px;">
+            <i class="fas fa-upload"></i>
+            <span class="file-name" id="coinReceiptName">No file chosen</span>
+          </label>
+          <input id="coinReceipt" type="file" accept="image/*,application/pdf" style="display:none">
+          <img id="coinReceiptPreview" class="receipt-preview" style="display:none;margin-top:6px;" alt="Receipt Preview">
+        </div>
+        <div class="card-ft" style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+          <button class="btn primary" id="coinSubmitBtn"><i class="fas fa-paper-plane"></i><span>Submit Receipt</span></button>
+        </div>
+      </div>
     </section>
 
     <!-- Chat -->
@@ -201,34 +218,6 @@
       <div class="card-ft">
         <button class="btn" id="cancelDonate">Cancel</button>
         <button class="btn primary" id="confirmDonate">Donate</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- JCoin Request Modal -->
-  <div class="modal" id="jcoinReqModal" role="dialog" aria-modal="true">
-    <div class="card">
-      <div class="card-hd"><h3>Request JCoins</h3><button class="btn" id="closeJcReq">Close</button></div>
-      <div class="card-bd">
-        <div class="row">
-          <label for="jcReqNaira">Amount (₦)</label>
-          <input id="jcReqNaira" class="input" type="number" min="100" step="1" placeholder="e.g. 1000">
-          <div class="help">You will get: <b id="jcReqCalculated">0</b> JCoins</div>
-        </div>
-        <div class="row">
-          <label>Upload Payment Receipt</label>
-          <label class="file-input-wrapper" for="jcReqReceipt">
-            <i class="fas fa-upload"></i>
-            <span class="file-name" id="jcReqFileName">No file chosen</span>
-          </label>
-          <input id="jcReqReceipt" type="file" accept="image/*,application/pdf" style="display:none">
-          <img id="jcReqPreview" class="receipt-preview" style="display:none" alt="Receipt Preview">
-        </div>
-        <div class="help">After submission, admins will review your request in Developer tools. You’ll get a notification once approved.</div>
-      </div>
-      <div class="card-ft">
-        <button class="btn" id="cancelJcReq">Cancel</button>
-        <button class="btn primary" id="submitJcReq">Submit</button>
       </div>
     </div>
   </div>
@@ -314,17 +303,14 @@
     const leaveBtn = document.getElementById('leaveBtn');
     const toast = document.getElementById('toast');
 
-    // JCoin request DOM
-    const openJCoinRequest = document.getElementById('openJCoinRequest');
-    const jcoinReqModal = document.getElementById('jcoinReqModal');
-    const closeJcReq = document.getElementById('closeJcReq');
-    const cancelJcReq = document.getElementById('cancelJcReq');
-    const submitJcReq = document.getElementById('submitJcReq');
-    const jcReqNaira = document.getElementById('jcReqNaira');
-    const jcReqCalculated = document.getElementById('jcReqCalculated');
-    const jcReqReceipt = document.getElementById('jcReqReceipt');
-    const jcReqFileName = document.getElementById('jcReqFileName');
-    const jcReqPreview = document.getElementById('jcReqPreview');
+    // Inline JCoin shop DOM
+    const coinShopGrid = document.getElementById('coinShopGrid');
+    const coinPurchaseBox = document.getElementById('coinPurchaseBox');
+    const coinPurchaseInfo = document.getElementById('coinPurchaseInfo');
+    const coinReceipt = document.getElementById('coinReceipt');
+    const coinReceiptName = document.getElementById('coinReceiptName');
+    const coinReceiptPreview = document.getElementById('coinReceiptPreview');
+    const coinSubmitBtn = document.getElementById('coinSubmitBtn');
 
     // Economy constants (tunable via server settings in future)
     const GROUP_CREATION_COST = 1000;
@@ -621,30 +607,50 @@
     function showDonate(){ if (!selectedRoom) { showToast('Select a room','error'); return; } donateModal.style.display='flex'; donateAmount.focus(); donateBalance.textContent = (currentProfile?.jCoins||0).toLocaleString(); }
     function hideDonate(){ donateModal.style.display='none'; donateAmount.value=''; }
 
-    // JCoin request UI helpers
-    function showJcReq(){ jcoinReqModal.style.display='flex'; jcReqNaira.value=''; jcReqCalculated.textContent='0'; jcReqReceipt.value=''; jcReqFileName.textContent='No file chosen'; jcReqPreview.style.display='none'; jcReqPreview.src=''; }
-    function hideJcReq(){ jcoinReqModal.style.display='none'; }
-    function onAmtInput(){ const v = Math.max(0, Math.floor(Number(jcReqNaira.value||0))); jcReqCalculated.textContent = calculateJCoins(v).toLocaleString(); }
-    function onReceiptChange(){ const f = jcReqReceipt.files?.[0]; jcReqFileName.textContent = f ? (f.name||'receipt') : 'No file chosen'; if (f && f.type.startsWith('image/')) { jcReqPreview.src = URL.createObjectURL(f); jcReqPreview.style.display='block'; } else { jcReqPreview.style.display='none'; jcReqPreview.src=''; } }
-    async function submitJc(){
+    // Inline coin shop helpers
+    function renderCoinShop(){
+      if (!coinShopGrid) return;
+      const pkgs = [200, 500, 1000, 2000, 5000, 10000, 20000];
+      coinShopGrid.innerHTML='';
+      pkgs.forEach(price=>{
+        const j = Math.floor(price * 3.75) + (price>=5000 ? Math.floor(price*3.75*0.10) : 0);
+        const btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.setAttribute('data-price', String(price));
+        btn.innerHTML = `<i class=\"fas fa-coins\"></i><span>₦${price.toLocaleString()} → ${j.toLocaleString()} J</span>`;
+        btn.addEventListener('click', ()=> selectCoinPackage(price, j));
+        coinShopGrid.appendChild(btn);
+      });
+    }
+    let selectedNaira = 0, selectedJ = 0;
+    function selectCoinPackage(naira, jcoins){
+      selectedNaira = naira; selectedJ = jcoins;
+      if (coinPurchaseInfo) coinPurchaseInfo.textContent = `Buying ₦${naira.toLocaleString()} → ${jcoins.toLocaleString()} JCoins`;
+      if (coinReceipt) coinReceipt.value = '';
+      if (coinReceiptName) coinReceiptName.textContent = 'No file chosen';
+      if (coinReceiptPreview) { coinReceiptPreview.style.display='none'; coinReceiptPreview.src=''; }
+      if (coinPurchaseBox) coinPurchaseBox.style.display='block';
+    }
+    function onCoinReceiptChange(){ const f = coinReceipt?.files?.[0]; if (coinReceiptName) coinReceiptName.textContent = f ? (f.name||'receipt') : 'No file chosen'; if (coinReceiptPreview){ if (f && f.type.startsWith('image/')){ coinReceiptPreview.src = URL.createObjectURL(f); coinReceiptPreview.style.display='block'; } else { coinReceiptPreview.style.display='none'; coinReceiptPreview.src=''; } } }
+    async function submitCoinPurchase(){
       try{
-        if (!currentUser) { showToast('Please log in','error'); return; }
-        const naira = Math.floor(Number(jcReqNaira.value||0)); if (!naira || naira<100){ showToast('Enter at least ₦100','error'); return; }
-        const file = jcReqReceipt.files?.[0]; if (!file){ showToast('Attach receipt','error'); return; }
-        const url = await uploadMediaToCloudinary(file); if (!url){ showToast('Upload failed','error'); return; }
-        const jcoins = calculateJCoins(naira);
+        if (!currentUser){ showToast('Please log in','error'); return; }
+        if (!selectedNaira || !selectedJ){ showToast('Select a package','error'); return; }
+        const f = coinReceipt?.files?.[0]; if (!f){ showToast('Attach receipt','error'); return; }
+        const url = await uploadMediaToCloudinary(f); if (!url){ showToast('Upload failed','error'); return; }
         await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'jcoin_buy_requests'), {
           userId: currentUser.uid,
           username: currentProfile?.username || (currentUser.email || 'User'),
           profilePicId: currentProfile?.profilePicId || null,
-          requestedNairaPrice: naira,
-          requestedJCoins: jcoins,
+          requestedNairaPrice: selectedNaira,
+          requestedJCoins: selectedJ,
           receiptImageUrl: url,
           status: 'pending',
           timestamp: serverTimestamp()
         });
-        showToast('Request submitted','success'); hideJcReq();
-      }catch(e){ console.error(e); showToast('Failed to submit','error'); }
+        showToast('Receipt submitted. Awaiting approval.','success');
+        if (coinPurchaseBox) coinPurchaseBox.style.display='none';
+      } catch(e){ console.error(e); showToast('Failed to submit','error'); }
     }
 
     // Events
@@ -660,12 +666,8 @@
     composerInput.addEventListener('keydown', (e)=>{ if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
     refreshRooms.addEventListener('click', renderRooms);
     roomSearch.addEventListener('input', renderRooms);
-    openJCoinRequest.addEventListener('click', async ()=>{ if (!currentUser) { await ensureAuth(); } await fetchSystemSettings(); showJcReq(); });
-    closeJcReq.addEventListener('click', hideJcReq);
-    cancelJcReq.addEventListener('click', hideJcReq);
-    submitJcReq.addEventListener('click', submitJc);
-    jcReqNaira.addEventListener('input', onAmtInput);
-    jcReqReceipt.addEventListener('change', onReceiptChange);
+    coinReceipt?.addEventListener('change', onCoinReceiptChange);
+    coinSubmitBtn?.addEventListener('click', submitCoinPurchase);
 
     inviteBtn.addEventListener('click', async ()=>{
       if (!selectedRoom) return;
@@ -696,6 +698,7 @@
       if (!currentUser) { await ensureAuth(); return; }
       await loadProfile();
       await fetchSystemSettings();
+      renderCoinShop();
       await subscribeRooms();
       await handleDeepLink();
     });
