@@ -3797,20 +3797,56 @@
                         const userId = pathParts[userIdIndex];
                         const username = data.username || data.displayName || 'Unknown';
                         const requestedAt = data.verificationRequestedAt ? (new Date(data.verificationRequestedAt.seconds * 1000)).toLocaleString() : (data.verificationRequestedAt || 'N/A');
+                        const receiptUrl = data.verificationReceiptUrl || null;
+
                         const card = document.createElement('div');
                         card.className = 'request-card';
                         card.style.padding = '10px';
                         card.style.border = '1px solid var(--border-light)';
                         card.style.borderRadius = '8px';
                         card.style.marginBottom = '8px';
-                        card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><div><strong>${username}</strong> <span style="opacity:.8">(ID: ${userId})</span><div style="font-size:.85rem;color:var(--text-light);">Requested: ${requestedAt}</div></div><div style="display:flex;gap:8px"><button class="admin-button small approve-verification-btn" data-userid="${userId}"><i class="fas fa-check-circle"></i> Approve</button><button class="admin-button small deny-verification-btn" data-userid="${userId}"><i class="fas fa-times-circle"></i> Deny</button></div></div>`;
+
+                        let receiptHtml = '<div style="font-size:.85rem;color:var(--text-light);">No receipt uploaded</div>';
+                        if (receiptUrl) {
+                            const imageUrl = getCloudinaryImageUrl(receiptUrl, 'w_300,h_200,c_fit');
+                            receiptHtml = `<img src="${imageUrl}" style="max-width:220px;max-height:140px;border-radius:8px;" alt="Receipt">`;
+                        }
+
+                        card.innerHTML = `
+                            <div style="display:flex;gap:12px;align-items:flex-start;">
+                                <div style="flex:1">
+                                    <strong>${username}</strong> <span style="opacity:.8">(ID: ${userId})</span>
+                                    <div style="font-size:.85rem;color:var(--text-light);">Requested: ${requestedAt}</div>
+                                    <div style="margin-top:8px;">${receiptHtml}</div>
+                                </div>
+                                <div style="display:flex;flex-direction:column;gap:8px;">
+                                    <button class="admin-button small approve-verification-btn" data-userid="${userId}"><i class="fas fa-check-circle"></i> Approve</button>
+                                    <button class="admin-button small deny-verification-btn" data-userid="${userId}"><i class="fas fa-times-circle"></i> Deny</button>
+                                    <button class="admin-button small upload-receipt-btn" data-userid="${userId}"><i class="fas fa-upload"></i> Upload Receipt</button>
+                                </div>
+                            </div>
+                        `;
+
                         pendingVerificationRequestsList.appendChild(card);
                     });
+
+                    // Attach handlers
                     pendingVerificationRequestsList.querySelectorAll('.approve-verification-btn').forEach(btn => {
                         btn.addEventListener('click', async () => { const uid = btn.dataset.userid; await approveBadgeForUser(uid); });
                     });
                     pendingVerificationRequestsList.querySelectorAll('.deny-verification-btn').forEach(btn => {
                         btn.addEventListener('click', async () => { const uid = btn.dataset.userid; await denyBadgeForUser(uid); });
+                    });
+                    pendingVerificationRequestsList.querySelectorAll('.upload-receipt-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const uid = btn.dataset.userid;
+                            // Use global trigger to open hidden file input
+                            if (typeof window.triggerVerificationReceiptUpload === 'function') {
+                                window.triggerVerificationReceiptUpload(uid);
+                            } else {
+                                console.warn('Upload helper not available');
+                            }
+                        });
                     });
                 });
             } catch (error) {
