@@ -3762,6 +3762,54 @@
         }
 
         /**
+         * Fetches and displays pending verification requests in real-time.
+         */
+        async function fetchPendingVerificationRequests() {
+            try {
+                if (unsubscribePendingVerificationListener) {
+                    try { unsubscribePendingVerificationListener(); } catch (_) {}
+                }
+                const q = query(collectionGroup(db, 'user_profile'), where('verificationRequested', '==', true));
+                unsubscribePendingVerificationListener = onSnapshot(q, (querySnapshot) => {
+                    pendingVerificationRequestsList.innerHTML = '';
+                    if (querySnapshot.empty) {
+                        noPendingVerificationMessage.style.display = 'block';
+                        pendingVerificationRequestsList.appendChild(noPendingVerificationMessage);
+                        return;
+                    }
+                    noPendingVerificationMessage.style.display = 'none';
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        const pathParts = docSnap.ref.path.split('/');
+                        const userIdIndex = pathParts.indexOf('users') + 1;
+                        const userId = pathParts[userIdIndex];
+                        const username = data.username || data.displayName || 'Unknown';
+                        const requestedAt = data.verificationRequestedAt ? (new Date(data.verificationRequestedAt.seconds * 1000)).toLocaleString() : (data.verificationRequestedAt || 'N/A');
+                        const card = document.createElement('div');
+                        card.className = 'request-card';
+                        card.style.padding = '10px';
+                        card.style.border = '1px solid var(--border-light)';
+                        card.style.borderRadius = '8px';
+                        card.style.marginBottom = '8px';
+                        card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><div><strong>${username}</strong> <span style="opacity:.8">(ID: ${userId})</span><div style="font-size:.85rem;color:var(--text-light);">Requested: ${requestedAt}</div></div><div style="display:flex;gap:8px"><button class="admin-button small approve-verification-btn" data-userid="${userId}"><i class="fas fa-check-circle"></i> Approve</button><button class="admin-button small deny-verification-btn" data-userid="${userId}"><i class="fas fa-times-circle"></i> Deny</button></div></div>`;
+                        pendingVerificationRequestsList.appendChild(card);
+                    });
+                    pendingVerificationRequestsList.querySelectorAll('.approve-verification-btn').forEach(btn => {
+                        btn.addEventListener('click', async () => { const uid = btn.dataset.userid; await approveBadgeForUser(uid); });
+                    });
+                    pendingVerificationRequestsList.querySelectorAll('.deny-verification-btn').forEach(btn => {
+                        btn.addEventListener('click', async () => { const uid = btn.dataset.userid; await denyBadgeForUser(uid); });
+                    });
+                });
+            } catch (error) {
+                console.error('Failed to fetch pending verification requests:', error);
+                noPendingVerificationMessage.style.display = 'block';
+                pendingVerificationRequestsList.innerHTML = '';
+                pendingVerificationRequestsList.appendChild(noPendingVerificationMessage);
+            }
+        }
+
+        /**
          * Fetches and displays pending JCoin requests in real-time.
          */
         async function fetchPendingJCoinRequests() {
