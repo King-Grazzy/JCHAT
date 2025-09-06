@@ -212,11 +212,13 @@
     }
 
     onAuthStateChanged(auth, async (u)=>{
-      if (!u) { await ensureAuth(); return; }
+      if (!u) { await ensureAuth(); await fetchSystemSettings(); renderShop(); return; }
       await loadProfile(u);
+      await fetchSystemSettings();
+      renderShop();
     });
 
-    (async ()=>{ await ensureAuth(); })();
+    (async ()=>{ await ensureAuth(); await fetchSystemSettings(); renderShop(); })();
   </script>
 </body>
 </html>
