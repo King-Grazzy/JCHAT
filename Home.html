@@ -7586,7 +7586,7 @@ async function checkAndStartDailyBonusTimer() {
                         postId
                     );
                     incrementDailyActivityCount('post');
-                    showMessageBox(`Post created! +${reward.xp} XP and +${reward.jc} JCoins pending admin review.`, 'success', true);
+                    showEnhancedSmartSuccess(`Post created! +${reward.xp} XP and +${reward.jc} JCoins are on the way.`, 'achievement');
                 }
                 playNotificationSound('success');
                 // Clear input fields and previews after successful post creation.
@@ -7701,7 +7701,7 @@ async function checkAndStartDailyBonusTimer() {
                     await createPendingActivityReward(postOwnerId, postOwnerName || 'Post Owner', 'post_owner_reaction_bonus', 10, 0.005, null, postId);
                 }
 
-                showMessageBox(`Reaction recorded! ${xpReward} XP and ${jCoinReward} JCoins pending admin review.`, 'success');
+                showEnhancedSmartSuccess(`Reaction recorded! +${xpReward} XP and +${jCoinReward} JCoins are on the way.`, 'update');
                 playNotificationSound('info');
             } catch (error) {
                 console.error("JCHAT_ERROR: Error handling reaction (Firestore update failed):", error);
@@ -7801,9 +7801,9 @@ async function checkAndStartDailyBonusTimer() {
                 // Show result using computed reward
                 if (typeof computeActivityReward === 'function') {
                     const reward = await computeActivityReward('post_comment', { contentLen: commentText.length, isReply: !!replyingTo, isFirstOnPost: wasFirstComment });
-                    showMessageBox(`Comment added! +${reward.xp} XP and +${reward.jc} JCoins pending admin review.`, 'success');
+                    showEnhancedSmartSuccess(`Comment added! +${reward.xp} XP and +${reward.jc} JCoins are on the way.`, 'update');
                 } else {
-                    showMessageBox('Comment added! Pending admin review.', 'success');
+                    showEnhancedSmartSuccess('Comment added! Your reward is on the way.', 'update');
                 }
                 playNotificationSound('success');
             } catch (error) {
