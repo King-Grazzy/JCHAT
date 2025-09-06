@@ -343,20 +343,8 @@
         
         
         
+        
 
-
-
-
-
-
-
-        .oauth-section { display: block; margin: 25px 0; }
-        .oauth-btn { width: 100%; border: 1px solid var(--border-light); border-radius: var(--radius); background: var(--card-background); backdrop-filter: blur(20px); color: var(--white); cursor: pointer; transition: all var(--transition); padding: 14px 16px; font-size: 15px; font-weight: 600; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: none; }
-        .oauth-btn:hover { transform: translateY(-3px); box-shadow: var(--button-shadow); border-color: var(--pink); }
-        .oauth-btn.github { background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); position: relative; overflow: hidden; }
-        .oauth-btn.github::before { content: ""; position: absolute; inset: 0; border-radius: var(--radius); background: linear-gradient(90deg, rgba(0,213,255,.25), rgba(255,46,146,.25), rgba(0,213,255,.25)); background-size: 200% 100%; opacity: .25; filter: blur(12px); transform: translateZ(0); transition: opacity var(--transition); animation: shimmerText 4s ease-in-out infinite; pointer-events: none; }
-        .oauth-btn.github:hover::before { opacity: .45; }
-        .oauth-icon { display: inline-flex; width: 18px; height: 18px; align-items: center; justify-content: center; }
 
         @keyframes loadingPulse {
             0%, 100% { 
@@ -370,7 +358,6 @@
                     0 0 70px var(--blue);
             }
         }
-
 
 
 
@@ -430,6 +417,16 @@
             background-clip: text;
             transform: scale(1.05);
         }
+        .unverified-banner { background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(236,72,153,0.12)); border: 1px solid var(--border-light); color: var(--white); padding: 12px 14px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; }
+        .unverified-banner .linklike { background: none; border: none; color: #60a5fa; cursor: pointer; padding: 0 2px; font-weight: 600; }
+        .password-strength { margin-top: 8px; }
+        .strength-bar { height: 6px; border-radius: 6px; background: rgba(255,255,255,0.12); position: relative; overflow: hidden; }
+        .strength-bar::after { content: ''; position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: linear-gradient(90deg, var(--pink), var(--blue)); transition: width var(--transition); }
+        .strength-bar.level-1::after { width: 25%; }
+        .strength-bar.level-2::after { width: 50%; }
+        .strength-bar.level-3::after { width: 75%; }
+        .strength-bar.level-4::after { width: 100%; }
+        .strength-text { margin-top: 6px; font-size: 12px; color: var(--text-light); }
 
         .error-message {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(249, 115, 22, 0.1) 100%);
@@ -453,9 +450,8 @@
 
         /* Signup mode styles */
         .login-container.signup-mode .login-header {
-            background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%);
-            background-size: 200% 200%;
-            animation: geminiSignupGradient 8s ease infinite;
+            background: var(--header-background);
+            animation: none;
         }
 
         @keyframes geminiSignupGradient {
@@ -882,7 +878,16 @@
                 padding: 30px 20px 25px;
             }
         }
-    </style>
+            /* OAuth section modern styles */
+        .oauth-section { display: flex; gap: 12px; margin-top: 10px; }
+        .oauth-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 16px; border-radius: var(--radius); border: 1px solid var(--border-light); background: var(--input-background); color: var(--white); cursor: pointer; transition: all var(--transition); }
+        .oauth-btn:hover { transform: translateY(-2px); box-shadow: var(--button-shadow); }
+        .oauth-btn .oauth-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
+        .oauth-btn.google { background: #ffffff; color: #1f2937; border: 1px solid rgba(0,0,0,0.08); }
+        .oauth-btn.google:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+.remember-actions { display: flex; gap: 12px; align-items: center; }
+        .caps-warning { display: none; color: #ef4444; font-size: 12px; margin-top: 6px; }
+        </style>
 </head>
 <body>
     <!-- Floating Particles -->
@@ -945,6 +950,7 @@
                 <button type="button" class="password-toggle" onclick="togglePassword()">
                     👁️
                 </button>
+                <div id="capsWarning" class="caps-warning">Caps Lock is ON</div>
             </div>
 
             <!-- Signup-only fields continued -->
@@ -984,24 +990,16 @@
                     <input type="checkbox" id="remember" name="remember">
                     <label for="remember">Remember me</label>
                 </div>
-                <a href="#" class="forgot-password" onclick="showResetPasswordModal()">Forgot password?</a>
+                <div class="remember-actions">
+                    <a href="#" class="forgot-password" onclick="showResetPasswordModal()">Forgot password?</a>
+                    <a href="#" class="forgot-password" onclick="resendVerificationEmail()">Resend verification email</a>
+                </div>
             </div>
-            
+
             <button type="submit" class="login-btn">
                 Sign In
             </button>
 
-            <div class="divider" id="oauthDivider"><span>Or continue with</span></div>
-            <div class="oauth-section" id="oauthSection">
-                <button type="button" class="oauth-btn github" id="githubOauthBtn" aria-label="Continue with GitHub">
-                    <span class="oauth-icon">
-                        <svg viewBox="0 0 16 16" width="18" height="18" fill="currentColor" aria-hidden="true">
-                            <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
-                        </svg>
-                    </span>
-                    <span>Continue with GitHub</span>
-                </button>
-            </div>
 
 
             <div class="signup-link">
@@ -1058,13 +1056,14 @@
     <script type="module">
         // Import Firebase modules
         import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, sendEmailVerification, updateProfile, setPersistence, browserLocalPersistence, browserSessionPersistence, signOut, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
 
         // Firebase configuration (using your existing config)
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyBsBinyrD9WZZXRaCvA4gxfX7BIimydDvo",
+            apiKey: "AIzaSyDz-8N0totzvMCvonF9pKj9RsoH3J8xL0w",
             authDomain: "jchat-1.firebaseapp.com",
+            databaseURL: "https://jchat-1-default-rtdb.firebaseio.com",
             projectId: "jchat-1",
             storageBucket: "jchat-1.firebasestorage.app",
             messagingSenderId: "328479683167",
@@ -1123,6 +1122,7 @@
 
 
 
+
         // Make functions globally available
         window.togglePassword = function() {
             const passwordInput = document.getElementById('password');
@@ -1136,6 +1136,7 @@
                 toggleBtn.textContent = '👁️';
             }
         };
+
 
 
 
@@ -1161,6 +1162,7 @@
                 adminNotice.style.display = 'block';
             }
         }
+
 
 
 
@@ -1203,10 +1205,27 @@
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
 
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const remember = document.getElementById('remember').checked;
             const isSignupMode = document.querySelector('.login-container').classList.contains('signup-mode');
+
+            try {
+                if (remember) {
+                    localStorage.setItem('remembered_email', email);
+                } else {
+                    localStorage.removeItem('remembered_email');
+                }
+            } catch(_) {}
+
+            try {
+                const cd = parseInt(localStorage.getItem('login_cooldown_until') || '0', 10);
+                if (cd && Date.now() < cd) {
+                    const secs = Math.ceil((cd - Date.now()) / 1000);
+                    showErrorModal(`Too many attempts. Try again in ${secs}s.`);
+                    return;
+                }
+            } catch(_) {}
 
             // Basic validation
             if (!email || !password) {
@@ -1240,6 +1259,7 @@
 
 
 
+
         // Sign up user
         async function signUpUser(email, password) {
             // Get additional signup fields
@@ -1267,6 +1287,13 @@
             
             if (password !== confirmPassword) {
                 showErrorModal('Passwords do not match. Please check and try again.');
+                return;
+            }
+
+            // Strong password policy: min 8, at least 1 letter and 1 number
+            const strongPwd = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+            if (!strongPwd.test(password)) {
+                showErrorModal('Password must be at least 8 characters and include at least one letter and one number.');
                 return;
             }
             
@@ -1316,14 +1343,14 @@
                 try {
                     await sendEmailVerification(user);
                     hideSmartLoader();
-                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Please check your email to verify your account.`, () => {
-                        window.location.href = 'Home.html';
+                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Please verify your email at ${user.email} before signing in.`, () => {
+                        window.location.href = 'Login.html';
                     });
                 } catch (verificationError) {
                     console.warn('Email verification failed:', verificationError);
                     hideSmartLoader();
-                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Your account has been created successfully. Note: Email verification could not be sent.`, () => {
-                        window.location.href = 'Home.html';
+                    showSuccessModal(`Welcome to JCHAT, ${fullName}! Email verification could not be sent right now. Please try "Forgot password" later to trigger a new email or contact support.`, () => {
+                        window.location.href = 'Login.html';
                     });
                 }
                 
@@ -1336,7 +1363,15 @@
 
                 switch (code) {
                     case 'auth/email-already-in-use':
-                        errorMessage = 'An account with this email already exists. Would you like to sign in instead?';
+                        errorMessage = 'An account with this email already exists. Switching to sign in.';
+                        try {
+                            const emailInput = document.getElementById('email');
+                            if (emailInput) emailInput.value = email;
+                            const container = document.querySelector('.login-container');
+                            if (container && container.classList.contains('signup-mode')) {
+                                toggleSignupMode();
+                            }
+                        } catch (_) {}
                         break;
                     case 'auth/weak-password':
                         errorMessage = 'Password is too weak. Please choose a stronger password with at least 6 characters.';
@@ -1368,10 +1403,25 @@
                 await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                
+
+                if (!user.emailVerified) {
+                    try {
+                        await sendEmailVerification(user);
+                    } catch (e) {
+                        console.warn('Failed to send verification email:', e);
+                    }
+                    try { localStorage.setItem('unverified_email', user.email); } catch(_) {}
+                    showUnverifiedBanner(user.email);
+                    hideSmartLoader();
+                    showCustomModal('info', 'Verify Your Email', `We sent a verification link to ${user.email}. Please verify your email, then sign in again.`, null);
+                    try { await signOut(auth); } catch (_) {}
+                    return;
+                }
+
                 // Update last login
                 await saveUserData(user, 'email');
-                
+                try { localStorage.removeItem('login_failed_attempts'); localStorage.removeItem('login_cooldown_until'); } catch(_) {}
+
                 hideSmartLoader();
                 showSuccessModal(`Welcome back, ${user.displayName || user.email}!`, () => {
                     window.location.href = 'Home.html';
@@ -1383,7 +1433,20 @@
                 
                 switch (error.code) {
                     case 'auth/user-not-found':
-                        errorMessage = 'No account found with this email. Would you like to create a new account or contact an administrator?';
+                        errorMessage = 'No account found with this email.';
+                        try {
+                            if (typeof __public_signup_enabled === 'undefined' || __public_signup_enabled !== false) {
+                                const currentEmail = document.getElementById('email')?.value.trim();
+                                showCustomModal('info', 'Create Account?', 'We can create a new account with this email. Continue?', () => {
+                                    const emailInput = document.getElementById('email');
+                                    if (emailInput && currentEmail) emailInput.value = currentEmail;
+                                    const container = document.querySelector('.login-container');
+                                    if (container && !container.classList.contains('signup-mode')) {
+                                        toggleSignupMode();
+                                    }
+                                });
+                            }
+                        } catch (_) {}
                         break;
                     case 'auth/wrong-password':
                         errorMessage = 'Incorrect password. Please check your password and try again, or use "Forgot password" to reset it.';
@@ -1404,7 +1467,19 @@
                         errorMessage = 'Network error. Please check your internet connection and try again.';
                         break;
                 }
-                
+
+                try {
+                    const kA = 'login_failed_attempts';
+                    const kC = 'login_cooldown_until';
+                    let a = parseInt(localStorage.getItem(kA) || '0', 10) + 1;
+                    localStorage.setItem(kA, String(a));
+                    if (a >= 5) {
+                        const until = Date.now() + 60000;
+                        localStorage.setItem(kC, String(until));
+                        localStorage.setItem(kA, '0');
+                    }
+                } catch(_) {}
+
                 showErrorModal(errorMessage);
             }
         }
@@ -1542,6 +1617,22 @@
             modal.style.display = 'none';
         }
 
+
+        function showUnverifiedBanner(email) {
+            try {
+                const banner = document.getElementById('unverifiedBanner');
+                const span = document.getElementById('unverifiedEmailText');
+                if (banner && span) {
+                    span.textContent = email || '';
+                    banner.style.display = 'block';
+                }
+            } catch (_) {}
+        }
+
+        function hideUnverifiedBanner() {
+            const banner = document.getElementById('unverifiedBanner');
+            if (banner) banner.style.display = 'none';
+        }
 
         // Enhanced show success with custom modal
         function showSuccessModal(message, callback = null) {
@@ -1707,7 +1798,7 @@
         };
 
         window.sendResetEmail = async function() {
-            const email = document.getElementById('resetEmail').value;
+            const email = document.getElementById('resetEmail').value.trim();
             
             if (!email) {
                 showCustomModal('error', 'Email Required', 'Please enter your email address.');
@@ -1745,6 +1836,34 @@
                 }
                 
                 showCustomModal('error', 'Reset Failed', errorMessage);
+            }
+        };
+
+        window.resendVerificationEmail = async function() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            if (!email || !isValidEmail(email)) {
+                showCustomModal('error', 'Email Required', 'Enter a valid email in the form to resend verification.');
+                return;
+            }
+            if (!password) {
+                showCustomModal('error', 'Password Required', 'Enter your password to verify account ownership.');
+                return;
+            }
+            try {
+                showSmartLoader('Resending', 'Sending verification email...');
+                const { user } = await signInWithEmailAndPassword(auth, email, password);
+                await sendEmailVerification(user);
+                try { await signOut(auth); } catch(_) {}
+                hideSmartLoader();
+                showSuccessModal(`Verification email sent to ${email}. Please check your inbox.`, () => {});
+            } catch (error) {
+                hideSmartLoader();
+                let msg = 'Could not resend verification email.';
+                if (error.code === 'auth/wrong-password') msg = 'Incorrect password. Please try again.';
+                if (error.code === 'auth/user-not-found') msg = 'No account found with this email.';
+                if (error.code === 'auth/too-many-requests') msg = 'Too many attempts. Please try again later.';
+                showCustomModal('error', 'Resend Failed', msg);
             }
         };
 
@@ -1819,6 +1938,22 @@
             });
         }
 
+        function updatePasswordStrength() {
+            const pwd = document.getElementById('password');
+            const bar = document.getElementById('strengthBar');
+            const text = document.getElementById('strengthText');
+            if (!pwd || !bar || !text) return;
+            const v = pwd.value || '';
+            let score = 0;
+            if (v.length >= 8) score++;
+            if (/[a-z]/.test(v) && /[A-Z]/.test(v)) score++;
+            if (/[0-9]/.test(v)) score++;
+            if (/[^A-Za-z0-9]/.test(v)) score++;
+            bar.className = 'strength-bar' + (score ? ' level-' + Math.min(score,4) : '');
+            const labels = ['very weak','weak','fair','strong','very strong'];
+            text.textContent = 'Password strength: ' + labels[Math.min(score,4)];
+        }
+
         // Preload critical resources for faster loading
         function preloadResources() {
             const preloadLinks = [
@@ -1834,48 +1969,15 @@
             });
         }
 
-        // GitHub OAuth via redirect (no Firebase)
-        function handleGithubOAuthRedirect() {
-            const clientId = 'Ov23liaK2pApMKMX2qvT';
-            const redirectUri = 'https://jchathub.netlify.app/auth/github/callback';
-            const scope = 'read:user user:email';
-            const state = Math.random().toString(36).slice(2) + Date.now();
-            try { sessionStorage.setItem('gh_oauth_state', state); } catch (e) {}
-            const url = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&state=${encodeURIComponent(state)}`;
-            window.location.href = url;
-        }
+        // Google Sign-In via Firebase modular SDK (redirect-based)
+
 
         // Initialize all smart features
         document.addEventListener('DOMContentLoaded', function() {
             // Performance optimization - preload resources
             preloadResources();
 
-            // Verify Firebase Auth iframe connectivity and guide if blocked
-            (function verifyAuthIframe(){
-                try {
-                    const test = document.createElement('iframe');
-                    test.style.position = 'absolute';
-                    test.style.width = '1px';
-                    test.style.height = '1px';
-                    test.style.top = '-100px';
-                    test.referrerPolicy = 'no-referrer';
-                    const authDomain = (typeof firebaseConfig !== 'undefined' && firebaseConfig.authDomain) ? firebaseConfig.authDomain : 'jchat-1.firebaseapp.com';
-                    const apiKey = (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey) ? firebaseConfig.apiKey : '';
-                    test.src = `https://${authDomain}/__/auth/iframe?apiKey=${encodeURIComponent(apiKey)}&v=11.8.0`;
-                    let handled = false;
-                    const cleanup = () => { if (test && test.parentNode) test.parentNode.removeChild(test); };
-                    const timer = setTimeout(() => {
-                        if (!handled) {
-                            handled = true;
-                            cleanup();
-                            showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. If you see “refused to connect”, ensure this site (${location.host}) is in Firebase Authentication → Settings → Authorized domains, and that corporate firewalls allow *.firebaseapp.com`);
-                        }
-                    }, 4000);
-                    test.onload = () => { handled = true; clearTimeout(timer); cleanup(); };
-                    test.onerror = async () => { handled = true; clearTimeout(timer); cleanup(); try { await switchAuthDomain('jchat-1.web.app'); } catch(e) {} showErrorModal(`Could not reach Firebase Auth iframe at ${authDomain}. Switched to jchat-1.web.app for auth. Please retry.`); };
-                    document.body.appendChild(test);
-                } catch (e) { /* noop */ }
-            })();
+
             
             // Create floating particles
             createFloatingParticles();
@@ -1885,7 +1987,22 @@
             
             // Add smart validation
             addSmartValidation();
-            
+
+            // Password strength live updates
+            const pwdInput = document.getElementById('password');
+            if (pwdInput) {
+                pwdInput.addEventListener('input', updatePasswordStrength);
+                updatePasswordStrength();
+            }
+
+            // Show unverified banner if stored
+            try {
+                const unv = localStorage.getItem('unverified_email');
+                if (unv) {
+                    showUnverifiedBanner(unv);
+                }
+            } catch(_) {}
+
             // Add focus effects to inputs with performance optimization
             const inputs = document.querySelectorAll('input[type="email"], input[type="password"], input[type="text"], textarea');
             
@@ -1907,10 +2024,35 @@
             // Setup username validation
             setupUsernameValidation();
 
-            // Wire GitHub OAuth redirect button
-            const ghBtn = document.getElementById('githubOauthBtn');
-            if (ghBtn) ghBtn.addEventListener('click', handleGithubOAuthRedirect);
 
+
+            // Prefill remembered email
+            try {
+                const remembered = localStorage.getItem('remembered_email');
+                if (remembered) {
+                    const emailInput = document.getElementById('email');
+                    const rememberCb = document.getElementById('remember');
+                    if (emailInput) emailInput.value = remembered;
+                    if (rememberCb) rememberCb.checked = true;
+                }
+            } catch(_) {}
+
+            // Caps Lock warning on password
+            const pwd = document.getElementById('password');
+            const cw = document.getElementById('capsWarning');
+            if (pwd && cw) {
+                const handleCaps = (e) => {
+                    try {
+                        if (e.getModifierState && e.getModifierState('CapsLock')) {
+                            cw.style.display = 'block';
+                        } else {
+                            cw.style.display = 'none';
+                        }
+                    } catch(_) {}
+                };
+                pwd.addEventListener('keyup', handleCaps);
+                pwd.addEventListener('keydown', handleCaps);
+            }
 
             // Close modals when clicking outside
             document.addEventListener('click', function(e) {
