@@ -5767,14 +5767,14 @@ function generateProceduralQuote(type) { const t = quoteTemplates[type] || quote
             return 1500 * level * (level + 1) / 2;
         }
         function getLevelInfo(level) {
-            // CHALLENGING SYSTEM - Dynamic calculation matching Profile.html
             let jCoinReward = 0;
             let gasReward = 0;
-            let otherRewards = [];
-            let name = "Unknown";
+            let name = `Level ${level}`;
             let icon = "fas fa-question-circle";
-            let timeEstimate = "Unknown";
+            let otherRewards = [];
 
+            // Base JCoin and Gas rewards scale linearly
+            // Starting values and increments are adjusted to provide a smoother curve up to 500
             if (level >= 1 && level <= 25) { // Tier 1: Early Explorer
                 jCoinReward = 10 + (level - 1) * 5; // Start 10, +5/level
                 gasReward = 5 + (level - 1) * 2;   // Start 5, +2/level
@@ -5792,85 +5792,139 @@ function generateProceduralQuote(type) { const t = quoteTemplates[type] || quote
                     "fas fa-chess", "fas fa-shield-alt", "fas fa-trophy", "fas fa-mask", "fas fa-dragon",
                     "fas fa-meteor", "fas fa-galaxy", "fas fa-hand-sparkles", "fas fa-infinity", "fas fa-atom"
                 ];
-                const timeEstimates = [
-                    "1 week", "2 weeks", "3 weeks", "1 month", "6 weeks",
-                    "2 months", "10 weeks", "3 months", "14 weeks", "4 months",
-                    "18 weeks", "5 months", "22 weeks", "6 months", "26 weeks",
-                    "7 months", "30 weeks", "8 months", "34 weeks", "9 months",
-                    "38 weeks", "10 months", "42 weeks", "11 months", "1 year"
-                ];
-                
                 name = levelNames[level - 1] || `Level ${level}`;
-                icon = levelIcons[level - 1] || "fas fa-star";
-                timeEstimate = timeEstimates[level - 1] || "Unknown";
+                icon = levelIcons[level - 1] || "fas fa-question-circle";
 
-                // Specific rewards for challenging progression
-                if (level === 1) otherRewards.push("Badge: 'First Steps'");
+                // Specific other rewards for Tier 1
+                if (level === 1) otherRewards.push("Badge: 'Newbie'");
                 if (level === 3) otherRewards.push("Unlock: 1-Hour XP Boost");
-                if (level === 5) otherRewards.push("Badge: 'Chat Starter'", "Unlock: Basic Profile Frame");
-                if (level === 10) otherRewards.push("Unlock: Custom Status Messages");
-                if (level === 15) otherRewards.push("Badge: 'Community Builder'");
-                if (level === 20) otherRewards.push("Unlock: Legendary Status", "Special Profile Effects");
-                if (level === 25) otherRewards.push("Badge: 'Cosmic Being'", "Ultimate Profile Customization");
-            }
+                if (level === 5) otherRewards.push("Badge: 'Chat Starter'", "Unlock: Basic Profile Picture Frame");
+                if (level === 8) otherRewards.push("Unlock: Common Emote Pack (Set 1)");
+                if (level === 10) otherRewards.push("Title: 'Friendly Face'", "Increased Message Character Limit (+10)");
+                if (level === 13) otherRewards.push("Unlock: 3-Hour XP Boost");
+                if (level === 15) otherRewards.push("Badge: 'Community Contributor'", "Unlock: Basic Chat Bubble Style");
+                if (level === 18) otherRewards.push("Unlock: Common Emote Pack (Set 2)");
+                if (level === 20) otherRewards.push("Title: 'Early Explorer'", "Increased Message Character Limit (+15)");
+                if (level === 25) otherRewards.push("Badge: 'Veteran Chatter'", "Unlock: Gradient Profile Picture Frame");
 
-            let xpToNextLevel;
+            } else if (level >= 26 && level <= 100) { // Tier 2: Active Member (Levels 26 - 100)
+                jCoinReward = 120 + (level - 26) * 8; // Starts higher, increases more
+                gasReward = 30 + (level - 26) * 3;
+                const tierNames = ["Active Member", "Group Enthusiast", "Social Butterfly", "Community Builder"];
+                const tierIcons = ["fas fa-user-check", "fas fa-users-cog", "fas fa-globe-europe", "fas fa-handshake"];
+                const tierIndex = Math.floor((level - 26) / 19); // Cycle every ~19 levels for 4 names
+                name = `${tierNames[tierIndex % tierNames.length]} Lv. ${level}`;
+                icon = tierIcons[tierIndex % tierIcons.length];
 
-            if (level < 1) level = 1;
+                // Specific other rewards for Tier 2
+                if (level === 30) otherRewards.push("Badge: 'Active Member'", "Unlock: Uncommon Emote Pack (Set 1)");
+                if (level === 35) otherRewards.push("Increased Friend Limit (+10)");
+                if (level === 40) otherRewards.push("Unlock: New Chat Bubble Style (Set 2)");
+                if (level === 45) otherRewards.push("Unlock: 1-Day XP Boost");
+                if (level === 50) otherRewards.push("Title: 'Centurion'", "Permanent: 1% JCoin Shop Discount", "Badge: '50-Level Achiever'");
+                if (level === 55) otherRewards.push("Unlock: Uncommon Emote Pack (Set 3)");
+                if (level === 60) otherRewards.push("Increased Message Character Limit (+20)");
+                if (level === 65) otherRewards.push("Unlock: Basic Profile Theme (Solid Color)");
+                if (level === 70) otherRewards.push("Increased Friend Limit (+15)");
+                if (level === 75) otherRewards.push("Title: 'Dedicated User'", "Unlock: Rare Emote Pack (Set 1)");
+                if (level === 80) otherRewards.push("Unlock: New Chat Bubble Style (Set 3)");
+                if (level === 85) otherRewards.push("Unlock: 3-Day XP Boost");
+                if (level === 90) otherRewards.push("Increased Group Creation Limit (+1)");
+                if (level === 95) otherRewards.push("Unlock: Uncommon Profile Picture Frame");
+                if (level === 100) otherRewards.push("Title: 'Master Conversationalist'", "Badge: 'Century Mark'", "Permanent: 2% JCoin Shop Discount", "Unlock: Exclusive 'Golden' Profile Picture Frame");
 
-            // Total Gas required to reach level N - mirrors Profile.html
-            function getTotalGasRequiredToReachLevel(level) { if (level <= 0) return 0; return 1500 * level * (level + 1) / 2; }
+            } else if (level >= 101 && level <= 250) { // Tier 3: Dedicated User (Levels 101 - 250)
+                jCoinReward = 750 + (level - 101) * 12;
+                gasReward = 150 + (level - 101) * 5;
+                const tierNames = ["Dedicated User", "JCHAT Elite", "Master Communicator", "Community Architect"];
+                const tierIcons = ["fas fa-user-shield", "fas fa-gem", "fas fa-microphone-alt", "fas fa-sitemap"];
+                const tierIndex = Math.floor((level - 101) / 37); // Cycle every ~37 levels for 4 names
+                name = `${tierNames[tierIndex % tierNames.length]} Lv. ${level}`;
+                icon = tierIcons[tierIndex % tierIcons.length];
 
-            // XP Calculation Logic - CHALLENGING progression system
-            // Uses the same formula as Profile.html: 1500 * level * (level + 1) / 2
-            // This creates a more challenging and rewarding progression curve
-            xpToNextLevel = 1500 * level * (level + 1) / 2;
+                // Specific other rewards for Tier 3
+                if (level === 110) otherRewards.push("Unlock: Animated Emote Pack (Set 1)");
+                if (level === 120) otherRewards.push("Increased Media Upload Size (+5MB)");
+                if (level === 125) otherRewards.push("Title: 'Rising Star'", "Unlock: Custom Chat Font (Style 1)");
+                if (level === 130) otherRewards.push("Unlock: 7-Day XP Boost");
+                if (level === 140) otherRewards.push("Permanent: 3% JCoin Shop Discount");
+                if (level === 150) otherRewards.push("Badge: 'JCHAT Expert'", "Unlock: Premium Profile Theme (Animated 1)");
+                if (level === 160) otherRewards.push("Increased Group Member Capacity (+5)");
+                if (level === 170) otherRewards.push("Unlock: Animated Emote Pack (Set 2)");
+                if (level === 175) otherRewards.push("Title: 'Elite Communicator'", "Unlock: Custom Chat Font (Style 2)");
+                if (level === 180) otherRewards.push("Increased Message Character Limit (+25)");
+                if (level === 190) otherRewards.push("Permanent: 4% JCoin Shop Discount");
+                if (level === 200) otherRewards.push("Badge: 'Double Century'", "Title: 'JCHAT Champion'", "Unlock: Exclusive 'Diamond' Profile Picture Frame", "Voucher: 1-Day Free Group Promotion");
+                if (level === 210) otherRewards.push("Increased Media Upload Size (+10MB)");
+                if (level === 220) otherRewards.push("Unlock: Premium Profile Theme (Animated 2)");
+                if (level === 230) otherRewards.push("Unlock: Rare Emote Pack (Set 2)");
+                if (level === 240) otherRewards.push("Priority Support Access");
+                if (level === 250) otherRewards.push("Badge: 'Quarter-Millennium'", "Title: 'The Architect'", "Early Access: Next Major Feature Beta");
 
-            // Handle higher levels (26+) with generic tiers
-            if (level > 25 && level <= 500) {
-                // Tiered naming for higher levels
-                const tierNames = [
-                    "Adept", "Master", "Grandmaster", "Exalted", "Ascendant",
-                    "Divine", "Apex", "Cosmic", "Ethereal", "Legendary",
-                    "Mythical", "Celestial", "Transcendent", "Omnipotent", "Infinite",
-                    "Starlight", "Nebula", "Galaxy", "Universe", "Multiverse",
-                    "Zenith", "Pinnacle", "Sovereign", "Eternal", "Absolute"
-                ];
-                const tierIcons = [
-                    "fas fa-magic", "fas fa-crown", "fas fa-chess-king", "fas fa-gem",
-                    "fas fa-star-of-life", "fas fa-hand-sparkles", "fas fa-mountain", "fas fa-atom",
-                    "fas fa-cloud-sun", "fas fa-dragon", "fas fa-meteor", "fas fa-galaxy",
-                    "fas fa-infinity", "fas fa-bahai", "fas fa-globe-americas", "fas fa-star",
-                    "fas fa-cloud", "fas fa-atom", "fas fa-globe", "fas fa-cubes",
-                    "fas fa-mountain", "fas fa-trophy", "fas fa-shield-alt", "fas fa-infinity", "fas fa-brain"
-                ];
+            } else if (level >= 251 && level <= 400) { // Tier 4: JCHAT Legend (Levels 251 - 400)
+                jCoinReward = 2500 + (level - 251) * 20;
+                gasReward = 500 + (level - 251) * 10;
+                const tierNames = ["JCHAT Legend", "Grandmaster", "Cosmic Converser", "Eternal Speaker"];
+                const tierIcons = ["fas fa-star-half-alt", "fas fa-chess-king", "fas fa-galaxy", "fas fa-infinity"];
+                const tierIndex = Math.floor((level - 251) / 37); // Cycle every ~37 levels for 4 names
+                name = `${tierNames[tierIndex % tierNames.length]} Lv. ${level}`;
+                icon = tierIcons[tierIndex % tierIcons.length];
 
-                const baseLevelForTier = 26;
-                const levelsPerTierName = 25; // Challenging system: bigger tier spans
-                const levelsPerTierIcon = 25;
+                // Specific other rewards for Tier 4
+                if (level === 260) otherRewards.push("Permanent: 5% JCoin Shop Discount");
+                if (level === 275) otherRewards.push("Title: 'Grand Strategist'", "Unlock: Legendary Emote Pack (Set 1)");
+                if (level === 290) otherRewards.push("Increased Group Creation Limit (+2)");
+                if (level === 300) otherRewards.push("Badge: 'Triple Century'", "Title: 'JCHAT Grandmaster'", "Voucher: 3-Day Free Group Promotion", "Unlock: Exclusive VIP Chat Room Access");
+                if (level === 310) otherRewards.push("Increased Media Upload Size (+15MB)");
+                if (level === 325) otherRewards.push("Title: 'Cosmic Weaver'", "Unlock: Custom Chat Font (Style 3)");
+                if (level === 340) otherRewards.push("Permanent: 7% JCoin Shop Discount");
+                if (level === 350) otherRewards.push("Badge: 'JCHAT Luminary'", "Unlock: Personalized Emote Slot (1 custom upload)");
+                if (level === 360) otherRewards.push("Increased Group Member Capacity (+10)");
+                if (level === 375) otherRewards.push("Title: 'The Eternal Flame'", "Unlock: Legendary Emote Pack (Set 2)");
+                if (level === 390) otherRewards.push("Ad-Free Experience (1 Month)");
+                if (level === 400) otherRewards.push("Badge: 'Quad Century'", "Title: 'The Unrivaled'", "Permanent: 10% JCoin Shop Discount", "Unlock: Unique Profile Aura (Tier 1)");
 
-                const tierNameIndex = Math.floor((level - baseLevelForTier) / levelsPerTierName);
-                const tierIconIndex = Math.floor((level - baseLevelForTier) / levelsPerTierIcon);
+            } else if (level >= 401 && level <= 500) { // Tier 5: The Unrivaled (Levels 401 - 500)
+                jCoinReward = 5000 + (level - 401) * 30;
+                gasReward = 1000 + (level - 401) * 15;
+                const tierNames = ["The Unrivaled", "Cosmic Creator", "JCHAT Deity", "Apex Being"];
+                const tierIcons = ["fas fa-infinity", "fas fa-solar-system", "fas fa-hand-holding-heart", "fas fa-star-and-crescent"];
+                const tierIndex = Math.floor((level - 401) / 25); // Cycle every 25 levels for 4 names
+                name = `${tierNames[tierIndex % tierNames.length]} Lv. ${level}`;
+                icon = tierIcons[tierIndex % tierIcons.length];
 
-                name = `${tierNames[tierNameIndex % tierNames.length]} Lv. ${level}`;
-                icon = tierIcons[tierIconIndex % tierIcons.length];
-                jCoinReward = 130 + (level - 26) * 10; // Challenging: higher base, slower growth
-                gasReward = 50 + (level - 26) * 5;
-                timeEstimate = `${Math.ceil(level / 4)} months`;
+                // Specific other rewards for Tier 5
+                if (level === 410) otherRewards.push("Ad-Free Experience (3 Months)");
+                if (level === 425) otherRewards.push("Title: 'Pinnacle Performer'", "Unlock: Unique Profile Aura (Tier 2)");
+                if (level === 440) otherRewards.push("Increased Media Upload Size (+20MB)");
+                if (level === 450) otherRewards.push("Badge: 'Near-God'", "Unlock: Mythic Emote Pack (Set 1)");
+                if (level === 460) otherRewards.push("Permanent: 12% JCoin Shop Discount");
+                if (level === 475) otherRewards.push("Title: 'Cosmic Architect'", "Voucher: 7-Day Free Group Promotion");
+                if (level === 480) otherRewards.push("Ad-Free Experience (6 Months)");
+                if (level === 490) otherRewards.push("Unlock: Exclusive 'Cosmic' Animated Avatar Frame");
+                if (level === 500) {
+                    otherRewards.push(
+                        "Badge: 'JCHAT Deity'",
+                        "Title: 'The Absolute'",
+                        "Lifetime Premium Status (Ad-Free, All Cosmetics Unlocked)",
+                        "Personalized Group Creation Perk (Custom starting benefits for new groups)",
+                        "Acknowledgment on JCHAT Hall of Fame (Your name/ID listed on a special page)",
+                        "Exclusive Discord Role (if applicable)",
+                        "Voting Rights on Future Feature Development"
+                    );
+                }
             } else if (level > 500) {
-                name = `Transcendent Lv. ${level}`;
-                icon = "fas fa-infinity";
-                jCoinReward = 130 + (500 - 26) * 10 + (level - 500) * 50;
-                gasReward = 50 + (500 - 26) * 5 + (level - 500) * 25;
-                timeEstimate = `${Math.ceil(level / 2)} months`;
-            } else if (level < 1) {
-                // Fallback for any edge cases (align with Profile/Levels)
-                name = `Level ${level}`;
-                icon = "fas fa-question-circle";
-                jCoinReward = 10;
-                gasReward = 5;
-                timeEstimate = "Unknown";
+                // Beyond level 500, continue scaling rewards and use a generic "Master" tier
+                jCoinReward = 5000 + (500 - 401) * 30 + (level - 500) * 50;
+                gasReward = 1000 + (500 - 401) * 8 + (level - 500) * 15;
+                name = `Master Lv. ${level}`;
+                icon = "fas fa-star";
+                otherRewards.push("Continued JCoin & Gas Rewards", "Exclusive Recognition (Tier 6)");
+                if (level % 100 === 0) otherRewards.push("Special Milestone Bonus");
             }
+
+            const xpToNextLevel = getTotalGasRequiredToReachLevel(level);
+            const timeEstimate = "Unknown";
 
             return {
                 level: level,
