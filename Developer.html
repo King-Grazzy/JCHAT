@@ -2226,6 +2226,7 @@
         let unsubscribeListeners = []; // To store all onSnapshot unsubscribe functions.
         let unsubscribeLookedUpUserListener = null;
         let unsubscribePendingRequestsListener = null;
+        let unsubscribePendingVerificationListener = null; // Listener for pending verification requests
         let unsubscribeSystemSettingsListener = null;
         let unsubscribeReportedContentListener = null; // New listener for reports
         let unsubscribePublicPostsListener = null; // New listener for public posts
@@ -5860,7 +5861,7 @@
             buyGasDescription.textContent = `Transfer ₦${amount.toLocaleString()} and upload your receipt. You will receive ${gasAmount.toLocaleString()} Gas after approval.`;
             const oid = `GAS-${Date.now()}`;
             buyGasOrderId.textContent = oid;
-            buyGasAmountText.textContent = `₦${amount.toLocaleString()}`;
+            buyGasAmountText.textContent = `��${amount.toLocaleString()}`;
             buyGasReceiptInput.value = '';
             buyGasError.style.display = 'none';
             submitBuyGasBtn.disabled = false;
