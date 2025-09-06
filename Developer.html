@@ -2382,6 +2382,7 @@
 
                 badgeApprovalResult.textContent = 'Badge denied and user notified.';
                 if (lookedUpUserId === userId) { if (typeof fetchAndDisplayLookedUpUser === 'function') fetchAndDisplayLookedUpUser(userId); }
+                if (typeof fetchPendingVerificationRequests === 'function') fetchPendingVerificationRequests();
             } catch (err) {
                 console.error('Error denying badge:', err);
                 badgeApprovalResult.textContent = 'Deny failed: ' + (err.message || err);
