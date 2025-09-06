@@ -23,25 +23,31 @@
 
     var isAllowlisted = AUTH_ALLOWLIST.some(function(p) { return path.endsWith('/' + p) || path === '/' + p || path.endsWith(p); });
 
-    function hasAuthenticatedUser() {
+    function extractAuthUserFrom(storage) {
       try {
-        var keys = Object.keys(localStorage || {});
+        var keys = Object.keys(storage || {});
         for (var i = 0; i < keys.length; i++) {
           var k = keys[i];
           if (k.indexOf('firebase:authUser:') === 0) {
-            var raw = localStorage.getItem(k);
+            var raw = storage.getItem(k);
             if (!raw) continue;
             try {
               var data = JSON.parse(raw);
               if (data && data.uid && data.stsTokenManager && data.stsTokenManager.accessToken) {
                 if (data.isAnonymous) continue; // treat anonymous as unauthorized
-                return true;
+                return data;
               }
             } catch (_) {}
           }
         }
-      } catch (e) {}
-      return false;
+      } catch (_) {}
+      return null;
+    }
+
+    function hasAuthenticatedUser() {
+      // Check both localStorage and sessionStorage to support both persistence types
+      var u = extractAuthUserFrom(localStorage) || extractAuthUserFrom(sessionStorage);
+      return !!u;
     }
 
     // If page is not allowlisted, enforce authentication
