@@ -6926,7 +6926,7 @@
             if (!currentUser) return; // Only allow logout if a user is actually logged in
             try {
                 await signOut(auth);
-                showEnhancedSmartSuccess("Logged out successfully! 👋", 'celebration');
+                showEnhancedSmartSuccess("Logged out successfully! ��", 'celebration');
                 setTimeout(() => {
                     window.location.href = '/login.html'; // Redirect to login page
                 }, 1000);
@@ -8873,7 +8873,12 @@
                         }
                     }
 
-                    if (profileVerifiedBadge) profileVerifiedBadge.style.display = (displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true) ? 'flex' : 'none';
+                    if (profileVerifiedBadge) {
+                        const isVerified = (displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true);
+                        const showForOwnerOrAdmin = (isCurrentUserProfile === true) || (currentUser && currentUser.uid === ADMIN_UID);
+                        profileVerifiedBadge.style.display = (isVerified || showForOwnerOrAdmin) ? 'flex' : 'none';
+                        profileVerifiedBadge.title = isVerified ? 'Verified' : (isCurrentUserProfile ? 'Request Verification' : 'Not Verified');
+                    }
 
                     // Bio
                     if (profileBio) { // Null check
