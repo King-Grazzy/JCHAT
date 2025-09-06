@@ -1415,8 +1415,8 @@
 
         .verified-badge {
             position: absolute;
-            bottom: 6px;
-            right: 6px;
+            bottom: -6px;
+            right: -6px;
             width: 28px;
             height: 28px;
             border-radius: 50%;
@@ -5218,17 +5218,15 @@
                 </div>
 
                 <div class="profile-header-area">
-                    <div class="profile-pic-row">
-                        <div class="profile-pic-wrapper" id="profilePicWrapper">
-                            <img id="profilePagePic" src="" alt="Profile Picture" class="profile-pic" style="display: none;">
-                            <i id="profilePageAvatarIcon" class="fas fa-user-circle profile-pic-placeholder"></i>
-                            <input type="file" id="profilePicUploadInput" accept="image/*" style="display: none;">
-                            <label for="profilePicUploadInput" class="edit-profile-pic-overlay" id="editProfilePicOverlay">
-                                <i class="fas fa-camera"></i> Edit
-                            </label>
-                             <!-- NEW: Loading spinner for profile pic -->
-                        </div>
-                        <button id="profileVerifiedBadge" class="verified-chip" title="Verified" aria-label="Verified account"><i class="fas fa-check"></i></button>
+                    <div class="profile-pic-wrapper" id="profilePicWrapper">
+                        <img id="profilePagePic" src="" alt="Profile Picture" class="profile-pic" style="display: none;">
+                        <i id="profilePageAvatarIcon" class="fas fa-user-circle profile-pic-placeholder"></i>
+                        <input type="file" id="profilePicUploadInput" accept="image/*" style="display: none;">
+                        <label for="profilePicUploadInput" class="edit-profile-pic-overlay" id="editProfilePicOverlay">
+                            <i class="fas fa-camera"></i> Edit
+                        </label>
+                        <span id="profileVerifiedBadge" class="verified-badge" title="Verified" aria-label="Verified account"><i class="fas fa-check"></i></span>
+                         <!-- NEW: Loading spinner for profile pic -->
                     </div>
                     <h2 id="profileUsername" class="profile-name">Username</h2>
                     <p id="profileBio" class="profile-bio">No bio provided yet.</p>
