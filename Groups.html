@@ -97,6 +97,11 @@
     .toast.success { border-left: 4px solid var(--success); }
     .toast.error { border-left: 4px solid var(--danger); }
     .toast.info { border-left: 4px solid var(--blue); }
+    /* JCoin Request modal helpers */
+    .file-input-wrapper { display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid var(--border); border-radius:10px; background: var(--panel-2); cursor:pointer; }
+    .file-input-wrapper i { color: var(--muted); }
+    .file-name { color: var(--muted); font-size: 12px; }
+    .receipt-preview { width: 100%; max-height: 220px; object-fit: contain; border: 1px solid var(--border-light); border-radius: 10px; display:block; }
   </style>
 </head>
 <body>
@@ -110,6 +115,7 @@
         <div class="balance-pill" title="Your JCoins"><i class="fas fa-coins"></i><span id="headerJc">0</span></div>
         <div class="balance-pill" title="Your Gas"><i class="fas fa-bolt"></i><span id="headerGas">0</span></div>
         <a class="btn" href="/Coin.html"><i class="fas fa-coins"></i><span>Buy JCoins</span></a>
+        <button class="btn" id="openJCoinRequest"><i class="fas fa-coins"></i><span>Request JCoins</span></button>
         <a class="btn" href="/Wallet.html"><i class="fas fa-wallet"></i><span>Wallet</span></a>
         <button class="btn primary" id="openCreateRoom"><i class="fas fa-plus"></i><span>New Room</span></button>
       </div>
@@ -199,6 +205,34 @@
     </div>
   </div>
 
+  <!-- JCoin Request Modal -->
+  <div class="modal" id="jcoinReqModal" role="dialog" aria-modal="true">
+    <div class="card">
+      <div class="card-hd"><h3>Request JCoins</h3><button class="btn" id="closeJcReq">Close</button></div>
+      <div class="card-bd">
+        <div class="row">
+          <label for="jcReqNaira">Amount (₦)</label>
+          <input id="jcReqNaira" class="input" type="number" min="100" step="1" placeholder="e.g. 1000">
+          <div class="help">You will get: <b id="jcReqCalculated">0</b> JCoins</div>
+        </div>
+        <div class="row">
+          <label>Upload Payment Receipt</label>
+          <label class="file-input-wrapper" for="jcReqReceipt">
+            <i class="fas fa-upload"></i>
+            <span class="file-name" id="jcReqFileName">No file chosen</span>
+          </label>
+          <input id="jcReqReceipt" type="file" accept="image/*,application/pdf" style="display:none">
+          <img id="jcReqPreview" class="receipt-preview" style="display:none" alt="Receipt Preview">
+        </div>
+        <div class="help">After submission, admins will review your request in Developer tools. You’ll get a notification once approved.</div>
+      </div>
+      <div class="card-ft">
+        <button class="btn" id="cancelJcReq">Cancel</button>
+        <button class="btn primary" id="submitJcReq">Submit</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast -->
   <div class="toast" id="toast">Info</div>
 
@@ -224,6 +258,27 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
+    // Cloudinary + settings (for JCoin request)
+    const cloudinaryConfig = { cloudName: 'dxld01rcp', uploadPreset: 'Storage_preset' };
+    let currentSystemSettings = { jcoinNairaRate: 7.5 };
+    async function fetchSystemSettings(){
+      try {
+        const refDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
+        const snap = await getDoc(refDoc);
+        if (snap.exists()) currentSystemSettings = Object.assign(currentSystemSettings, snap.data());
+      } catch(_) {}
+    }
+    function calculateJCoins(naira){ const rate = Number(currentSystemSettings.jcoinNairaRate||7.5); const base = Math.floor((Number(naira)||0)/rate); return base; }
+    async function uploadMediaToCloudinary(file){
+      try{
+        const fd = new FormData(); fd.append('file', file); fd.append('upload_preset', cloudinaryConfig.uploadPreset);
+        const type = (file?.type||'').startsWith('image/') ? 'image' : ((file?.type||'').endsWith('pdf') ? 'raw' : 'image');
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/${type}/upload`, { method:'POST', body: fd });
+        if(!res.ok){ const e=await res.json(); throw new Error(e?.error?.message||'Upload failed'); }
+        const data = await res.json(); return data.secure_url || null;
+      }catch(e){ console.error('JCHAT_ERROR: Cloudinary upload', e); return null; }
+    }
 
     // DOM
     const roomSearch = document.getElementById('roomSearch');
@@ -258,6 +313,18 @@
     const inviteBtn = document.getElementById('inviteBtn');
     const leaveBtn = document.getElementById('leaveBtn');
     const toast = document.getElementById('toast');
+
+    // JCoin request DOM
+    const openJCoinRequest = document.getElementById('openJCoinRequest');
+    const jcoinReqModal = document.getElementById('jcoinReqModal');
+    const closeJcReq = document.getElementById('closeJcReq');
+    const cancelJcReq = document.getElementById('cancelJcReq');
+    const submitJcReq = document.getElementById('submitJcReq');
+    const jcReqNaira = document.getElementById('jcReqNaira');
+    const jcReqCalculated = document.getElementById('jcReqCalculated');
+    const jcReqReceipt = document.getElementById('jcReqReceipt');
+    const jcReqFileName = document.getElementById('jcReqFileName');
+    const jcReqPreview = document.getElementById('jcReqPreview');
 
     // Economy constants (tunable via server settings in future)
     const GROUP_CREATION_COST = 1000;
@@ -554,6 +621,32 @@
     function showDonate(){ if (!selectedRoom) { showToast('Select a room','error'); return; } donateModal.style.display='flex'; donateAmount.focus(); donateBalance.textContent = (currentProfile?.jCoins||0).toLocaleString(); }
     function hideDonate(){ donateModal.style.display='none'; donateAmount.value=''; }
 
+    // JCoin request UI helpers
+    function showJcReq(){ jcoinReqModal.style.display='flex'; jcReqNaira.value=''; jcReqCalculated.textContent='0'; jcReqReceipt.value=''; jcReqFileName.textContent='No file chosen'; jcReqPreview.style.display='none'; jcReqPreview.src=''; }
+    function hideJcReq(){ jcoinReqModal.style.display='none'; }
+    function onAmtInput(){ const v = Math.max(0, Math.floor(Number(jcReqNaira.value||0))); jcReqCalculated.textContent = calculateJCoins(v).toLocaleString(); }
+    function onReceiptChange(){ const f = jcReqReceipt.files?.[0]; jcReqFileName.textContent = f ? (f.name||'receipt') : 'No file chosen'; if (f && f.type.startsWith('image/')) { jcReqPreview.src = URL.createObjectURL(f); jcReqPreview.style.display='block'; } else { jcReqPreview.style.display='none'; jcReqPreview.src=''; } }
+    async function submitJc(){
+      try{
+        if (!currentUser) { showToast('Please log in','error'); return; }
+        const naira = Math.floor(Number(jcReqNaira.value||0)); if (!naira || naira<100){ showToast('Enter at least ₦100','error'); return; }
+        const file = jcReqReceipt.files?.[0]; if (!file){ showToast('Attach receipt','error'); return; }
+        const url = await uploadMediaToCloudinary(file); if (!url){ showToast('Upload failed','error'); return; }
+        const jcoins = calculateJCoins(naira);
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'jcoin_buy_requests'), {
+          userId: currentUser.uid,
+          username: currentProfile?.username || (currentUser.email || 'User'),
+          profilePicId: currentProfile?.profilePicId || null,
+          requestedNairaPrice: naira,
+          requestedJCoins: jcoins,
+          receiptImageUrl: url,
+          status: 'pending',
+          timestamp: serverTimestamp()
+        });
+        showToast('Request submitted','success'); hideJcReq();
+      }catch(e){ console.error(e); showToast('Failed to submit','error'); }
+    }
+
     // Events
     openCreateRoom.addEventListener('click', showCreate);
     closeCreate.addEventListener('click', hideCreate);
@@ -567,6 +660,13 @@
     composerInput.addEventListener('keydown', (e)=>{ if (e.key==='Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
     refreshRooms.addEventListener('click', renderRooms);
     roomSearch.addEventListener('input', renderRooms);
+    openJCoinRequest.addEventListener('click', async ()=>{ if (!currentUser) { await ensureAuth(); } await fetchSystemSettings(); showJcReq(); });
+    closeJcReq.addEventListener('click', hideJcReq);
+    cancelJcReq.addEventListener('click', hideJcReq);
+    submitJcReq.addEventListener('click', submitJc);
+    jcReqNaira.addEventListener('input', onAmtInput);
+    jcReqReceipt.addEventListener('change', onReceiptChange);
+
     inviteBtn.addEventListener('click', async ()=>{
       if (!selectedRoom) return;
       try {
@@ -595,6 +695,7 @@
       currentUser = user || null;
       if (!currentUser) { await ensureAuth(); return; }
       await loadProfile();
+      await fetchSystemSettings();
       await subscribeRooms();
       await handleDeepLink();
     });
