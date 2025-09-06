@@ -2316,7 +2316,7 @@
 
                 // Update both private and public profiles in a transaction
                 await runTransaction(db, async (tx) => {
-                    tx.set(privateProfileRef, { isVerified: true, verified: true, verifiedAt: serverTimestamp(), verificationApprovedBy: currentUser?.uid || null }, { merge: true });
+                    tx.set(privateProfileRef, { isVerified: true, verified: true, verifiedAt: serverTimestamp(), verificationApprovedBy: currentUser?.uid || null, verificationRequested: false }, { merge: true });
                     tx.set(publicProfileRef, { verified: true, isVerified: true, verifiedAt: serverTimestamp() }, { merge: true });
                 });
 
@@ -2336,32 +2336,6 @@
                     read: false,
                     timestamp: serverTimestamp()
                 });
-
-                // Enqueue email using template
-                try {
-                    const publicProfileSnap = await getDoc(publicProfileRef);
-                    const publicData = publicProfileSnap.exists() ? publicProfileSnap.data() : {};
-                    const toEmail = publicData?.email || privateData?.email || null;
-                    if (toEmail) {
-                        // fetch template
-                        const tmplRef = doc(db, 'artifacts', appId, 'public', 'data', 'email_templates', 'verification_badge');
-                        const tmplSnap = await getDoc(tmplRef);
-                        const tmpl = tmplSnap.exists() ? tmplSnap.data() : null;
-                        const subject = (tmpl && tmpl.approved && tmpl.approved.subject) ? tmpl.approved.subject : 'Your account is verified';
-                        const bodyTemplate = (tmpl && tmpl.approved && tmpl.approved.body) ? tmpl.approved.body : 'Hi {{username}},\n\nYour account has been verified by {{admin}}.';
-                        const body = (bodyTemplate || '').replace(/{{username}}/g, publicData?.username || privateData?.username || '').replace(/{{admin}}/g, currentUserProfileData?.username || 'Admin');
-                        await addDoc(collection(db, `artifacts/${appId}/public/data/email_queue`), {
-                            to: toEmail,
-                            subject: subject,
-                            body: body,
-                            status: 'pending',
-                            createdAt: serverTimestamp(),
-                            metadata: { action: 'approve_badge', adminId: currentUser?.uid || null, userId }
-                        });
-                    }
-                } catch (e) {
-                    console.error('Failed to enqueue email:', e);
-                }
 
                 badgeApprovalResult.textContent = 'Badge approved successfully.';
                 // Refresh looked up user display if it matches
@@ -5861,7 +5835,7 @@
             buyGasDescription.textContent = `Transfer ₦${amount.toLocaleString()} and upload your receipt. You will receive ${gasAmount.toLocaleString()} Gas after approval.`;
             const oid = `GAS-${Date.now()}`;
             buyGasOrderId.textContent = oid;
-            buyGasAmountText.textContent = `��${amount.toLocaleString()}`;
+            buyGasAmountText.textContent = `₦${amount.toLocaleString()}`;
             buyGasReceiptInput.value = '';
             buyGasError.style.display = 'none';
             submitBuyGasBtn.disabled = false;
