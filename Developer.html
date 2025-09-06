@@ -2425,42 +2425,6 @@
             }
         }
 
-        // Email template management
-        async function loadEmailTemplate() {
-            try {
-                const tmplRef = doc(db, 'artifacts', appId, 'public', 'data', 'email_templates', 'verification_badge');
-                const snapT = await getDoc(tmplRef);
-                if (snapT.exists()) {
-                    const data = snapT.data();
-                    emailTemplateSubject.value = data?.approved?.subject || data?.default?.approved?.subject || '';
-                    emailTemplateBody.value = data?.approved?.body || data?.default?.approved?.body || '';
-                } else {
-                    emailTemplateSubject.value = 'Your account has been verified';
-                    emailTemplateBody.value = 'Hi {{username}},\n\nYour account has been verified by {{admin}}.';
-                }
-            } catch (e) { console.error('Failed to load email template:', e); }
-        }
-
-        async function saveEmailTemplate() {
-            try {
-                const tmplRef = doc(db, 'artifacts', appId, 'public', 'data', 'email_templates', 'verification_badge');
-                await setDoc(tmplRef, { approved: { subject: emailTemplateSubject.value || '', body: emailTemplateBody.value || '' } }, { merge: true });
-                badgeApprovalResult.textContent = 'Template saved.';
-            } catch (e) { console.error('Failed to save email template:', e); badgeApprovalResult.textContent = 'Save failed.'; }
-        }
-
-        if (saveEmailTemplateBtn) saveEmailTemplateBtn.addEventListener('click', saveEmailTemplate);
-        if (sendEmailPreviewBtn) sendEmailPreviewBtn.addEventListener('click', async () => {
-            // send preview to admin email
-            try {
-                const adminEmail = currentUserProfileData?.email || null;
-                if (!adminEmail) { badgeApprovalResult.textContent = 'No admin email available for preview.'; return; }
-                const subject = emailTemplateSubject.value || 'Preview: Verified';
-                const body = (emailTemplateBody.value || 'Hi {{username}},\n\nVerified by {{admin}}').replace(/{{username}}/g, currentUserProfileData?.username || 'User').replace(/{{admin}}/g, currentUserProfileData?.username || 'Admin');
-                await addDoc(collection(db, `artifacts/${appId}/public/data/email_queue`), { to: adminEmail, subject, body, status: 'pending', createdAt: serverTimestamp(), metadata: { preview: true } });
-                badgeApprovalResult.textContent = 'Preview queued to your email.';
-            } catch (e) { console.error('Preview send failed:', e); badgeApprovalResult.textContent = 'Preview failed.'; }
-        });
         const infoSynth = new Tone.Synth().toDestination();
 
         successSynth.oscillator.type = "sine";
@@ -4585,7 +4549,7 @@
                 'warning': '⚠️ Warning',
                 'success': '��� Success',
                 'maintenance': '🔧 Maintenance',
-                'update': '�� Update'
+                'update': '🆕 Update'
             };
             return typeLabels[type] || 'ℹ️ Information';
         }
