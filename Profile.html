@@ -1413,6 +1413,24 @@
             flex-shrink: 0;
         }
 
+        .verified-badge {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--blue);
+            color: #ffffff;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--background-main);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 2;
+        }
+        .verified-badge i { font-size: 14px; line-height: 1; }
+
         .profile-pic {
             width: 100%;
             height: 100%;
@@ -5200,6 +5218,7 @@
                         <img id="profilePagePic" src="" alt="Profile Picture" class="profile-pic" style="display: none;">
                         <i id="profilePageAvatarIcon" class="fas fa-user-circle profile-pic-placeholder"></i>
                         <input type="file" id="profilePicUploadInput" accept="image/*" style="display: none;">
+                        <span id="profileVerifiedBadge" class="verified-badge" title="Verified" aria-label="Verified account"><i class="fas fa-check"></i></span>
                         <label for="profilePicUploadInput" class="edit-profile-pic-overlay" id="editProfilePicOverlay">
                             <i class="fas fa-camera"></i> Edit
                         </label>
@@ -5982,6 +6001,7 @@
         const profilePageAvatarIcon = document.getElementById('profilePageAvatarIcon');
         const profilePicUploadInput = document.getElementById('profilePicUploadInput');
         const editProfilePicOverlay = document.getElementById('editProfilePicOverlay');
+        const profileVerifiedBadge = document.getElementById('profileVerifiedBadge');
 
         const profileUsername = document.getElementById('profileUsername'); // H2 element for username
         const profileBio = document.getElementById('profileBio');
@@ -8846,6 +8866,8 @@
                             profilePageAvatarIcon.style.display = 'block';
                         }
                     }
+
+                    if (profileVerifiedBadge) profileVerifiedBadge.style.display = (displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true) ? 'flex' : 'none';
 
                     // Bio
                     if (profileBio) { // Null check
