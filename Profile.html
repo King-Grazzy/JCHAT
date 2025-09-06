@@ -5061,6 +5061,57 @@
     </style>
 </head>
 <body class="theme-dark-mode">
+    <!-- Home-like Loader (2s only) -->
+    <div id="nuviaLoader" class="jchat-loader" style="display:none">
+        <div class="loader-container">
+            <div class="loader-spinner"></div>
+            <div class="loader-particles">
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+                <div class="particle"></div>
+            </div>
+            <div class="loader-text">Nuvia</div>
+            <div class="loader-subtext">
+                Loading your experience
+                <span class="loader-dots">
+                    <span class="loader-dot"></span>
+                    <span class="loader-dot"></span>
+                    <span class="loader-dot"></span>
+                </span>
+            </div>
+            <div class="loader-progress" role="progressbar" aria-label="Loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="loader-progress-bar"></div></div>
+            <div class="loader-percentage" id="profileLoaderPercent">0%</div>
+        </div>
+    </div>
+    <script>
+      (function(){
+        try{
+          var nuviaLoader = document.getElementById('nuviaLoader');
+          if(!nuviaLoader) return;
+          var pctEl = document.getElementById('profileLoaderPercent');
+          var bar = nuviaLoader.querySelector('.loader-progress-bar');
+          // Show loader
+          nuviaLoader.style.display = 'flex';
+          nuviaLoader.classList.remove('hidden');
+          var prevOverflow = document.body.style.overflow;
+          document.body.style.overflow = 'hidden';
+          var start = Date.now();
+          var int = setInterval(function(){
+            var elapsed = Date.now() - start;
+            var pct = Math.min(100, Math.round((elapsed/2000)*100));
+            if (bar) bar.style.width = pct + '%';
+            if (pctEl) pctEl.textContent = pct + '%';
+            if (pct >= 100){ clearInterval(int); }
+          }, 60);
+          setTimeout(function(){
+            nuviaLoader.classList.add('hidden');
+            setTimeout(function(){ nuviaLoader.style.display='none'; }, 400);
+            document.body.style.overflow = prevOverflow || 'auto';
+          }, 2000);
+        }catch(e){}
+      })();
+    </script>
 
     <!-- Smart Success Message Panel -->
     <div class="smart-success-panel" id="smartSuccessPanel">
