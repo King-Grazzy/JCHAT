@@ -571,6 +571,16 @@
     refreshRooms.addEventListener('click', renderRooms);
     roomSearch.addEventListener('input', renderRooms);
 
+    // Gate Wallet links until unlocked by admin
+    document.addEventListener('click', (ev)=>{
+      const a = ev.target.closest('a[href*="/Wallet.html"], a[href*="/wallet.html"]');
+      if (!a) return;
+      const href = a.getAttribute('href')||'';
+      const allowUnlock = /[?&]unlock=1(\b|&|$)/i.test(href);
+      const unlocked = !!(currentProfile && currentProfile.walletUnlocked);
+      if (!unlocked && !allowUnlock) { ev.preventDefault(); showToast('Wallet is locked. Contact admin to unlock.','error'); }
+    });
+
     inviteBtn.addEventListener('click', async ()=>{
       if (!selectedRoom) return;
       try {
