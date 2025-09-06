@@ -2374,23 +2374,6 @@
                 // Send notification
                 await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'notifications'), { title: 'Verification Denied', message: 'Your verification request was denied by an admin.', read: false, timestamp: serverTimestamp() });
 
-                // Enqueue email for denial
-                try {
-                    const publicProfileSnap = await getDoc(publicProfileRef);
-                    const privateSnap = await getDoc(privateProfileRef);
-                    const publicData = publicProfileSnap.exists() ? publicProfileSnap.data() : {};
-                    const privateData = privateSnap.exists() ? privateSnap.data() : {};
-                    const toEmail = publicData?.email || privateData?.email || null;
-                    if (toEmail) {
-                        const tmplRef = doc(db, 'artifacts', appId, 'public', 'data', 'email_templates', 'verification_badge');
-                        const tmplSnap = await getDoc(tmplRef);
-                        const tmpl = tmplSnap.exists() ? tmplSnap.data() : null;
-                        const subject = (tmpl && tmpl.denied && tmpl.denied.subject) ? tmpl.denied.subject : 'Verification request denied';
-                        const bodyTemplate = (tmpl && tmpl.denied && tmpl.denied.body) ? tmpl.denied.body : 'Hi {{username}},\n\nYour verification request has been denied by {{admin}}.';
-                        const body = (bodyTemplate || '').replace(/{{username}}/g, publicData?.username || privateData?.username || '').replace(/{{admin}}/g, currentUserProfileData?.username || 'Admin');
-                        await addDoc(collection(db, `artifacts/${appId}/public/data/email_queue`), { to: toEmail, subject, body, status: 'pending', createdAt: serverTimestamp(), metadata: { action: 'deny_badge', adminId: currentUser?.uid || null, userId } });
-                    }
-                } catch (e) { console.error('Failed to enqueue deny email:', e); }
 
                 badgeApprovalResult.textContent = 'Badge denied and user notified.';
                 if (lookedUpUserId === userId) { if (typeof fetchAndDisplayLookedUpUser === 'function') fetchAndDisplayLookedUpUser(userId); }
