@@ -3613,6 +3613,13 @@
                         const profilePicSrc = request.profilePicId ? `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/w_100,h_100,c_fill,g_face,r_max/${request.profilePicId}` : `https://placehold.co/50x50/CCCCCC/000000?text=${requesterInitial}`;
                         const timestamp = request.timestamp ? new Date(request.timestamp.toDate()).toLocaleString() : 'N/A';
 
+                        const rUrl = request.receiptImageUrl || request.receiptUrl || null;
+                        const isPdf = rUrl && /\.pdf(\?|$)/i.test(rUrl);
+                        const receiptHtml = rUrl
+                            ? (isPdf
+                                ? `<div style="margin-top:6px;padding:8px;border:1px solid var(--border-light);border-radius:10px;display:flex;align-items:center;gap:8px;font-size:12px;"><i class=\"fas fa-file-pdf\" style=\"color:#e11d48\"></i><span>PDF receipt</span><a href=\"${rUrl}\" target=\"_blank\" class=\"admin-button secondary\" style=\"margin-left:auto;text-decoration:none;\"><i class=\"fas fa-external-link-alt\"></i> Open</a></div>`
+                                : `<img src=\"${rUrl}\" alt=\"Receipt\" class=\"receipt-thumb\" onclick=\"window.open(this.src,'_blank')\">`)
+                            : '<p>No receipt image.</p>';
                         requestCard.innerHTML = `
                             <div class="request-header">
                                 <img src="${profilePicSrc}" alt="Requester Pic" class="requester-pic" onerror="this.onerror=null; this.src='https://placehold.co/50x50/CCCCCC/000000?text=${requesterInitial}';">
@@ -3624,7 +3631,7 @@
                             <div class="request-details">
                                 <p>Requested Naira: <strong>#${request.requestedNairaPrice.toLocaleString()}</strong></p>
                                 <p>Will Receive JCoins: <strong>${request.requestedJCoins.toLocaleString()}</strong></p>
-                                ${ request.receiptImageUrl || request.receiptUrl ? `<img src="${request.receiptImageUrl || request.receiptUrl}" alt="Receipt" class="receipt-thumb" onclick="window.open(this.src,'_blank')">` : '<p>No receipt image.</p>' }
+                                ${ receiptHtml }
                             </div>
                             <div class="request-actions">
                                 <button class="approve-btn" data-request-id="${requestId}" data-user-id="${request.userId}" data-jcoins="${request.requestedJCoins}">
