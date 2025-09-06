@@ -25,20 +25,20 @@
 
     function extractAuthUserFrom(storage) {
       try {
-        var keys = Object.keys(storage || {});
-        for (var i = 0; i < keys.length; i++) {
-          var k = keys[i];
-          if (k.indexOf('firebase:authUser:') === 0) {
-            var raw = storage.getItem(k);
-            if (!raw) continue;
-            try {
-              var data = JSON.parse(raw);
-              if (data && data.uid && data.stsTokenManager && data.stsTokenManager.accessToken) {
-                if (data.isAnonymous) continue; // treat anonymous as unauthorized
-                return data;
-              }
-            } catch (_) {}
-          }
+        if (!storage) return null;
+        // localStorage/sessionStorage keys are not enumerable via Object.keys; use storage.key(i)
+        for (var i = 0; i < storage.length; i++) {
+          var k = storage.key(i);
+          if (!k || k.indexOf('firebase:authUser:') !== 0) continue;
+          var raw = storage.getItem(k);
+          if (!raw) continue;
+          try {
+            var data = JSON.parse(raw);
+            if (data && data.uid && data.stsTokenManager && data.stsTokenManager.accessToken) {
+              if (data.isAnonymous) continue; // treat anonymous as unauthorized
+              return data;
+            }
+          } catch (_) {}
         }
       } catch (_) {}
       return null;
@@ -70,8 +70,9 @@
     // Fail-closed: if anything goes wrong, prefer redirecting to Login (unless already offline page)
     try {
       var p2 = (window.location.pathname || '').toLowerCase();
+      var ORIGIN_FALLBACK = (window.location && window.location.origin) ? window.location.origin : '';
       if (!/\boffline\.html$/.test(p2)) {
-        window.location.replace(ORIGIN + '/Login.html');
+        window.location.replace(ORIGIN_FALLBACK + '/Login.html');
       }
     } catch (_) {}
   }
