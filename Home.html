@@ -6076,7 +6076,7 @@ async function computeActivityReward(activityType, ctx={}){
   const checklistOK = meetsDailyChecklist();
   // Minimal XP always; JCoins only if checklist satisfied
   if (activityType==='post_creation'){
-    return { xp: 5, jc: 0.005 };
+    return { xp: 10, jc: 0.005 };
   }
   if (activityType && activityType.startsWith('react_')){
     // Reactions do not pay JCoins; tiny XP only
@@ -7623,7 +7623,7 @@ async function checkAndStartDailyBonusTimer() {
                 }
 
                 if (addedNewReaction && postOwnerId) {
-                    await createPendingActivityReward(postOwnerId, postOwnerName || 'Post Owner', 'post_owner_reaction_bonus', 0, 0.005, null, postId);
+                    await createPendingActivityReward(postOwnerId, postOwnerName || 'Post Owner', 'post_owner_reaction_bonus', 10, 0.005, null, postId);
                 }
 
                 showMessageBox(`Reaction recorded! ${xpReward} XP and ${jCoinReward} JCoins pending admin review.`, 'success');
@@ -7714,7 +7714,7 @@ async function checkAndStartDailyBonusTimer() {
                             postOwnerId,
                             postOwnerName || 'Post Owner',
                             'post_owner_comment_bonus',
-                            0,
+                            10,
                             0.005,
                             commentId,
                             postId
