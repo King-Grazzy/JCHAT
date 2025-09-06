@@ -527,7 +527,7 @@
         if (data.count >= QUEST_MSGS_DAILY_TARGET && !data.rewarded) {
           data.rewarded = true;
           createPendingActivityReward(currentUser.uid, currentProfile?.username || 'User', 'daily_message_streak', QUEST_JCOIN_REWARD, 5, selectedRoom?.id || null);
-          showToast('Quest reached! Pending review for JCoins.','info');
+          showToast(`Quest reached! +${QUEST_JCOIN_REWARD} JCoins are on the way.`,'info');
         }
         localStorage.setItem(key, JSON.stringify(data));
       } catch {}
