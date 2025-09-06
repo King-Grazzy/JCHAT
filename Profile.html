@@ -1528,6 +1528,18 @@
             transform: scale(1.02);
         }
 
+        /* Premium username color styles for verified users */
+        .username-style-gold {
+            background-image: linear-gradient(90deg, var(--theme-gold), var(--theme-gold));
+            text-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+        }
+        .username-style-pink {
+            background-image: linear-gradient(90deg, var(--pink), var(--pink));
+        }
+        .username-style-blue {
+            background-image: linear-gradient(90deg, var(--blue), var(--blue));
+        }
+
         .profile-bio, .profile-location, .profile-email, .profile-info-item {
             font-size: 1rem;
             color: var(--text-light);
@@ -5474,7 +5486,17 @@
                                 <label for="editDisplayName">Display Name</label>
                                 <input type="text" id="editDisplayName" placeholder="Enter your display name">
                             </div>
-                            
+
+                            <div class="form-group" id="usernameStyleGroup" style="display:none;">
+                                <label for="usernameStyleSelect">Username Color (Verified)</label>
+                                <select id="usernameStyleSelect">
+                                    <option value="default">Pink & Blue (Default)</option>
+                                    <option value="gold">Gold</option>
+                                    <option value="pink">Pink</option>
+                                    <option value="blue">Blue</option>
+                                </select>
+                            </div>
+
                             <div class="form-group">
                                 <label for="editEmail">Email</label>
                                 <input type="email" id="editEmail" placeholder="Enter your email address">
@@ -6067,6 +6089,27 @@
         const languageText = document.getElementById('languageText');
         const profileTimezone = document.getElementById('profileTimezone');
         const timezoneText = document.getElementById('timezoneText');
+        const usernameStyleSelect = document.getElementById('usernameStyleSelect');
+
+        function applyUsernameStyle(style, isVerified) {
+            if (!profileUsername) return;
+            profileUsername.classList.remove('username-style-gold', 'username-style-pink', 'username-style-blue');
+            if (!isVerified) return;
+            switch ((style || 'default')) {
+                case 'gold':
+                    profileUsername.classList.add('username-style-gold');
+                    break;
+                case 'pink':
+                    profileUsername.classList.add('username-style-pink');
+                    break;
+                case 'blue':
+                    profileUsername.classList.add('username-style-blue');
+                    break;
+                default:
+                    // Default pink/blue gradient already applied by .profile-name
+                    break;
+            }
+        }
 
         // --- Notification Badge Management ---
         function updateNotificationBadge(count) {
@@ -6983,6 +7026,7 @@
             const newInterests = interestsInput.value.trim(); // NEW
             const newWebsite = websiteInput.value.trim();   // NEW
             const newSocialLinks = socialLinksInput.value.trim(); // NEW
+            const newUsernameStyle = (usernameStyleSelect && (currentUserProfileData?.isVerified === true || currentUserProfileData?.verified === true)) ? usernameStyleSelect.value : 'default';
 
             if (!newDisplayName) {
                 console.error("Display name cannot be empty.");
@@ -7009,6 +7053,7 @@
                     interests: newInterests, // NEW
                     website: newWebsite,   // NEW
                     socialLinks: newSocialLinks, // NEW
+                    usernameStyle: newUsernameStyle,
                     updatedAt: serverTimestamp()
                 });
                 console.log("JCHAT_DEBUG: Firestore private profile updated.");
@@ -7024,6 +7069,7 @@
                     interests: newInterests, // NEW
                     website: newWebsite,   // NEW
                     socialLinks: newSocialLinks, // NEW
+                    usernameStyle: newUsernameStyle,
                     updatedAt: serverTimestamp()
                 });
                 console.log("JCHAT_DEBUG: Firestore public profile updated.");
@@ -7040,6 +7086,7 @@
                 if (newWebsite) { if (websiteLink) { websiteLink.href = newWebsite; websiteLink.textContent = newWebsite.replace(/^(https?:\/\/)?(www\.)?/, ''); } if (profileWebsite) profileWebsite.style.display = 'block'; } else { if (profileWebsite) profileWebsite.style.display = 'none'; }
                 if (newSocialLinks) { if (socialLinksText) socialLinksText.textContent = newSocialLinks; if (profileSocialLinks) profileSocialLinks.style.display = 'block'; } else { if (profileSocialLinks) profileSocialLinks.style.display = 'none'; }
 
+                applyUsernameStyle(newUsernameStyle, true);
                 showEnhancedSmartSuccess("Profile saved successfully! ✨", 'update');
 
 
@@ -8888,6 +8935,8 @@
 
                     if (profileUsername) profileUsername.textContent = displayedUserProfileData.username || "JCHAT User"; // Null check
                     const usernameInitial = (displayedUserProfileData.username || "J").charAt(0).toUpperCase();
+                    const isVerifiedUser = (displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true);
+                    applyUsernameStyle(displayedUserProfileData.usernameStyle || 'default', isVerifiedUser);
 
 
 
@@ -9197,6 +9246,7 @@
                         if (displayNameInput) displayNameInput.value = displayedUserProfileData.username || ""; // Null check
                         if (bioTextarea) bioTextarea.value = displayedUserProfileData.bio || ""; // Null check
                         if (locationInput) locationInput.value = displayedUserProfileData.location || ""; // Null check
+                        if (usernameStyleSelect) { usernameStyleSelect.value = displayedUserProfileData.usernameStyle || 'default'; const styleGroup = document.getElementById('usernameStyleGroup'); const isVerified = (displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true); if (styleGroup) styleGroup.style.display = isVerified ? 'block' : 'none'; }
                         if (schoolInput) schoolInput.value = displayedUserProfileData.school || ""; // NEW
                         if (workInput) workInput.value = displayedUserProfileData.work || ""; // NEW
                         if (interestsInput) interestsInput.value = displayedUserProfileData.interests || ""; // NEW
