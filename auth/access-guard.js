@@ -57,7 +57,7 @@
     window.addEventListener('offline', function() {
       var p = (window.location.pathname || '').toLowerCase();
       if (!/\boffline\.html$/.test(p)) {
-        window.location.replace('offline.html');
+        window.location.replace(ORIGIN + '/offline.html');
       }
     });
   } catch (err) {
