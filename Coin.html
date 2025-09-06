@@ -184,8 +184,8 @@
         card.className = 'card';
         card.innerHTML = `
           <div class="price">₦${price.toLocaleString()}</div>
-          <div class="hint">Rate at ₦${jcoinRate}/J</div>
-          <div class="coins">${total.toLocaleString()} JCoins ${bonus>0?`<span class="hint">(+${bonus.toLocaleString()} bonus)</span>`:''}</div>
+          <div class="hint">Rate at ₦${SHOP_NAIRA_PER_J}/J</div>
+          <div class="coins">${total.toLocaleString()} JCoins</div>
           <button class="btn primary" data-price="${price}"><i class="fas fa-shopping-cart"></i><span>Purchase</span></button>
         `;
         card.querySelector('button').addEventListener('click', ()=> requestPurchase(price, total));
