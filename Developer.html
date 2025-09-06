@@ -2342,6 +2342,7 @@
                 });
 
                 badgeApprovalResult.textContent = 'Badge approved successfully.';
+                if (typeof fetchPendingVerificationRequests === 'function') fetchPendingVerificationRequests();
                 // Refresh looked up user display if it matches
                 if (lookedUpUserId === userId) {
                     // Trigger existing lookup refresh if available
