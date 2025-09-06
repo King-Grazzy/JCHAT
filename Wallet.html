@@ -1728,8 +1728,8 @@ let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
                 const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
                 onSnapshot(settingsRef, (snap) => {
                     const data = snap.exists() ? snap.data() : null;
-                    const nairaPerJ = Number(data?.jcoinNairaRate);
-                    if (nairaPerJ > 0) jcoinPerNaira = 1 / nairaPerJ; // convert ₦/J → J/₦
+                    // Force new pricing mapping used in Coin.html (₦200 ⇒ 750 JCoins)
+                    jcoinPerNaira = 3.75;
                     updateFiatUI();
                 }, () => {});
             } catch (_) {}
