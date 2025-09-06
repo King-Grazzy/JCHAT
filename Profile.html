@@ -80,6 +80,7 @@
             --accent-color: #00d5ff; /* A bright cyan */
             --accent-color-dark: #00aaff;
             --border-color: #3a3a5a;
+            --theme-gold: #ffd700;
         }
 
         /* --- Theme Definitions (Light and Dark Mode) --- */
@@ -1411,6 +1412,9 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             position: relative;
             flex-shrink: 0;
+        }
+        .profile-pic-wrapper.gold-glow {
+            box-shadow: 0 0 0 3px var(--theme-gold), 0 0 18px 6px rgba(255, 215, 0, 0.55), 0 4px 15px rgba(0,0,0,0.3);
         }
 
         .verified-badge {
@@ -8879,6 +8883,9 @@
                         const showForOwnerOrAdmin = (isCurrentUserProfile === true) || (currentUser && currentUser.uid === ADMIN_UID);
                         profileVerifiedBadge.style.display = (isVerified || showForOwnerOrAdmin) ? 'flex' : 'none';
                         profileVerifiedBadge.title = isVerified ? 'Verified' : (isCurrentUserProfile ? 'Request Verification' : 'Not Verified');
+                        if (profilePicWrapper) {
+                            if (isVerified) profilePicWrapper.classList.add('gold-glow'); else profilePicWrapper.classList.remove('gold-glow');
+                        }
                     }
 
                     // Bio
