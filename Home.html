@@ -3735,6 +3735,29 @@
         .post-skeleton-line { height:10px; }
         .post-skeleton-media { width:100%; height:150px; border-radius: 10px; }
         .post-visibility-badge { align-self:center; margin-left:auto; padding:4px 8px; border:1px solid var(--border-light); border-radius: 999px; color: var(--white); font-size: 0.75rem; background: rgba(255,255,255,0.05); }
+        /* 🚀 SMART SUCCESS MESSAGE PANEL - Edge Slide System */
+        .smart-success-panel { position: fixed; top: 50%; right: -100vw; transform: translateY(-50%); width: clamp(260px, 90vw, 380px); background: linear-gradient(135deg, rgba(76, 175, 80, 0.98), rgba(139, 195, 74, 0.98), rgba(76, 175, 80, 0.98)); border-radius: 20px 0 0 20px; box-shadow: -10px 0 30px rgba(76, 175, 80, 0.3), -5px 0 15px rgba(139, 195, 74, 0.2), inset 1px 0 0 rgba(255, 255, 255, 0.2); border: 2px solid rgba(76, 175, 80, 0.3); border-right: none; backdrop-filter: blur(20px); z-index: 99999; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .smart-success-panel.show { right: max(env(safe-area-inset-right, 0px), 0px); transform: translateY(-50%) scale(1); }
+        .smart-success-panel.hide { right: -100vw; transform: translateY(-50%) scale(0.95); }
+        .smart-success-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.3)); animation: smartSuccessProgress 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+        .smart-success-content { padding: 24px 28px 20px 28px; color: var(--white); text-align: left; max-height: calc(100vh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); overflow-y: auto; overscroll-behavior: contain; word-break: break-word; overflow-wrap: anywhere; }
+        .smart-success-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .smart-success-icon { width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; animation: smartSuccessIconPop 0.8s ease-out 0.3s both; }
+        .smart-success-close { width: 32px; height: 32px; background: rgba(255, 255, 255, 0.15); border: none; border-radius: 50%; color: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+        .smart-success-close:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.1); }
+        .smart-success-close:active { transform: scale(0.95); }
+        .smart-success-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; animation: smartSuccessTextSlide 0.6s ease-out 0.5s both; }
+        .smart-success-message { font-size: 1rem; line-height: 1.5; opacity: 0.95; animation: smartSuccessTextSlide 0.6s ease-out 0.7s both; }
+        .smart-success-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.2); display: flex; align-items: center; gap: 12px; animation: smartSuccessTextSlide 0.6s ease-out 0.9s both; }
+        .smart-success-timestamp { font-size: 0.85rem; opacity: 0.8; }
+        .smart-success-sound-indicator { width: 16px; height: 16px; background: rgba(255, 255, 255, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; animation: smartSuccessPulse 2s ease-in-out infinite; }
+        @keyframes smartSuccessProgress { 0% { width: 0%; opacity: 1; } 100% { width: 100%; opacity: 0; } }
+        @keyframes smartSuccessIconPop { 0% { transform: scale(0) rotate(-180deg); opacity: 0; } 50% { transform: scale(1.2) rotate(0deg); } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+        @keyframes smartSuccessTextSlide { 0% { transform: translateX(30px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+        @keyframes smartSuccessPulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } }
+        @media (max-width: 768px) { .smart-success-panel { width: clamp(260px, 90vw, 320px); } .smart-success-content { padding: 20px 24px 16px 24px; } .smart-success-icon { width: 40px; height: 40px; font-size: 1.3rem; } .smart-success-title { font-size: 1.2rem; } }
+        @media (max-width: 480px) { .smart-success-panel { width: clamp(240px, 92vw, 280px); } .smart-success-content { padding: 18px 20px 14px 20px; } .smart-success-icon { width: 36px; height: 36px; font-size: 1.2rem; } .smart-success-title { font-size: 1.1rem; } .smart-success-message { font-size: 0.95rem; } }
+@media (max-height: 540px) { .smart-success-panel { top: auto; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); transform: none; border-radius: 16px; } .smart-success-panel.show { right: 12px; } .smart-success-panel.hide { right: -100vw; } }
 </style>
 <style id="header-overflow-fix">
 /*header-overflow-fix*/
@@ -3751,6 +3774,37 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
 #premiumRequestBtn{flex:0 0 auto}
 @media (max-width:800px){#headerDisplayName{max-width:180px}}
 @media (max-width:600px){header .header-content-wrapper{gap:8px}#profileLink{column-gap:6px}#headerDisplayName{max-width:140px}#premiumRequestBtn span{display:none}}
+</style>
+<style id="responsive-layout">
+@media (min-width: 1024px) {
+  .content-wrapper { display: grid; grid-template-columns: 300px minmax(0,1fr) 320px; gap: 16px; align-items: start; }
+  .content-wrapper > * { min-width: 0; }
+  /* Left rail */
+  #engagementPanel { grid-column: 1; position: sticky; top: 84px; }
+  /* Center column */
+  #postCreationSection, #trendingHashtags, #postsFeed { grid-column: 2; }
+  #postCreationSection, #trendingHashtags { max-width: 720px; margin: 0 auto; }
+  .posts-feed-section { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 720px; margin: 0 auto; }
+  .posts-feed-section .post-card { margin: 0; }
+  /* Right rail */
+  .daily-inspiration-section, #peopleMayKnow, #globalAnnouncementsSection, #homeChipsRow, #premiumFeaturesSection, #highlightsSection, #savedWidgetSection { grid-column: 3; }
+  /* Make right rail act like a stacked sticky column */
+  .daily-inspiration-section, #peopleMayKnow, #globalAnnouncementsSection, #homeChipsRow, #premiumFeaturesSection, #highlightsSection, #savedWidgetSection { position: sticky; top: 84px; }
+  #peopleMayKnow, .daily-inspiration-section, #globalAnnouncementsSection, #homeChipsRow, #premiumFeaturesSection, #highlightsSection, #savedWidgetSection { width: 100%; max-width: none !important; }
+}
+@media (min-width: 1440px) {
+  .content-wrapper { grid-template-columns: 320px minmax(0, 1fr) 360px; }
+}
+/* Tablet centering: keep single column but center blocks */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .content-wrapper { padding: 0 16px; }
+  #postCreationSection, .posts-feed-section, #peopleMayKnow, .daily-inspiration-section, #globalAnnouncementsSection, #homeChipsRow, #premiumFeaturesSection, #highlightsSection, #savedWidgetSection { max-width: 760px; margin: 0 auto; }
+  .posts-feed-section { display: grid; grid-template-columns: 1fr; gap: 16px; }
+}
+/* Ultra‑wide: offer a comfortable 2‑up feed like Instagram Explore */
+@media (min-width: 1600px) {
+  .posts-feed-section { max-width: 1200px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 </style></head>
 <body class="theme-dark-mode">
     <!-- JCHAT Pink & Blue Glowing Loader -->
@@ -4237,6 +4291,22 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
 
     <!-- Custom Message Box -->
     <div id="messageBox" role="alert" aria-live="polite"></div>
+
+    <!-- Smart Success Message Panel -->
+    <div class="smart-success-panel" id="smartSuccessPanel">
+        <div class="smart-success-content">
+            <div class="smart-success-header">
+                <div class="smart-success-icon"><i class="fas fa-check-circle"></i></div>
+                <button class="smart-success-close" aria-label="Close success message">×</button>
+            </div>
+            <div class="smart-success-title" id="smartSuccessTitle">Success!</div>
+            <div class="smart-success-message" id="smartSuccessMessage">Operation completed successfully.</div>
+            <div class="smart-success-footer">
+                <div class="smart-success-timestamp" id="smartSuccessTimestamp"></div>
+                <div class="smart-success-sound-indicator">🔊</div>
+            </div>
+        </div>
+    </div>
 
     <!-- NEW: Maintenance Mode Overlay -->
     <div id="maintenanceOverlay" role="dialog" aria-modal="true" aria-labelledby="maintenanceOverlayTitle">
@@ -6176,7 +6246,7 @@ async function checkAndStartDailyBonusTimer() {
                     jcCapped
                 );
 
-                showMessageBox(`Daily bonus claimed! +${reward.xp} XP and +${reward.jc} JCoins (streak-based) pending admin review.`, 'success');
+                showEnhancedSmartSuccess(`Daily bonus booked! +${reward.xp} XP and +${jcCapped} JCoins are on the way — nice streak!`, 'achievement');
                 playNotificationSound('success');
 
                 // Update local profile data immediately for UI consistency (especially for the timer).
@@ -6454,6 +6524,43 @@ async function checkAndStartDailyBonusTimer() {
                     }, { once: true });
                 }, 3000);
             }
+        }
+
+        // Smart success panel utilities
+        function showSmartSuccessPanel(message, title = 'Success!', duration = 4000) {
+            const panel = document.getElementById('smartSuccessPanel');
+            const titleEl = document.getElementById('smartSuccessTitle');
+            const messageEl = document.getElementById('smartSuccessMessage');
+            const timestampEl = document.getElementById('smartSuccessTimestamp');
+            if (!panel || !titleEl || !messageEl || !timestampEl) { console.error('Smart success panel elements not found'); return; }
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            timestampEl.textContent = new Date().toLocaleTimeString();
+            panel.classList.remove('hide');
+            panel.classList.add('show');
+            const closeBtn = panel.querySelector('.smart-success-close');
+            if (closeBtn) closeBtn.onclick = () => hideSmartSuccessPanel();
+            playSuccessSound();
+            setTimeout(() => { hideSmartSuccessPanel(); }, duration);
+        }
+        function hideSmartSuccessPanel() {
+            const panel = document.getElementById('smartSuccessPanel');
+            if (!panel) return;
+            panel.classList.remove('show');
+            panel.classList.add('hide');
+        }
+        function showEnhancedSmartSuccess(message, style = 'default', duration = 4000) {
+            let title = 'Success!';
+            switch (style) {
+                case 'achievement': title = '🎉 Achievement Unlocked!'; break;
+                case 'update': title = '✅ Update Complete!'; break;
+                case 'celebration': title = '🎊 Celebration!'; break;
+                default: title = 'Success!';
+            }
+            showSmartSuccessPanel(message, title, duration);
+        }
+        function playSuccessSound() {
+            try { const audio = new Audio('ne.mp3'); audio.volume = 0.7; audio.play().catch(()=>{}); } catch {}
         }
 
         /**
@@ -7511,7 +7618,7 @@ async function checkAndStartDailyBonusTimer() {
                         postId
                     );
                     incrementDailyActivityCount('post');
-                    showMessageBox(`Post created! +${reward.xp} XP and +${reward.jc} JCoins pending admin review.`, 'success', true);
+                    showEnhancedSmartSuccess(`Post created! +${reward.xp} XP and +${reward.jc} JCoins are on the way.`, 'achievement');
                 }
                 playNotificationSound('success');
                 // Clear input fields and previews after successful post creation.
@@ -7626,7 +7733,7 @@ async function checkAndStartDailyBonusTimer() {
                     await createPendingActivityReward(postOwnerId, postOwnerName || 'Post Owner', 'post_owner_reaction_bonus', 10, 0.005, null, postId);
                 }
 
-                showMessageBox(`Reaction recorded! ${xpReward} XP and ${jCoinReward} JCoins pending admin review.`, 'success');
+                showEnhancedSmartSuccess(`Reaction recorded! +${xpReward} XP and +${jCoinReward} JCoins are on the way.`, 'update');
                 playNotificationSound('info');
             } catch (error) {
                 console.error("JCHAT_ERROR: Error handling reaction (Firestore update failed):", error);
@@ -7726,9 +7833,9 @@ async function checkAndStartDailyBonusTimer() {
                 // Show result using computed reward
                 if (typeof computeActivityReward === 'function') {
                     const reward = await computeActivityReward('post_comment', { contentLen: commentText.length, isReply: !!replyingTo, isFirstOnPost: wasFirstComment });
-                    showMessageBox(`Comment added! +${reward.xp} XP and +${reward.jc} JCoins pending admin review.`, 'success');
+                    showEnhancedSmartSuccess(`Comment added! +${reward.xp} XP and +${reward.jc} JCoins are on the way.`, 'update');
                 } else {
-                    showMessageBox('Comment added! Pending admin review.', 'success');
+                    showEnhancedSmartSuccess('Comment added! Your reward is on the way.', 'update');
                 }
                 playNotificationSound('success');
             } catch (error) {
@@ -10742,6 +10849,15 @@ async function fetchAndDisplayPosts() {
             sidebarNav.classList.add('sidebar-hidden');
             sidebarToggleState = false;
         }
+
+        // Device class toggles for responsive targeting
+        const applyDeviceClass = () => {
+            const isDesktop = window.innerWidth >= 1024;
+            document.body.classList.toggle('device-desktop', isDesktop);
+            document.body.classList.toggle('device-mobile', !isDesktop);
+        };
+        applyDeviceClass();
+        window.addEventListener('resize', applyDeviceClass, { passive: true });
         });
 
         // Comment reaction handler
