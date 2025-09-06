@@ -6080,5 +6080,69 @@
 
     </script>
 	
+        <!-- Hidden file input and upload helper for verification receipts (created programmatically) -->
+        <script>
+        (function() {
+            // Create hidden input
+            const verificationReceiptUploadInput = document.createElement('input');
+            verificationReceiptUploadInput.type = 'file';
+            verificationReceiptUploadInput.accept = 'image/*';
+            verificationReceiptUploadInput.style.display = 'none';
+            document.body.appendChild(verificationReceiptUploadInput);
+
+            // Helper: upload to Cloudinary
+            async function uploadMediaToCloudinary(file) {
+                try {
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    fd.append('upload_preset', cloudinaryConfig.uploadPreset);
+                    const type = (file?.type||'').startsWith('image/') ? 'image' : ((file?.type||'').includes('pdf') ? 'raw' : 'image');
+                    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/${type}/upload`, { method: 'POST', body: fd });
+                    if (!res.ok) {
+                        const e = await res.json();
+                        throw new Error(e?.error?.message || 'Upload failed');
+                    }
+                    const data = await res.json();
+                    return data.secure_url || data.public_id || null;
+                } catch (err) {
+                    console.error('Cloudinary upload failed', err);
+                    return null;
+                }
+            }
+
+            let currentReceiptUploadTargetUserId = null;
+
+            // Expose a function for other code to trigger upload for a specific user
+            window.triggerVerificationReceiptUpload = function(userId) {
+                currentReceiptUploadTargetUserId = userId;
+                verificationReceiptUploadInput.click();
+            };
+
+            verificationReceiptUploadInput.addEventListener('change', async (e) => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                if (!currentReceiptUploadTargetUserId) {
+                    console.warn('No target user for receipt upload');
+                    verificationReceiptUploadInput.value = '';
+                    return;
+                }
+                try {
+                    badgeApprovalResult.textContent = 'Uploading receipt...';
+                    const url = await uploadMediaToCloudinary(f);
+                    if (!url) { badgeApprovalResult.textContent = 'Upload failed.'; return; }
+                    const privateProfileRef = doc(db, 'artifacts', appId, 'users', currentReceiptUploadTargetUserId, 'profiles', 'user_profile');
+                    await updateDoc(privateProfileRef, { verificationReceiptUrl: url, verificationReceiptUploadedAt: serverTimestamp(), verificationReceiptUploadedBy: currentUser?.uid || null });
+                    badgeApprovalResult.textContent = 'Receipt uploaded.';
+                    if (typeof fetchPendingVerificationRequests === 'function') fetchPendingVerificationRequests();
+                } catch (err) {
+                    console.error('Receipt upload failed', err);
+                    badgeApprovalResult.textContent = 'Receipt upload failed.';
+                } finally {
+                    verificationReceiptUploadInput.value = '';
+                    currentReceiptUploadTargetUserId = null;
+                }
+            });
+        })();
+        </script>
 </body>
 </html>
