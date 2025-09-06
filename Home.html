@@ -6102,10 +6102,18 @@ async function checkAndStartDailyBonusTimer() {
             showMessageBox("Claiming daily bonus...", 'loading', true);
 
             try {
+                if (!meetsDailyChecklist()) {
+                    showMessageBox("Complete today’s checklist first: 15 posts, 50 comments, 100 reactions.", 'warning');
+                    return;
+                }
                 const userProfileDocRef = doc(db, "artifacts", appId, "users", currentUser.uid, "profiles", "user_profile");
 
-                // Determine challenging reward based on streak
+                // Determine strict reward based on streak
                 const streakCount = await getCurrentStreakCount();
+                if (streakCount < 3) {
+                    showMessageBox("Build a 3‑day streak to unlock the Daily Bonus.", 'warning');
+                    return;
+                }
                 const reward = computeDailyBonusFromStreak(streakCount, currentUser.uid);
 
                 // Update the lastLoginBonusClaimed timestamp in the user's private profile.
@@ -6114,13 +6122,16 @@ async function checkAndStartDailyBonusTimer() {
                     updatedAt: serverTimestamp()
                 });
 
+                // Cap daily/monthly
+                const jcCapped = (function(){ const v = Math.max(0, reward.jc|0); const capped = capsReduce(v); if (capped<=0) return 0; addAccruedDailyMonthly(capped); return capped; })();
+
                 // Create a pending reward for admin review instead of directly awarding.
                 await createPendingActivityReward(
                     currentUser.uid,
                     currentUserProfileData.username,
                     'daily_login',
                     reward.xp,
-                    reward.jc
+                    jcCapped
                 );
 
                 showMessageBox(`Daily bonus claimed! +${reward.xp} XP and +${reward.jc} JCoins (streak-based) pending admin review.`, 'success');
