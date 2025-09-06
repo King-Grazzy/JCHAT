@@ -1727,7 +1727,7 @@
                                     </label>
                                     <button id="toggleWalletLockButton" class="admin-button">
                                         <span class="button-text">Toggle Wallet Lock</span>
-                                        
+
                                     </button>
                                     <p>Ban Status: <strong id="currentBanStatus">N/A</strong></p>
                                     <label class="toggle-switch">
@@ -1736,13 +1736,29 @@
                                     </label>
                                     <button id="toggleBanButton" class="admin-button secondary">
                                         <span class="button-text">Toggle Ban Status</span>
-                                        
+
                                     </button>
                                     <button id="deleteUserAccountButton" class="admin-button danger">
                                         <span class="button-text"><i class="fas fa-trash-alt"></i> Delete User Account</span>
-                                        
+
                                     </button>
                                 </div>
+
+                                <!-- Approve Paid Badge Tool -->
+                                <div class="management-card">
+                                    <h4>Approve Paid Badge</h4>
+                                    <p style="margin:0 0 8px 0; color:var(--text-light);">Quickly approve a verified badge for a paid user. You can enter a User ID or Username, or leave empty to use the currently looked-up user.</p>
+                                    <div class="input-group">
+                                        <label for="badgeApprovalUserInput">User ID or Username</label>
+                                        <input type="text" id="badgeApprovalUserInput" placeholder="Optional - leave empty to use looked-up user">
+                                    </div>
+                                    <div class="button-group">
+                                        <button id="badgeLookupBtn" class="admin-button secondary"><span class="button-text"><i class="fas fa-search"></i> Lookup</span></button>
+                                        <button id="badgeApproveBtn" class="admin-button primary"><span class="button-text"><i class="fas fa-check-circle"></i> Approve Badge</span></button>
+                                    </div>
+                                    <div id="badgeApprovalResult" style="margin-top:8px; color:var(--text-light);"></div>
+                                </div>
+
                             </div>
                              <!-- Admin Chat/Direct Message to User -->
                             <div class="management-card" style="width: 100%;">
@@ -2105,6 +2121,12 @@
         const setLevelInput = document.getElementById('setLevelInput');
         const updateLevelButton = document.getElementById('updateLevelButton');
 
+        // Approve Badge Tool Elements
+        const badgeApprovalUserInput = document.getElementById('badgeApprovalUserInput');
+        const badgeLookupBtn = document.getElementById('badgeLookupBtn');
+        const badgeApproveBtn = document.getElementById('badgeApproveBtn');
+        const badgeApprovalResult = document.getElementById('badgeApprovalResult');
+
         const currentJCoinsValue = document.getElementById('currentJCoinsValue');
         const jcoinAmountInput = document.getElementById('jcoinAmountInput');
         const creditJCoinsButton = document.getElementById('creditJCoinsButton');
@@ -2192,6 +2214,9 @@
         let lookedUpUserProfileData = null;
         let currentSystemSettings = {};
 
+        // Internal helper: target id for badge approval flow
+        let badgeTargetUserId = null;
+
         let unsubscribeListeners = []; // To store all onSnapshot unsubscribe functions.
         let unsubscribeLookedUpUserListener = null;
         let unsubscribePendingRequestsListener = null;
@@ -2207,6 +2232,119 @@
 
         // --- Tone.js Synths for Notification Sounds ---
         const successSynth = new Tone.Synth().toDestination();
+
+        // Approve Badge: Lookup and Approve functions
+        async function lookupUserForBadge(inputValue) {
+            const val = (inputValue || badgeApprovalUserInput?.value || '').trim();
+            badgeApprovalResult.textContent = '';
+            try {
+                if (!val && lookedUpUserId) {
+                    badgeTargetUserId = lookedUpUserId;
+                } else if (!val) {
+                    badgeApprovalResult.textContent = 'Please enter a User ID or Username, or lookup a user first.';
+                    return null;
+                } else {
+                    // Try as UID first
+                    const privateRef = doc(db, 'artifacts', appId, 'users', val, 'profiles', 'user_profile');
+                    const snap = await getDoc(privateRef);
+                    if (snap.exists()) {
+                        badgeTargetUserId = val;
+                    } else {
+                        // Try username lookup in public users
+                        const publicUsersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                        const q = query(publicUsersRef, where('username', '==', val));
+                        const results = await getDocs(q);
+                        if (!results.empty) {
+                            badgeTargetUserId = results.docs[0].id;
+                        } else {
+                            // Try email lookup
+                            const q2 = query(publicUsersRef, where('email', '==', val));
+                            const r2 = await getDocs(q2);
+                            if (!r2.empty) badgeTargetUserId = r2.docs[0].id; else badgeTargetUserId = null;
+                        }
+                    }
+                }
+
+                if (!badgeTargetUserId) {
+                    badgeApprovalResult.textContent = 'User not found.';
+                    return null;
+                }
+
+                // Fetch private & public profile
+                const privateProfileRef = doc(db, 'artifacts', appId, 'users', badgeTargetUserId, 'profiles', 'user_profile');
+                const publicProfileRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', badgeTargetUserId);
+                const [privateSnap, publicSnap] = await Promise.all([getDoc(privateProfileRef), getDoc(publicProfileRef)]);
+                const privateData = privateSnap.exists() ? privateSnap.data() : null;
+                const publicData = publicSnap.exists() ? publicSnap.data() : null;
+
+                badgeApprovalResult.innerHTML = `<strong>Found:</strong> ${publicData?.username || privateData?.username || 'N/A'} (ID: ${badgeTargetUserId})<br>Verified: ${privateData?.isVerified || publicData?.verified ? 'Yes' : 'No'}<br>Premium: ${privateData?.premiumStatus?.plan || publicData?.premiumStatus?.plan || 'none'}`;
+                return badgeTargetUserId;
+            } catch (error) {
+                console.error('Error looking up user for badge:', error);
+                badgeApprovalResult.textContent = 'Lookup failed: ' + (error.message || error);
+                return null;
+            }
+        }
+
+        async function approveBadgeForUser(userId) {
+            badgeApprovalResult.textContent = '';
+            try {
+                if (!userId) {
+                    badgeApprovalResult.textContent = 'No target user selected.';
+                    return;
+                }
+
+                const privateProfileRef = doc(db, 'artifacts', appId, 'users', userId, 'profiles', 'user_profile');
+                const publicProfileRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userId);
+
+                // Optional: check premium status before granting badge
+                const privateSnap = await getDoc(privateProfileRef);
+                const privateData = privateSnap.exists() ? privateSnap.data() : {};
+                const isPaid = (privateData?.premiumStatus && privateData.premiumStatus.plan && privateData.premiumStatus.plan !== 'none') || (privateData?.jCoins && privateData.jCoins > 0);
+
+                if (!isPaid) {
+                    // warn but allow
+                    if (!confirm('This user does not appear to have an active premium plan. Proceed to approve badge anyway?')) return;
+                }
+
+                // Update both private and public profiles in a transaction
+                await runTransaction(db, async (tx) => {
+                    tx.set(privateProfileRef, { isVerified: true, verified: true, verifiedAt: serverTimestamp(), verificationApprovedBy: currentUser?.uid || null }, { merge: true });
+                    tx.set(publicProfileRef, { verified: true, isVerified: true, verifiedAt: serverTimestamp() }, { merge: true });
+                });
+
+                // Add admin log
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'admin_logs'), {
+                    action: 'approve_badge',
+                    adminId: currentUser?.uid || 'unknown',
+                    adminUsername: currentUserProfileData?.username || null,
+                    userId: userId,
+                    timestamp: serverTimestamp()
+                });
+
+                // Send notification to user
+                await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'notifications'), {
+                    title: 'Account Verified',
+                    message: 'Your account has been verified and granted the Premium badge by an admin.',
+                    read: false,
+                    timestamp: serverTimestamp()
+                });
+
+                badgeApprovalResult.textContent = 'Badge approved successfully.';
+                // Refresh looked up user display if it matches
+                if (lookedUpUserId === userId) {
+                    // Trigger existing lookup refresh if available
+                    if (typeof fetchAndDisplayLookedUpUser === 'function') fetchAndDisplayLookedUpUser(userId);
+                }
+            } catch (error) {
+                console.error('Error approving badge:', error);
+                badgeApprovalResult.textContent = 'Approval failed: ' + (error.message || error);
+            }
+        }
+
+        // Wire up buttons
+        if (badgeLookupBtn) badgeLookupBtn.addEventListener('click', async () => { await lookupUserForBadge(); });
+        if (badgeApproveBtn) badgeApproveBtn.addEventListener('click', async () => { const target = badgeTargetUserId || lookedUpUserId; if (!target) { badgeApprovalResult.textContent = 'No user selected. Use lookup first.'; return; } await approveBadgeForUser(target); });
         const errorSynth = new Tone.Synth().toDestination();
         const infoSynth = new Tone.Synth().toDestination();
 
