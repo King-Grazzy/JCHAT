@@ -230,7 +230,7 @@
 
         /* Loader progress bar */
         .loader-progress { width: 220px; height: 6px; margin: 12px auto 0; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; border: 1px solid var(--border-light); }
-        .loader-progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--blue), var(--pink)); }
+        .loader-progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--blue), var(--pink)); transition: width 0.3s ease; }
         .loader-percentage { margin-top: 8px; color: var(--text-light); font-size: 13px; letter-spacing: .5px; }
 
         .loader-spinner { display: none !important; }
@@ -6560,7 +6560,7 @@ async function checkAndStartDailyBonusTimer() {
         function showEnhancedSmartSuccess(message, style = 'default', duration = 4000) {
             let title = 'Success!';
             switch (style) {
-                case 'achievement': title = '🎉 Achievement Unlocked!'; break;
+                case 'achievement': title = '��� Achievement Unlocked!'; break;
                 case 'update': title = '✅ Update Complete!'; break;
                 case 'celebration': title = '🎊 Celebration!'; break;
                 default: title = 'Success!';
