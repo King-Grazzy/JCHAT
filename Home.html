@@ -5982,22 +5982,11 @@ function generateProceduralQuote(type) { const t = quoteTemplates[type] || quote
          * Checks the daily bonus status and starts/stops the countdown timer.
          * This is called on auth state change and after claiming a bonus.
          */
-        // Compute challenging daily reward amounts based on the user's current streak.
+        // Compute daily bonus (Hard mode): only if checklist met AND streak ≥ 3; small 1–3 J
         function computeDailyBonusFromStreak(streakCount, userId) {
-            const baseXp = 6; // small base to always reward
-            const baseJ = 2;
-            // Scale with streak: linear XP, sublinear JCoins for balance
-            const streakXp = Math.min(streakCount * 2, 80); // caps to avoid abuse
-            const streakJ = Math.min(Math.floor(Math.sqrt(streakCount)), 15);
-            // Weekly milestone boost (every 7th day)
-            const milestoneXp = (streakCount > 0 && streakCount % 7 === 0) ? 10 : 0;
-            const milestoneJ = (streakCount > 0 && streakCount % 7 === 0) ? 2 : 0;
-            // Deterministic tiny variance per day per user (0..2)
-            const dayIndex = Math.floor(Date.now() / 86400000);
-            const salt = (userId || 'guest').split('').reduce((a,c)=>a + c.charCodeAt(0), 0);
-            const variance = (salt + dayIndex * 7) % 3;
-            const xp = baseXp + streakXp + milestoneXp + variance;
-            const jc = baseJ + streakJ + Math.floor(variance / 2);
+            const baseXp = 3; // tiny XP
+            const jc = Math.max(0, Math.min(3, streakCount >= 3 ? 1 + Math.floor(Math.sqrt(streakCount)) : 0));
+            const xp = baseXp + Math.min(streakCount, 10);
             return { xp, jc };
         }
         // Read the current streak count for the logged-in user (no side effects)
