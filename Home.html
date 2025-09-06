@@ -3736,11 +3736,11 @@
         .post-skeleton-media { width:100%; height:150px; border-radius: 10px; }
         .post-visibility-badge { align-self:center; margin-left:auto; padding:4px 8px; border:1px solid var(--border-light); border-radius: 999px; color: var(--white); font-size: 0.75rem; background: rgba(255,255,255,0.05); }
         /* 🚀 SMART SUCCESS MESSAGE PANEL - Edge Slide System */
-        .smart-success-panel { position: fixed; top: 50%; right: -400px; transform: translateY(-50%); width: 380px; background: linear-gradient(135deg, rgba(76, 175, 80, 0.98), rgba(139, 195, 74, 0.98), rgba(76, 175, 80, 0.98)); border-radius: 20px 0 0 20px; box-shadow: -10px 0 30px rgba(76, 175, 80, 0.3), -5px 0 15px rgba(139, 195, 74, 0.2), inset 1px 0 0 rgba(255, 255, 255, 0.2); border: 2px solid rgba(76, 175, 80, 0.3); border-right: none; backdrop-filter: blur(20px); z-index: 99999; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: hidden; }
-        .smart-success-panel.show { right: 0; transform: translateY(-50%) scale(1); }
-        .smart-success-panel.hide { right: -400px; transform: translateY(-50%) scale(0.95); }
+        .smart-success-panel { position: fixed; top: 50%; right: -100vw; transform: translateY(-50%); width: clamp(260px, 90vw, 380px); background: linear-gradient(135deg, rgba(76, 175, 80, 0.98), rgba(139, 195, 74, 0.98), rgba(76, 175, 80, 0.98)); border-radius: 20px 0 0 20px; box-shadow: -10px 0 30px rgba(76, 175, 80, 0.3), -5px 0 15px rgba(139, 195, 74, 0.2), inset 1px 0 0 rgba(255, 255, 255, 0.2); border: 2px solid rgba(76, 175, 80, 0.3); border-right: none; backdrop-filter: blur(20px); z-index: 99999; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .smart-success-panel.show { right: max(env(safe-area-inset-right, 0px), 0px); transform: translateY(-50%) scale(1); }
+        .smart-success-panel.hide { right: -100vw; transform: translateY(-50%) scale(0.95); }
         .smart-success-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.3)); animation: smartSuccessProgress 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
-        .smart-success-content { padding: 24px 28px 20px 28px; color: var(--white); text-align: left; }
+        .smart-success-content { padding: 24px 28px 20px 28px; color: var(--white); text-align: left; max-height: calc(100vh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); overflow-y: auto; overscroll-behavior: contain; word-break: break-word; overflow-wrap: anywhere; }
         .smart-success-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
         .smart-success-icon { width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; animation: smartSuccessIconPop 0.8s ease-out 0.3s both; }
         .smart-success-close { width: 32px; height: 32px; background: rgba(255, 255, 255, 0.15); border: none; border-radius: 50%; color: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.3s ease; backdrop-filter: blur(10px); }
@@ -3755,8 +3755,9 @@
         @keyframes smartSuccessIconPop { 0% { transform: scale(0) rotate(-180deg); opacity: 0; } 50% { transform: scale(1.2) rotate(0deg); } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
         @keyframes smartSuccessTextSlide { 0% { transform: translateX(30px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
         @keyframes smartSuccessPulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } }
-        @media (max-width: 768px) { .smart-success-panel { width: 320px; right: -320px; } .smart-success-panel.show { right: 0; } .smart-success-panel.hide { right: -320px; } .smart-success-content { padding: 20px 24px 16px 24px; } .smart-success-icon { width: 40px; height: 40px; font-size: 1.3rem; } .smart-success-title { font-size: 1.2rem; } }
-        @media (max-width: 480px) { .smart-success-panel { width: 280px; right: -280px; } .smart-success-panel.show { right: 0; } .smart-success-panel.hide { right: -280px; } .smart-success-content { padding: 18px 20px 14px 20px; } .smart-success-icon { width: 36px; height: 36px; font-size: 1.2rem; } .smart-success-title { font-size: 1.1rem; } .smart-success-message { font-size: 0.95rem; } }
+        @media (max-width: 768px) { .smart-success-panel { width: clamp(260px, 90vw, 320px); } .smart-success-content { padding: 20px 24px 16px 24px; } .smart-success-icon { width: 40px; height: 40px; font-size: 1.3rem; } .smart-success-title { font-size: 1.2rem; } }
+        @media (max-width: 480px) { .smart-success-panel { width: clamp(240px, 92vw, 280px); } .smart-success-content { padding: 18px 20px 14px 20px; } .smart-success-icon { width: 36px; height: 36px; font-size: 1.2rem; } .smart-success-title { font-size: 1.1rem; } .smart-success-message { font-size: 0.95rem; } }
+@media (max-height: 540px) { .smart-success-panel { top: auto; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); transform: none; border-radius: 16px; } .smart-success-panel.show { right: 12px; } .smart-success-panel.hide { right: -100vw; } }
 </style>
 <style id="header-overflow-fix">
 /*header-overflow-fix*/
