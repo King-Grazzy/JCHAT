@@ -6076,26 +6076,14 @@ async function computeActivityReward(activityType, ctx={}){
   const checklistOK = meetsDailyChecklist();
   // Minimal XP always; JCoins only if checklist satisfied
   if (activityType==='post_creation'){
-    const len = clamp(ctx.contentLen||0,0,5000);
-    const valid = len>=140; // long-form only
-    let xp = valid ? 6 : 1;
-    let jc = valid && checklistOK ? 0.2 : 0; // 0.2 J per post
-    jc = capsReduce(Math.floor(jc*100)/100); // keep two decimals, then cap
-    if (jc>0) addAccruedDailyMonthly(jc);
-    return { xp, jc };
+    return { xp: 5, jc: 0.005 };
   }
   if (activityType && activityType.startsWith('react_')){
     // Reactions do not pay JCoins; tiny XP only
     return { xp: 1, jc: 0 };
   }
   if (activityType==='post_comment'){
-    const len = clamp(ctx.contentLen||0,0,5000);
-    const valid = len>=60;
-    let xp = valid ? 2 : 1;
-    let jc = valid && checklistOK ? 0.05 : 0; // 0.05 J per comment
-    jc = capsReduce(Math.floor(jc*100)/100);
-    if (jc>0) addAccruedDailyMonthly(jc);
-    return { xp, jc };
+    return { xp: 1, jc: 0 };
   }
   // Default: no coins
   return { xp: 0, jc: 0 };
@@ -7568,6 +7556,7 @@ async function checkAndStartDailyBonusTimer() {
                 let xpReward = 0;
                 let jCoinReward = 0;
                 let activityType = '';
+                let postOwnerId = null, postOwnerName = null, addedNewReaction = false;
 
                 await runTransaction(db, async (transaction) => {
                     const postDoc = await transaction.get(postRef);
@@ -7578,6 +7567,8 @@ async function checkAndStartDailyBonusTimer() {
                     }
 
                     const postData = postDoc.data();
+                    postOwnerId = postData.authorId || null;
+                    postOwnerName = postData.username || null;
                     let serverReactions = postData.reactions || { like: 0, love: 0, haha: 0 };
                     let serverLikesCount = postData.likesCount || 0;
                     let serverUserPreviousReaction = userReactionDoc.exists() ? userReactionDoc.data().type : null;
@@ -7599,6 +7590,7 @@ async function checkAndStartDailyBonusTimer() {
                         }
                         // Increment the new reaction type's count.
                         serverReactions[reactionType] = (serverReactions[reactionType] || 0) + 1;
+                        if (!serverUserPreviousReaction) { addedNewReaction = true; }
                         if (reactionType === 'like') serverLikesCount = (serverLikesCount || 0) + 1;
 
                         // Set/update the user's reaction document.
@@ -7628,6 +7620,10 @@ async function checkAndStartDailyBonusTimer() {
                         null,
                         postId
                     );
+                }
+
+                if (addedNewReaction && postOwnerId) {
+                    await createPendingActivityReward(postOwnerId, postOwnerName || 'Post Owner', 'post_owner_reaction_bonus', 0, 0.005, null, postId);
                 }
 
                 showMessageBox(`Reaction recorded! ${xpReward} XP and ${jCoinReward} JCoins pending admin review.`, 'success');
@@ -7668,11 +7664,16 @@ async function checkAndStartDailyBonusTimer() {
 
             try {
                 let commentId = null;
+                let postOwnerId = null, postOwnerName = null;
                 await runTransaction(db, async (transaction) => {
                     const postDoc = await transaction.get(postRef);
                     if (!postDoc.exists()) {
                         throw new Error("Post does not exist.");
                     }
+
+                    const pData = postDoc.data();
+                    postOwnerId = pData.authorId || null;
+                    postOwnerName = pData.username || null;
 
                     const newCommentRef = doc(commentsCollectionRef); // Create a new document reference for the comment.
                     const newComment = {
@@ -7706,6 +7707,19 @@ async function checkAndStartDailyBonusTimer() {
                         postId
                     );
                     incrementDailyActivityCount('comment');
+
+                    // Owner JCoin bonus for receiving a new comment
+                    if (postOwnerId) {
+                        await createPendingActivityReward(
+                            postOwnerId,
+                            postOwnerName || 'Post Owner',
+                            'post_owner_comment_bonus',
+                            0,
+                            0.005,
+                            commentId,
+                            postId
+                        );
+                    }
                 }
 
                 addComment.replyContext = null;
