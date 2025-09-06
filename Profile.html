@@ -6084,7 +6084,28 @@
         function applyUsernameStyle(isVerified) {
             if (!profileUsername) return;
             profileUsername.classList.remove('username-style-gold', 'username-style-pink', 'username-style-blue');
-            if (isVerified) {
+
+            // Determine verified state from data or visible badge (robust)
+            let verified = false;
+            try {
+                // Prefer explicit profile data if available
+                if (typeof displayedUserProfileData !== 'undefined' && displayedUserProfileData) {
+                    verified = (displayedUserProfileData.isVerified === true || displayedUserProfileData.verified === true);
+                }
+            } catch (e) {
+                // ignore
+            }
+
+            // Fallback: check the verified badge element title/display if DB flag isn't present
+            const badgeEl = document.getElementById('profileVerifiedBadge');
+            if (!verified && badgeEl) {
+                const badgeTitle = (badgeEl.title || '').toString().toLowerCase();
+                const badgeDisplayed = window.getComputedStyle(badgeEl).display !== 'none';
+                // Only treat as verified when the badge explicitly says 'verified'
+                if (badgeDisplayed && badgeTitle === 'verified') verified = true;
+            }
+
+            if (verified) {
                 profileUsername.classList.add('username-style-gold');
             }
         }
