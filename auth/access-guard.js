@@ -3,8 +3,9 @@
     var path = (window.location.pathname || '').toLowerCase();
 
     // Always redirect to Offline.html when there is no internet, except when already there
+    var ORIGIN = (window.location && window.location.origin) ? window.location.origin : '';
     if (!navigator.onLine && !/\boffline\.html$/.test(path)) {
-      window.location.replace('offline.html');
+      window.location.replace(ORIGIN + '/offline.html');
       return;
     }
 
