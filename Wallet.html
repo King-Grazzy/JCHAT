@@ -1131,7 +1131,7 @@
         <div class="fiat-value" id="localValueDisplay">≈ —</div>
     </div>
     <div class="fiat-col">
-        <div class="fiat-note" id="jcoinLabelNote">—</div>
+        <div class="fiat-note" id="jcoinLabelNote">��</div>
         <div class="fiat-value" id="oneJcoinRateDisplay">—</div>
     </div>
 </div>
@@ -1728,8 +1728,8 @@ let userCurrency = { code: 'USD', symbol: '$', label: 'USD' };
                 const settingsRef = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'system_settings');
                 onSnapshot(settingsRef, (snap) => {
                     const data = snap.exists() ? snap.data() : null;
-                    const rate = Number(data?.jcoinNairaRate);
-                    if (rate > 0) jcoinPerNaira = rate;
+                    const nairaPerJ = Number(data?.jcoinNairaRate);
+                    if (nairaPerJ > 0) jcoinPerNaira = 1 / nairaPerJ; // convert ₦/J → J/₦
                     updateFiatUI();
                 }, () => {});
             } catch (_) {}
