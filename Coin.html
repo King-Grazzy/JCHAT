@@ -50,7 +50,7 @@
         <div class="card">
           <h4>Buy JCoins</h4>
           <div class="hint">Purchase JCoins securely. Orders are reviewed by admins.</div>
-          <a class="btn primary" href="/jcoin_shop.html"><i class="fas fa-shopping-cart"></i><span>Open JCoin Shop</span></a>
+          <a class="btn primary" href="#shop"><i class="fas fa-shopping-cart"></i><span>Open JCoin Shop</span></a>
         </div>
         <div class="card">
           <h4>Wallet</h4>
@@ -69,6 +69,19 @@
         </div>
       </div>
     </section>
+
+    <section class="panel" id="shop">
+      <div class="panel-hd">
+        <div>
+          <div class="panel-title">JCoin Shop</div>
+          <div class="hint">Rate: ₦<span id="rateLabel">—</span>/J • 10% bonus from ₦1,000+</div>
+        </div>
+        <div class="pill" title="System rate"><i class="fas fa-scale-balanced"></i><span id="ratePill">—</span></div>
+      </div>
+      <div class="grid" id="shopGrid"></div>
+    </section>
+
+    <div class="toast" id="coinToast">Info</div>
   </main>
 
   <script type="module">
