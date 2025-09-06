@@ -5807,6 +5807,8 @@
             if (filterGlobalUsersButton) {
                 filterGlobalUsersButton.addEventListener('click', fetchAndFilterAllUsers);
             }
+            // Also start listening for pending verification requests (if available)
+            if (typeof fetchPendingVerificationRequests === 'function') fetchPendingVerificationRequests();
             if (globalUsersTableBody) {
                 globalUsersTableBody.addEventListener('click', (event) => {
                     const lookupBtn = event.target.closest('[data-action="lookup-user"]');
