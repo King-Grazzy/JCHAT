@@ -1727,7 +1727,7 @@
                                     </label>
                                     <button id="toggleWalletLockButton" class="admin-button">
                                         <span class="button-text">Toggle Wallet Lock</span>
-                                        
+
                                     </button>
                                     <p>Ban Status: <strong id="currentBanStatus">N/A</strong></p>
                                     <label class="toggle-switch">
@@ -1736,13 +1736,33 @@
                                     </label>
                                     <button id="toggleBanButton" class="admin-button secondary">
                                         <span class="button-text">Toggle Ban Status</span>
-                                        
+
                                     </button>
                                     <button id="deleteUserAccountButton" class="admin-button danger">
                                         <span class="button-text"><i class="fas fa-trash-alt"></i> Delete User Account</span>
-                                        
+
                                     </button>
                                 </div>
+
+                                <!-- Approve Paid Badge Tool -->
+                                <div class="management-card">
+                                    <h4>Approve Paid Badge</h4>
+                                    <p style="margin:0 0 8px 0; color:var(--text-light);">Quickly approve a verified badge for a paid user. Enter a User ID/Username or leave empty to use the currently looked-up user.</p>
+                                    <div class="input-group">
+                                        <label for="badgeApprovalUserInput">User ID or Username</label>
+                                        <input type="text" id="badgeApprovalUserInput" placeholder="Optional - leave empty to use looked-up user">
+                                    </div>
+
+                                    <div style="display:flex; gap:8px; margin-top:8px;">
+                                        <button id="badgeLookupBtn" class="admin-button secondary"><span class="button-text"><i class="fas fa-search"></i> Lookup</span></button>
+                                        <button id="badgeApproveBtn" class="admin-button primary"><span class="button-text"><i class="fas fa-check-circle"></i> Approve Badge</span></button>
+                                        <button id="badgeDenyBtn" class="admin-button danger"><span class="button-text"><i class="fas fa-times-circle"></i> Deny Badge</span></button>
+                                    </div>
+
+
+                                    <div id="badgeApprovalResult" style="margin-top:8px; color:var(--text-light);"></div>
+                                </div>
+
                             </div>
                              <!-- Admin Chat/Direct Message to User -->
                             <div class="management-card" style="width: 100%;">
@@ -1810,6 +1830,12 @@
                         <div id="pendingRequestsList">
                             <p class="no-requests-message" id="noPendingRequestsMessage">No pending JCoin requests.</p>
                             <!-- Pending requests will be dynamically loaded here -->
+                        </div>
+
+                        <!-- Pending Verification Requests -->
+                        <h3 style="margin-top:18px;">Pending Verification Requests</h3>
+                        <div id="pendingVerificationRequestsList">
+                            <p class="no-requests-message" id="noPendingVerificationMessage">No pending verification requests.</p>
                         </div>
 
                         <!-- Pending Activity Rewards Section -->
@@ -2028,7 +2054,7 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, runTransaction, writeBatch, serverTimestamp, onSnapshot, addDoc, deleteDoc, Timestamp, arrayUnion, arrayRemove, orderBy } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs, runTransaction, writeBatch, serverTimestamp, onSnapshot, addDoc, deleteDoc, Timestamp, arrayUnion, arrayRemove, orderBy, collectionGroup } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-firestore.js";
         import { getStorage, ref, getDownloadURL, deleteObject, uploadBytes } from "https://www.gstatic.com/firebasejs/11.8.0/firebase-storage.js";
 
         // --- Firebase & Canvas Environment Configuration ---
@@ -2105,6 +2131,14 @@
         const setLevelInput = document.getElementById('setLevelInput');
         const updateLevelButton = document.getElementById('updateLevelButton');
 
+        // Approve Badge Tool Elements
+        const badgeApprovalUserInput = document.getElementById('badgeApprovalUserInput');
+        const badgeLookupBtn = document.getElementById('badgeLookupBtn');
+        const badgeApproveBtn = document.getElementById('badgeApproveBtn');
+        const badgeDenyBtn = document.getElementById('badgeDenyBtn');
+        const badgeApprovalResult = document.getElementById('badgeApprovalResult');
+
+
         const currentJCoinsValue = document.getElementById('currentJCoinsValue');
         const jcoinAmountInput = document.getElementById('jcoinAmountInput');
         const creditJCoinsButton = document.getElementById('creditJCoinsButton');
@@ -2127,6 +2161,10 @@
 
         const pendingRequestsList = document.getElementById('pendingRequestsList');
         const noPendingRequestsMessage = document.getElementById('noPendingRequestsMessage');
+
+        // Pending verification requests UI
+        const pendingVerificationRequestsList = document.getElementById('pendingVerificationRequestsList');
+        const noPendingVerificationMessage = document.getElementById('noPendingVerificationMessage');
 
         // Activity Rewards Specific Elements
         const selectAllRewardsCheckbox = document.getElementById('selectAllRewards');
@@ -2192,9 +2230,13 @@
         let lookedUpUserProfileData = null;
         let currentSystemSettings = {};
 
+        // Internal helper: target id for badge approval flow
+        let badgeTargetUserId = null;
+
         let unsubscribeListeners = []; // To store all onSnapshot unsubscribe functions.
         let unsubscribeLookedUpUserListener = null;
         let unsubscribePendingRequestsListener = null;
+        let unsubscribePendingVerificationListener = null; // Listener for pending verification requests
         let unsubscribeSystemSettingsListener = null;
         let unsubscribeReportedContentListener = null; // New listener for reports
         let unsubscribePublicPostsListener = null; // New listener for public posts
@@ -2207,7 +2249,152 @@
 
         // --- Tone.js Synths for Notification Sounds ---
         const successSynth = new Tone.Synth().toDestination();
+
+        // Approve Badge: Lookup and Approve functions
+        async function lookupUserForBadge(inputValue) {
+            const val = (inputValue || badgeApprovalUserInput?.value || '').trim();
+            badgeApprovalResult.textContent = '';
+            try {
+                if (!val && lookedUpUserId) {
+                    badgeTargetUserId = lookedUpUserId;
+                } else if (!val) {
+                    badgeApprovalResult.textContent = 'Please enter a User ID or Username, or lookup a user first.';
+                    return null;
+                } else {
+                    // Try as UID first
+                    const privateRef = doc(db, 'artifacts', appId, 'users', val, 'profiles', 'user_profile');
+                    const snap = await getDoc(privateRef);
+                    if (snap.exists()) {
+                        badgeTargetUserId = val;
+                    } else {
+                        // Try username lookup in public users
+                        const publicUsersRef = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+                        const q = query(publicUsersRef, where('username', '==', val));
+                        const results = await getDocs(q);
+                        if (!results.empty) {
+                            badgeTargetUserId = results.docs[0].id;
+                        } else {
+                            // Try email lookup
+                            const q2 = query(publicUsersRef, where('email', '==', val));
+                            const r2 = await getDocs(q2);
+                            if (!r2.empty) badgeTargetUserId = r2.docs[0].id; else badgeTargetUserId = null;
+                        }
+                    }
+                }
+
+                if (!badgeTargetUserId) {
+                    badgeApprovalResult.textContent = 'User not found.';
+                    return null;
+                }
+
+                // Fetch private & public profile
+                const privateProfileRef = doc(db, 'artifacts', appId, 'users', badgeTargetUserId, 'profiles', 'user_profile');
+                const publicProfileRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', badgeTargetUserId);
+                const [privateSnap, publicSnap] = await Promise.all([getDoc(privateProfileRef), getDoc(publicProfileRef)]);
+                const privateData = privateSnap.exists() ? privateSnap.data() : null;
+                const publicData = publicSnap.exists() ? publicSnap.data() : null;
+
+                badgeApprovalResult.innerHTML = `<strong>Found:</strong> ${publicData?.username || privateData?.username || 'N/A'} (ID: ${badgeTargetUserId})<br>Verified: ${privateData?.isVerified || publicData?.verified ? 'Yes' : 'No'}<br>Premium: ${privateData?.premiumStatus?.plan || publicData?.premiumStatus?.plan || 'none'}`;
+                return badgeTargetUserId;
+            } catch (error) {
+                console.error('Error looking up user for badge:', error);
+                badgeApprovalResult.textContent = 'Lookup failed: ' + (error.message || error);
+                return null;
+            }
+        }
+
+        async function approveBadgeForUser(userId) {
+            badgeApprovalResult.textContent = '';
+            try {
+                if (!userId) {
+                    badgeApprovalResult.textContent = 'No target user selected.';
+                    return;
+                }
+
+                const privateProfileRef = doc(db, 'artifacts', appId, 'users', userId, 'profiles', 'user_profile');
+                const publicProfileRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userId);
+
+                // Optional: check premium status before granting badge
+                const privateSnap = await getDoc(privateProfileRef);
+                const privateData = privateSnap.exists() ? privateSnap.data() : {};
+                const isPaid = (privateData?.premiumStatus && privateData.premiumStatus.plan && privateData.premiumStatus.plan !== 'none') || (privateData?.jCoins && privateData.jCoins > 0);
+
+                if (!isPaid) {
+                    // warn but allow
+                    if (!confirm('This user does not appear to have an active premium plan. Proceed to approve badge anyway?')) return;
+                }
+
+                // Update both private and public profiles in a transaction
+                await runTransaction(db, async (tx) => {
+                    tx.set(privateProfileRef, { isVerified: true, verified: true, verifiedAt: serverTimestamp(), verificationApprovedBy: currentUser?.uid || null, verificationRequested: false }, { merge: true });
+                    tx.set(publicProfileRef, { verified: true, isVerified: true, verifiedAt: serverTimestamp() }, { merge: true });
+                });
+
+                // Add admin log
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'admin_logs'), {
+                    action: 'approve_badge',
+                    adminId: currentUser?.uid || 'unknown',
+                    adminUsername: currentUserProfileData?.username || null,
+                    userId: userId,
+                    timestamp: serverTimestamp()
+                });
+
+                // Send notification to user
+                await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'notifications'), {
+                    title: 'Account Verified',
+                    message: 'Your account has been verified and granted the Premium badge by an admin.',
+                    read: false,
+                    timestamp: serverTimestamp()
+                });
+
+                badgeApprovalResult.textContent = 'Badge approved successfully.';
+                if (typeof fetchPendingVerificationRequests === 'function') fetchPendingVerificationRequests();
+                // Refresh looked up user display if it matches
+                if (lookedUpUserId === userId) {
+                    // Trigger existing lookup refresh if available
+                    if (typeof fetchAndDisplayLookedUpUser === 'function') fetchAndDisplayLookedUpUser(userId);
+                }
+            } catch (error) {
+                console.error('Error approving badge:', error);
+                badgeApprovalResult.textContent = 'Approval failed: ' + (error.message || error);
+            }
+        }
+
+        // Wire up buttons
+        if (badgeLookupBtn) badgeLookupBtn.addEventListener('click', async () => { await lookupUserForBadge(); });
+        if (badgeApproveBtn) badgeApproveBtn.addEventListener('click', async () => { const target = badgeTargetUserId || lookedUpUserId; if (!target) { badgeApprovalResult.textContent = 'No user selected. Use lookup first.'; return; } await approveBadgeForUser(target); });
+        if (badgeDenyBtn) badgeDenyBtn.addEventListener('click', async () => { const target = badgeTargetUserId || lookedUpUserId; if (!target) { badgeApprovalResult.textContent = 'No user selected. Use lookup first.'; return; } await denyBadgeForUser(target); });
         const errorSynth = new Tone.Synth().toDestination();
+
+        // Deny badge flow
+        async function denyBadgeForUser(userId) {
+            badgeApprovalResult.textContent = '';
+            try {
+                if (!userId) { badgeApprovalResult.textContent = 'No target user selected.'; return; }
+                const privateProfileRef = doc(db, 'artifacts', appId, 'users', userId, 'profiles', 'user_profile');
+                const publicProfileRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', userId);
+
+                // Log denial
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'admin_logs'), {
+                    action: 'deny_badge', adminId: currentUser?.uid || 'unknown', adminUsername: currentUserProfileData?.username || null, userId, timestamp: serverTimestamp()
+                });
+
+                // Optionally clear any pending verification flags (do not set isVerified)
+                await updateDoc(privateProfileRef, { verificationRequested: false, verificationDeniedAt: serverTimestamp(), verificationDeniedBy: currentUser?.uid || null }).catch(()=>{});
+
+                // Send notification
+                await addDoc(collection(db, 'artifacts', appId, 'users', userId, 'notifications'), { title: 'Verification Denied', message: 'Your verification request was denied by an admin.', read: false, timestamp: serverTimestamp() });
+
+
+                badgeApprovalResult.textContent = 'Badge denied and user notified.';
+                if (lookedUpUserId === userId) { if (typeof fetchAndDisplayLookedUpUser === 'function') fetchAndDisplayLookedUpUser(userId); }
+                if (typeof fetchPendingVerificationRequests === 'function') fetchPendingVerificationRequests();
+            } catch (err) {
+                console.error('Error denying badge:', err);
+                badgeApprovalResult.textContent = 'Deny failed: ' + (err.message || err);
+            }
+        }
+
         const infoSynth = new Tone.Synth().toDestination();
 
         successSynth.oscillator.type = "sine";
@@ -3583,6 +3770,90 @@
                 // The user can re-lookup the user if needed
             } finally {
                 toggleButtonLoading(deleteUserAccountButton, false);
+            }
+        }
+
+        /**
+         * Fetches and displays pending verification requests in real-time.
+         */
+        async function fetchPendingVerificationRequests() {
+            try {
+                if (unsubscribePendingVerificationListener) {
+                    try { unsubscribePendingVerificationListener(); } catch (_) {}
+                }
+                const q = query(collectionGroup(db, 'user_profile'), where('verificationRequested', '==', true));
+                unsubscribePendingVerificationListener = onSnapshot(q, (querySnapshot) => {
+                    pendingVerificationRequestsList.innerHTML = '';
+                    if (querySnapshot.empty) {
+                        noPendingVerificationMessage.style.display = 'block';
+                        pendingVerificationRequestsList.appendChild(noPendingVerificationMessage);
+                        return;
+                    }
+                    noPendingVerificationMessage.style.display = 'none';
+                    querySnapshot.forEach((docSnap) => {
+                        const data = docSnap.data();
+                        const pathParts = docSnap.ref.path.split('/');
+                        const userIdIndex = pathParts.indexOf('users') + 1;
+                        const userId = pathParts[userIdIndex];
+                        const username = data.username || data.displayName || 'Unknown';
+                        const requestedAt = data.verificationRequestedAt ? (new Date(data.verificationRequestedAt.seconds * 1000)).toLocaleString() : (data.verificationRequestedAt || 'N/A');
+                        const receiptUrl = data.verificationReceiptUrl || null;
+
+                        const card = document.createElement('div');
+                        card.className = 'request-card';
+                        card.style.padding = '10px';
+                        card.style.border = '1px solid var(--border-light)';
+                        card.style.borderRadius = '8px';
+                        card.style.marginBottom = '8px';
+
+                        let receiptHtml = '<div style="font-size:.85rem;color:var(--text-light);">No receipt uploaded</div>';
+                        if (receiptUrl) {
+                            const imageUrl = getCloudinaryImageUrl(receiptUrl, 'w_300,h_200,c_fit');
+                            receiptHtml = `<img src="${imageUrl}" style="max-width:220px;max-height:140px;border-radius:8px;" alt="Receipt">`;
+                        }
+
+                        card.innerHTML = `
+                            <div style="display:flex;gap:12px;align-items:flex-start;">
+                                <div style="flex:1">
+                                    <strong>${username}</strong> <span style="opacity:.8">(ID: ${userId})</span>
+                                    <div style="font-size:.85rem;color:var(--text-light);">Requested: ${requestedAt}</div>
+                                    <div style="margin-top:8px;">${receiptHtml}</div>
+                                </div>
+                                <div style="display:flex;flex-direction:column;gap:8px;">
+                                    <button class="admin-button small approve-verification-btn" data-userid="${userId}"><i class="fas fa-check-circle"></i> Approve</button>
+                                    <button class="admin-button small deny-verification-btn" data-userid="${userId}"><i class="fas fa-times-circle"></i> Deny</button>
+                                    <button class="admin-button small upload-receipt-btn" data-userid="${userId}"><i class="fas fa-upload"></i> Upload Receipt</button>
+                                </div>
+                            </div>
+                        `;
+
+                        pendingVerificationRequestsList.appendChild(card);
+                    });
+
+                    // Attach handlers
+                    pendingVerificationRequestsList.querySelectorAll('.approve-verification-btn').forEach(btn => {
+                        btn.addEventListener('click', async () => { const uid = btn.dataset.userid; await approveBadgeForUser(uid); });
+                    });
+                    pendingVerificationRequestsList.querySelectorAll('.deny-verification-btn').forEach(btn => {
+                        btn.addEventListener('click', async () => { const uid = btn.dataset.userid; await denyBadgeForUser(uid); });
+                    });
+                    pendingVerificationRequestsList.querySelectorAll('.upload-receipt-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const uid = btn.dataset.userid;
+                            // Use global trigger to open hidden file input
+                            if (typeof window.triggerVerificationReceiptUpload === 'function') {
+                                window.triggerVerificationReceiptUpload(uid);
+                            } else {
+                                console.warn('Upload helper not available');
+                            }
+                        });
+                    });
+                });
+            } catch (error) {
+                console.error('Failed to fetch pending verification requests:', error);
+                noPendingVerificationMessage.style.display = 'block';
+                pendingVerificationRequestsList.innerHTML = '';
+                pendingVerificationRequestsList.appendChild(noPendingVerificationMessage);
             }
         }
 
@@ -5542,6 +5813,7 @@
                 approveSelectedBtn.addEventListener('click', handleApproveSelectedRewards);
             }
 
+
             // New: Reported Content Event Listeners
             if (reportedContentTableBody) {
                 reportedContentTableBody.addEventListener('click', (event) => {
@@ -5577,6 +5849,8 @@
             if (filterGlobalUsersButton) {
                 filterGlobalUsersButton.addEventListener('click', fetchAndFilterAllUsers);
             }
+            // Also start listening for pending verification requests (if available)
+            if (typeof fetchPendingVerificationRequests === 'function') fetchPendingVerificationRequests();
             if (globalUsersTableBody) {
                 globalUsersTableBody.addEventListener('click', (event) => {
                     const lookupBtn = event.target.closest('[data-action="lookup-user"]');
@@ -5604,6 +5878,9 @@
             }
             if (unsubscribePendingRequestsListener) {
                 unsubscribePendingRequestsListener();
+            }
+            if (unsubscribePendingVerificationListener) {
+                unsubscribePendingVerificationListener();
             }
             if (unsubscribeSystemSettingsListener) {
                 unsubscribeSystemSettingsListener();
@@ -5839,5 +6116,69 @@
 
     </script>
 	
+        <!-- Hidden file input and upload helper for verification receipts (created programmatically) -->
+        <script>
+        (function() {
+            // Create hidden input
+            const verificationReceiptUploadInput = document.createElement('input');
+            verificationReceiptUploadInput.type = 'file';
+            verificationReceiptUploadInput.accept = 'image/*';
+            verificationReceiptUploadInput.style.display = 'none';
+            document.body.appendChild(verificationReceiptUploadInput);
+
+            // Helper: upload to Cloudinary
+            async function uploadMediaToCloudinary(file) {
+                try {
+                    const fd = new FormData();
+                    fd.append('file', file);
+                    fd.append('upload_preset', cloudinaryConfig.uploadPreset);
+                    const type = (file?.type||'').startsWith('image/') ? 'image' : ((file?.type||'').includes('pdf') ? 'raw' : 'image');
+                    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/${type}/upload`, { method: 'POST', body: fd });
+                    if (!res.ok) {
+                        const e = await res.json();
+                        throw new Error(e?.error?.message || 'Upload failed');
+                    }
+                    const data = await res.json();
+                    return data.secure_url || data.public_id || null;
+                } catch (err) {
+                    console.error('Cloudinary upload failed', err);
+                    return null;
+                }
+            }
+
+            let currentReceiptUploadTargetUserId = null;
+
+            // Expose a function for other code to trigger upload for a specific user
+            window.triggerVerificationReceiptUpload = function(userId) {
+                currentReceiptUploadTargetUserId = userId;
+                verificationReceiptUploadInput.click();
+            };
+
+            verificationReceiptUploadInput.addEventListener('change', async (e) => {
+                const f = e.target.files?.[0];
+                if (!f) return;
+                if (!currentReceiptUploadTargetUserId) {
+                    console.warn('No target user for receipt upload');
+                    verificationReceiptUploadInput.value = '';
+                    return;
+                }
+                try {
+                    badgeApprovalResult.textContent = 'Uploading receipt...';
+                    const url = await uploadMediaToCloudinary(f);
+                    if (!url) { badgeApprovalResult.textContent = 'Upload failed.'; return; }
+                    const privateProfileRef = doc(db, 'artifacts', appId, 'users', currentReceiptUploadTargetUserId, 'profiles', 'user_profile');
+                    await updateDoc(privateProfileRef, { verificationReceiptUrl: url, verificationReceiptUploadedAt: serverTimestamp(), verificationReceiptUploadedBy: currentUser?.uid || null });
+                    badgeApprovalResult.textContent = 'Receipt uploaded.';
+                    if (typeof fetchPendingVerificationRequests === 'function') fetchPendingVerificationRequests();
+                } catch (err) {
+                    console.error('Receipt upload failed', err);
+                    badgeApprovalResult.textContent = 'Receipt upload failed.';
+                } finally {
+                    verificationReceiptUploadInput.value = '';
+                    currentReceiptUploadTargetUserId = null;
+                }
+            });
+        })();
+        </script>
 </body>
 </html>
