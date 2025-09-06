@@ -1431,8 +1431,8 @@
         }
         .verified-badge i { font-size: 14px; line-height: 1; }
 
-        .profile-pic-row { display: flex; align-items: flex-end; gap: 10px; }
-        .verified-chip { display: none; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--blue); color: #ffffff; border: 2px solid var(--border-light); box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+        .profile-pic-row { display: flex; align-items: center; gap: 6px; }
+        .verified-chip { display: none; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--blue); color: #ffffff; border: 2px solid var(--border-light); box-shadow: 0 2px 6px rgba(0,0,0,0.3); margin-left: -6px; }
         .verified-chip i { font-size: 16px; line-height: 1; }
 
         .profile-pic {
@@ -6926,7 +6926,7 @@
             if (!currentUser) return; // Only allow logout if a user is actually logged in
             try {
                 await signOut(auth);
-                showEnhancedSmartSuccess("Logged out successfully! ��", 'celebration');
+                showEnhancedSmartSuccess("Logged out successfully! 👋", 'celebration');
                 setTimeout(() => {
                     window.location.href = '/login.html'; // Redirect to login page
                 }, 1000);
