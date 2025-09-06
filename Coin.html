@@ -168,11 +168,9 @@
       if (ratePill) ratePill.textContent = SHOP_NAIRA_PER_J.toString();
     }
 
-    const JCOIN_BONUS_THRESHOLD_NAIRA = 1000;
-    const JCOIN_BONUS_PERCENTAGE = 0.10;
     function calculateJCoins(naira){
-      const base = Math.floor(naira / jcoinRate);
-      const bonus = naira >= JCOIN_BONUS_THRESHOLD_NAIRA ? Math.floor(base * JCOIN_BONUS_PERCENTAGE) : 0;
+      const base = Math.floor(naira / SHOP_NAIRA_PER_J);
+      const bonus = 0;
       return { base, bonus, total: base + bonus };
     }
 
