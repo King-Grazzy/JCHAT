@@ -3779,15 +3779,24 @@ header .user-profile-header{display:flex;align-items:center;gap:10px;flex:1 1 au
 @media (min-width: 1024px) {
   .content-wrapper { display: grid; grid-template-columns: 300px minmax(0,1fr) 320px; gap: 16px; align-items: start; }
   .content-wrapper > * { min-width: 0; }
+  /* Left rail */
   #engagementPanel { grid-column: 1; position: sticky; top: 84px; }
+  /* Center column */
   #postCreationSection, #trendingHashtags, #postsFeed { grid-column: 2; }
-  .posts-feed-section { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .posts-feed-section { display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 720px; margin: 0 auto; }
   .posts-feed-section .post-card { margin: 0; }
+  /* Right rail */
   .daily-inspiration-section, #peopleMayKnow, #globalAnnouncementsSection, #homeChipsRow, #premiumFeaturesSection, #highlightsSection, #savedWidgetSection { grid-column: 3; }
+  /* Make right rail act like a stacked sticky column */
+  .daily-inspiration-section, #peopleMayKnow, #globalAnnouncementsSection, #homeChipsRow, #premiumFeaturesSection, #highlightsSection, #savedWidgetSection { position: sticky; top: 84px; }
   #peopleMayKnow, .daily-inspiration-section, #globalAnnouncementsSection, #homeChipsRow, #premiumFeaturesSection, #highlightsSection, #savedWidgetSection { width: 100%; max-width: none !important; }
 }
 @media (min-width: 1440px) {
   .content-wrapper { grid-template-columns: 320px minmax(0, 1fr) 360px; }
+}
+/* Ultra‑wide: offer a comfortable 2‑up feed like Instagram Explore */
+@media (min-width: 1600px) {
+  .posts-feed-section { max-width: 1200px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 </style></head>
 <body class="theme-dark-mode">
