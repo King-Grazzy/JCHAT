@@ -2326,6 +2326,9 @@
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
+        .reaction-animate {
+            animation: pop-reaction 0.3s ease-out;
+        }
 
         /* Comments Section */
         .comments-section {
@@ -8272,9 +8275,9 @@ async function checkAndStartDailyBonusTimer() {
                 </div>` : ''}
                 <div class="post-reactions-summary">
                     <span>
-                        <i class="fas fa-thumbs-up" style="color:var(--blue);"></i> <span class="like-count">${post.reactions?.like || 0}</span>
-                        <i class="fas fa-heart" style="color:var(--pink);"></i> <span class="love-count">${post.reactions?.love || 0}</span>
-                        <i class="fas fa-face-laugh" style="color:#ffd700;"></i> <span class="haha-count">${post.reactions?.haha || 0}</span>
+                        <i class="fas fa-thumbs-up reaction-icon-like" style="color:var(--blue);"></i> <span class="like-count">${post.reactions?.like || 0}</span>
+                        <i class="fas fa-heart reaction-icon-love" style="color:var(--pink);"></i> <span class="love-count">${post.reactions?.love || 0}</span>
+                        <i class="fas fa-face-laugh reaction-icon-haha" style="color:#ffd700;"></i> <span class="haha-count">${post.reactions?.haha || 0}</span>
                     </span>
                     <span><span class="comments-count">${post.commentsCount || 0}</span> Comments</span>
                 </div>
@@ -8307,6 +8310,7 @@ async function checkAndStartDailyBonusTimer() {
             `;
             return postElement;
         }
+        function pulseReaction(el){ try{ if(!el) return; el.classList.remove('reaction-animate'); void el.offsetWidth; el.classList.add('reaction-animate'); setTimeout(()=>{ try{ el.classList.remove('reaction-animate'); }catch(_){} }, 350); }catch(_){} }
         /**
          * Renders a single comment HTML element.
          * @param {object} comment, commentId, postId
@@ -8479,9 +8483,12 @@ async function fetchAndDisplayPosts() {
                             const summaryLikeCountElement = postElement.querySelector('.post-reactions-summary .like-count');
                             const summaryLoveCountElement = postElement.querySelector('.post-reactions-summary .love-count');
                             const summaryHahaCountElement = postElement.querySelector('.post-reactions-summary .haha-count');
-                            if (summaryLikeCountElement) summaryLikeCountElement.textContent = post.reactions?.like || 0;
-                            if (summaryLoveCountElement) summaryLoveCountElement.textContent = post.reactions?.love || 0;
-                            if (summaryHahaCountElement) summaryHahaCountElement.textContent = post.reactions?.haha || 0;
+                            const likeNew = post.reactions?.like || 0; const likePrev = Number(summaryLikeCountElement?.textContent || '0');
+                            const loveNew = post.reactions?.love || 0; const lovePrev = Number(summaryLoveCountElement?.textContent || '0');
+                            const hahaNew = post.reactions?.haha || 0; const hahaPrev = Number(summaryHahaCountElement?.textContent || '0');
+                            if (summaryLikeCountElement) { if (likePrev !== likeNew) { summaryLikeCountElement.textContent = likeNew; pulseReaction(summaryLikeCountElement); const icon = postElement.querySelector('.reaction-icon-like'); pulseReaction(icon); } else { summaryLikeCountElement.textContent = likeNew; } }
+                            if (summaryLoveCountElement) { if (lovePrev !== loveNew) { summaryLoveCountElement.textContent = loveNew; pulseReaction(summaryLoveCountElement); const icon = postElement.querySelector('.reaction-icon-love'); pulseReaction(icon); } else { summaryLoveCountElement.textContent = loveNew; } }
+                            if (summaryHahaCountElement) { if (hahaPrev !== hahaNew) { summaryHahaCountElement.textContent = hahaNew; pulseReaction(summaryHahaCountElement); const icon = postElement.querySelector('.reaction-icon-haha'); pulseReaction(icon); } else { summaryHahaCountElement.textContent = hahaNew; } }
 
                             // Update comments count.
                             const commentsCountElement = postElement.querySelector('.post-reactions-summary .comments-count');
@@ -8623,6 +8630,14 @@ async function fetchAndDisplayPosts() {
                 if (!currentSystemSettings.enablePublicChat && currentUser.uid !== ADMIN_UID) { showMessageBox("Reactions are currently disabled by administrators.", 'warning'); return; }
                 const postId = button.dataset.postId;
                 const reactionType = button.dataset.reactionType;
+                pulseReaction(button);
+                const card = button.closest('.post-card');
+                if (card) {
+                    const countEl = card.querySelector(`.post-reactions-summary .${reactionType}-count`);
+                    const iconEl = card.querySelector(`.post-reactions-summary .reaction-icon-${reactionType}`);
+                    pulseReaction(countEl);
+                    pulseReaction(iconEl);
+                }
                 handleReaction(postId, reactionType);
             }
             // Handle Poll Vote
