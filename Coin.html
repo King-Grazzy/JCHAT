@@ -163,9 +163,9 @@
           if (typeof s.jcoinNairaRate === 'number' && s.jcoinNairaRate > 0) jcoinRate = s.jcoinNairaRate;
         }
       } catch {}
-      if (rateLabel) rateLabel.textContent = jcoinRate.toString();
+      if (rateLabel) rateLabel.textContent = SHOP_NAIRA_PER_J.toString();
       if (usdRateLabel) usdRateLabel.textContent = USD_PER_J.toFixed(7);
-      if (ratePill) ratePill.textContent = jcoinRate.toString();
+      if (ratePill) ratePill.textContent = SHOP_NAIRA_PER_J.toString();
     }
 
     const JCOIN_BONUS_THRESHOLD_NAIRA = 1000;
