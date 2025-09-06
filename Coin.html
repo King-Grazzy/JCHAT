@@ -81,7 +81,7 @@
       <div class="panel-hd">
         <div>
           <div class="panel-title">JCoin Shop</div>
-          <div class="hint">Rate: ₦<span id="rateLabel">—</span>/J • 10% bonus from ₦1,000+</div>
+          <div class="hint">Rate: ₦<span id="rateLabel">—</span>/J • $<span id="usdRateLabel">0.0000001</span>/J • 10% bonus from ₦1,000+</div>
         </div>
         <div class="pill" title="System rate"><i class="fas fa-scale-balanced"></i><span id="ratePill">—</span></div>
       </div>
@@ -116,12 +116,14 @@
     const hdrJc = document.getElementById('hdrJc');
     const hdrGas = document.getElementById('hdrGas');
     const rateLabel = document.getElementById('rateLabel');
+    const usdRateLabel = document.getElementById('usdRateLabel');
     const ratePill = document.getElementById('ratePill');
     const shopGrid = document.getElementById('shopGrid');
     const toast = document.getElementById('coinToast');
 
     let currentProfile = null;
     let jcoinRate = 7.5;
+    const USD_PER_J = 0.0000001;
 
     async function ensureAuth(){
       if (auth.currentUser) return;
@@ -161,6 +163,7 @@
         }
       } catch {}
       if (rateLabel) rateLabel.textContent = jcoinRate.toString();
+      if (usdRateLabel) usdRateLabel.textContent = USD_PER_J.toFixed(7);
       if (ratePill) ratePill.textContent = jcoinRate.toString();
     }
 
