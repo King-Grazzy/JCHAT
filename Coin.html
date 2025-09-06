@@ -91,23 +91,32 @@
         <div class="pill" title="System rate"><i class="fas fa-scale-balanced"></i><span id="ratePill">—</span></div>
       </div>
       <div class="grid" id="shopGrid"></div>
-      <div id="purchaseBox" class="card" style="display:none;margin:0 16px 16px;">
-        <h4 style="margin:0 0 6px;">Complete Purchase</h4>
-        <div class="hint" id="purchaseInfo">Buying —</div>
-        <div class="row" style="margin-top:8px;">
-          <label>Upload Payment Receipt</label>
-          <label class="file-input-wrapper" for="receiptInput" style="margin-top:4px;">
-            <i class="fas fa-upload"></i>
-            <span class="file-name" id="receiptName">No file chosen</span>
-          </label>
-          <input id="receiptInput" type="file" accept="image/*,application/pdf" style="display:none" />
-          <img id="receiptPreview" class="receipt-preview" alt="Receipt Preview" />
+    </section>
+
+    <!-- Purchase Modal -->
+    <div id="purchaseModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:80;align-items:center;justify-content:center;padding:16px;">
+      <div class="panel" style="max-width:520px;width:100%;">
+        <div class="panel-hd" style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="panel-title">Complete Purchase</div>
+          <button id="closePurchaseModal" class="btn" style="padding:6px 10px;"><i class="fas fa-times"></i><span>Close</span></button>
         </div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
-          <button class="btn primary" id="submitPurchase"><i class="fas fa-paper-plane"></i><span>Submit Receipt</span></button>
+        <div class="card" style="margin:12px;">
+          <div class="hint" id="purchaseInfo">Buying —</div>
+          <div class="row" style="margin-top:8px;">
+            <label>Upload Payment Receipt</label>
+            <label class="file-input-wrapper" for="receiptInput" style="margin-top:4px;">
+              <i class="fas fa-upload"></i>
+              <span class="file-name" id="receiptName">No file chosen</span>
+            </label>
+            <input id="receiptInput" type="file" accept="image/*,application/pdf" style="display:none" />
+            <img id="receiptPreview" class="receipt-preview" alt="Receipt Preview" />
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px;">
+            <button class="btn primary" id="submitPurchase"><i class="fas fa-paper-plane"></i><span>Submit Receipt</span></button>
+          </div>
         </div>
       </div>
-    </section>
+    </div>
 
     <div class="toast" id="coinToast">Info</div>
   </main>
@@ -142,7 +151,8 @@
     const shopGrid = document.getElementById('shopGrid');
     const toast = document.getElementById('coinToast');
     // Receipt UI
-    const purchaseBox = document.getElementById('purchaseBox');
+    const purchaseModal = document.getElementById('purchaseModal');
+    const closePurchaseModal = document.getElementById('closePurchaseModal');
     const purchaseInfo = document.getElementById('purchaseInfo');
     const receiptInput = document.getElementById('receiptInput');
     const receiptName = document.getElementById('receiptName');
@@ -243,7 +253,7 @@
       if (receiptInput) receiptInput.value = '';
       if (receiptName) receiptName.textContent = 'No file chosen';
       if (receiptPreview){ receiptPreview.style.display='none'; receiptPreview.src=''; }
-      if (purchaseBox) purchaseBox.style.display = 'block';
+      if (purchaseModal) purchaseModal.style.display = 'flex';
     }
 
     function onReceiptChange(){
@@ -269,7 +279,7 @@
           timestamp: serverTimestamp()
         });
         showToast('Receipt submitted. Awaiting approval.', 'success');
-        if (purchaseBox) purchaseBox.style.display = 'none';
+        if (purchaseModal) purchaseModal.style.display = 'none';
       }catch(e){ console.error(e); showToast('Failed to submit', 'error'); }
     }
 
@@ -281,6 +291,7 @@
     });
     receiptInput?.addEventListener('change', onReceiptChange);
     submitPurchase?.addEventListener('click', submitReceipt);
+    closePurchaseModal?.addEventListener('click', ()=>{ if (purchaseModal) purchaseModal.style.display='none'; });
 
     (async ()=>{ await ensureAuth(); await fetchSystemSettings(); renderShop(); })();
   </script>
