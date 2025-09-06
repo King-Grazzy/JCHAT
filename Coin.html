@@ -30,6 +30,13 @@
     .btn:hover{transform:translateY(-1px);border-color:var(--blue);box-shadow:0 6px 18px rgba(0,0,0,.25)}
     .btn.primary{background-image:var(--grad);color:#0b1220;border:0}
     .hint{color:var(--muted);font-size:12px}
+    .price{font-size:28px;font-weight:800;font-family:Poppins,Inter,sans-serif}
+    .coins{font-weight:700}
+    .toast{position:fixed;top:16px;right:16px;background:var(--panel);border:1px solid var(--border);padding:12px 14px;border-radius:10px;box-shadow:var(--shadow);transform:translateX(400px);transition:transform .3s ease;z-index:60}
+    .toast.show{transform:translateX(0)}
+    .toast.success{border-left:4px solid #10b981}
+    .toast.error{border-left:4px solid #ef4444}
+    .toast.info{border-left:4px solid var(--blue)}
   </style>
 </head>
 <body>
